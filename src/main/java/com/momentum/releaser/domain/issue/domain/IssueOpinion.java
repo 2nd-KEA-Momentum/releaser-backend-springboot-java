@@ -31,7 +31,7 @@ public class IssueOpinion extends BaseTime {
     @Column(name = "status")
     private char status;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "opinion_id")
     private ProjectMember projectMember;
 

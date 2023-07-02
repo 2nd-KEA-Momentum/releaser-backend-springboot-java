@@ -42,7 +42,7 @@ public class Release extends BaseTime {
     @Column(name = "status")
     private char status;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id")
     private Project project;
 
