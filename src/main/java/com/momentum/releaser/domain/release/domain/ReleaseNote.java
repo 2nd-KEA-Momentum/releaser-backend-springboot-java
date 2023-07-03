@@ -12,14 +12,15 @@ import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Where(clause = "status = 'Y'")
-@Table(name = "release")
+@Table(name = "release_note")
 @Entity
-public class Release extends BaseTime {
+public class ReleaseNote extends BaseTime {
 
     @Id
     @Column(name = "release_id")
@@ -41,6 +42,9 @@ public class Release extends BaseTime {
     @Column(name = "version")
     private String version;
 
+    @Column(name = "deploy_date")
+    private Date deployDate;
+
     @NotNull
     @Column(name = "status")
     private char status;
@@ -56,11 +60,12 @@ public class Release extends BaseTime {
     private List<Issue> issues = new ArrayList<>();
 
     @Builder
-    public Release(String title, String content, String summary, String version, char status, Project project) {
+    public ReleaseNote(String title, String content, String summary, String version, Date deployDate, char status, Project project) {
         this.title = title;
         this.content = content;
         this.summary = summary;
         this.version = version;
+        this.deployDate = deployDate;
         this.status = status;
         this.project = project;
     }

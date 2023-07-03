@@ -19,9 +19,9 @@ import javax.persistence.*;
 public class IssueOpinion extends BaseTime {
 
     @Id
-    @Column(name = "opinion_id")
+    @Column(name = "issue_opinion_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long opinionId;
+    private Long issueOpinionId;
 
     @NotNull
     @Column(name = "opinion")

@@ -3,7 +3,7 @@ package com.momentum.releaser.domain.issue.domain;
 
 import com.momentum.releaser.domain.project.domain.Project;
 import com.momentum.releaser.domain.project.domain.ProjectMember;
-import com.momentum.releaser.domain.release.domain.Release;
+import com.momentum.releaser.domain.release.domain.ReleaseNote;
 import com.momentum.releaser.domain.release.domain.ReleaseOpinion;
 import com.momentum.releaser.global.common.BaseTime;
 import com.sun.istack.NotNull;
@@ -47,6 +47,10 @@ public class Issue extends BaseTime {
     private Date endDate;
 
     @NotNull
+    @Column(name = "life_cycle")
+    private String lifeCycle;
+
+    @NotNull
     @Column(name = "status")
     private char status;
 
@@ -59,19 +63,20 @@ public class Issue extends BaseTime {
     private ProjectMember member;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "issue_id")
-    private Release release;
+    @JoinColumn(name = "release_id")
+    private ReleaseNote release;
 
     @OneToMany(mappedBy = "issue")
     private List<ReleaseOpinion> opinions = new ArrayList<>();
 
 
     @Builder
-    public Issue(String title, String content, String tag, Date endDate, char status, Project project, ProjectMember member, Release release) {
+    public Issue(String title, String content, String tag, Date endDate, String lifeCycle, char status, Project project, ProjectMember member, ReleaseNote release) {
         this.title = title;
         this.content = content;
         this.tag = tag;
         this.endDate = endDate;
+        this.lifeCycle = lifeCycle;
         this.status = status;
         this.project = project;
         this.member = member;

@@ -20,9 +20,9 @@ import javax.persistence.*;
 public class ReleaseOpinion extends BaseTime {
 
     @Id
-    @Column(name = "opinion_id")
+    @Column(name = "release_opinion_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long opinionId;
+    private Long releaseOpinionId;
 
     @NotNull
     @Column(name = "opinion")
@@ -34,7 +34,7 @@ public class ReleaseOpinion extends BaseTime {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "release_id")
-    private Release release;
+    private ReleaseNote release;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
@@ -45,7 +45,7 @@ public class ReleaseOpinion extends BaseTime {
     private Issue issue;
 
     @Builder
-    public ReleaseOpinion(String opinion, char status, Release release, ProjectMember member, Issue issue) {
+    public ReleaseOpinion(String opinion, char status, ReleaseNote release, ProjectMember member, Issue issue) {
         this.opinion = opinion;
         this.status = status;
         this.release = release;

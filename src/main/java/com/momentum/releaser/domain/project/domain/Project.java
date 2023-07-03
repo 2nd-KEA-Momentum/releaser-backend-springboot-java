@@ -2,7 +2,7 @@ package com.momentum.releaser.domain.project.domain;
 
 
 import com.momentum.releaser.domain.issue.domain.Issue;
-import com.momentum.releaser.domain.release.domain.Release;
+import com.momentum.releaser.domain.release.domain.ReleaseNote;
 import com.momentum.releaser.global.common.BaseTime;
 import com.sun.istack.NotNull;
 import lombok.AccessLevel;
@@ -46,7 +46,7 @@ public class Project extends BaseTime {
     private List<ProjectMember> members = new ArrayList<>();
 
     @OneToMany(mappedBy = "project")
-    private List<Release> releases = new ArrayList<>();
+    private List<ReleaseNote> releases = new ArrayList<>();
 
     @OneToMany(mappedBy = "project")
     private List<Issue> issues = new ArrayList<>();
