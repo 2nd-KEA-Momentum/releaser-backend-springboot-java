@@ -34,6 +34,9 @@ public class Release extends BaseTime {
     @Column(name = "content")
     private String content;
 
+    @Column(name = "summary")
+    private String summary;
+
     @NotNull
     @Column(name = "version")
     private String version;
@@ -53,9 +56,10 @@ public class Release extends BaseTime {
     private List<Issue> issues = new ArrayList<>();
 
     @Builder
-    public Release(String title, String content, String version, char status, Project project) {
+    public Release(String title, String content, String summary, String version, char status, Project project) {
         this.title = title;
         this.content = content;
+        this.summary = summary;
         this.version = version;
         this.status = status;
         this.project = project;
