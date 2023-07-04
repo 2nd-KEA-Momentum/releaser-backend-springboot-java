@@ -9,9 +9,12 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.ConstraintViolationException;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static com.momentum.releaser.global.config.BaseResponseStatus.INVALID_REQUEST_BODY;
 
@@ -49,7 +52,7 @@ public class GlobalControllerAdvice {
     }
 
     /**
-     * Validation 검증 에러
+     * Validation 검증 에러 (Request body)
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public BaseResponse<Map<String, String>> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
@@ -59,6 +62,25 @@ public class GlobalControllerAdvice {
 
         e.getBindingResult().getAllErrors()
                 .forEach(c -> errors.put(((FieldError) c).getField(), c.getDefaultMessage()));
+
+        return new BaseResponse<>(INVALID_REQUEST_BODY, errors);
+    }
+
+    /**
+     * Validation 검증 에러
+     */
+    @ExceptionHandler(ConstraintViolationException.class)
+    public BaseResponse<Map<String, String>> handleConstraintViolationException(ConstraintViolationException e) {
+        log.debug(e.getMessage());
+
+        Map<String, String> errors = new HashMap<>();
+
+        e.getConstraintViolations()
+                .parallelStream()
+                .forEach(violation -> {
+                    String fieldName = violation.getPropertyPath().toString().split("\\.")[1];
+                    errors.put(fieldName, violation.getMessage());
+                });
 
         return new BaseResponse<>(INVALID_REQUEST_BODY, errors);
     }
