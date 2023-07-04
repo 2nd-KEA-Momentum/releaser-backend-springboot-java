@@ -28,4 +28,27 @@ public class ReleaseDataDto {
             this.deployStatus = deployStatus;
         }
     }
+
+    /**
+     * 5.5 릴리즈 노트 조회
+     * 6.4 릴리즈 노트 의견 목록 조회
+     */
+    @Getter
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    public static class ReleaseOpinionsDataDto {
+        private Long opinionId;
+        private String opinion;
+        private Long memberId;
+        private String memberName;
+        private String memberProfileImg;
+
+        @Builder
+        public ReleaseOpinionsDataDto(Long opinionId, String opinion, Long memberId, String memberName, String memberProfileImg) {
+            this.opinionId = opinionId;
+            this.opinion = opinion;
+            this.memberId = memberId;
+            this.memberName = memberName;
+            this.memberProfileImg = memberProfileImg;
+        }
+    }
 }

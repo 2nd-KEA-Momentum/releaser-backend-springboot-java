@@ -82,4 +82,11 @@ public class Issue extends BaseTime {
         this.member = member;
         this.release = release;
     }
+
+    /**
+     * 특정 릴리즈 노트와 이슈를 연결할 때 사용한다.
+     */
+    public void updateReleaseNote(ReleaseNote releaseNote) {
+        this.release = releaseNote;
+    }
 }
