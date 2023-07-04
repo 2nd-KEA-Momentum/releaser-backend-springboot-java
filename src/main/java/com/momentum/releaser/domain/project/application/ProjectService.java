@@ -10,4 +10,9 @@ public interface ProjectService {
      * 3.1 프로젝트 생성
      */
     ProjectInfoRes createProject(Long userId, ProjectInfoReq registerReq);
+
+    /**
+     * 3.2 프로젝트 수정
+     */
+    ProjectInfoRes updateProject(Long projectId, ProjectInfoReq updateReq);
 }

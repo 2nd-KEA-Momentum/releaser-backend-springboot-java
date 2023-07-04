@@ -2,6 +2,8 @@ package com.momentum.releaser.domain.project.domain;
 
 
 import com.momentum.releaser.domain.issue.domain.Issue;
+import com.momentum.releaser.domain.project.dto.ProjectReqDto;
+import com.momentum.releaser.domain.project.dto.ProjectReqDto.ProjectInfoReq;
 import com.momentum.releaser.domain.release.domain.ReleaseNote;
 import com.momentum.releaser.global.common.BaseTime;
 import com.sun.istack.NotNull;
@@ -57,5 +59,11 @@ public class Project extends BaseTime {
         this.team = team;
         this.img = img;
         this.status = status;
+    }
+
+    public void updateProject(ProjectInfoReq updateReq) {
+        this.title = updateReq.getTitle();
+        this.team = updateReq.getTeam();
+        this.img = updateReq.getImg();
     }
 }

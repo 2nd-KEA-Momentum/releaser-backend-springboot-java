@@ -31,6 +31,8 @@ public class QReleaseNote extends EntityPathBase<ReleaseNote> {
 
     public final DateTimePath<java.util.Date> deployDate = createDateTime("deployDate", java.util.Date.class);
 
+    public final StringPath deployStatus = createString("deployStatus");
+
     public final ListPath<com.momentum.releaser.domain.issue.domain.Issue, com.momentum.releaser.domain.issue.domain.QIssue> issues = this.<com.momentum.releaser.domain.issue.domain.Issue, com.momentum.releaser.domain.issue.domain.QIssue>createList("issues", com.momentum.releaser.domain.issue.domain.Issue.class, com.momentum.releaser.domain.issue.domain.QIssue.class, PathInits.DIRECT2);
 
     //inherited

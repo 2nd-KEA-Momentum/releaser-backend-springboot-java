@@ -66,6 +66,30 @@ public class ProjectServiceImpl implements ProjectService {
         return projectMemberRepository.save(projectMember);
     }
 
+    @Override
+    @Transactional
+    public ProjectInfoRes updateProject(Long projectId, ProjectInfoReq updateReq) {
+        ModelMapper modelMapper = new ModelMapper();
+        //project 정보
+        Project project = projectRepository.findById(projectId).orElseThrow(() -> new CustomException(NOT_EXISTS_PROJECT));
 
+        //project update
+        project.updateProject(updateReq);
+        Project updateProject = projectRepository.save(project);
 
+        //projectMember 정보
+        ProjectMember projectMember = projectMemberRepository.findByProject(updateProject);
+
+        //user 정보
+        User user = userRepository.findById(projectMember.getUser().getUserId()).orElseThrow(() -> new CustomException(NOT_EXISTS_USER));
+
+        //프로젝트 Response 추가
+        ProjectInfoRes registerRes = modelMapper.map(updateProject, ProjectInfoRes.class);
+        registerRes.setProjectId(updateProject.getProjectId());
+        registerRes.setAdmin(user.getName());
+        registerRes.setMemberId(projectMember.getMemberId());
+        registerRes.setAdminImg(user.getImg());
+
+        return registerRes;
+    }
 }

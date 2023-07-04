@@ -7,4 +7,5 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 @RepositoryRestResource(collectionResourceRel="project-member", path="project-member")
 public interface ProjectMemberRepository extends JpaRepository<ProjectMember, Long> {
+    ProjectMember findByProject(Project updateProject);
 }

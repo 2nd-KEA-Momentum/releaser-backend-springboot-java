@@ -31,8 +31,8 @@ public class ProjectController {
     /**
      * 3.2 프로젝트 수정
      */
-//    @PatchMapping("/{projectId}")
-//    public BaseResponse<ProjectInfoRes> updateProject(@PathVariable Long projectId, @Valid @RequestBody ProjectInfoReq registerReq) {
-//
-//    }
+    @PatchMapping("/{projectId}")
+    public BaseResponse<ProjectInfoRes> updateProject(@PathVariable Long projectId, @Valid @RequestBody ProjectInfoReq updateReq) {
+        return new BaseResponse<>(projectService.updateProject(projectId, updateReq));
+    }
 }
