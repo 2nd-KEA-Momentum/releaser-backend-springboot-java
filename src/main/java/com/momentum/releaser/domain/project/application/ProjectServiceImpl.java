@@ -5,6 +5,9 @@ import com.momentum.releaser.domain.project.dao.ProjectRepository;
 import com.momentum.releaser.domain.project.domain.Project;
 import com.momentum.releaser.domain.project.domain.ProjectMember;
 import com.momentum.releaser.domain.project.dto.ProjectReqDto.ProjectInfoReq;
+import com.momentum.releaser.domain.project.dto.ProjectResDto;
+import com.momentum.releaser.domain.project.dto.ProjectResDto.GetProject;
+import com.momentum.releaser.domain.project.dto.ProjectResDto.GetProjectRes;
 import com.momentum.releaser.domain.project.dto.ProjectResDto.ProjectInfoRes;
 import com.momentum.releaser.domain.user.dao.UserRepository;
 import com.momentum.releaser.domain.user.domain.User;
@@ -14,6 +17,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.momentum.releaser.global.config.BaseResponseStatus.NOT_EXISTS_PROJECT;
 import static com.momentum.releaser.global.config.BaseResponseStatus.NOT_EXISTS_USER;
@@ -27,11 +33,11 @@ public class ProjectServiceImpl implements ProjectService {
     private final ProjectRepository projectRepository;
     private final ProjectMemberRepository projectMemberRepository;
     private final UserRepository userRepository;
+    private final ModelMapper modelMapper;
 
     @Override
     @Transactional
     public ProjectInfoRes createProject(Long userId, ProjectInfoReq registerReq) {
-        ModelMapper modelMapper = new ModelMapper();
         //user 정보
         User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(NOT_EXISTS_USER));
 
@@ -70,7 +76,6 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     @Transactional
     public ProjectInfoRes updateProject(Long projectId, ProjectInfoReq updateReq) {
-        ModelMapper modelMapper = new ModelMapper();
         //project 정보
         Project project = projectRepository.findById(projectId).orElseThrow(() -> new CustomException(NOT_EXISTS_PROJECT));
 
@@ -92,5 +97,37 @@ public class ProjectServiceImpl implements ProjectService {
         registerRes.setAdminImg(user.getImg());
 
         return registerRes;
+    }
+
+    @Override
+    @Transactional
+    public GetProjectRes getProjects(Long userId) {
+        //user 정보
+        User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(NOT_EXISTS_USER));
+
+        //project 정보
+        List<ProjectMember> projectMemberList = projectMemberRepository.findByUser(user);
+        List<GetProject> getCreateProjectList = new ArrayList<>();
+        List<GetProject> getEnterProjectList = new ArrayList<>();
+
+        for (ProjectMember projectMember : projectMemberList) {
+            //생성한 프로젝트 조회
+            if (projectMember.getPosition() == 'L') {
+                getCreateProjectList.add(modelMapper.map(projectMember.getProject(), GetProject.class));
+            }
+            //참가한 프로젝트 조회
+            else {
+                getEnterProjectList.add(modelMapper.map(projectMember.getProject(), GetProject.class));
+            }
+
+        }
+
+        GetProjectRes getProjectRes = GetProjectRes.builder()
+                .getCreateProjectList(getCreateProjectList)
+                .getEnterProjectList(getEnterProjectList)
+                .build();
+
+        return getProjectRes;
+
     }
 }

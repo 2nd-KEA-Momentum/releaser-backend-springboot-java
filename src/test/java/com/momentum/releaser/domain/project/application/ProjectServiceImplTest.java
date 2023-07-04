@@ -23,7 +23,7 @@ class ProjectServiceImplTest {
 
     @Test
     public void registerProject() {
-        Project project = new Project("project", "momentum", "", 'Y');
+        Project project = new Project("project", "momentum", "", "dsfsfsdfsdf", 'Y');
         projectRepository.save(project);
     }
 

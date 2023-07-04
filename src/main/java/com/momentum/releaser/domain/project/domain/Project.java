@@ -68,6 +68,7 @@ public class Project extends BaseTime {
 
     public void updateProject(ProjectInfoReq updateReq) {
         this.title = updateReq.getTitle();
+        this.content = updateReq.getContent();
         this.team = updateReq.getTeam();
         this.img = updateReq.getImg();
     }

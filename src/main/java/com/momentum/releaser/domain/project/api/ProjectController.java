@@ -9,7 +9,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 import static com.momentum.releaser.domain.project.dto.ProjectResDto.*;
 
@@ -28,7 +28,7 @@ public class ProjectController {
      */
     @PostMapping("/{userId}/project")
     public BaseResponse<ProjectInfoRes> createProject(
-            @PathVariable @NotBlank(message = "요청 데이터가 잘못되었습니다.") Long userId,
+            @PathVariable @NotNull(message = "요청 데이터가 잘못되었습니다.") Long userId,
             @Valid @RequestBody ProjectInfoReq registerReq) {
         return new BaseResponse<>(projectService.createProject(userId, registerReq));
     }
@@ -38,7 +38,7 @@ public class ProjectController {
      */
     @PatchMapping("/{projectId}")
     public BaseResponse<ProjectInfoRes> updateProject(
-            @PathVariable @NotBlank(message = "요청 데이터가 잘못되었습니다.") Long projectId,
+            @PathVariable @NotNull(message = "요청 데이터가 잘못되었습니다.") Long projectId,
             @Valid @RequestBody ProjectInfoReq updateReq) {
         return new BaseResponse<>(projectService.updateProject(projectId, updateReq));
     }
@@ -49,9 +49,13 @@ public class ProjectController {
 
 
     /**
-     * 3.4 프로젝트 조회
+     * 3.4 프로젝트 목록 조회
      */
-//    @GetMapping("")
-//    public BaseResponse<>
+    @GetMapping("/{userId}")
+    public BaseResponse<GetProjectRes> getProjects(@PathVariable @NotNull(message = "요청 데이터가 잘못되었습니다.") Long userId) {
+        return new BaseResponse<>(projectService.getProjects(userId));
+    }
+
+
 
 }

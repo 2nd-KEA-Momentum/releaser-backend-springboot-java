@@ -6,6 +6,10 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 public class ProjectReqDto {
+
+    /**
+     * 프로젝트 정보 - 생성, 수정
+     */
     @Data
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     public static class ProjectInfoReq {
