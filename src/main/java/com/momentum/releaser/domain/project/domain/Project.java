@@ -34,6 +34,10 @@ public class Project extends BaseTime {
     private String title;
 
     @NotNull
+    @Column(name = "content")
+    private String content;
+
+    @NotNull
     @Column(name = "team")
     private String team;
 
@@ -54,8 +58,9 @@ public class Project extends BaseTime {
     private List<Issue> issues = new ArrayList<>();
 
     @Builder
-    public Project(String title, String team, String img, char status) {
+    public Project(String title, String content, String team, String img, char status) {
         this.title = title;
+        this.content = content;
         this.team = team;
         this.img = img;
         this.status = status;

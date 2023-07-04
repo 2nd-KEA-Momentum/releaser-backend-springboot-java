@@ -14,6 +14,7 @@ public class ProjectResDto {
     public static class ProjectInfoRes {
         private Long projectId;
         private String title;
+        private String content;
         private String team;
         private String img;
         private Long memberId;
@@ -21,9 +22,10 @@ public class ProjectResDto {
         private String adminImg;
 
         @Builder
-        public ProjectInfoRes(Long projectId, String title, String team, String img, Long memberId, String admin, String adminImg) {
+        public ProjectInfoRes(Long projectId, String title, String content, String team, String img, Long memberId, String admin, String adminImg) {
             this.projectId = projectId;
             this.title = title;
+            this.content = content;
             this.team = team;
             this.img = img;
             this.memberId = memberId;

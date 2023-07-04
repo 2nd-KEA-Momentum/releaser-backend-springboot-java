@@ -38,6 +38,7 @@ public class ProjectServiceImpl implements ProjectService {
         //프로젝트 생성
         Project newProject = projectRepository.save(Project.builder()
                 .title(registerReq.getTitle())
+                .content(registerReq.getContent())
                 .team(registerReq.getTeam())
                 .img(registerReq.getImg())
                 .status('Y')
