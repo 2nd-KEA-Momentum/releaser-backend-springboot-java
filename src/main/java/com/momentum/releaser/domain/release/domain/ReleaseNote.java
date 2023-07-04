@@ -46,6 +46,10 @@ public class ReleaseNote extends BaseTime {
     private Date deployDate;
 
     @NotNull
+    @Column(name = "deploy_status")
+    private String deployStatus;
+
+    @NotNull
     @Column(name = "status")
     private char status;
 
@@ -60,12 +64,13 @@ public class ReleaseNote extends BaseTime {
     private List<Issue> issues = new ArrayList<>();
 
     @Builder
-    public ReleaseNote(String title, String content, String summary, String version, Date deployDate, char status, Project project) {
+    public ReleaseNote(String title, String content, String summary, String version, Date deployDate, String deployStatus, char status, Project project) {
         this.title = title;
         this.content = content;
         this.summary = summary;
         this.version = version;
         this.deployDate = deployDate;
+        this.deployStatus = deployStatus;
         this.status = status;
         this.project = project;
     }
