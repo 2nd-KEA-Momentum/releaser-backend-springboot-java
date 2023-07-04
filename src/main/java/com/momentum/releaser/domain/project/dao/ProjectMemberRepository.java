@@ -10,7 +10,8 @@ import java.util.List;
 
 @RepositoryRestResource(collectionResourceRel="project-member", path="project-member")
 public interface ProjectMemberRepository extends JpaRepository<ProjectMember, Long> {
-    ProjectMember findByProject(Project updateProject);
+    List<ProjectMember> findByProject(Project updateProject);
 
     List<ProjectMember> findByUser(User user);
+
 }

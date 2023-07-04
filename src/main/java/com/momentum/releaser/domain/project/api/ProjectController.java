@@ -46,6 +46,11 @@ public class ProjectController {
     /**
      * 3.3 프로젝트 삭제
      */
+    @PostMapping("/{projectId}")
+    public BaseResponse<String> deleteProject(
+            @PathVariable @NotNull(message = "요청 데이터가 잘못되었습니다.") Long projectId) {
+        return new BaseResponse<>(projectService.deleteProject(projectId));
+    }
 
 
     /**

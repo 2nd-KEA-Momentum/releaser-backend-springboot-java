@@ -2,7 +2,6 @@ package com.momentum.releaser.domain.project.domain;
 
 
 import com.momentum.releaser.domain.issue.domain.Issue;
-import com.momentum.releaser.domain.project.dto.ProjectReqDto;
 import com.momentum.releaser.domain.project.dto.ProjectReqDto.ProjectInfoReq;
 import com.momentum.releaser.domain.release.domain.ReleaseNote;
 import com.momentum.releaser.global.common.BaseTime;
@@ -11,6 +10,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
@@ -19,6 +19,7 @@ import java.util.List;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@SQLDelete(sql = "UPDATE project SET status = 'N' WHERE project_id=?")
 @Where(clause = "status = 'Y'")
 @Table(name = "project")
 @Entity
@@ -71,5 +72,12 @@ public class Project extends BaseTime {
         this.content = updateReq.getContent();
         this.team = updateReq.getTeam();
         this.img = updateReq.getImg();
+    }
+
+    @PreRemove
+    private void preRemoveMember() {
+        for (ProjectMember member : members) {
+            member.statusToInactive();
+        }
     }
 }

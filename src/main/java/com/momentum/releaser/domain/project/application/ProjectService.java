@@ -21,6 +21,7 @@ public interface ProjectService {
     /**
      * 3.3 프로젝트 삭제
      */
+    String deleteProject(Long projectId);
 
     /**
      * 3.4 프로젝트 조회

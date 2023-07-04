@@ -32,7 +32,8 @@ public enum BaseResponseStatus {
     SERVER_ERROR(false, 4001, "서버와의 연결에 실패하였습니다."),
 
     NOT_EXISTS_USER(false, 4100, "존재하지 않는 유저입니다."),
-    NOT_EXISTS_PROJECT(false, 4200, "존재하지 않는 프로젝트입니다.");
+    NOT_EXISTS_PROJECT(false, 4200, "존재하지 않는 프로젝트입니다."),
+    NOT_EXISTS_PROJECT_MEMBER(false, 4300, "존재하지 않는 멤버입니다.");
 
     private final boolean isSuccess;
     private final int code;

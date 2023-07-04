@@ -71,4 +71,26 @@ public class ProjectResDto {
         }
     }
 
+    /**
+     * 프로젝트 멤버 조회
+     */
+    @Data
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    public static class GetMembersRes {
+        private Long memberId;
+        private Long userId;
+        private String name;
+        private String img;
+        private char position;
+
+        @Builder
+        public GetMembersRes(Long memberId, Long userId, String name, String img, char position) {
+            this.memberId = memberId;
+            this.userId = userId;
+            this.name = name;
+            this.img = img;
+            this.position = position;
+        }
+    }
+
 }
