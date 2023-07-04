@@ -24,7 +24,7 @@ public class ProjectMember extends BaseTime {
     @Id
     @Column(name = "member_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long issueId;
+    private Long memberId;
 
     @NotNull
     @Column(name = "position")

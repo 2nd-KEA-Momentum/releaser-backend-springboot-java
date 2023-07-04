@@ -16,15 +16,23 @@ public enum BaseResponseStatus {
      * 2000 : Request 오류
      */
 
+    INVALID_REQUEST_BODY(false, 2000, "요청 데이터가 잘못되었습니다."),
+
+
     /**
      * 3000 : Response 오류
      */
+
+
 
     /**
      * 4000 : Database, Server 오류
      */
     DATABASE_ERROR(false, 4000, "데이터베이스 연결에 실패하였습니다."),
-    SERVER_ERROR(false, 4001, "서버와의 연결에 실패하였습니다.");
+    SERVER_ERROR(false, 4001, "서버와의 연결에 실패하였습니다."),
+
+    NOT_EXISTS_USER(false, 4100, "존재하지 않는 유저입니다."),
+    NOT_EXISTS_PROJECT(false, 4200, "존재하지 않는 프로젝트입니다.");
 
     private final boolean isSuccess;
     private final int code;

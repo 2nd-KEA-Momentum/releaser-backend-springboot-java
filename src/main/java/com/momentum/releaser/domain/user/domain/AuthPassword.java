@@ -31,9 +31,14 @@ public class AuthPassword extends BaseTime {
     @Column(name = "password")
     private String password;
 
+    @NotNull
+    @Column(name = "status")
+    private char status;
+
     @Builder
-    public AuthPassword(User user, String password) {
+    public AuthPassword(User user, String password, char status) {
         this.user = user;
         this.password = password;
+        this.status = status;
     }
 }
