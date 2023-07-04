@@ -32,6 +32,8 @@ public class QAuthSocial extends EntityPathBase<AuthSocial> {
     //inherited
     public final DateTimePath<java.time.LocalDateTime> modifiedDate = _super.modifiedDate;
 
+    public final ComparablePath<Character> status = createComparable("status", Character.class);
+
     public final StringPath token = createString("token");
 
     public final StringPath type = createString("type");

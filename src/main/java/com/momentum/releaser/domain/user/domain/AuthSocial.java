@@ -35,10 +35,15 @@ public class AuthSocial extends BaseTime {
     @Column(name = "token")
     private String token;
 
+    @NotNull
+    @Column(name = "status")
+    private char status;
+
     @Builder
-    public AuthSocial(User user, String type, String token) {
+    public AuthSocial(User user, String type, String token, char status) {
         this.user = user;
         this.type = type;
         this.token = token;
+        this.status = status;
     }
 }

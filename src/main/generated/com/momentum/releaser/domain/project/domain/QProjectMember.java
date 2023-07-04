@@ -27,7 +27,7 @@ public class QProjectMember extends EntityPathBase<ProjectMember> {
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdDate = _super.createdDate;
 
-    public final NumberPath<Long> issueId = createNumber("issueId", Long.class);
+    public final NumberPath<Long> memberId = createNumber("memberId", Long.class);
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> modifiedDate = _super.modifiedDate;

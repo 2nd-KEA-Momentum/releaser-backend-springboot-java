@@ -34,6 +34,8 @@ public class QAuthPassword extends EntityPathBase<AuthPassword> {
 
     public final NumberPath<Long> securityId = createNumber("securityId", Long.class);
 
+    public final ComparablePath<Character> status = createComparable("status", Character.class);
+
     public final QUser user;
 
     public QAuthPassword(String variable) {
