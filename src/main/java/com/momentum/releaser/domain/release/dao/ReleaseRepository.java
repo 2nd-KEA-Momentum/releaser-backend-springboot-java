@@ -8,7 +8,7 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import java.util.List;
 
 @RepositoryRestResource(collectionResourceRel="release-note", path="release-note")
-public interface ReleaseRepository extends JpaRepository<ReleaseNote, Long> {
+public interface ReleaseRepository extends JpaRepository<ReleaseNote, Long>, ReleaseRepositoryCustom {
 
     List<ReleaseNote> findAllByProject(Project project);
 

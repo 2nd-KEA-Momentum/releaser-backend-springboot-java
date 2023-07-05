@@ -26,8 +26,7 @@ public class ReleaseRequestDto {
         private Long memberId;
 
         @NotNull
-        @NotBlank
-        private String version;
+        private String versionType;
 
         @Size(max = 1000)
         private String content;
@@ -40,10 +39,10 @@ public class ReleaseRequestDto {
         List<Long> issues;
 
         @Builder
-        public ReleaseCreateRequestDto(String title, Long memberId, String version, String content, String summary, Date deployDate, List<Long> issues) {
+        public ReleaseCreateRequestDto(String title, Long memberId, String versionType, String content, String summary, Date deployDate, List<Long> issues) {
             this.title = title;
             this.memberId = memberId;
-            this.version = version;
+            this.versionType = versionType;
             this.content = content;
             this.summary = summary;
             this.deployDate = deployDate;

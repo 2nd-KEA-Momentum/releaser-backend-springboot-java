@@ -1,6 +1,6 @@
 package com.momentum.releaser.domain.release.dto;
 
-import com.momentum.releaser.domain.release.domain.ReleaseDeployStatus;
+import com.momentum.releaser.domain.release.domain.ReleaseEnum.ReleaseDeployStatus;
 import lombok.*;
 
 import java.util.Date;

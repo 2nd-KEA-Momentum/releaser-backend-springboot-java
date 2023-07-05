@@ -63,21 +63,56 @@ public class ReleaseServiceImpl implements ReleaseService {
     public ReleaseCreateResponseDto createReleaseNote(Long projectId, ReleaseCreateRequestDto releaseCreateRequestDto) {
         Project project = projectRepository.findById(projectId).orElseThrow(() -> new CustomException(NOT_EXISTS_PROJECT));
 
-        // 연결할 이슈들을 엔티티 형태로 받아온다. 만약 없다면 예외를 발생시킨다.
+        // 연결할 이슈들의 식별 번호를 가지고 엔티티 형태로 받아온다. 만약 없다면 예외를 발생시킨다.
         List<Issue> issues = releaseCreateRequestDto.getIssues().stream()
                 .map(i -> issueRepository.findById(i).orElseThrow(() -> new CustomException(NOT_EXISTS_ISSUE)))
                 .collect(Collectors.toList());
 
-        // 릴리즈 노트 생성 및 저장
+        // 버전
+        String newVersion = "";
+
+        // 데이터베이스로부터 가장 최근의 버전을 가져온다.
+        ReleaseNote latestReleaseNote = releaseRepository.findLatestReleaseNote(project);
+        String[] latestVersion = latestReleaseNote.getVersion().split(" ");
+        int latestMajorVersion = Integer.parseInt(latestVersion[0]);
+        int latestMinorVersion = Integer.parseInt(latestVersion[1]);
+        int latestPatchVersion = Integer.parseInt(latestVersion[2]);
+
+        // 버전 종류에 따른 버전을 생성한다.
+        String versionType = releaseCreateRequestDto.getVersionType();
+        switch (versionType.toUpperCase()) {
+
+            case "MAJOR":
+                int major = latestMajorVersion + 1;
+                newVersion = major + "." + latestMinorVersion + "." + latestPatchVersion;
+                break;
+
+            case "MINOR":
+                int minor = latestMinorVersion + 1;
+                newVersion = latestMajorVersion + "." + minor + "." + latestPatchVersion;
+                break;
+
+            case "PATCH":
+                int patch = latestPatchVersion + 1;
+                newVersion = latestMajorVersion + "." + latestMinorVersion + "." + patch;
+                break;
+
+            default:
+                // 클라이언트로부터 받은 버전 타입이 올바르지 않은 경우 예외를 발생시킨다.
+                throw new CustomException(INVALID_RELEASE_VERSION_TYPE);
+        }
+
+        // 새로운 릴리즈 노트 생성
         ReleaseNote newReleaseNote = ReleaseNote.builder()
                 .title(releaseCreateRequestDto.getTitle())
                 .content(releaseCreateRequestDto.getContent())
                 .summary(releaseCreateRequestDto.getSummary())
-                .version(releaseCreateRequestDto.getVersion())
+                .version(newVersion)
                 .deployDate(releaseCreateRequestDto.getDeployDate())
                 .project(project)
                 .build();
 
+        // 릴리즈 노트 엔티티 저장
         ReleaseNote savedReleaseNote = releaseRepository.save(newReleaseNote);
 
         if (!Objects.equals(newReleaseNote.getReleaseId(), savedReleaseNote.getReleaseId())) {
@@ -85,6 +120,7 @@ public class ReleaseServiceImpl implements ReleaseService {
             throw new CustomException(FAILED_TO_CREATE_RELEASE_NOTE);
         }
 
+        // 새롭게 생성된 릴리즈 노트에 이슈들을 연결시킨다.
         issues.forEach(i -> {
             i.updateReleaseNote(savedReleaseNote);
             Issue updatedIssue = issueRepository.save(i);

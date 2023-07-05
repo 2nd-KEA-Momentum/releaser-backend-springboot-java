@@ -17,12 +17,11 @@ public enum BaseResponseStatus {
      */
 
     INVALID_REQUEST_BODY(false, 2000, "요청 데이터가 잘못되었습니다."),
-
+    INVALID_RELEASE_VERSION_TYPE(false, 2400, "릴리즈 버전 타입이 올바르지 않습니다. MAJOR, MINOR, PATCH 중 하나여야 합니다."),
 
     /**
      * 3000 : Response 오류
      */
-
 
 
     /**
