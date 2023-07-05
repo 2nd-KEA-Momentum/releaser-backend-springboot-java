@@ -41,6 +41,7 @@ public class ReleaseServiceImpl implements ReleaseService {
         Project project = projectRepository.findById(projectId).orElseThrow(() -> new CustomException(NOT_EXISTS_PROJECT));
 
         List<ReleaseNote> releases = releaseRepository.findAllByProject(project);
+
         List<ReleasesDataDto> releasesDataDtos = releases.stream()
                 .map(ReleaseMapper.INSTANCE::toReleasesDataDto)
                 .collect(Collectors.toList());

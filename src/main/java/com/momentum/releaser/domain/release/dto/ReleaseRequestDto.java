@@ -1,6 +1,7 @@
 package com.momentum.releaser.domain.release.dto;
 
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -37,5 +38,16 @@ public class ReleaseRequestDto {
         private Date deployDate;
 
         List<Long> issues;
+
+        @Builder
+        public ReleaseCreateRequestDto(String title, Long memberId, String version, String content, String summary, Date deployDate, List<Long> issues) {
+            this.title = title;
+            this.memberId = memberId;
+            this.version = version;
+            this.content = content;
+            this.summary = summary;
+            this.deployDate = deployDate;
+            this.issues = issues;
+        }
     }
 }

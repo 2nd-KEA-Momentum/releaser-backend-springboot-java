@@ -1,5 +1,6 @@
 package com.momentum.releaser.domain.release.dto;
 
+import com.momentum.releaser.domain.release.domain.ReleaseDeployStatus;
 import lombok.*;
 
 import java.util.Date;
@@ -17,10 +18,10 @@ public class ReleaseDataDto {
         private String version;
         private String summary;
         private Date deployDate;
-        private String deployStatus;
+        private ReleaseDeployStatus deployStatus;
 
         @Builder
-        public ReleasesDataDto(Long releaseId, String version, String summary, Date deployDate, String deployStatus) {
+        public ReleasesDataDto(Long releaseId, String version, String summary, Date deployDate, ReleaseDeployStatus deployStatus) {
             this.releaseId = releaseId;
             this.version = version;
             this.summary = summary;
