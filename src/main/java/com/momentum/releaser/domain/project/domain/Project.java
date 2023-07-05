@@ -79,6 +79,15 @@ public class Project extends BaseTime {
         for (ProjectMember member : members) {
             member.statusToInactive();
         }
+        for (ReleaseNote releaseNote : releases) {
+            releaseNote.statusToInactive();
+            releaseNote.softDelete();
+
+        }
+        for (Issue issue : issues) {
+            issue.statusToInactive();
+            issue.softDelete();
+        }
     }
 
     /**

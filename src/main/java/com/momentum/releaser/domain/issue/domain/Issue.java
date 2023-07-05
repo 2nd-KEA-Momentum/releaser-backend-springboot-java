@@ -77,7 +77,7 @@ public class Issue extends BaseTime {
     private ReleaseNote release;
 
     @OneToMany(mappedBy = "issue")
-    private List<ReleaseOpinion> opinions = new ArrayList<>();
+    private List<IssueOpinion> opinions = new ArrayList<>();
 
 
     @Builder
@@ -112,6 +112,23 @@ public class Issue extends BaseTime {
         this.tag = updateReq.getTag();
         this.endDate = updateReq.getEndDate();
         this.member = member;
+    }
+
+    @PreRemove
+    private void preRemove() {
+        for (IssueOpinion opinion : opinions) {
+            opinion.statusToInactive();
+        }
+    }
+
+    public void statusToInactive() {
+        this.status = 'N';
+    }
+
+    public void softDelete() {
+        for (IssueOpinion opinion : opinions) {
+            opinion.statusToInactive();
+        }
     }
 
     /**

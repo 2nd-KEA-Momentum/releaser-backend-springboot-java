@@ -2,6 +2,7 @@ package com.momentum.releaser.domain.release.domain;
 
 import com.momentum.releaser.domain.issue.domain.Issue;
 import com.momentum.releaser.domain.project.domain.Project;
+import com.momentum.releaser.domain.project.domain.ProjectMember;
 import com.momentum.releaser.global.common.BaseTime;
 import com.sun.istack.NotNull;
 import lombok.*;
@@ -72,6 +73,26 @@ public class ReleaseNote extends BaseTime {
         this.version = version;
         this.deployDate = deployDate;
         this.project = project;
+    }
+
+    @PreRemove
+    private void preRemove() {
+        for (ReleaseOpinion opinion : opinions) {
+            opinion.statusToInactive();
+        }
+        for (Issue issue : issues) {
+            issue.statusToInactive();
+        }
+    }
+
+    public void softDelete() {
+        for (ReleaseOpinion opinion : opinions) {
+            opinion.statusToInactive();
+        }
+    }
+
+    public void statusToInactive() {
+        this.status = 'N';
     }
 
     /**
