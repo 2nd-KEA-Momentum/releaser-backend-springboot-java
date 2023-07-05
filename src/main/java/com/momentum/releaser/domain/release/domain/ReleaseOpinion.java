@@ -42,17 +42,15 @@ public class ReleaseOpinion extends BaseTime {
     @JoinColumn(name = "member_id")
     private ProjectMember member;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "issue_id")
-    private Issue issue;
-
     @Builder
-    public ReleaseOpinion(String opinion, char status, ReleaseNote release, ProjectMember member, Issue issue) {
+    public ReleaseOpinion(String opinion, char status, ReleaseNote release, ProjectMember member) {
         this.opinion = opinion;
         this.status = status;
         this.release = release;
         this.member = member;
-        this.issue = issue;
+    }
+    public void statusToInactive() {
+        this.status = 'N';
     }
 
     /**

@@ -34,14 +34,25 @@ public class IssueOpinion extends BaseTime {
     private char status;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "opinion_id")
+    @JoinColumn(name = "member_id")
     private ProjectMember projectMember;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "issue_id")
+    private Issue issue;
+
     @Builder
-    public IssueOpinion(String opinion, char status, ProjectMember projectMember) {
+    public IssueOpinion(Long issueOpinionId, String opinion, char status, ProjectMember projectMember, Issue issue) {
+        this.issueOpinionId = issueOpinionId;
         this.opinion = opinion;
         this.status = status;
         this.projectMember = projectMember;
+        this.issue = issue;
+    }
+
+
+    public void statusToInactive() {
+        this.status = 'N';
     }
 
     /**
