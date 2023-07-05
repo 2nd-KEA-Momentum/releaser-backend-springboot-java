@@ -7,6 +7,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
@@ -15,6 +16,7 @@ import java.util.List;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@SQLDelete(sql = "UPDATE user SET status = 'N' WHERE user_id=?")
 @Where(clause = "status = 'Y'")
 @Table(name = "user")
 @Entity
@@ -56,5 +58,13 @@ public class User extends BaseTime {
         this.email = email;
         this.img = img;
         this.status = status;
+    }
+
+    /**
+     * insert 되기전 (persist 되기전) 실행된다.
+     */
+    @PrePersist
+    public void prePersist() {
+        this.status = (this.status == '\0') ? 'Y' : this.status;
     }
 }
