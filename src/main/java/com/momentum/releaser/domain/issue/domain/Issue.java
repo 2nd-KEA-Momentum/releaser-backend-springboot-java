@@ -40,7 +40,8 @@ public class Issue extends BaseTime {
 
     @NotNull
     @Column(name = "tag")
-    private String tag;
+    @Enumerated(EnumType.STRING)
+    private Tag tag;
 
     @NotNull
     @Column(name = "end_date")
@@ -48,7 +49,8 @@ public class Issue extends BaseTime {
 
     @NotNull
     @Column(name = "life_cycle")
-    private String lifeCycle;
+    @Enumerated(EnumType.STRING)
+    private LifeCycle lifeCycle;
 
     @NotNull
     @Column(name = "status")
@@ -71,7 +73,8 @@ public class Issue extends BaseTime {
 
 
     @Builder
-    public Issue(String title, String content, String tag, Date endDate, String lifeCycle, char status, Project project, ProjectMember member, ReleaseNote release) {
+    public Issue(Long issueId, String title, String content, Tag tag, Date endDate, LifeCycle lifeCycle, char status, Project project, ProjectMember member, ReleaseNote release) {
+        this.issueId = issueId;
         this.title = title;
         this.content = content;
         this.tag = tag;
@@ -88,5 +91,13 @@ public class Issue extends BaseTime {
      */
     public void updateReleaseNote(ReleaseNote releaseNote) {
         this.release = releaseNote;
+    }
+
+    /**
+     * insert 되기전 (persist 되기전) 실행된다.
+     */
+    @PrePersist
+    public void prePersist() {
+        this.status = String.valueOf(this.status).equals(null) ? 'Y' : this.status;
     }
 }

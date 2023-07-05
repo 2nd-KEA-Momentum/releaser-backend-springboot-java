@@ -8,6 +8,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
@@ -16,6 +17,7 @@ import java.util.List;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@SQLDelete(sql = "UPDATE project_member SET status = 'N' WHERE member_id=?")
 @Where(clause = "status = 'Y'")
 @Table(name = "project_member")
 @Entity
@@ -51,5 +53,9 @@ public class ProjectMember extends BaseTime {
         this.status = status;
         this.user = user;
         this.project = project;
+    }
+
+    public void statusToInactive() {
+        this.status = 'N';
     }
 }
