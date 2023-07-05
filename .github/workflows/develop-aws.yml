@@ -5,7 +5,8 @@ name: Deploy to Amazon EC2
 on:
   # Triggers the workflow on push or pull request events but only for the "main" branch
   push:
-    branches: [ "develop" ]
+    branches:
+      - develop
 
 env:
   AWS_REGION: ap-northeast-2
@@ -13,13 +14,18 @@ env:
   CODE_DEPLOY_APPLICATION_NAME: releaser-codedeploy-app
   CODE_DEPLOY_DEPLOYMENT_GROUP_NAME: releaser-codedeploy-deployment-group
 
+permissions:
+  contents: read
+
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
-  build-with-gradle:
+  deploy:
     # The type of runner that the job will run on
+    name: Deploy
     runs-on: ubuntu-22.04
-
+    environment: develop
+    
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       - name: Checkout
