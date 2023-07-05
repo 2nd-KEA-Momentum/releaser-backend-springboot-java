@@ -2,7 +2,7 @@ package com.momentum.releaser.domain.release.api;
 
 import com.momentum.releaser.domain.release.application.ReleaseServiceImpl;
 import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.ReleaseCreateRequestDto;
-import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.ReleaseInfoResponseDto;
+import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.ReleaseCreateResponseDto;
 import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.ReleasesResponseDto;
 import com.momentum.releaser.global.config.BaseResponse;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +37,7 @@ public class ReleaseController {
      * 5.2 릴리즈 노트 생성
      */
     @PostMapping(value = "/projects/{projectId}")
-    public BaseResponse<ReleaseInfoResponseDto> createReleaseNote(
+    public BaseResponse<ReleaseCreateResponseDto> createReleaseNote(
             @PathVariable @Min(1) Long projectId,
             @RequestBody @Valid ReleaseCreateRequestDto releaseCreateRequestDto) {
 

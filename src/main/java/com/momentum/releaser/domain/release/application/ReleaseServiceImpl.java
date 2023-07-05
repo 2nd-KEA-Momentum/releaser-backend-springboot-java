@@ -5,17 +5,17 @@ import com.momentum.releaser.domain.issue.domain.Issue;
 import com.momentum.releaser.domain.project.dao.ProjectRepository;
 import com.momentum.releaser.domain.project.domain.Project;
 import com.momentum.releaser.domain.release.dao.ReleaseRepository;
-import com.momentum.releaser.domain.release.domain.ReleaseDeployStatus;
 import com.momentum.releaser.domain.release.domain.ReleaseNote;
 import com.momentum.releaser.domain.release.dto.ReleaseDataDto.ReleasesDataDto;
 import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.ReleaseCreateRequestDto;
-import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.ReleaseInfoResponseDto;
+import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.ReleaseCreateResponseDto;
 import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.ReleasesResponseDto;
 import com.momentum.releaser.domain.release.mapper.ReleaseMapper;
 import com.momentum.releaser.global.error.CustomException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
@@ -35,6 +35,7 @@ public class ReleaseServiceImpl implements ReleaseService {
     /**
      * 5.1 프로젝트별 릴리즈 노트 목록 조회
      */
+    @Transactional(readOnly = true)
     @Override
     public ReleasesResponseDto getReleasesByProject(Long projectId) {
         Project project = projectRepository.findById(projectId).orElseThrow(() -> new CustomException(NOT_EXISTS_PROJECT));
@@ -56,9 +57,15 @@ public class ReleaseServiceImpl implements ReleaseService {
     /**
      * 5.2 릴리즈 노트 생성하기
      */
+    @Transactional
     @Override
-    public ReleaseInfoResponseDto createReleaseNote(Long projectId, ReleaseCreateRequestDto releaseCreateRequestDto) {
+    public ReleaseCreateResponseDto createReleaseNote(Long projectId, ReleaseCreateRequestDto releaseCreateRequestDto) {
         Project project = projectRepository.findById(projectId).orElseThrow(() -> new CustomException(NOT_EXISTS_PROJECT));
+
+        // 연결할 이슈들을 엔티티 형태로 받아온다. 만약 없다면 예외를 발생시킨다.
+        List<Issue> issues = releaseCreateRequestDto.getIssues().stream()
+                .map(i -> issueRepository.findById(i).orElseThrow(() -> new CustomException(NOT_EXISTS_ISSUE)))
+                .collect(Collectors.toList());
 
         // 릴리즈 노트 생성 및 저장
         ReleaseNote newReleaseNote = ReleaseNote.builder()
@@ -67,8 +74,6 @@ public class ReleaseServiceImpl implements ReleaseService {
                 .summary(releaseCreateRequestDto.getSummary())
                 .version(releaseCreateRequestDto.getVersion())
                 .deployDate(releaseCreateRequestDto.getDeployDate())
-                .deployStatus(ReleaseDeployStatus.PLANNING.name())
-                .status('Y')
                 .project(project)
                 .build();
 
@@ -78,11 +83,6 @@ public class ReleaseServiceImpl implements ReleaseService {
             // 만약 데이터베이스에 제대로 저장이 되지 않은 경우 예외를 발생시킨다.
             throw new CustomException(FAILED_TO_CREATE_RELEASE_NOTE);
         }
-
-        // 릴리즈 노트를 생성한 후, 이슈 연결
-        List<Issue> issues = releaseCreateRequestDto.getIssues().stream()
-                .map(i -> issueRepository.findById(i).orElseThrow(() -> new CustomException(NOT_EXISTS_PROJECT)))
-                .collect(Collectors.toList());
 
         issues.forEach(i -> {
             i.updateReleaseNote(savedReleaseNote);
@@ -94,7 +94,6 @@ public class ReleaseServiceImpl implements ReleaseService {
             }
         });
 
-        // 릴리즈 노트를 생성한 후 생성된 내용을 보여줄 반환 데이터 클래스를 작성한다.
-        return ReleaseMapper.INSTANCE.toReleaseInfoResponseDto(savedReleaseNote);
+        return ReleaseMapper.INSTANCE.toReleaseCreateResponseDto(savedReleaseNote);
     }
 }
