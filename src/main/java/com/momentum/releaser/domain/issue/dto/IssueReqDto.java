@@ -36,18 +36,14 @@ public class IssueReqDto {
         private Tag tag;
 
         private Date endDate;
-        private LifeCycle lifeCycle;
-        private List<RegisterOpinionReq> opinions;
-
+        private Long memberId;
 
         @Builder
-        public IssueInfoReq(String title, String content, Tag tag, Date endDate, LifeCycle lifeCycle, List<RegisterOpinionReq> opinions) {
+        public IssueInfoReq(String title, String content, Tag tag, Date endDate) {
             this.title = title;
             this.content = content;
             this.tag = tag;
             this.endDate = endDate;
-            this.lifeCycle = lifeCycle;
-            this.opinions = opinions;
         }
     }
 

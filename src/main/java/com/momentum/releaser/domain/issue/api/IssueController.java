@@ -24,17 +24,22 @@ public class IssueController {
     /**
      * 7.1 이슈 생성
      */
-    @PostMapping("/{memberId}/project/{projectId}")
+    @PostMapping("/{projectId}")
     public BaseResponse<String> registerIssue(
-            @PathVariable @NotNull(message = "요청 데이터가 잘못되었습니다.") Long memberId,
             @PathVariable @NotNull(message = "요청 데이터가 잘못되었습니다.") Long projectId,
             @Valid @RequestBody IssueInfoReq registerReq) {
-        return new BaseResponse<>(issueService.registerIssue(memberId, projectId, registerReq));
+        return new BaseResponse<>(issueService.registerIssue(projectId, registerReq));
     }
 
     /**
      * 7.2 이슈 수정
      */
+    @PatchMapping("/{issueId}")
+    public BaseResponse<String> updateIssue(
+            @PathVariable @NotNull(message = "요청 데이터가 잘못되었습니다.") Long issueId,
+            @Valid @RequestBody IssueInfoReq updateReq) {
+        return new BaseResponse<>(issueService.updateIssue(issueId, updateReq));
+    }
 
     /**
      * 7.3 이슈 제거
