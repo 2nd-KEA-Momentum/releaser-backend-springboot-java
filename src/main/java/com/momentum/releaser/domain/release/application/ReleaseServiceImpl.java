@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.momentum.releaser.global.config.BaseResponseStatus.*;
@@ -71,35 +72,52 @@ public class ReleaseServiceImpl implements ReleaseService {
         // 버전
         String newVersion = "";
 
-        // 데이터베이스로부터 가장 최근의 버전을 가져온다.
-        ReleaseNote latestReleaseNote = releaseRepository.findLatestReleaseNote(project);
-        String[] latestVersion = latestReleaseNote.getVersion().split(" ");
-        int latestMajorVersion = Integer.parseInt(latestVersion[0]);
-        int latestMinorVersion = Integer.parseInt(latestVersion[1]);
-        int latestPatchVersion = Integer.parseInt(latestVersion[2]);
+        // 데이터베이스로부터 가장 최신의 버전을 가져온다.
+        Optional<ReleaseNote> optionalReleaseNote = releaseRepository.findByProject(project);
 
-        // 버전 종류에 따른 버전을 생성한다.
-        String versionType = releaseCreateRequestDto.getVersionType();
-        switch (versionType.toUpperCase()) {
+        if (optionalReleaseNote.isEmpty()) {
+            // 데이터베이스에서 가장 최신의 버전을 가져오지 못한 경우
 
-            case "MAJOR":
-                int major = latestMajorVersion + 1;
-                newVersion = major + "." + latestMinorVersion + "." + latestPatchVersion;
-                break;
+            int size = releaseRepository.findAllByProject(project).size();
 
-            case "MINOR":
-                int minor = latestMinorVersion + 1;
-                newVersion = latestMajorVersion + "." + minor + "." + latestPatchVersion;
-                break;
+            if (size != 0) {
+                throw new CustomException(FAILED_TO_GET_LATEST_RELEASE_VERSION);
+            } else {
+                // 처음 생성하는 릴리즈 노트인 경우
+                newVersion = "1.0.0";
+            }
+        } else {
+            // 데이터베이스에서 가장 최신의 버전을 가져온 경우
 
-            case "PATCH":
-                int patch = latestPatchVersion + 1;
-                newVersion = latestMajorVersion + "." + latestMinorVersion + "." + patch;
-                break;
+            String latestVersion = optionalReleaseNote.get().getVersion();
 
-            default:
-                // 클라이언트로부터 받은 버전 타입이 올바르지 않은 경우 예외를 발생시킨다.
-                throw new CustomException(INVALID_RELEASE_VERSION_TYPE);
+            int latestMajorVersion = latestVersion.charAt(0) - 48;
+            int latestMinorVersion = latestVersion.charAt(2) - 48;
+            int latestPatchVersion = latestVersion.charAt(4) - 48;
+
+            // 버전 종류에 따른 버전을 생성한다.
+            String versionType = releaseCreateRequestDto.getVersionType();
+            switch (versionType.toUpperCase()) {
+
+                case "MAJOR":
+                    int major = latestMajorVersion + 1;
+                    newVersion = major + "." + latestMinorVersion + "." + latestPatchVersion;
+                    break;
+
+                case "MINOR":
+                    int minor = latestMinorVersion + 1;
+                    newVersion = latestMajorVersion + "." + minor + "." + latestPatchVersion;
+                    break;
+
+                case "PATCH":
+                    int patch = latestPatchVersion + 1;
+                    newVersion = latestMajorVersion + "." + latestMinorVersion + "." + patch;
+                    break;
+
+                default:
+                    // 클라이언트로부터 받은 버전 타입이 올바르지 않은 경우 예외를 발생시킨다.
+                    throw new CustomException(INVALID_RELEASE_VERSION_TYPE);
+            }
         }
 
         // 새로운 릴리즈 노트 생성
@@ -114,11 +132,6 @@ public class ReleaseServiceImpl implements ReleaseService {
 
         // 릴리즈 노트 엔티티 저장
         ReleaseNote savedReleaseNote = releaseRepository.save(newReleaseNote);
-
-        if (!Objects.equals(newReleaseNote.getReleaseId(), savedReleaseNote.getReleaseId())) {
-            // 만약 데이터베이스에 제대로 저장이 되지 않은 경우 예외를 발생시킨다.
-            throw new CustomException(FAILED_TO_CREATE_RELEASE_NOTE);
-        }
 
         // 새롭게 생성된 릴리즈 노트에 이슈들을 연결시킨다.
         issues.forEach(i -> {

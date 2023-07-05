@@ -35,8 +35,9 @@ public enum BaseResponseStatus {
     NOT_EXISTS_PROJECT_MEMBER(false, 4300, "존재하지 않는 멤버입니다."),
     NOT_EXISTS_RELEASE_NOTE(false, 4400, "존재하지 않는 릴리즈 노트입니다."),
     FAILED_TO_CREATE_RELEASE_NOTE(false, 4401, "릴리즈 노트 생성에 실패하였습니다."),
+    FAILED_TO_GET_LATEST_RELEASE_VERSION(false, 4402, "릴리즈 노트 버전 불러오기에 실패하였습니다."),
     NOT_EXISTS_ISSUE(false, 4500, "존재하지 않는 이슈입니다."),
-    FAILED_TO_CONNECT_ISSUE_WITH_RELEASE_NOTE(false, 4505, "이슈 연결에 실패하였습니다.");
+    FAILED_TO_CONNECT_ISSUE_WITH_RELEASE_NOTE(false, 4501, "이슈 연결에 실패하였습니다.");
 
     private final boolean isSuccess;
     private final int code;
