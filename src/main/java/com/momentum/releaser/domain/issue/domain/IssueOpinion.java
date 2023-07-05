@@ -41,4 +41,12 @@ public class IssueOpinion extends BaseTime {
         this.status = status;
         this.projectMember = projectMember;
     }
+
+    /**
+     * insert 되기전 (persist 되기전) 실행된다.
+     */
+    @PrePersist
+    public void prePersist() {
+        this.status = (this.status == '\0') ? 'Y' : this.status;
+    }
 }

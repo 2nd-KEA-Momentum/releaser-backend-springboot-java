@@ -50,7 +50,11 @@ public class Issue extends BaseTime {
     @NotNull
     @Column(name = "life_cycle")
     @Enumerated(EnumType.STRING)
-    private LifeCycle lifeCycle;
+    private LifeCycle lifeCycle; //이슈 진행 상태
+
+    @NotNull
+    @Column(name = "resolve")
+    private char resolve; //해결, 미해결
 
     @NotNull
     @Column(name = "status")
@@ -73,18 +77,20 @@ public class Issue extends BaseTime {
 
 
     @Builder
-    public Issue(Long issueId, String title, String content, Tag tag, Date endDate, LifeCycle lifeCycle, char status, Project project, ProjectMember member, ReleaseNote release) {
+    public Issue(Long issueId, String title, String content, Tag tag, Date endDate, LifeCycle lifeCycle, char resolve, char status, Project project, ProjectMember member, ReleaseNote release) {
         this.issueId = issueId;
         this.title = title;
         this.content = content;
         this.tag = tag;
         this.endDate = endDate;
         this.lifeCycle = lifeCycle;
+        this.resolve = resolve;
         this.status = status;
         this.project = project;
         this.member = member;
         this.release = release;
     }
+
 
     /**
      * 특정 릴리즈 노트와 이슈를 연결할 때 사용한다.
@@ -98,6 +104,8 @@ public class Issue extends BaseTime {
      */
     @PrePersist
     public void prePersist() {
-        this.status = String.valueOf(this.status).equals(null) ? 'Y' : this.status;
+        this.lifeCycle = lifeCycle == null ? LifeCycle.Not_Started : this.lifeCycle;
+        this.resolve = (this.resolve == '\0') ? 'N' : this.resolve;
+        this.status = (this.status == '\0') ? 'Y' : this.status;
     }
 }
