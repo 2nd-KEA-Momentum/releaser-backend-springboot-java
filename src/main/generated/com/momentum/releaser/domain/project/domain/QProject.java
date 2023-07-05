@@ -22,6 +22,8 @@ public class QProject extends EntityPathBase<Project> {
 
     public final com.momentum.releaser.global.common.QBaseTime _super = new com.momentum.releaser.global.common.QBaseTime(this);
 
+    public final StringPath content = createString("content");
+
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdDate = _super.createdDate;
 
