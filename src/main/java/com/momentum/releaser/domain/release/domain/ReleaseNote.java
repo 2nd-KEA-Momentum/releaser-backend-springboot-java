@@ -43,8 +43,9 @@ public class ReleaseNote extends BaseTime {
     private Date deployDate;
 
     @NotNull
+    @Enumerated(EnumType.STRING)
     @Column(name = "deploy_status")
-    private String deployStatus;
+    private ReleaseDeployStatus deployStatus;
 
     @NotNull
     @Column(name = "status")
@@ -61,15 +62,21 @@ public class ReleaseNote extends BaseTime {
     private List<Issue> issues = new ArrayList<>();
 
     @Builder
-    public ReleaseNote(String title, String content, String summary, String version, Date deployDate, String deployStatus, char status, Project project) {
+    public ReleaseNote(String title, String content, String summary, String version, Date deployDate, Project project) {
         this.title = title;
         this.content = content;
         this.summary = summary;
         this.version = version;
         this.deployDate = deployDate;
-        this.deployStatus = deployStatus;
-        this.status = status;
         this.project = project;
     }
-}
 
+    /**
+     * Insert 되기 전에 (persist 되기 전에) 실행된다.
+     */
+    @PrePersist
+    public void init() {
+        this.deployStatus = String.valueOf(this.deployStatus).equals("") ? ReleaseDeployStatus.PLANNING : this.deployStatus;
+        this.status = String.valueOf(this.status).equals("") ? 'Y' : this.status;
+    }
+}
