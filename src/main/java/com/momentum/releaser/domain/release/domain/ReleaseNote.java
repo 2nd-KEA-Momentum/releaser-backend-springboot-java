@@ -5,6 +5,7 @@ import com.momentum.releaser.domain.project.domain.Project;
 import com.momentum.releaser.global.common.BaseTime;
 import com.sun.istack.NotNull;
 import lombok.*;
+import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
@@ -14,6 +15,7 @@ import java.util.List;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@SQLDelete(sql = "UPDATE release_note SET status = 'N' WHERE release_id=?")
 @Where(clause = "status = 'Y'")
 @Table(name = "release_note")
 @Entity
@@ -62,14 +64,13 @@ public class ReleaseNote extends BaseTime {
     private List<Issue> issues = new ArrayList<>();
 
     @Builder
-    public ReleaseNote(String title, String content, String summary, String version, Date deployDate, ReleaseDeployStatus deployStatus, char status, Project project) {
+    public ReleaseNote(Long releaseId, String title, String content, String summary, String version, Date deployDate, Project project) {
+        this.releaseId = releaseId;
         this.title = title;
         this.content = content;
         this.summary = summary;
         this.version = version;
         this.deployDate = deployDate;
-        this.deployStatus = deployStatus;
-        this.status = status;
         this.project = project;
     }
 
@@ -81,5 +82,5 @@ public class ReleaseNote extends BaseTime {
         this.deployStatus = (this.deployStatus.equals(null)) ? ReleaseDeployStatus.PLANNING : this.deployStatus;
         this.status = (this.status == '\0') ? 'Y' : this.status;
     }
-}
 
+}

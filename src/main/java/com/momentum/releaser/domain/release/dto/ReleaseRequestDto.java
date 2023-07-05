@@ -34,7 +34,6 @@ public class ReleaseRequestDto {
         @Size(max = 100)
         private String summary;
 
-        @FutureOrPresent
         private Date deployDate;
 
         List<Long> issues;
