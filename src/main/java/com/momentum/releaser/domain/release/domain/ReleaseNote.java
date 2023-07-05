@@ -4,10 +4,7 @@ import com.momentum.releaser.domain.issue.domain.Issue;
 import com.momentum.releaser.domain.project.domain.Project;
 import com.momentum.releaser.global.common.BaseTime;
 import com.sun.istack.NotNull;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
@@ -74,5 +71,5 @@ public class ReleaseNote extends BaseTime {
         this.status = status;
         this.project = project;
     }
-
 }
+

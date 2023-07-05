@@ -87,8 +87,15 @@ public class Issue extends BaseTime {
     }
 
     /**
+     * 특정 릴리즈 노트와 이슈를 연결할 때 사용한다.
+     */
+    public void updateReleaseNote(ReleaseNote releaseNote) {
+        this.release = releaseNote;
+    }
+
+    /**
      * insert 되기전 (persist 되기전) 실행된다.
-     * */
+     */
     @PrePersist
     public void prePersist() {
         this.status = String.valueOf(this.status).equals(null) ? 'Y' : this.status;
