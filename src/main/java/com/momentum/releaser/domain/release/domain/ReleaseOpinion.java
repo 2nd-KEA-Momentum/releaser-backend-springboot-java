@@ -52,4 +52,12 @@ public class ReleaseOpinion extends BaseTime {
         this.member = member;
         this.issue = issue;
     }
+
+    /**
+     * insert 되기전 (persist 되기전) 실행된다.
+     */
+    @PrePersist
+    public void prePersist() {
+        this.status = (this.status == '\0') ? 'Y' : this.status;
+    }
 }

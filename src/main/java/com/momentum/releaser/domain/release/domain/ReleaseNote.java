@@ -5,6 +5,7 @@ import com.momentum.releaser.domain.project.domain.Project;
 import com.momentum.releaser.global.common.BaseTime;
 import com.sun.istack.NotNull;
 import lombok.*;
+import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
@@ -14,6 +15,7 @@ import java.util.List;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@SQLDelete(sql = "UPDATE release_note SET status = 'N' WHERE release_id=?")
 @Where(clause = "status = 'Y'")
 @Table(name = "release_note")
 @Entity
@@ -43,8 +45,8 @@ public class ReleaseNote extends BaseTime {
     private Date deployDate;
 
     @NotNull
-    @Enumerated(EnumType.STRING)
     @Column(name = "deploy_status")
+    @Enumerated(EnumType.STRING)
     private ReleaseDeployStatus deployStatus;
 
     @NotNull
@@ -62,7 +64,8 @@ public class ReleaseNote extends BaseTime {
     private List<Issue> issues = new ArrayList<>();
 
     @Builder
-    public ReleaseNote(String title, String content, String summary, String version, Date deployDate, Project project) {
+    public ReleaseNote(Long releaseId, String title, String content, String summary, String version, Date deployDate, Project project) {
+        this.releaseId = releaseId;
         this.title = title;
         this.content = content;
         this.summary = summary;
@@ -72,11 +75,12 @@ public class ReleaseNote extends BaseTime {
     }
 
     /**
-     * Insert 되기 전에 (persist 되기 전에) 실행된다.
+     * insert 되기전 (persist 되기전) 실행된다.
      */
     @PrePersist
-    public void init() {
-        this.deployStatus = String.valueOf(this.deployStatus).equals("") ? ReleaseDeployStatus.PLANNING : this.deployStatus;
-        this.status = String.valueOf(this.status).equals("") ? 'Y' : this.status;
+    public void prePersist() {
+        this.deployStatus = (this.deployStatus.equals(null)) ? ReleaseDeployStatus.PLANNING : this.deployStatus;
+        this.status = (this.status == '\0') ? 'Y' : this.status;
     }
+
 }
