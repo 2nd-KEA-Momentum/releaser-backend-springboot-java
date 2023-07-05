@@ -1,6 +1,8 @@
 package com.momentum.releaser.domain.issue.domain;
 
 
+import com.momentum.releaser.domain.issue.dto.IssueReqDto;
+import com.momentum.releaser.domain.issue.dto.IssueReqDto.IssueInfoReq;
 import com.momentum.releaser.domain.project.domain.Project;
 import com.momentum.releaser.domain.project.domain.ProjectMember;
 import com.momentum.releaser.domain.release.domain.ReleaseNote;
@@ -75,7 +77,7 @@ public class Issue extends BaseTime {
     private ReleaseNote release;
 
     @OneToMany(mappedBy = "issue")
-    private List<ReleaseOpinion> opinions = new ArrayList<>();
+    private List<IssueOpinion> opinions = new ArrayList<>();
 
 
     @Builder
@@ -99,6 +101,34 @@ public class Issue extends BaseTime {
      */
     public void updateReleaseNote(ReleaseNote releaseNote) {
         this.release = releaseNote;
+    }
+
+    /**
+     * 이슈 수정
+     */
+    public void updateIssue(IssueInfoReq updateReq, ProjectMember member) {
+        this.title = updateReq.getTitle();
+        this.content = updateReq.getContent();
+        this.tag = updateReq.getTag();
+        this.endDate = updateReq.getEndDate();
+        this.member = member;
+    }
+
+    @PreRemove
+    private void preRemove() {
+        for (IssueOpinion opinion : opinions) {
+            opinion.statusToInactive();
+        }
+    }
+
+    public void statusToInactive() {
+        this.status = 'N';
+    }
+
+    public void softDelete() {
+        for (IssueOpinion opinion : opinions) {
+            opinion.statusToInactive();
+        }
     }
 
     /**

@@ -5,21 +5,27 @@ name: Deploy to Amazon EC2
 on:
   # Triggers the workflow on push or pull request events but only for the "main" branch
   push:
-    branches: [ "develop" ]
+    branches:
+      - develop
 
 env:
   AWS_REGION: ap-northeast-2
   S3_BUCKET_NAME: releaserbucket
   CODE_DEPLOY_APPLICATION_NAME: releaser-codedeploy-app
-  CODE_DEPLOY_DEPLOYMENT_GROUP_NAME: releaser-codedeploy-deployment-group
+  CODE_DEPLOY_DEPLOYMENT_GROUP_NAME: releaser-codedeploy-app-group
+
+permissions:
+  contents: read
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
-  build-with-gradle:
+  deploy:
     # The type of runner that the job will run on
+    name: Deploy
     runs-on: ubuntu-22.04
-
+    environment: develop
+    
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       - name: Checkout
@@ -44,16 +50,16 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-region: ${{ env.AWS_REGION }}
-          aws-access-key-id: ${{ secrets.CICD_RELEASER_ACCESS_KEY }}
-          aws-secret-access-key: ${{ secrets.CICD_RELEASER_SECRET_KEY }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           
       #빌드 결과물을 S3에 업로드
       - name: Upload to AWS S3
         run: |
           aws deploy push \
-            --application-name ${{ env.AWS_CODE_DEPLOY_APPLICATION_NAME }} \
+            --application-name ${{ env.CODE_DEPLOY_APPLICATION_NAME }} \
             --ignore-hidden-files \
-            --s3-location s3://$AWS_S3_BUCKET_NAME/$GITHUB_SHA.zip \
+            --s3-location s3://$S3_BUCKET_NAME/$GITHUB_SHA.zip \
             --source .
       #S3에 있는 파일을 대상으로 CodeDeploy 실행
       - name: Deploy to AWS EC2 from S3

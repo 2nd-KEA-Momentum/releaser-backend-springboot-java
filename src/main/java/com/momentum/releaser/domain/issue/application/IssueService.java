@@ -7,11 +7,12 @@ public interface IssueService {
     /**
      * 7.1 이슈 생성
      */
-    String registerIssue(Long memberId, Long projectId, IssueInfoReq issueInfoReq);
+    String registerIssue(Long projectId, IssueInfoReq issueInfoReq);
 
     /**
      * 7.2 이슈 수정
      */
+    String updateIssue(Long issueId, IssueInfoReq updateReq);
 
     /**
      * 7.3 이슈 제거

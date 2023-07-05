@@ -75,6 +75,26 @@ public class ReleaseNote extends BaseTime {
         this.project = project;
     }
 
+    @PreRemove
+    private void preRemove() {
+        for (ReleaseOpinion opinion : opinions) {
+            opinion.statusToInactive();
+        }
+        for (Issue issue : issues) {
+            issue.statusToInactive();
+        }
+    }
+
+    public void softDelete() {
+        for (ReleaseOpinion opinion : opinions) {
+            opinion.statusToInactive();
+        }
+    }
+
+    public void statusToInactive() {
+        this.status = 'N';
+    }
+
     /**
      * insert 되기전 (persist 되기전) 실행된다.
      */
