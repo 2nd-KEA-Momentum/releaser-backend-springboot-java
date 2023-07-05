@@ -1,7 +1,6 @@
 package com.momentum.releaser.domain.project.application;
 
 import com.momentum.releaser.domain.project.dto.ProjectReqDto.ProjectInfoReq;
-import com.momentum.releaser.domain.project.dto.ProjectResDto;
 import com.momentum.releaser.domain.project.dto.ProjectResDto.GetProjectRes;
 import com.momentum.releaser.domain.project.dto.ProjectResDto.ProjectInfoRes;
 
