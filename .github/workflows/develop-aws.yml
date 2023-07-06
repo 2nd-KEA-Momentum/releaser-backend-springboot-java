@@ -56,9 +56,9 @@ jobs:
         
       - name: Access Secrets
         run: |
-          echo "DEV_DB_URL=${{ secrets.DEV_DB_URL }}" > application.yml
-          echo "DEV_DB_USERNAME=${{ secrets.DEV_DB_USERNAME }}" >> application.yml
-          echo "DEV_DB_PASSWORD=${{ secrets.DEV_DB_PASSWORD }}" >> application.yml
+          echo "DEV_DB_URL=${{ secrets.DEV_DB_URL }}" >> ./src/main/resources/application.yml
+          echo "DEV_DB_USERNAME=${{ secrets.DEV_DB_USERNAME }}" >> ./src/main/resources/application.yml
+          echo "DEV_DB_PASSWORD=${{ secrets.DEV_DB_PASSWORD }}" >> ./src/main/resources/application.yml
       
      #AWS 인증
       - name: AWS credentials
