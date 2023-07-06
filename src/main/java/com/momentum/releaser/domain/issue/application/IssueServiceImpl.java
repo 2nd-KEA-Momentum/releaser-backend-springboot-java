@@ -41,15 +41,15 @@ public class IssueServiceImpl implements IssueService {
      */
     @Override
     @Transactional
-    public String registerIssue(Long projectId, IssueInfoReq issueInfoReq) {
+    public String registerIssue(Long projectId, IssueInfoReq createReq) {
         ProjectMember projectMember = null;
         // memberId not null
-        if (issueInfoReq.getMemberId() != null) {
-            projectMember = findProjectMember(issueInfoReq.getMemberId());
+        if (createReq.getMemberId() != null) {
+            projectMember = findProjectMember(createReq.getMemberId());
         }
         Project project = findProject(projectId);
-        Tag tagIssue = checkTagEnum(issueInfoReq.getTag());
-        Issue newIssue = saveIssue(issueInfoReq, project, projectMember, tagIssue);
+        Tag tagIssue = checkTagEnum(createReq.getTag());
+        Issue newIssue = saveIssue(createReq, project, projectMember, tagIssue);
         String result = "이슈 생성이 완료되었습니다.";
         return result;
     }
@@ -96,18 +96,43 @@ public class IssueServiceImpl implements IssueService {
      */
     @Override
     @Transactional
-    public String updateIssue(Long issueId, IssueInfoReq updateReq) {
-        //issue 정보
-        Issue issue = issueRepository.findById(issueId).orElseThrow(() -> new CustomException(NOT_EXISTS_ISSUE));
+    public String updateIssue(Long issueId, Long memberId, IssueInfoReq updateReq) {
+        // 이슈 정보 조회
+        Issue issue = findIssue(issueId);
 
-        //member 정보
-        ProjectMember member = projectMemberRepository.findById(updateReq.getMemberId()).orElseThrow(() -> new CustomException(NOT_EXISTS_PROJECT_MEMBER));
+        //edit check
+        char edit = editCheck(memberId);
 
-        //issue update
-        issue.updateIssue(updateReq, member);
+        ProjectMember projectMember = null;
+        // 담당자 memberId가 null이 아닌 경우 프로젝트 멤버 조회
+        if (updateReq.getMemberId() != null) {
+            projectMember = findProjectMember(updateReq.getMemberId());
+        }
+
+        // 태그 확인
+        Tag tagIssue = checkTagEnum(updateReq.getTag());
+
+        // 이슈 업데이트
+        issue.updateIssue(updateReq, edit, projectMember, tagIssue);
+        issueRepository.save(issue);
+
         String result = "이슈 수정이 완료되었습니다.";
         return result;
     }
+
+    // issueId로 issue 조회
+    private Issue findIssue(Long issueId) {
+        return issueRepository.findById(issueId)
+                .orElseThrow(() -> new CustomException(NOT_EXISTS_ISSUE));
+    }
+
+    // 멤버의 역할에 따라 edit 상태를 결정
+    private char editCheck(Long memberId) {
+        ProjectMember projectMember = findProjectMember(memberId);
+        return (projectMember.getPosition() == 'M') ? 'Y' : 'N';
+    }
+
+
     /**
      * 7.3 이슈 제거
      */

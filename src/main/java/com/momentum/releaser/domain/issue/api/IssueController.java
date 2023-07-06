@@ -35,11 +35,12 @@ public class IssueController {
     /**
      * 7.2 이슈 수정
      */
-    @PatchMapping("/{issueId}")
+    @PatchMapping("/{issueId}/member/{memberId}")
     public BaseResponse<String> updateIssue(
             @PathVariable @Min(1) Long issueId,
+            @PathVariable @Min(1) Long memberId,
             @Valid @RequestBody IssueInfoReq updateReq) {
-        return new BaseResponse<>(issueService.updateIssue(issueId, updateReq));
+        return new BaseResponse<>(issueService.updateIssue(issueId, memberId, updateReq));
     }
 
     /**
