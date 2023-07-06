@@ -72,7 +72,7 @@ public class ReleaseServiceImpl implements ReleaseService {
                 .collect(Collectors.toList());
 
         // 클라이언트로부터 전달받은 릴리즈 버전 타입을 바탕으로 올바른 릴리즈 버전을 생성한다.
-        //
+
         String newVersion = "";
 
         // 데이터베이스로부터 가장 최신의 버전을 가져온다.
@@ -191,7 +191,6 @@ public class ReleaseServiceImpl implements ReleaseService {
         // 새로 업데이트된 이슈들로 다시 연결한다.
         updatedIssues.forEach(i -> {
             // 각각의 이슈들에 이미 연결된 릴리즈 노트가 없는지, 각 이슈들은 완료된 상태인지를 한 번 더 확인한다.
-
             if (i.getLifeCycle() == LifeCycle.Completed || i.getRelease() != null) {
                 throw new CustomException(INVALID_ISSUE_WITH_COMPLETED);
             }
@@ -200,7 +199,7 @@ public class ReleaseServiceImpl implements ReleaseService {
                 throw new CustomException(INVALID_ISSUE_WITH_NOT_DONE);
             }
 
-            // 문제가 없는 경우 연결한다.
+            // 문제가 없는 경우 연결한다..
             i.updateReleaseNote(savedReleaseNote);
             issueRepository.save(i);
         });
