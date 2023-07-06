@@ -33,13 +33,13 @@ public class IssueReqDto {
         private String content;
 
         @NotNull(message = "태그를 선택해주세요.")
-        private Tag tag;
+        private String tag;
 
         private Date endDate;
         private Long memberId;
 
         @Builder
-        public IssueInfoReq(String title, String content, Tag tag, Date endDate) {
+        public IssueInfoReq(String title, String content, String tag, Date endDate) {
             this.title = title;
             this.content = content;
             this.tag = tag;
