@@ -28,7 +28,6 @@ import static com.momentum.releaser.global.config.BaseResponseStatus.*;
 
 @Slf4j
 @Service
-//final 있는 필드만 생성자 만들어줌
 @RequiredArgsConstructor
 public class IssueServiceImpl implements IssueService {
 
@@ -43,7 +42,11 @@ public class IssueServiceImpl implements IssueService {
     @Override
     @Transactional
     public String registerIssue(Long projectId, IssueInfoReq issueInfoReq) {
-        ProjectMember projectMember = findProjectMember(issueInfoReq.getMemberId());
+        ProjectMember projectMember = null;
+        // memberId not null
+        if (issueInfoReq.getMemberId() != null) {
+            projectMember = findProjectMember(issueInfoReq.getMemberId());
+        }
         Project project = findProject(projectId);
         Tag tagIssue = checkTagEnum(issueInfoReq.getTag());
         Issue newIssue = saveIssue(issueInfoReq, project, projectMember, tagIssue);
@@ -51,20 +54,19 @@ public class IssueServiceImpl implements IssueService {
         return result;
     }
 
-    //memberId로 프로젝트 멤버 찾기
+    // memberId로 프로젝트 멤버 찾기
     private ProjectMember findProjectMember(Long memberId) {
         return projectMemberRepository.findById(memberId)
                 .orElseThrow(() -> new CustomException(BaseResponseStatus.NOT_EXISTS_PROJECT_MEMBER));
     }
 
-
-    //projectId로 프로젝트 찾기
+    // projectId로 프로젝트 찾기
     private Project findProject(Long projectId) {
         return projectRepository.findById(projectId)
                 .orElseThrow(() -> new CustomException(BaseResponseStatus.NOT_EXISTS_PROJECT));
     }
 
-    //Tag enum check
+    // Tag enum check
     private Tag checkTagEnum(String tagValue) {
         EnumSet<Tag> tagEnum = EnumSet.allOf(Tag.class);
         for (Tag tag : tagEnum) {
@@ -75,7 +77,7 @@ public class IssueServiceImpl implements IssueService {
         throw new CustomException(INVALID_ISSUE_TAG);
     }
 
-    //이슈 저장
+    // 이슈 저장
     private Issue saveIssue(IssueInfoReq issueInfoReq, Project project, ProjectMember projectMember, Tag tagIssue) {
         return issueRepository.save(Issue.builder()
                 .title(issueInfoReq.getTitle())
@@ -86,6 +88,7 @@ public class IssueServiceImpl implements IssueService {
                 .member(projectMember)
                 .build());
     }
+
 
 
     /**
