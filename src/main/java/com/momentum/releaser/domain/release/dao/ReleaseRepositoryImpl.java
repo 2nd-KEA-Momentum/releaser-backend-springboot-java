@@ -34,16 +34,14 @@ public class ReleaseRepositoryImpl implements ReleaseRepositoryCustom {
     }
 
     /**
-     * 버전을 수정할 때 바로 이전 버전을 가져온다.
+     * 수정하려는 릴리즈의 기존 버전 값을 뺀 나머지를 전달한다.
      */
     @Override
-    public Optional<ReleaseNote> findTop2ByProject(Project project) {
-        List<ReleaseNote> foundReleaseNotes = queryFactory
+    public List<ReleaseNote> findByProjectAndNotInVersion(Project project, String version) {
+        return queryFactory
                 .selectFrom(releaseNote)
                 .where(releaseNote.project.eq(project))
-                .limit(2)
+                .where(releaseNote.version.ne(version))
                 .fetch();
-
-        return Optional.ofNullable(foundReleaseNotes.get(1));
     }
 }

@@ -1,13 +1,11 @@
 package com.momentum.releaser.domain.release.api;
 
 import com.momentum.releaser.domain.release.application.ReleaseServiceImpl;
-import com.momentum.releaser.domain.release.dto.ReleaseRequestDto;
 import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.ReleaseCreateRequestDto;
 import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.ReleaseUpdateRequestDto;
 import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.ReleaseCreateResponseDto;
 import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.ReleasesResponseDto;
 import com.momentum.releaser.global.config.BaseResponse;
-import com.momentum.releaser.global.config.BaseResponseStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
@@ -63,6 +61,5 @@ public class ReleaseController {
         } else {
             return new BaseResponse<>(FAILED_TO_UPDATE_RELEASE_NOTE);
         }
-
     }
 }

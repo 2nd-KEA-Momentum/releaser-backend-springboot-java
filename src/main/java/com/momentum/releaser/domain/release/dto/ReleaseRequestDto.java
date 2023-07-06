@@ -57,6 +57,7 @@ public class ReleaseRequestDto {
         private String title;
 
         @NotNull(message = "릴리즈 버전을 입력해 주세요.")
+        @Pattern(regexp = "^(?!0)\\d+\\.\\d+\\.\\d+$", message = "릴리즈 버전 형식에 맞지 않습니다.")
         private String version;
 
         @Size(max = 1000, message = "릴리즈 설명은 1000자를 넘을 수 없습니다.")

@@ -10,6 +10,7 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
+import javax.validation.constraints.Pattern;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -39,6 +40,7 @@ public class ReleaseNote extends BaseTime {
     private String summary;
 
     @NotNull
+    @Pattern(regexp = "^(?!0)\\d+\\.\\d+\\.\\d+$", message = "릴리즈 버전 형식에 맞지 않습니다.")
     @Column(name = "version")
     private String version;
 
@@ -102,5 +104,16 @@ public class ReleaseNote extends BaseTime {
     public void prePersist() {
         this.deployStatus = (this.deployStatus == null) ? ReleaseDeployStatus.PLANNING : this.deployStatus;
         this.status = (this.status == '\0') ? 'Y' : this.status;
+    }
+
+    /**
+     * 릴리즈 노트 정보를 업데이트할 때 사용한다.
+     */
+    public void updateReleaseNote(String title, String content, String summary, String version, Date deployDate) {
+        this.title = title;
+        this.content = content;
+        this.version = version;
+        this.summary = summary;
+        this.deployDate = deployDate;
     }
 }
