@@ -10,6 +10,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
 @Slf4j
@@ -26,7 +27,7 @@ public class IssueController {
      */
     @PostMapping("/{projectId}")
     public BaseResponse<String> registerIssue(
-            @PathVariable @NotNull(message = "요청 데이터가 잘못되었습니다.") Long projectId,
+            @PathVariable @Min(1) Long projectId,
             @Valid @RequestBody IssueInfoReq registerReq) {
         return new BaseResponse<>(issueService.registerIssue(projectId, registerReq));
     }
@@ -36,7 +37,7 @@ public class IssueController {
      */
     @PatchMapping("/{issueId}")
     public BaseResponse<String> updateIssue(
-            @PathVariable @NotNull(message = "요청 데이터가 잘못되었습니다.") Long issueId,
+            @PathVariable @Min(1) Long issueId,
             @Valid @RequestBody IssueInfoReq updateReq) {
         return new BaseResponse<>(issueService.updateIssue(issueId, updateReq));
     }

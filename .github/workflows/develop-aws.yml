@@ -1,0 +1,89 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Deploy to Amazon EC2
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the "main" branch
+  push:
+    branches:
+      - develop
+
+env:
+  AWS_REGION: ap-northeast-2
+  S3_BUCKET_NAME: releaserbucket
+  CODE_DEPLOY_APPLICATION_NAME: releaser-codedeploy-app
+  CODE_DEPLOY_DEPLOYMENT_GROUP_NAME: releaser-codedeploy-app-group
+
+permissions:
+  contents: read
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  deploy:
+    # The type of runner that the job will run on
+    name: Deploy
+    runs-on: ubuntu-22.04
+    environment: develop
+    
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+      - name: Set Yaml
+        uses: microsoft/variable-substitution@v1
+        with:
+            files: ./src/main/resources/application.yml 
+        env:
+          spring.datasource.url: ${{ secrets.DEV_DB_URL }} 
+          spring.datasource.username: ${{ secrets.DEV_DB_USERNAME }} 
+          spring.datasource.password: ${{ secrets.DEV_DB_PASSWORD }}   
+
+      #Gradle 권한 설정
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+        
+      #Gradle build
+      - name: Build with Gradle
+        run: ./gradlew clean build -x test
+        
+      - name: Check if a.yml exists
+        run: |
+          if [ -f ./src/main/resources/application.yml ]; then
+            echo "a.yml exists"
+          else
+            echo "a.yml does not exist"
+          fi
+        
+      
+     
+     #AWS 인증
+      - name: AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: ${{ env.AWS_REGION }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          
+      #빌드 결과물을 S3에 업로드
+      - name: Upload to AWS S3
+        run: |
+          aws deploy push \
+            --application-name ${{ env.CODE_DEPLOY_APPLICATION_NAME }} \
+            --ignore-hidden-files \
+            --s3-location s3://$S3_BUCKET_NAME/$GITHUB_SHA.zip \
+            --source .
+      #S3에 있는 파일을 대상으로 CodeDeploy 실행
+      - name: Deploy to AWS EC2 from S3
+        run: |
+          aws deploy create-deployment \
+            --application-name ${{ env.CODE_DEPLOY_APPLICATION_NAME }} \
+            --deployment-config-name CodeDeployDefault.AllAtOnce \
+            --deployment-group-name ${{ env.CODE_DEPLOY_DEPLOYMENT_GROUP_NAME }} \
+            --s3-location bucket=$S3_BUCKET_NAME,key=$GITHUB_SHA.zip,bundleType=zip

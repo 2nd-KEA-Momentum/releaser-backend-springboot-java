@@ -4,6 +4,7 @@ import com.momentum.releaser.domain.issue.dao.IssueOpinionRepository;
 import com.momentum.releaser.domain.issue.dao.IssueRepository;
 import com.momentum.releaser.domain.issue.domain.Issue;
 import com.momentum.releaser.domain.issue.domain.IssueOpinion;
+import com.momentum.releaser.domain.issue.domain.Tag;
 import com.momentum.releaser.domain.issue.dto.IssueReqDto;
 import com.momentum.releaser.domain.issue.dto.IssueReqDto.IssueInfoReq;
 import com.momentum.releaser.domain.issue.dto.IssueReqDto.RegisterOpinionReq;
@@ -15,17 +16,20 @@ import com.momentum.releaser.global.config.BaseResponseStatus;
 import com.momentum.releaser.global.error.CustomException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.catalina.valves.rewrite.InternalRewriteMap;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.momentum.releaser.global.config.BaseResponseStatus.NOT_EXISTS_ISSUE;
-import static com.momentum.releaser.global.config.BaseResponseStatus.NOT_EXISTS_PROJECT_MEMBER;
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.List;
+
+import static com.momentum.releaser.global.config.BaseResponseStatus.*;
 
 @Slf4j
 @Service
-//final 있는 필드만 생성자 만들어줌
 @RequiredArgsConstructor
-public class IssueServiceImpl implements IssueService{
+public class IssueServiceImpl implements IssueService {
 
     private final IssueRepository issueRepository;
     private final IssueOpinionRepository issueOpinionRepository;
@@ -38,27 +42,54 @@ public class IssueServiceImpl implements IssueService{
     @Override
     @Transactional
     public String registerIssue(Long projectId, IssueInfoReq issueInfoReq) {
-
-        //member 정보
-        ProjectMember projectMember = projectMemberRepository.findById(issueInfoReq.getMemberId()).orElseThrow(() -> new CustomException(BaseResponseStatus.NOT_EXISTS_PROJECT_MEMBER));
-
-        //project 정보
-        Project project = projectRepository.findById(projectId).orElseThrow(() -> new CustomException(BaseResponseStatus.NOT_EXISTS_PROJECT));
-
-        Issue newIssue = issueRepository.save(Issue.builder()
-                        .title(issueInfoReq.getTitle())
-                        .content(issueInfoReq.getContent())
-                        .tag(issueInfoReq.getTag())
-                        .endDate(issueInfoReq.getEndDate())
-                        .project(project)
-                        .member(projectMember)
-                .build());
-
-
-        log.debug("newOpinion : {}", newIssue);
+        ProjectMember projectMember = null;
+        // memberId not null
+        if (issueInfoReq.getMemberId() != null) {
+            projectMember = findProjectMember(issueInfoReq.getMemberId());
+        }
+        Project project = findProject(projectId);
+        Tag tagIssue = checkTagEnum(issueInfoReq.getTag());
+        Issue newIssue = saveIssue(issueInfoReq, project, projectMember, tagIssue);
         String result = "이슈 생성이 완료되었습니다.";
         return result;
     }
+
+    // memberId로 프로젝트 멤버 찾기
+    private ProjectMember findProjectMember(Long memberId) {
+        return projectMemberRepository.findById(memberId)
+                .orElseThrow(() -> new CustomException(BaseResponseStatus.NOT_EXISTS_PROJECT_MEMBER));
+    }
+
+    // projectId로 프로젝트 찾기
+    private Project findProject(Long projectId) {
+        return projectRepository.findById(projectId)
+                .orElseThrow(() -> new CustomException(BaseResponseStatus.NOT_EXISTS_PROJECT));
+    }
+
+    // Tag enum check
+    private Tag checkTagEnum(String tagValue) {
+        EnumSet<Tag> tagEnum = EnumSet.allOf(Tag.class);
+        for (Tag tag : tagEnum) {
+            if (tag.name().equalsIgnoreCase(tagValue)) {
+                return tag;
+            }
+        }
+        throw new CustomException(INVALID_ISSUE_TAG);
+    }
+
+    // 이슈 저장
+    private Issue saveIssue(IssueInfoReq issueInfoReq, Project project, ProjectMember projectMember, Tag tagIssue) {
+        return issueRepository.save(Issue.builder()
+                .title(issueInfoReq.getTitle())
+                .content(issueInfoReq.getContent())
+                .tag(tagIssue)
+                .endDate(issueInfoReq.getEndDate())
+                .project(project)
+                .member(projectMember)
+                .build());
+    }
+
+
 
     /**
      * 7.2 이슈 수정

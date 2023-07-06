@@ -67,7 +67,7 @@ public class ReleaseNote extends BaseTime {
     private Project project;
 
     @OneToMany(mappedBy = "release")
-    private List<ReleaseOpinion> opinions = new ArrayList<>();
+    private List<ReleaseOpinion> releaseOpinions = new ArrayList<>();
 
     @OneToMany(mappedBy = "release")
     private List<Issue> issues = new ArrayList<>();
@@ -85,7 +85,7 @@ public class ReleaseNote extends BaseTime {
 
     @PreRemove
     private void preRemove() {
-        for (ReleaseOpinion opinion : opinions) {
+        for (ReleaseOpinion opinion : releaseOpinions) {
             opinion.statusToInactive();
         }
         for (Issue issue : issues) {
@@ -94,7 +94,7 @@ public class ReleaseNote extends BaseTime {
     }
 
     public void softDelete() {
-        for (ReleaseOpinion opinion : opinions) {
+        for (ReleaseOpinion opinion : releaseOpinions) {
             opinion.statusToInactive();
         }
     }

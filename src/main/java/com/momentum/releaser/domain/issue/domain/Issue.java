@@ -77,7 +77,7 @@ public class Issue extends BaseTime {
     private ReleaseNote release;
 
     @OneToMany(mappedBy = "issue")
-    private List<IssueOpinion> opinions = new ArrayList<>();
+    private List<IssueOpinion> issueOpinions = new ArrayList<>();
 
 
     @Builder
@@ -116,14 +116,14 @@ public class Issue extends BaseTime {
     public void updateIssue(IssueInfoReq updateReq, ProjectMember member) {
         this.title = updateReq.getTitle();
         this.content = updateReq.getContent();
-        this.tag = updateReq.getTag();
+        this.tag = Tag.valueOf(updateReq.getTag());
         this.endDate = updateReq.getEndDate();
         this.member = member;
     }
 
     @PreRemove
     private void preRemove() {
-        for (IssueOpinion opinion : opinions) {
+        for (IssueOpinion opinion : issueOpinions) {
             opinion.statusToInactive();
         }
     }
@@ -133,7 +133,7 @@ public class Issue extends BaseTime {
     }
 
     public void softDelete() {
-        for (IssueOpinion opinion : opinions) {
+        for (IssueOpinion opinion : issueOpinions) {
             opinion.statusToInactive();
         }
     }
