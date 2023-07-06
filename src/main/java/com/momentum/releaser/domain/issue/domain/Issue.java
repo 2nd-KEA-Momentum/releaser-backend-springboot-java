@@ -57,8 +57,8 @@ public class Issue extends BaseTime {
     private LifeCycle lifeCycle; //이슈 진행 상태
 
     @NotNull
-    @Column(name = "resolve")
-    private char resolve; //해결, 미해결
+    @Column(name = "edit")
+    private char edit; //수정 여부
 
     @NotNull
     @Column(name = "status")
@@ -81,14 +81,14 @@ public class Issue extends BaseTime {
 
 
     @Builder
-    public Issue(Long issueId, String title, String content, Tag tag, Date endDate, LifeCycle lifeCycle, char resolve, char status, Project project, ProjectMember member, ReleaseNote release) {
+    public Issue(Long issueId, String title, String content, Tag tag, Date endDate, LifeCycle lifeCycle, char edit, char status, Project project, ProjectMember member, ReleaseNote release) {
         this.issueId = issueId;
         this.title = title;
         this.content = content;
         this.tag = tag;
         this.endDate = endDate;
         this.lifeCycle = lifeCycle;
-        this.resolve = resolve;
+        this.edit = edit;
         this.status = status;
         this.project = project;
         this.member = member;
@@ -137,7 +137,7 @@ public class Issue extends BaseTime {
     @PrePersist
     public void prePersist() {
         this.lifeCycle = lifeCycle == null ? LifeCycle.Not_Started : this.lifeCycle;
-        this.resolve = (this.resolve == '\0') ? 'N' : this.resolve;
+        this.edit = (this.edit == '\0') ? 'N' : this.edit;
         this.status = (this.status == '\0') ? 'Y' : this.status;
     }
 }
