@@ -1,7 +1,5 @@
 package com.momentum.releaser.domain.issue.dto;
 
-import com.momentum.releaser.domain.issue.domain.LifeCycle;
-import com.momentum.releaser.domain.issue.domain.Tag;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
@@ -11,7 +9,6 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.Date;
-import java.util.List;
 
 public class IssueReqDto {
 
