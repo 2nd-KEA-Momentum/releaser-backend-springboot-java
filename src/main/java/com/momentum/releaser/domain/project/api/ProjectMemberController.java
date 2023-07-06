@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
@@ -27,7 +28,7 @@ public class ProjectMemberController {
      * 4.1 프로젝트 멤버 조회
      */
     @GetMapping("/{projectId}")
-    public BaseResponse<List<GetMembersRes>> getMembers(@PathVariable @NotNull(message = "요청 데이터가 잘못되었습니다.") Long projectId) {
+    public BaseResponse<List<GetMembersRes>> getMembers(@PathVariable @Min(1) Long projectId) {
         return new BaseResponse<>(projectMemberService.getMembers(projectId));
     }
 
@@ -39,7 +40,7 @@ public class ProjectMemberController {
      * 4.3 프로젝트 멤버 제거
      */
     @PostMapping("/{memberId}")
-    public BaseResponse<String> deleteProjectMember(@PathVariable @NotNull(message = "요청 데이터가 잘못되었습니다.") Long memberId) {
+    public BaseResponse<String> deleteProjectMember(@PathVariable @Min(1) Long memberId) {
         return new BaseResponse<>(projectMemberService.deleteMember(memberId));
     }
 }
