@@ -24,7 +24,6 @@ import static com.momentum.releaser.global.config.BaseResponseStatus.*;
 
 @Slf4j
 @Service
-//final 있는 필드만 생성자 만들어줌
 @RequiredArgsConstructor
 public class ProjectServiceImpl implements ProjectService {
 

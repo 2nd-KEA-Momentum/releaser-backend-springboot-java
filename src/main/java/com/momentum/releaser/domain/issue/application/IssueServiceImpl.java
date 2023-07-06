@@ -28,7 +28,6 @@ import static com.momentum.releaser.global.config.BaseResponseStatus.*;
 
 @Slf4j
 @Service
-//final 있는 필드만 생성자 만들어줌
 @RequiredArgsConstructor
 public class IssueServiceImpl implements IssueService {
 
@@ -44,6 +43,7 @@ public class IssueServiceImpl implements IssueService {
     @Transactional
     public String registerIssue(Long projectId, IssueInfoReq issueInfoReq) {
         ProjectMember projectMember = null;
+        // memberId not null
         if (issueInfoReq.getMemberId() != null) {
             projectMember = findProjectMember(issueInfoReq.getMemberId());
         }
