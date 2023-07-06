@@ -38,14 +38,10 @@ jobs:
           java-version: '11'
 
       - name: Access Secrets
-        env:
-          DEV_DB_URL: ${{secrets.DEV_DB_URL}}
-          DEV_DB_USERNAME: ${{secrets.DEV_DB_USERNAME}}
-          DEV_DB_PASSWORD: ${{secrets.DEV_DB_PASSWORD}}
         run: |
-          echo "DEV_DB_URL=$DEV_DB_URL" >> application.yml
-          echo "DEV_DB_USERNAME=$DEV_DB_USERNAME" >> application.yml
-          echo "DEV_DB_PASSWORD=$DEV_DB_PASSWORD" >> application.yml
+          echo "DEV_DB_URL=${{secrets.DEV_DB_URL}}" >> application.yml
+          echo "DEV_DB_USERNAME=${{secrets.DEV_DB_USERNAME}}" >> application.yml
+          echo "DEV_DB_PASSWORD=${{secrets.DEV_DB_PASSWORD}}" >> application.yml
 
       #Gradle 권한 설정
       - name: Grant execute permission for gradlew
