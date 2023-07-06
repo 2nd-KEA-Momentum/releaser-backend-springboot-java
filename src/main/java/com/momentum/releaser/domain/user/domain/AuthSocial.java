@@ -6,12 +6,14 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@SQLDelete(sql = "UPDATE auth_social SET status = 'N' WHERE auth_id=?")
 @Where(clause = "status = 'Y'")
 @Table(name = "auth_social")
 @Entity
@@ -45,5 +47,13 @@ public class AuthSocial extends BaseTime {
         this.type = type;
         this.token = token;
         this.status = status;
+    }
+
+    /**
+     * insert 되기전 (persist 되기전) 실행된다.
+     */
+    @PrePersist
+    public void prePersist() {
+        this.status = (this.status == '\0') ? 'Y' : this.status;
     }
 }

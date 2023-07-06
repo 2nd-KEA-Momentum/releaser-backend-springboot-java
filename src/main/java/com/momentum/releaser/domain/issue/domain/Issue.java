@@ -1,6 +1,8 @@
 package com.momentum.releaser.domain.issue.domain;
 
 
+import com.momentum.releaser.domain.issue.dto.IssueReqDto;
+import com.momentum.releaser.domain.issue.dto.IssueReqDto.IssueInfoReq;
 import com.momentum.releaser.domain.project.domain.Project;
 import com.momentum.releaser.domain.project.domain.ProjectMember;
 import com.momentum.releaser.domain.release.domain.ReleaseNote;
@@ -11,6 +13,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
@@ -20,6 +23,7 @@ import java.util.List;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@SQLDelete(sql = "UPDATE issue SET status = 'N' WHERE issue_id=?")
 @Where(clause = "status = 'Y'")
 @Table(name = "issue")
 @Entity
@@ -50,7 +54,11 @@ public class Issue extends BaseTime {
     @NotNull
     @Column(name = "life_cycle")
     @Enumerated(EnumType.STRING)
-    private LifeCycle lifeCycle;
+    private LifeCycle lifeCycle; //이슈 진행 상태
+
+    @NotNull
+    @Column(name = "resolve")
+    private char resolve; //해결, 미해결
 
     @NotNull
     @Column(name = "status")
@@ -69,22 +77,24 @@ public class Issue extends BaseTime {
     private ReleaseNote release;
 
     @OneToMany(mappedBy = "issue")
-    private List<ReleaseOpinion> opinions = new ArrayList<>();
+    private List<IssueOpinion> opinions = new ArrayList<>();
 
 
     @Builder
-    public Issue(Long issueId, String title, String content, Tag tag, Date endDate, LifeCycle lifeCycle, char status, Project project, ProjectMember member, ReleaseNote release) {
+    public Issue(Long issueId, String title, String content, Tag tag, Date endDate, LifeCycle lifeCycle, char resolve, char status, Project project, ProjectMember member, ReleaseNote release) {
         this.issueId = issueId;
         this.title = title;
         this.content = content;
         this.tag = tag;
         this.endDate = endDate;
         this.lifeCycle = lifeCycle;
+        this.resolve = resolve;
         this.status = status;
         this.project = project;
         this.member = member;
         this.release = release;
     }
+
 
     /**
      * 특정 릴리즈 노트와 이슈를 연결할 때 사용한다.
@@ -94,10 +104,47 @@ public class Issue extends BaseTime {
     }
 
     /**
+     * 이슈 연결을 해제할 때 사용한다.
+     */
+    public void disconnectReleaseNote() {
+        this.release = null;
+    }
+
+    /**
+     * 이슈 수정
+     */
+    public void updateIssue(IssueInfoReq updateReq, ProjectMember member) {
+        this.title = updateReq.getTitle();
+        this.content = updateReq.getContent();
+        this.tag = updateReq.getTag();
+        this.endDate = updateReq.getEndDate();
+        this.member = member;
+    }
+
+    @PreRemove
+    private void preRemove() {
+        for (IssueOpinion opinion : opinions) {
+            opinion.statusToInactive();
+        }
+    }
+
+    public void statusToInactive() {
+        this.status = 'N';
+    }
+
+    public void softDelete() {
+        for (IssueOpinion opinion : opinions) {
+            opinion.statusToInactive();
+        }
+    }
+
+    /**
      * insert 되기전 (persist 되기전) 실행된다.
      */
     @PrePersist
     public void prePersist() {
-        this.status = String.valueOf(this.status).equals(null) ? 'Y' : this.status;
+        this.lifeCycle = lifeCycle == null ? LifeCycle.Not_Started : this.lifeCycle;
+        this.resolve = (this.resolve == '\0') ? 'N' : this.resolve;
+        this.status = (this.status == '\0') ? 'Y' : this.status;
     }
 }

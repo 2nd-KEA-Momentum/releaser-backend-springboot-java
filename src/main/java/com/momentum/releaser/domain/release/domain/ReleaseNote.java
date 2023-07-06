@@ -2,9 +2,11 @@ package com.momentum.releaser.domain.release.domain;
 
 import com.momentum.releaser.domain.issue.domain.Issue;
 import com.momentum.releaser.domain.project.domain.Project;
+import com.momentum.releaser.domain.release.domain.ReleaseEnum.ReleaseDeployStatus;
 import com.momentum.releaser.global.common.BaseTime;
 import com.sun.istack.NotNull;
 import lombok.*;
+import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
@@ -14,6 +16,7 @@ import java.util.List;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@SQLDelete(sql = "UPDATE release_note SET status = 'N' WHERE release_id=?")
 @Where(clause = "status = 'Y'")
 @Table(name = "release_note")
 @Entity
@@ -44,7 +47,8 @@ public class ReleaseNote extends BaseTime {
 
     @NotNull
     @Column(name = "deploy_status")
-    private String deployStatus;
+    @Enumerated(EnumType.STRING)
+    private ReleaseDeployStatus deployStatus;
 
     @NotNull
     @Column(name = "status")
@@ -61,15 +65,42 @@ public class ReleaseNote extends BaseTime {
     private List<Issue> issues = new ArrayList<>();
 
     @Builder
-    public ReleaseNote(String title, String content, String summary, String version, Date deployDate, String deployStatus, char status, Project project) {
+    public ReleaseNote(Long releaseId, String title, String content, String summary, String version, Date deployDate, Project project) {
+        this.releaseId = releaseId;
         this.title = title;
         this.content = content;
         this.summary = summary;
         this.version = version;
         this.deployDate = deployDate;
-        this.deployStatus = deployStatus;
-        this.status = status;
         this.project = project;
     }
-}
 
+    @PreRemove
+    private void preRemove() {
+        for (ReleaseOpinion opinion : opinions) {
+            opinion.statusToInactive();
+        }
+        for (Issue issue : issues) {
+            issue.statusToInactive();
+        }
+    }
+
+    public void softDelete() {
+        for (ReleaseOpinion opinion : opinions) {
+            opinion.statusToInactive();
+        }
+    }
+
+    public void statusToInactive() {
+        this.status = 'N';
+    }
+
+    /**
+     * insert 되기전 (persist 되기전) 실행된다.
+     */
+    @PrePersist
+    public void prePersist() {
+        this.deployStatus = (this.deployStatus == null) ? ReleaseDeployStatus.PLANNING : this.deployStatus;
+        this.status = (this.status == '\0') ? 'Y' : this.status;
+    }
+}

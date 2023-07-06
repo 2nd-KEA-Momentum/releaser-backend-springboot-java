@@ -41,6 +41,19 @@ public class ReleaseResponseDto {
 
     /**
      * 5.2 릴리즈 노트 생성
+     */
+    @Getter
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    public static class ReleaseCreateResponseDto {
+        private Long releaseId;
+
+        @Builder
+        public ReleaseCreateResponseDto(Long releaseId) {
+            this.releaseId = releaseId;
+        }
+    }
+
+    /**
      * 5.4 릴리즈 노트 조회
      */
     @Getter
