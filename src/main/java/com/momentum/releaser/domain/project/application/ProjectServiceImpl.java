@@ -20,8 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.momentum.releaser.global.config.BaseResponseStatus.NOT_EXISTS_PROJECT;
-import static com.momentum.releaser.global.config.BaseResponseStatus.NOT_EXISTS_USER;
+import static com.momentum.releaser.global.config.BaseResponseStatus.*;
 
 @Slf4j
 @Service
@@ -40,29 +39,45 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     @Transactional
     public ProjectInfoRes createProject(Long userId, ProjectInfoReq registerReq) {
-        //user 정보
-        User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(NOT_EXISTS_USER));
+        // 사용자 정보
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(NOT_EXISTS_USER));
 
-        //프로젝트 생성
-        Project newProject = projectRepository.save(Project.builder()
+        // 프로젝트 생성
+        Project newProject = createNewProject(registerReq);
+
+        // 프로젝트 멤버 추가
+        ProjectMember projectMember = addProjectMember(newProject, user);
+
+        // 프로젝트 응답 객체 생성
+        ProjectInfoRes projectInfoRes = createProjectInfoResponse(newProject, user, projectMember);
+
+        return projectInfoRes;
+    }
+
+    // 프로젝트 생성
+    private Project createNewProject(ProjectInfoReq registerReq) {
+        return projectRepository.save(Project.builder()
                 .title(registerReq.getTitle())
                 .content(registerReq.getContent())
                 .team(registerReq.getTeam())
                 .img(registerReq.getImg())
                 .status('Y')
                 .build());
-
-        ProjectMember projectMember = addProjectMember(newProject, user);
-
-        //프로젝트 Response 추가
-        ProjectInfoRes registerRes = modelMapper.map(newProject, ProjectInfoRes.class);
-        registerRes.setProjectId(newProject.getProjectId());
-        registerRes.setAdmin(user.getName());
-        registerRes.setMemberId(projectMember.getMemberId());
-        registerRes.setAdminImg(user.getImg());
-        return registerRes;
-
     }
+
+
+    // 프로젝트 응답 객체 생성
+    private ProjectInfoRes createProjectInfoResponse(Project project, User user, ProjectMember projectMember) {
+        ProjectInfoRes projectInfoRes = modelMapper.map(project, ProjectInfoRes.class);
+        projectInfoRes.setProjectId(project.getProjectId());
+        projectInfoRes.setAdmin(user.getName());
+        projectInfoRes.setMemberId(projectMember.getMemberId());
+        projectInfoRes.setAdminImg(user.getImg());
+        return projectInfoRes;
+    }
+
+
 
     //프로젝트 멤버 추가
     private ProjectMember addProjectMember(Project project, User user) {
@@ -81,38 +96,42 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     @Transactional
     public ProjectInfoRes updateProject(Long projectId, ProjectInfoReq updateReq) {
-        //project 정보
-        Project project = projectRepository.findById(projectId).orElseThrow(() -> new CustomException(NOT_EXISTS_PROJECT));
+        // 프로젝트 정보
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new CustomException(NOT_EXISTS_PROJECT));
 
-        //project update
+        // 프로젝트 업데이트
         project.updateProject(updateReq);
-        Project updateProject = projectRepository.save(project);
+        Project updatedProject = projectRepository.save(project);
 
-        //projectMember 정보
-        List<ProjectMember> projectMember = projectMemberRepository.findByProject(updateProject);
+        // 프로젝트 멤버 정보
+        List<ProjectMember> projectMembers = projectMemberRepository.findByProject(updatedProject);
 
         // 관리자(L) 멤버 조회
-        ProjectMember adminMember = null;
-        for (ProjectMember member : projectMember) {
-            if (member.getPosition() == 'L') {
-                adminMember = member;
-                break;
-            }
-        }
+        ProjectMember adminMember = findAdminMember(projectMembers);
 
-        // 사용자 정보 조회
+        // 관리자(L) 멤버의 사용자 정보 조회
         User adminUser = userRepository.findById(adminMember.getUser().getUserId())
                 .orElseThrow(() -> new CustomException(NOT_EXISTS_USER));
 
-        // 프로젝트 응답 생성
-        ProjectInfoRes registerRes = modelMapper.map(updateProject, ProjectInfoRes.class);
-        registerRes.setProjectId(updateProject.getProjectId());
-        registerRes.setAdmin(adminUser.getName());
-        registerRes.setMemberId(adminMember.getMemberId());
-        registerRes.setAdminImg(adminUser.getImg());
+        // 프로젝트 응답 객체 생성
+        ProjectInfoRes projectInfoRes = createProjectInfoResponse(updatedProject, adminUser, adminMember);
 
-        return registerRes;
+        return projectInfoRes;
     }
+
+    // 관리자(L) 멤버 조회
+    private ProjectMember findAdminMember(List<ProjectMember> projectMembers) {
+        for (ProjectMember member : projectMembers) {
+            if (member.getPosition() == 'L') {
+                return member;
+            }
+        }
+        throw new CustomException(NOT_EXISTS_ADMIN_MEMBER);
+    }
+
+
+
 
     /**
      * 3.3 프로젝트 삭제
@@ -133,24 +152,24 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     @Transactional
     public GetProjectRes getProjects(Long userId) {
-        //user 정보
-        User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(NOT_EXISTS_USER));
+        // 사용자 정보
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(NOT_EXISTS_USER));
 
-        //project 정보
+        // 프로젝트 멤버 정보
         List<ProjectMember> projectMemberList = projectMemberRepository.findByUser(user);
         List<GetProject> getCreateProjectList = new ArrayList<>();
         List<GetProject> getEnterProjectList = new ArrayList<>();
 
         for (ProjectMember projectMember : projectMemberList) {
-            //생성한 프로젝트 조회
+            // 생성한 프로젝트 조회
             if (projectMember.getPosition() == 'L') {
-                getCreateProjectList.add(modelMapper.map(projectMember.getProject(), GetProject.class));
+                getCreateProjectList.add(mapToGetProject(projectMember.getProject()));
             }
-            //참가한 프로젝트 조회
+            // 참가한 프로젝트 조회
             else {
-                getEnterProjectList.add(modelMapper.map(projectMember.getProject(), GetProject.class));
+                getEnterProjectList.add(mapToGetProject(projectMember.getProject()));
             }
-
         }
 
         GetProjectRes getProjectRes = GetProjectRes.builder()
@@ -159,6 +178,11 @@ public class ProjectServiceImpl implements ProjectService {
                 .build();
 
         return getProjectRes;
-
     }
+
+    //project mapper 사용
+    private GetProject mapToGetProject(Project project) {
+        return modelMapper.map(project, GetProject.class);
+    }
+
 }
