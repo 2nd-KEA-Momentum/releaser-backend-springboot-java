@@ -2,12 +2,14 @@ package com.momentum.releaser.domain.release.application;
 
 import com.momentum.releaser.domain.issue.dao.IssueRepository;
 import com.momentum.releaser.domain.issue.domain.Issue;
+import com.momentum.releaser.domain.issue.domain.LifeCycle;
 import com.momentum.releaser.domain.project.dao.ProjectRepository;
 import com.momentum.releaser.domain.project.domain.Project;
 import com.momentum.releaser.domain.release.dao.ReleaseRepository;
 import com.momentum.releaser.domain.release.domain.ReleaseNote;
 import com.momentum.releaser.domain.release.dto.ReleaseDataDto.ReleasesDataDto;
 import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.ReleaseCreateRequestDto;
+import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.ReleaseUpdateRequestDto;
 import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.ReleaseCreateResponseDto;
 import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.ReleasesResponseDto;
 import com.momentum.releaser.domain.release.mapper.ReleaseMapper;
@@ -64,7 +66,10 @@ public class ReleaseServiceImpl implements ReleaseService {
     public ReleaseCreateResponseDto createReleaseNote(Long projectId, ReleaseCreateRequestDto releaseCreateRequestDto) {
         Project project = projectRepository.findById(projectId).orElseThrow(() -> new CustomException(NOT_EXISTS_PROJECT));
 
-        List<Issue> issues = getIssuesByReleaseNote(releaseCreateRequestDto);
+        // 연결할 이슈들의 식별 번호를 가지고 엔티티 형태로 받아온다.
+        List<Issue> issues = releaseCreateRequestDto.getIssues().stream()
+                .map(i -> issueRepository.findById(i).orElseThrow(() -> new CustomException(NOT_EXISTS_ISSUE)))
+                .collect(Collectors.toList());
 
         // 클라이언트로부터 전달받은 릴리즈 버전 타입을 바탕으로 올바른 릴리즈 버전을 생성한다.
         //
@@ -134,12 +139,7 @@ public class ReleaseServiceImpl implements ReleaseService {
         // 새롭게 생성된 릴리즈 노트에 이슈들을 연결시킨다.
         issues.forEach(i -> {
             i.updateReleaseNote(savedReleaseNote);
-            Issue updatedIssue = issueRepository.save(i);
-
-            if (!Objects.equals(i.getIssueId(), updatedIssue.getIssueId())) {
-                // 만약 릴리즈 노트와 이슈의 연결이 제대로 업데이트 되지 않은 경우 예외를 발생시킨다.
-                throw new CustomException(FAILED_TO_CONNECT_ISSUE_WITH_RELEASE_NOTE);
-            }
+            issueRepository.save(i);
         });
 
         return ReleaseMapper.INSTANCE.toReleaseCreateResponseDto(savedReleaseNote);
@@ -149,29 +149,62 @@ public class ReleaseServiceImpl implements ReleaseService {
      * 5.3 릴리즈 노트 수정
      */
     @Override
-    public int updateReleaseNote(Long releaseId, ReleaseCreateRequestDto releaseCreateRequestDto) {
+    public int updateReleaseNote(Long releaseId, ReleaseUpdateRequestDto releaseUpdateRequestDto) {
         ReleaseNote releaseNote = releaseRepository.findById(releaseId).orElseThrow(() -> new CustomException(NOT_EXISTS_RELEASE_NOTE));
 
         // 기존의 이슈들에 대해 연결을 해제한다.
         releaseNote.getIssues()
                 .forEach(Issue::disconnectReleaseNote);
 
-        // 새로 업데이트된 이슈들로 다시 연결한다.
-        List<Issue> updatedIssues = getIssuesByReleaseNote(releaseCreateRequestDto);
+        // 클라이언트로부터 전달받은 버전이 올바른지 검사한다.
 
-        // 클라이언트로부터 전달받은 버전 타입을 바탕으로 올바른 버전을 생성한다.
+        String newVersion = releaseUpdateRequestDto.getVersion();
+
+        // 1. 해당 프로젝트의 모든 릴리즈 버전을 가져온다.
+        List<ReleaseNote> releaseNotes = releaseRepository.findAllByProject(releaseNote.getProject());
+
+        // 2. 중복된 버전이 있는지 확인한다. 중복된 버전이 존재할 경우 예외를 발생시킨다.
+        if (releaseRepository.existsByVersion(newVersion)) {
+            throw new CustomException(DUPLICATED_RELEASE_VERSION);
+        }
+
+        // 3. 바꾸려는 버전 값이 올바른 버전 값인지를 분기 처리를 통해 확인한다.
 
 
-        return 1;
-    }
+        // 릴리즈 노트 수정 후 저장한다.
+        ReleaseNote newReleaseNote = ReleaseNote.builder()
+                .title(releaseUpdateRequestDto.getTitle())
+                .content(releaseUpdateRequestDto.getContent())
+                .summary(releaseUpdateRequestDto.getSummary())
+                .version(newVersion)
+                .deployDate(releaseUpdateRequestDto.getDeployDate())
+                .project(releaseNote.getProject())
+                .build();
 
-    /**
-     * 연결할 이슈들의 식별 번호를 가지고 엔티티 형태로 받아온다.
-     * 만약 없다면 예외를 발생시킨다.
-     */
-    private List<Issue> getIssuesByReleaseNote(ReleaseCreateRequestDto releaseCreateRequestDto) {
-         return releaseCreateRequestDto.getIssues().stream()
+        ReleaseNote savedReleaseNote = releaseRepository.save(newReleaseNote);
+
+        // 클라이언트로부터 전달받은 이슈 식별 번호 목록을 통해 이슈 엔티티 목록을 가져온다.
+        List<Issue> updatedIssues = releaseUpdateRequestDto.getIssues().stream()
                 .map(i -> issueRepository.findById(i).orElseThrow(() -> new CustomException(NOT_EXISTS_ISSUE)))
                 .collect(Collectors.toList());
+
+        // 새로 업데이트된 이슈들로 다시 연결한다.
+        updatedIssues.forEach(i -> {
+            // 각각의 이슈들에 이미 연결된 릴리즈 노트가 없는지, 각 이슈들은 완료된 상태인지를 한 번 더 확인한다.
+
+            if (i.getLifeCycle() == LifeCycle.Completed || i.getRelease() != null) {
+                throw new CustomException(INVALID_ISSUE_WITH_COMPLETED);
+            }
+
+            if (i.getLifeCycle() != LifeCycle.Done) {
+                throw new CustomException(INVALID_ISSUE_WITH_NOT_DONE);
+            }
+
+            // 문제가 없는 경우 연결한다.
+            i.updateReleaseNote(savedReleaseNote);
+            issueRepository.save(i);
+        });
+
+        return 1;
     }
 }

@@ -1,7 +1,9 @@
 package com.momentum.releaser.domain.release.api;
 
 import com.momentum.releaser.domain.release.application.ReleaseServiceImpl;
+import com.momentum.releaser.domain.release.dto.ReleaseRequestDto;
 import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.ReleaseCreateRequestDto;
+import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.ReleaseUpdateRequestDto;
 import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.ReleaseCreateResponseDto;
 import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.ReleasesResponseDto;
 import com.momentum.releaser.global.config.BaseResponse;
@@ -54,9 +56,9 @@ public class ReleaseController {
     @PatchMapping(value = "/{releaseId}")
     public BaseResponse<String> updateReleaseNote(
             @PathVariable @Min(1) Long releaseId,
-            @RequestBody @Valid ReleaseCreateRequestDto releaseCreateRequestDto) {
+            @RequestBody @Valid ReleaseUpdateRequestDto releaseUpdateRequestDto) {
 
-        if (releaseService.updateReleaseNote(releaseId, releaseCreateRequestDto) == 1) {
+        if (releaseService.updateReleaseNote(releaseId, releaseUpdateRequestDto) == 1) {
             return new BaseResponse<>(SUCCESS_TO_UPDATE_RELEASE_NOTE);
         } else {
             return new BaseResponse<>(FAILED_TO_UPDATE_RELEASE_NOTE);

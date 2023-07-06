@@ -38,7 +38,11 @@ public enum BaseResponseStatus {
     FAILED_TO_CREATE_RELEASE_NOTE(false, 4401, "릴리즈 노트 생성에 실패하였습니다."),
     FAILED_TO_GET_LATEST_RELEASE_VERSION(false, 4402, "릴리즈 노트 버전 불러오기에 실패하였습니다."),
     FAILED_TO_UPDATE_RELEASE_NOTE(false, 4403, "릴리즈 노트 수정에 실패하였습니다."),
+    DUPLICATED_RELEASE_VERSION(false, 4404, "이미 존재하는 릴리즈 버전입니다."),
+    INVALID_RELEASE_VERSION(false, 4405, "올바르지 않은 릴리즈 버전입니다."),
     NOT_EXISTS_ISSUE(false, 4500, "존재하지 않는 이슈입니다."),
+    INVALID_ISSUE_WITH_COMPLETED(false, 4501, "이미 연결된 이슈가 포함되어 있습니다."),
+    INVALID_ISSUE_WITH_NOT_DONE(false, 4502, "완료되지 않은 이슈는 연결할 수 없습니다."),
     FAILED_TO_CONNECT_ISSUE_WITH_RELEASE_NOTE(false, 4501, "이슈 연결에 실패하였습니다.");
 
     private final boolean isSuccess;

@@ -12,4 +12,6 @@ public interface ReleaseRepository extends JpaRepository<ReleaseNote, Long>, Rel
 
     List<ReleaseNote> findAllByProject(Project project);
 
+    boolean existsByVersion(String version);
+
 }
