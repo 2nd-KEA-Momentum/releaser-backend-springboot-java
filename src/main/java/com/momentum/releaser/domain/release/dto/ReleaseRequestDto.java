@@ -52,6 +52,7 @@ public class ReleaseRequestDto {
     @Getter
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     public static class ReleaseUpdateRequestDto {
+        @NotNull(message = "릴리즈 제목을 입력해 주세요.")
         @NotBlank(message = "릴리즈 제목을 입력해 주세요.")
         @Size(min = 1, max = 45, message = "릴리즈 제목은 1자 이상 45자 이하여야 합니다.")
         private String title;
@@ -66,6 +67,7 @@ public class ReleaseRequestDto {
         @Size(max = 100, message = "릴리즈 요약은 100자를 넘을 수 없습니다.")
         private String summary;
 
+        @NotNull(message = "릴리즈 배포 날짜를 입력해 주세요.")
         private Date deployDate;
 
         List<Long> issues;

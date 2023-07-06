@@ -161,7 +161,7 @@ public class ReleaseServiceImpl implements ReleaseService {
         // 클라이언트로부터 전달받은 버전이 올바른지 검사한다.
         String newVersion = releaseUpdateRequestDto.getVersion();
 
-        // 1. 만약 수정하려고 하는 릴리즈 노트의 원래 버전이 1.0.0인 경우 수정하지 못하도록 한다. 이 경우 릴리즈 노트 내용만 수정해야 ㅎ나다.
+        // 1. 만약 수정하려고 하는 릴리즈 노트의 원래 버전이 1.0.0인 경우 수정하지 못하도록 한다. 이 경우 릴리즈 노트 내용만 수정해야 한다.
         if (Objects.equals(releaseNote.getVersion(), "1.0.0")) {
             throw new CustomException(FAILED_TO_UPDATE_INITIAL_RELEASE_VERSION);
         }
@@ -181,7 +181,7 @@ public class ReleaseServiceImpl implements ReleaseService {
         // 5. 바꾸려는 버전 값이 올바른 버전 값인지를 확인한다.
         validateCorrectVersion(versions);
 
-        // 릴리즈 노트 수정 후 저장한다.
+        // 릴리즈 노트르루 수정한 후 저장한다.
         releaseNote.updateReleaseNote(
                 releaseUpdateRequestDto.getTitle(),
                 releaseUpdateRequestDto.getContent(),
@@ -189,7 +189,6 @@ public class ReleaseServiceImpl implements ReleaseService {
                 newVersion,
                 releaseUpdateRequestDto.getDeployDate()
         );
-
         ReleaseNote savedReleaseNote = releaseRepository.save(releaseNote);
 
         // 클라이언트로부터 전달받은 이슈 식별 번호 목록을 통해 이슈 엔티티 목록을 가져온다.
@@ -217,17 +216,25 @@ public class ReleaseServiceImpl implements ReleaseService {
     }
 
     /**
-     * 각 버전의 자릿수의 숫자가 +1씩 증가하는지를 검증한다.
+     * 클라이언트가 수정하고자 하는 버전이 올바른 버전인지 검증한다.
      */
     private void validateCorrectVersion(List<String> versions) {
+        int[] majors = versions.stream().mapToInt(v -> v.charAt(0) - 48).toArray();
+        int[] minors = versions.stream().mapToInt(v -> v.charAt(2) - 48).toArray();
+        int[] patches = versions.stream().mapToInt(v -> v.charAt(4) - 48).toArray();
+
         int majorStartIdx = 0;
         int minorStartIdx = 0;
 
-        int[] majors = versions.stream().mapToInt(v -> v.charAt(0) - 48).toArray();
-        int[] minors = versions.stream().mapToInt(v -> v.charAt(2) - 48).toArray();
-        int[] patchs = versions.stream().mapToInt(v -> v.charAt(4) - 48).toArray();
+        validateMajorVersion(majors, minors, patches, versions.size() - 1, majorStartIdx, minorStartIdx);
+    }
 
-        for (int i = 0; i < versions.size() - 1; i++) {
+    /**
+     * Major(메이저) 버전 숫자에 대한 유효성 검사를 진행한다.
+     */
+    private void validateMajorVersion(int[] majors, int[] minors, int[] patches, int end, int majorStartIdx, int minorStartIdx) {
+
+        for (int i = 0; i < end; i++) {
             int currentMajor = majors[i];
             int nextMajor = majors[i + 1];
 
@@ -236,36 +243,78 @@ public class ReleaseServiceImpl implements ReleaseService {
                 throw new CustomException(INVALID_RELEASE_VERSION);
             }
 
+            // 만약 가장 큰 메이저 버전 숫자인 경우 해당 메이저 버전에 대한 모든 하위 버전의 유효성 검사를 진행한다.
+            if (currentMajor == nextMajor && i + 1 == end) {
+                validateMinorVersion(minors, patches, majorStartIdx, end, minorStartIdx);
+                return;
+            }
+
             // 만약 그 다음 번째 메이저 버전 숫자가 바뀌는 경우 넘어가기 전에 마이너 버전 숫자를 확인한다.
             if (nextMajor - currentMajor == 1) {
-
-                for (int j = majorStartIdx; j < i - 1; j++) {
-                    int currentMinor = minors[j];
-                    int nextMinor = minors[j + 1];
-
-                    // 만약 연속되는 두 개의 메이저 버전 숫자가 +-1이 아닌 경우 예외를 발생시킨다.
-                    if ((nextMinor - currentMinor > 1) || (nextMinor - currentMinor < 0)) {
-                        throw new CustomException(INVALID_RELEASE_VERSION);
-                    }
-
-                    // 만약 그 다음 번째 마이너 버전 숫자가 바뀌는 경우 넘어가기 전에 패치 버전 숫자를 확인한다.
-                    if (nextMinor - currentMinor == 1) {
-
-                        for (int k = minorStartIdx; k < j - 1; k++) {
-                            int currentPatch = patchs[k];
-                            int nextPatch = patchs[k + 1];
-
-                            // 만약 연속되는 두 개의 메이저 버전 숫자가 +-1이 아닌 경우 예외를 발생시킨다.
-                            if ((nextPatch - currentPatch > 1) || (nextPatch - currentPatch < 0)) {
-                                throw new CustomException(INVALID_RELEASE_VERSION);
-                            }
-                        }
-
-                        minorStartIdx = j + 1;
-                    }
-                }
-
+                validateMinorVersion(minors, patches, majorStartIdx, i, minorStartIdx);
                 majorStartIdx = i + 1;
+
+                // 메이저 버전 숫자가 바뀌었을 때 마이너와 패치 버전 숫자는 모두 0이어야 한다.
+                if (minors[majorStartIdx] != 0 || patches[majorStartIdx] != 0) {
+                    throw new CustomException(INVALID_RELEASE_VERSION);
+                }
+            }
+        }
+    }
+
+    /**
+     * Minor(마이너) 버전 숫자에 대한 유효성 검사를 진행한다.
+     */
+    private void validateMinorVersion(int[] minors, int[] patches, int start, int end, int minorStartIdx) {
+
+        if (end == 0) {
+            return;
+        }
+
+        for (int i = start; i < end; i++) {
+            int currentMinor = minors[i];
+            int nextMinor = minors[i + 1];
+
+            // 만약 연속되는 두 개의 마이너 버전 숫자가 +-1이 아닌 경우 예외를 발생시킨다.
+            if ((nextMinor - currentMinor > 1) || (nextMinor - currentMinor < 0)) {
+                throw new CustomException(INVALID_RELEASE_VERSION);
+            }
+
+            // 만약 가장 큰 마이너 버전 숫자인 경우 해당 마이너 버전에 대한 모든 하위 버전의 유효성 검사를 진행한다.
+            if (currentMinor == nextMinor && i + 1 == end) {
+                validatePatchVersion(patches, minorStartIdx, end);
+                return;
+            }
+
+            // 만약 그 다음 번째 마이너 버전 숫자가 바뀌는 경우 넘어가기 전에 패치 버전 숫자를 확인한다.
+            if (nextMinor - currentMinor == 1) {
+                validatePatchVersion(patches, minorStartIdx, i + 1);
+                minorStartIdx = i + 1;
+
+                // 마이너 버전 숫자가 바뀌었을 때 패치 버전 숫자는 0이어야 한다.
+                if (patches[minorStartIdx] != 0) {
+                    throw new CustomException(INVALID_RELEASE_VERSION);
+                }
+            }
+        }
+    }
+
+    /**
+     * Patch(패치) 버전 숫자에 대한 유효성 검사를 진행한다.
+     */
+    private void validatePatchVersion(int[] patches, int start, int end) {
+
+        if (end == 0) {
+            return;
+        }
+
+        for (int i = start; i < end; i++) {
+            int currentPatch = patches[i];
+            int nextPatch = patches[i + 1];
+
+            // 만약 연속되는 두 개의 메이저 버전 숫자가 +-1이 아닌 경우 예외를 발생시킨다.
+            if ((nextPatch - currentPatch > 1) || (nextPatch - currentPatch < 0)) {
+                throw new CustomException(INVALID_RELEASE_VERSION);
             }
         }
     }

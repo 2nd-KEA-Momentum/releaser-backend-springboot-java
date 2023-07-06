@@ -10,7 +10,9 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -29,13 +31,17 @@ public class ReleaseNote extends BaseTime {
     private Long releaseId;
 
     @NotNull
+    @NotBlank(message = "릴리즈 제목을 입력해 주세요.")
+    @Size(min = 1, max = 45, message = "릴리즈 제목은 1자 이상 45자 이하여야 합니다.")
     @Column(name = "title")
     private String title;
 
     @NotNull
+    @Size(max = 1000, message = "릴리즈 설명은 1000자를 넘을 수 없습니다.")
     @Column(name = "content")
     private String content;
 
+    @Size(max = 100, message = "릴리즈 요약은 100자를 넘을 수 없습니다.")
     @Column(name = "summary")
     private String summary;
 
