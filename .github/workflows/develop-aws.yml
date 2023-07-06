@@ -36,10 +36,6 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '11'
-
-      - name: Access Secrets
-        run: |
-          echo "${{secrets.APPLICATION}}" >src/main/resources/application.yml
          
 
       #Gradle 권한 설정
@@ -49,6 +45,20 @@ jobs:
       #Gradle build
       - name: Build with Gradle
         run: ./gradlew clean build -x test
+        
+      - name: Check if a.yml exists
+        run: |
+          if [ -f ./src/main/resources/application.yml ]; then
+            echo "a.yml exists"
+          else
+            echo "a.yml does not exist"
+          fi
+        
+      - name: Access Secrets
+        run: |
+          echo "DEV_DB_URL=${{ secrets.DEV_DB_URL }}" > application.yml
+          echo "DEV_DB_USERNAME=${{ secrets.DEV_DB_USERNAME }}" > application.yml
+          echo "DEV_DB_PASSWORD=${{ secrets.DEV_DB_PASSWORD }}" > application.yml
       
      #AWS 인증
       - name: AWS credentials
