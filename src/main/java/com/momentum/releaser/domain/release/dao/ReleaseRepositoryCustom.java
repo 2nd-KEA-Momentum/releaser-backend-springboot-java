@@ -7,5 +7,7 @@ import java.util.Optional;
 
 public interface ReleaseRepositoryCustom {
 
-    Optional<ReleaseNote> findByProject(Project project);
+    Optional<ReleaseNote> findTopByProject(Project project);
+
+    Optional<ReleaseNote> findTop2ByProject(Project project);
 }

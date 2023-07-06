@@ -104,6 +104,13 @@ public class Issue extends BaseTime {
     }
 
     /**
+     * 이슈 연결을 해제할 때 사용한다.
+     */
+    public void disconnectReleaseNote() {
+        this.release = null;
+    }
+
+    /**
      * 이슈 수정
      */
     public void updateIssue(IssueInfoReq updateReq, ProjectMember member) {

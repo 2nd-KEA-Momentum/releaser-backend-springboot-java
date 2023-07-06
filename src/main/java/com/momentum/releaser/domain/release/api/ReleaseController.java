@@ -5,6 +5,7 @@ import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.ReleaseCreateR
 import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.ReleaseCreateResponseDto;
 import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.ReleasesResponseDto;
 import com.momentum.releaser.global.config.BaseResponse;
+import com.momentum.releaser.global.config.BaseResponseStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
@@ -12,6 +13,9 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
+
+import static com.momentum.releaser.global.config.BaseResponseStatus.FAILED_TO_UPDATE_RELEASE_NOTE;
+import static com.momentum.releaser.global.config.BaseResponseStatus.SUCCESS_TO_UPDATE_RELEASE_NOTE;
 
 @Slf4j
 @RestController
@@ -42,5 +46,21 @@ public class ReleaseController {
             @RequestBody @Valid ReleaseCreateRequestDto releaseCreateRequestDto) {
 
         return new BaseResponse<>(releaseService.createReleaseNote(projectId, releaseCreateRequestDto));
+    }
+
+    /**
+     * 5.3 릴리즈 노트 수정
+     */
+    @PatchMapping(value = "/{releaseId}")
+    public BaseResponse<String> updateReleaseNote(
+            @PathVariable @Min(1) Long releaseId,
+            @RequestBody @Valid ReleaseCreateRequestDto releaseCreateRequestDto) {
+
+        if (releaseService.updateReleaseNote(releaseId, releaseCreateRequestDto) == 1) {
+            return new BaseResponse<>(SUCCESS_TO_UPDATE_RELEASE_NOTE);
+        } else {
+            return new BaseResponse<>(FAILED_TO_UPDATE_RELEASE_NOTE);
+        }
+
     }
 }

@@ -11,6 +11,7 @@ public enum BaseResponseStatus {
      * 1000 : 요청 성공
      */
     SUCCESS(true, 1000, "요청에 성공하였습니다."),
+    SUCCESS_TO_UPDATE_RELEASE_NOTE(true, 1400, "릴리즈 노트 수정에 성공하였습니다."),
 
     /**
      * 2000 : Request 오류
@@ -36,6 +37,7 @@ public enum BaseResponseStatus {
     NOT_EXISTS_RELEASE_NOTE(false, 4400, "존재하지 않는 릴리즈 노트입니다."),
     FAILED_TO_CREATE_RELEASE_NOTE(false, 4401, "릴리즈 노트 생성에 실패하였습니다."),
     FAILED_TO_GET_LATEST_RELEASE_VERSION(false, 4402, "릴리즈 노트 버전 불러오기에 실패하였습니다."),
+    FAILED_TO_UPDATE_RELEASE_NOTE(false, 4403, "릴리즈 노트 수정에 실패하였습니다."),
     NOT_EXISTS_ISSUE(false, 4500, "존재하지 않는 이슈입니다."),
     FAILED_TO_CONNECT_ISSUE_WITH_RELEASE_NOTE(false, 4501, "이슈 연결에 실패하였습니다.");
 

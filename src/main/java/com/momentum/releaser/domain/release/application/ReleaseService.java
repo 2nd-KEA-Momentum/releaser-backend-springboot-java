@@ -15,4 +15,9 @@ public interface ReleaseService {
      * 5.2 릴리즈 노트 생성
      */
     ReleaseCreateResponseDto createReleaseNote(Long project, ReleaseCreateRequestDto releaseCreateRequestDto);
+
+    /**
+     * 5.3 릴리즈 노트 수정
+     */
+    int updateReleaseNote(Long releaseId, ReleaseCreateRequestDto releaseCreateRequestDto);
 }

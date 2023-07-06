@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import static com.momentum.releaser.domain.release.domain.QReleaseNote.releaseNote;
@@ -18,16 +19,31 @@ public class ReleaseRepositoryImpl implements ReleaseRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
 
+    /**
+     * 가장 최신의 버전을 가져온다.
+     */
     @Override
-    public Optional<ReleaseNote> findByProject(Project project) {
+    public Optional<ReleaseNote> findTopByProject(Project project) {
         ReleaseNote foundReleaseNote = queryFactory
                 .selectFrom(releaseNote)
                 .where(releaseNote.project.eq(project))
                 .limit(1)
                 .fetchOne();
 
-        log.info("foundReleaseNote: {}", foundReleaseNote);
-
         return Optional.ofNullable(foundReleaseNote);
+    }
+
+    /**
+     * 버전을 수정할 때 바로 이전 버전을 가져온다.
+     */
+    @Override
+    public Optional<ReleaseNote> findTop2ByProject(Project project) {
+        List<ReleaseNote> foundReleaseNotes = queryFactory
+                .selectFrom(releaseNote)
+                .where(releaseNote.project.eq(project))
+                .limit(2)
+                .fetch();
+
+        return Optional.ofNullable(foundReleaseNotes.get(1));
     }
 }
