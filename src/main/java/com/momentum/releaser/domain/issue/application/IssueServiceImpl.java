@@ -8,6 +8,7 @@ import com.momentum.releaser.domain.issue.domain.Tag;
 import com.momentum.releaser.domain.issue.dto.IssueReqDto;
 import com.momentum.releaser.domain.issue.dto.IssueReqDto.IssueInfoReq;
 import com.momentum.releaser.domain.issue.dto.IssueReqDto.RegisterOpinionReq;
+import com.momentum.releaser.domain.issue.dto.IssueResDto;
 import com.momentum.releaser.domain.project.dao.ProjectMemberRepository;
 import com.momentum.releaser.domain.project.dao.ProjectRepository;
 import com.momentum.releaser.domain.project.domain.Project;
@@ -140,7 +141,13 @@ public class IssueServiceImpl implements IssueService {
     /**
      * 7.4 프로젝트별 모든 이슈 조회
      */
-
+    @Override
+    public List<IssueResDto.IssueInfoRes> getIssues(Long projectId) {
+        //issue 정보
+        //member 정보
+        //
+        return null;
+    }
     /**
      * 7.5 프로젝트별 해결 & 미연결 이슈 조회
      */
