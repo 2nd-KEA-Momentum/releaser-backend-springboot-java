@@ -39,9 +39,13 @@ jobs:
 
       - name: Access Secrets
         env:
-          DEV_DB_URL: ${{secret.DEV_DB_URL}}
-          DEV_DB_USERNAME: ${{secret.DEV_DB_USERNAME}}
-          DEV_DB_PASSWORD: ${{secret.DEV_DB_PASSWORD}}
+          DEV_DB_URL: ${{secrets.DEV_DB_URL}}
+          DEV_DB_USERNAME: ${{secrets.DEV_DB_USERNAME}}
+          DEV_DB_PASSWORD: ${{secrets.DEV_DB_PASSWORD}}
+        run: |
+          echo "DEV_DB_URL=$DEV_DB_URL" >> application.yml
+          echo "DEV_DB_USERNAME=$DB_DEV_USERNAME" >> application.yml
+          echo "DEV_DB_PASSWORD=$DB_DEV_PASSWORD" >> application.yml
 
       #Gradle 권한 설정
       - name: Grant execute permission for gradlew
