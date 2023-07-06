@@ -13,6 +13,9 @@ env:
   S3_BUCKET_NAME: releaserbucket
   CODE_DEPLOY_APPLICATION_NAME: releaser-codedeploy-app
   CODE_DEPLOY_DEPLOYMENT_GROUP_NAME: releaser-codedeploy-app-group
+  DEV_DB_URL: ${{secret.DEV_DB_URL}}
+  DEV_DB_USERNAME: ${{secret.DEV_DB_USERNAME}}
+  DEV_DB_PASSWORD: ${{secret.DEV_DB_PASSWORD}}
 
 permissions:
   contents: read
