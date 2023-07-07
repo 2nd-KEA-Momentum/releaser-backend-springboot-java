@@ -60,7 +60,6 @@ public class IssueServiceImpl implements IssueService {
 
     private IssueNum saveIssueNum(Project project, Issue newIssue, Long number) {
 
-
         return issueNumRepository.save(IssueNum.builder()
                         .issue(newIssue)
                         .project(project)
@@ -102,7 +101,8 @@ public class IssueServiceImpl implements IssueService {
                 .project(project)
                 .member(projectMember)
                 .build());
-//        IssueNum issueNum = saveIssueNum(project, newIssue, number);
+        IssueNum issueNum = saveIssueNum(project, issue, number);
+        issue.updateIssueNum(issueNum);
         return issue;
     }
 
