@@ -25,7 +25,7 @@ public class IssueResDto {
         private char edit;
         private String lifeCycle;
 
-        @Builder
+        @QueryProjection
         public IssueInfoRes(Long issueId, String title, String content, Long memberId, String memberName, String memberImg, String tag, String releaseVersion, char edit, String lifeCycle) {
             this.issueId = issueId;
             this.title = title;

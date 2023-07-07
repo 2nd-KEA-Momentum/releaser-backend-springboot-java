@@ -1,9 +1,13 @@
 package com.momentum.releaser.domain.issue.dao;
 
+import com.momentum.releaser.domain.issue.dto.IssueResDto;
+import com.momentum.releaser.domain.issue.dto.IssueResDto.IssueInfoRes;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 
 @Slf4j
