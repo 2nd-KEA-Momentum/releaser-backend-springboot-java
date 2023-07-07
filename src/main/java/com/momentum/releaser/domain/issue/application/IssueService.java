@@ -2,6 +2,10 @@ package com.momentum.releaser.domain.issue.application;
 
 import com.momentum.releaser.domain.issue.dto.IssueReqDto;
 import com.momentum.releaser.domain.issue.dto.IssueReqDto.IssueInfoReq;
+import com.momentum.releaser.domain.issue.dto.IssueResDto;
+import com.momentum.releaser.domain.issue.dto.IssueResDto.IssueInfoRes;
+
+import java.util.List;
 
 public interface IssueService {
     /**
@@ -12,15 +16,17 @@ public interface IssueService {
     /**
      * 7.2 이슈 수정
      */
-    String updateIssue(Long issueId, IssueInfoReq updateReq);
+    String updateIssue(Long issueId, Long memberId, IssueInfoReq updateReq);
 
     /**
      * 7.3 이슈 제거
      */
 
+
     /**
      * 7.4 프로젝트별 모든 이슈 조회
      */
+    List<IssueInfoRes> getIssues(Long projectId);
 
     /**
      * 7.5 프로젝트별 해결 & 미연결 이슈 조회
