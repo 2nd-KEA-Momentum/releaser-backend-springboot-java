@@ -76,12 +76,16 @@ public class Issue extends BaseTime {
     @JoinColumn(name = "release_id")
     private ReleaseNote release;
 
+    @OneToOne
+    @JoinColumn(name = "issue_num_id")
+    private IssueNum issueNum;
+
     @OneToMany(mappedBy = "issue")
     private List<IssueOpinion> issueOpinions = new ArrayList<>();
 
 
     @Builder
-    public Issue(Long issueId, String title, String content, Tag tag, Date endDate, LifeCycle lifeCycle, char edit, char status, Project project, ProjectMember member, ReleaseNote release) {
+    public Issue(Long issueId, String title, String content, Tag tag, Date endDate, LifeCycle lifeCycle, char edit, char status, Project project, ProjectMember member, ReleaseNote release, IssueNum issueNum) {
         this.issueId = issueId;
         this.title = title;
         this.content = content;
@@ -93,7 +97,9 @@ public class Issue extends BaseTime {
         this.project = project;
         this.member = member;
         this.release = release;
+        this.issueNum = issueNum;
     }
+
 
 
     /**
