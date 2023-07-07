@@ -113,10 +113,11 @@ public class Issue extends BaseTime {
     /**
      * 이슈 수정
      */
-    public void updateIssue(IssueInfoReq updateReq, ProjectMember member) {
+    public void updateIssue(IssueInfoReq updateReq, char edit, ProjectMember member, Tag tagIssue) {
         this.title = updateReq.getTitle();
         this.content = updateReq.getContent();
-        this.tag = Tag.valueOf(updateReq.getTag());
+        this.edit = edit;
+        this.tag = tagIssue;
         this.endDate = updateReq.getEndDate();
         this.member = member;
     }

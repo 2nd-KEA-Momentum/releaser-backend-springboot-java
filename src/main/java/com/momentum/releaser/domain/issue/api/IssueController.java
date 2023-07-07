@@ -3,7 +3,10 @@ package com.momentum.releaser.domain.issue.api;
 import com.momentum.releaser.domain.issue.application.IssueService;
 import com.momentum.releaser.domain.issue.dto.IssueReqDto;
 import com.momentum.releaser.domain.issue.dto.IssueReqDto.IssueInfoReq;
+import com.momentum.releaser.domain.issue.dto.IssueResDto;
+import com.momentum.releaser.domain.issue.dto.IssueResDto.IssueInfoRes;
 import com.momentum.releaser.global.config.BaseResponse;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
@@ -12,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -35,11 +39,12 @@ public class IssueController {
     /**
      * 7.2 이슈 수정
      */
-    @PatchMapping("/{issueId}")
+    @PatchMapping("/{issueId}/member/{memberId}")
     public BaseResponse<String> updateIssue(
             @PathVariable @Min(1) Long issueId,
+            @PathVariable @Min(1) Long memberId,
             @Valid @RequestBody IssueInfoReq updateReq) {
-        return new BaseResponse<>(issueService.updateIssue(issueId, updateReq));
+        return new BaseResponse<>(issueService.updateIssue(issueId, memberId, updateReq));
     }
 
     /**
@@ -49,6 +54,11 @@ public class IssueController {
     /**
      * 7.4 프로젝트별 모든 이슈 조회
      */
+    @GetMapping("/project/{projectId}")
+    public BaseResponse<List<IssueInfoRes>> getIssues(
+            @PathVariable @Min(1) Long projectId) {
+        return new BaseResponse<>(issueService.getIssues(projectId));
+    }
 
     /**
      * 7.5 프로젝트별 해결 & 미연결 이슈 조회
