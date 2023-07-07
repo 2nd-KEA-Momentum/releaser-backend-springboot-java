@@ -8,7 +8,9 @@ import java.util.Optional;
 
 public interface ReleaseRepositoryCustom {
 
-    Optional<ReleaseNote> findTopByProject(Project project);
+    boolean existsByProjectAndVersion(Project project, Long releaseId, String version);
+
+    Optional<ReleaseNote> findLatestVersionByProject(Project project);
 
     List<ReleaseNote> findByProjectAndNotInVersion(Project project, String version);
 }

@@ -21,13 +21,27 @@ public class ReleaseRepositoryImpl implements ReleaseRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
     /**
+     * 변경하려는 버전이 해당 프로젝트 내에 이미 존재하는 버전인지 확인한다.
+     */
+    @Override
+    public boolean existsByProjectAndVersion(Project project, Long releaseId, String version) {
+        return queryFactory
+                .selectFrom(releaseNote)
+                .where(releaseNote.project.eq(project))
+                .where(releaseNote.releaseId.ne(releaseId))
+                .where(releaseNote.version.eq(version))
+                .fetchFirst() != null;
+    }
+
+    /**
      * 가장 최신의 버전을 가져온다.
      */
     @Override
-    public Optional<ReleaseNote> findTopByProject(Project project) {
+    public Optional<ReleaseNote> findLatestVersionByProject(Project project) {
         ReleaseNote foundReleaseNote = queryFactory
                 .selectFrom(releaseNote)
                 .where(releaseNote.project.eq(project))
+                .orderBy(releaseNote.version.desc())
                 .limit(1)
                 .fetchOne();
 
