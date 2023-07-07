@@ -66,6 +66,12 @@ public class ReleaseNote extends BaseTime {
     @JoinColumn(name = "project_id")
     private Project project;
 
+    @Column(name = "coord_x")
+    private Double coordX;
+
+    @Column(name = "coord_y")
+    private Double coordY;
+
     @OneToMany(mappedBy = "release")
     private List<ReleaseOpinion> releaseOpinions = new ArrayList<>();
 
