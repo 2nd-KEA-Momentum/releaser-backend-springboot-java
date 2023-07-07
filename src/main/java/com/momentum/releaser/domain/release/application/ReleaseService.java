@@ -21,4 +21,9 @@ public interface ReleaseService {
      * 5.3 릴리즈 노트 수정
      */
     int updateReleaseNote(Long releaseId, ReleaseUpdateRequestDto releaseUpdateRequestDto);
+
+    /**
+     * 5.5 릴리즈 노트 조회
+     */
+
 }

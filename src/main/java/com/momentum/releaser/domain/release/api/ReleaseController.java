@@ -32,7 +32,7 @@ public class ReleaseController {
      */
     @GetMapping(value = "/projects")
     public BaseResponse<ReleasesResponseDto> getReleases(
-            @RequestParam @Min(1) Long projectId) {
+            @RequestParam @Min(value = 1, message = "프로젝트 식별 번호는 1 이상의 숫자여야 합니다.") Long projectId) {
 
         return new BaseResponse<>(releaseService.getReleasesByProject(projectId));
     }
@@ -42,7 +42,7 @@ public class ReleaseController {
      */
     @PostMapping(value = "/projects/{projectId}")
     public BaseResponse<ReleaseCreateResponseDto> createReleaseNote(
-            @PathVariable @Min(1) Long projectId,
+            @PathVariable @Min(value = 1, message = "프로젝트 식별 번호는 1 이상의 숫자여야 합니다.") Long projectId,
             @RequestBody @Valid ReleaseCreateRequestDto releaseCreateRequestDto) {
 
         return new BaseResponse<>(releaseService.createReleaseNote(projectId, releaseCreateRequestDto));
@@ -61,5 +61,13 @@ public class ReleaseController {
         } else {
             throw new CustomException(FAILED_TO_UPDATE_RELEASE_NOTE);
         }
+    }
+
+    /**
+     * 5.5 릴리즈 노트 조회
+     */
+    @GetMapping(value = "/{releaseId}")
+    public void getReleaseNote(
+            @PathVariable @Min(value = 1, message = "릴리즈 식별 번호는 1 이상의 숫자여야 합니다.") Long releaseId) {
     }
 }

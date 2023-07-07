@@ -54,7 +54,7 @@ public class ReleaseResponseDto {
     }
 
     /**
-     * 5.4 릴리즈 노트 조회
+     * 5.5 릴리즈 노트 조회
      */
     @Getter
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
