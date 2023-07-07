@@ -20,6 +20,7 @@ import com.momentum.releaser.global.error.CustomException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.catalina.valves.rewrite.InternalRewriteMap;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +28,7 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 
+import static com.momentum.releaser.domain.issue.dto.IssueResDto.*;
 import static com.momentum.releaser.global.config.BaseResponseStatus.*;
 
 @Slf4j
@@ -39,6 +41,7 @@ public class IssueServiceImpl implements IssueService {
     private final IssueNumRepository issueNumRepository;
     private final ProjectRepository projectRepository;
     private final ProjectMemberRepository projectMemberRepository;
+    private final ModelMapper modelMapper;
 
     /**
      * 7.1 이슈 생성
@@ -59,7 +62,6 @@ public class IssueServiceImpl implements IssueService {
     }
 
     private IssueNum saveIssueNum(Project project, Issue newIssue, Long number) {
-
 
         return issueNumRepository.save(IssueNum.builder()
                         .issue(newIssue)
@@ -102,7 +104,8 @@ public class IssueServiceImpl implements IssueService {
                 .project(project)
                 .member(projectMember)
                 .build());
-//        IssueNum issueNum = saveIssueNum(project, newIssue, number);
+        IssueNum issueNum = saveIssueNum(project, issue, number);
+        issue.updateIssueNum(issueNum);
         return issue;
     }
 
@@ -158,11 +161,10 @@ public class IssueServiceImpl implements IssueService {
      * 7.4 프로젝트별 모든 이슈 조회
      */
     @Override
-    public List<IssueResDto.IssueInfoRes> getIssues(Long projectId) {
-        //issue 정보
-        //member 정보
-        //
-        return null;
+    public List<IssueInfoRes> getIssues(Long projectId) {
+        List<IssueInfoRes> getAllIssue = issueRepository.getIssues();
+
+        return getAllIssue;
     }
     /**
      * 7.5 프로젝트별 해결 & 미연결 이슈 조회

@@ -46,8 +46,10 @@ public class IssueRepositoryImpl implements IssueRepositoryCustom{
                                 issue.edit,
                                 issue.lifeCycle.stringValue())
                 )
-                .from()
-                .where()
+                .from(issue)  // Issue 테이블을 지정
+                .leftJoin(issue.member, member)
+                .leftJoin(member.user, user)
+                .leftJoin(issue.release, releaseNote)
                 .fetch();
         return null;
     }
