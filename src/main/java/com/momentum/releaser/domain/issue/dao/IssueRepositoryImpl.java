@@ -1,7 +1,12 @@
 package com.momentum.releaser.domain.issue.dao;
 
+import com.momentum.releaser.domain.issue.domain.QIssue;
 import com.momentum.releaser.domain.issue.dto.IssueResDto;
 import com.momentum.releaser.domain.issue.dto.IssueResDto.IssueInfoRes;
+import com.momentum.releaser.domain.issue.dto.QIssueResDto_IssueInfoRes;
+import com.momentum.releaser.domain.project.domain.QProjectMember;
+import com.momentum.releaser.domain.release.domain.QReleaseNote;
+import com.momentum.releaser.domain.user.domain.QUser;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
