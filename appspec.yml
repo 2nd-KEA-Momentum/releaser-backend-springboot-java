@@ -5,6 +5,7 @@ files:
   - source:  /
     destination: /home/ubuntu/releaser-app
     overwrite: yes
+files_exists_behavior: OVERWRITE
 
 permissions:
   - object: / 
