@@ -145,6 +145,11 @@ public class Issue extends BaseTime {
         }
     }
 
+    //issueNum 저장
+    public void updateIssueNum(IssueNum issueNum) {
+        this.issueNum = issueNum;
+    }
+
     /**
      * insert 되기전 (persist 되기전) 실행된다.
      */
