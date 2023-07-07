@@ -76,7 +76,7 @@ public class Issue extends BaseTime {
     @JoinColumn(name = "release_id")
     private ReleaseNote release;
 
-    @OneToOne
+    @OneToOne()
     @JoinColumn(name = "issue_num_id")
     private IssueNum issueNum;
 
@@ -128,12 +128,19 @@ public class Issue extends BaseTime {
         this.member = member;
     }
 
+
     @PreRemove
     private void preRemove() {
         for (IssueOpinion opinion : issueOpinions) {
             opinion.statusToInactive();
         }
+        issueNum.deleteToIssue();
     }
+
+    public void deleteToIssueNum() {
+        this.issueNum = null;
+    }
+
 
     public void statusToInactive() {
         this.status = 'N';
@@ -143,6 +150,7 @@ public class Issue extends BaseTime {
         for (IssueOpinion opinion : issueOpinions) {
             opinion.statusToInactive();
         }
+
     }
 
     //issueNum 저장

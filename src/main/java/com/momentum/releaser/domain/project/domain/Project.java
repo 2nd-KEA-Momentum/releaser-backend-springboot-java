@@ -79,7 +79,7 @@ public class Project extends BaseTime {
     }
 
     @PreRemove
-    private void preRemoveMember() {
+    private void preRemove() {
         for (ProjectMember member : members) {
             member.statusToInactive();
         }
@@ -88,11 +88,18 @@ public class Project extends BaseTime {
             releaseNote.softDelete();
 
         }
+        for (IssueNum issueNum : issueNums){
+            issueNum.deleteToProject();
+        }
         for (Issue issue : issues) {
             issue.statusToInactive();
+            issue.deleteToIssueNum();
             issue.softDelete();
         }
+
+
     }
+
 
     /**
      * insert 되기전 (persist 되기전) 실행된다.
