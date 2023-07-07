@@ -65,6 +65,7 @@ public class ReleaseServiceImpl implements ReleaseService {
     @Transactional
     @Override
     public ReleaseCreateResponseDto createReleaseNote(Long projectId, ReleaseCreateRequestDto releaseCreateRequestDto) {
+        // 프로젝트를 가져온다.
         Project project = projectRepository.findById(projectId).orElseThrow(() -> new CustomException(NOT_EXISTS_PROJECT));
 
         // 연결할 이슈들의 식별 번호를 가지고 엔티티 형태로 받아온다.
@@ -213,6 +214,10 @@ public class ReleaseServiceImpl implements ReleaseService {
         });
 
         return 1;
+    }
+
+    private Project getProjectById(Long projectId) {
+        return projectRepository.findById(projectId).orElseThrow(() -> new CustomException(NOT_EXISTS_PROJECT));
     }
 
     /**
