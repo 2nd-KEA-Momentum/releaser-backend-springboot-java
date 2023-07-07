@@ -1,8 +1,10 @@
 package com.momentum.releaser.domain.issue.application;
 
+import com.momentum.releaser.domain.issue.dao.IssueNumRepository;
 import com.momentum.releaser.domain.issue.dao.IssueOpinionRepository;
 import com.momentum.releaser.domain.issue.dao.IssueRepository;
 import com.momentum.releaser.domain.issue.domain.Issue;
+import com.momentum.releaser.domain.issue.domain.IssueNum;
 import com.momentum.releaser.domain.issue.domain.IssueOpinion;
 import com.momentum.releaser.domain.issue.domain.Tag;
 import com.momentum.releaser.domain.issue.dto.IssueReqDto;
@@ -34,6 +36,7 @@ public class IssueServiceImpl implements IssueService {
 
     private final IssueRepository issueRepository;
     private final IssueOpinionRepository issueOpinionRepository;
+    private final IssueNumRepository issueNumRepository;
     private final ProjectRepository projectRepository;
     private final ProjectMemberRepository projectMemberRepository;
 
@@ -53,6 +56,16 @@ public class IssueServiceImpl implements IssueService {
         Issue newIssue = saveIssue(createReq, project, projectMember, tagIssue);
         String result = "이슈 생성이 완료되었습니다.";
         return result;
+    }
+
+    private IssueNum saveIssueNum(Project project, Issue newIssue, Long number) {
+
+
+        return issueNumRepository.save(IssueNum.builder()
+                        .issue(newIssue)
+                        .project(project)
+                        .issueNum(number)
+                .build());
     }
 
     // memberId로 프로젝트 멤버 찾기
@@ -80,7 +93,8 @@ public class IssueServiceImpl implements IssueService {
 
     // 이슈 저장
     private Issue saveIssue(IssueInfoReq issueInfoReq, Project project, ProjectMember projectMember, Tag tagIssue) {
-        return issueRepository.save(Issue.builder()
+        Long number = issueRepository.getIssueNum(project) + 1;
+        Issue issue = issueRepository.save(Issue.builder()
                 .title(issueInfoReq.getTitle())
                 .content(issueInfoReq.getContent())
                 .tag(tagIssue)
@@ -88,6 +102,8 @@ public class IssueServiceImpl implements IssueService {
                 .project(project)
                 .member(projectMember)
                 .build());
+//        IssueNum issueNum = saveIssueNum(project, newIssue, number);
+        return issue;
     }
 
 
