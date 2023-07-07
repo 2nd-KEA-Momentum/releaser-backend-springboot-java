@@ -1,13 +1,12 @@
 package com.momentum.releaser.domain.release.api;
 
 import com.momentum.releaser.domain.release.application.ReleaseServiceImpl;
-import com.momentum.releaser.domain.release.dto.ReleaseRequestDto;
 import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.ReleaseCreateRequestDto;
 import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.ReleaseUpdateRequestDto;
 import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.ReleaseCreateResponseDto;
 import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.ReleasesResponseDto;
 import com.momentum.releaser.global.config.BaseResponse;
-import com.momentum.releaser.global.config.BaseResponseStatus;
+import com.momentum.releaser.global.error.CustomException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
@@ -16,8 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 
-import static com.momentum.releaser.global.config.BaseResponseStatus.FAILED_TO_UPDATE_RELEASE_NOTE;
-import static com.momentum.releaser.global.config.BaseResponseStatus.SUCCESS_TO_UPDATE_RELEASE_NOTE;
+import static com.momentum.releaser.global.config.BaseResponseStatus.*;
 
 @Slf4j
 @RestController
@@ -55,14 +53,13 @@ public class ReleaseController {
      */
     @PatchMapping(value = "/{releaseId}")
     public BaseResponse<String> updateReleaseNote(
-            @PathVariable @Min(1) Long releaseId,
+            @PathVariable @Min(value = 1, message = "릴리즈 식별 번호는 1 이상의 숫자여야 합니다.") Long releaseId,
             @RequestBody @Valid ReleaseUpdateRequestDto releaseUpdateRequestDto) {
 
         if (releaseService.updateReleaseNote(releaseId, releaseUpdateRequestDto) == 1) {
-            return new BaseResponse<>(SUCCESS_TO_UPDATE_RELEASE_NOTE);
+            return new BaseResponse<>("릴리즈 노트 수정에 성공하였습니다.");
         } else {
-            return new BaseResponse<>(FAILED_TO_UPDATE_RELEASE_NOTE);
+            throw new CustomException(FAILED_TO_UPDATE_RELEASE_NOTE);
         }
-
     }
 }
