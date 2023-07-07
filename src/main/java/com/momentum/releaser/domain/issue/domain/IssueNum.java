@@ -38,4 +38,21 @@ public class IssueNum extends BaseTime {
         this.project = project;
         this.issueNum = issueNum;
     }
+
+    @PreRemove
+    private void preRemove() {
+        if (issue != null) {
+            issue.deleteToIssueNum();
+        }
+    }
+
+    public void deleteToIssue() {
+        this.issue = null;
+    }
+
+    public void deleteToProject() {
+        this.project = null;
+        this.issue = null;
+    }
+
 }

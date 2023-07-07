@@ -1,8 +1,10 @@
 package com.momentum.releaser.domain.issue.application;
 
+import com.momentum.releaser.domain.issue.dao.IssueNumRepository;
 import com.momentum.releaser.domain.issue.dao.IssueOpinionRepository;
 import com.momentum.releaser.domain.issue.dao.IssueRepository;
 import com.momentum.releaser.domain.issue.domain.Issue;
+import com.momentum.releaser.domain.issue.domain.IssueNum;
 import com.momentum.releaser.domain.issue.domain.IssueOpinion;
 import com.momentum.releaser.domain.issue.domain.Tag;
 import com.momentum.releaser.domain.issue.dto.IssueReqDto;
@@ -18,6 +20,7 @@ import com.momentum.releaser.global.error.CustomException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.catalina.valves.rewrite.InternalRewriteMap;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +28,7 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 
+import static com.momentum.releaser.domain.issue.dto.IssueResDto.*;
 import static com.momentum.releaser.global.config.BaseResponseStatus.*;
 
 @Slf4j
@@ -34,8 +38,10 @@ public class IssueServiceImpl implements IssueService {
 
     private final IssueRepository issueRepository;
     private final IssueOpinionRepository issueOpinionRepository;
+    private final IssueNumRepository issueNumRepository;
     private final ProjectRepository projectRepository;
     private final ProjectMemberRepository projectMemberRepository;
+    private final ModelMapper modelMapper;
 
     /**
      * 7.1 이슈 생성
@@ -53,6 +59,15 @@ public class IssueServiceImpl implements IssueService {
         Issue newIssue = saveIssue(createReq, project, projectMember, tagIssue);
         String result = "이슈 생성이 완료되었습니다.";
         return result;
+    }
+
+    private IssueNum saveIssueNum(Project project, Issue newIssue, Long number) {
+
+        return issueNumRepository.save(IssueNum.builder()
+                        .issue(newIssue)
+                        .project(project)
+                        .issueNum(number)
+                .build());
     }
 
     // memberId로 프로젝트 멤버 찾기
@@ -80,7 +95,8 @@ public class IssueServiceImpl implements IssueService {
 
     // 이슈 저장
     private Issue saveIssue(IssueInfoReq issueInfoReq, Project project, ProjectMember projectMember, Tag tagIssue) {
-        return issueRepository.save(Issue.builder()
+        Long number = issueRepository.getIssueNum(project) + 1;
+        Issue issue = issueRepository.save(Issue.builder()
                 .title(issueInfoReq.getTitle())
                 .content(issueInfoReq.getContent())
                 .tag(tagIssue)
@@ -88,6 +104,9 @@ public class IssueServiceImpl implements IssueService {
                 .project(project)
                 .member(projectMember)
                 .build());
+        IssueNum issueNum = saveIssueNum(project, issue, number);
+        issue.updateIssueNum(issueNum);
+        return issue;
     }
 
 
@@ -142,11 +161,10 @@ public class IssueServiceImpl implements IssueService {
      * 7.4 프로젝트별 모든 이슈 조회
      */
     @Override
-    public List<IssueResDto.IssueInfoRes> getIssues(Long projectId) {
-        //issue 정보
-        //member 정보
-        //
-        return null;
+    public List<IssueInfoRes> getIssues(Long projectId) {
+        List<IssueInfoRes> getAllIssue = issueRepository.getIssues();
+
+        return getAllIssue;
     }
     /**
      * 7.5 프로젝트별 해결 & 미연결 이슈 조회
