@@ -11,7 +11,4 @@ import java.util.List;
 public interface ReleaseRepository extends JpaRepository<ReleaseNote, Long>, ReleaseRepositoryCustom {
 
     List<ReleaseNote> findAllByProject(Project project);
-
-    boolean existsByVersion(String version);
-
 }
