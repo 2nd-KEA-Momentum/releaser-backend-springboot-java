@@ -1,5 +1,7 @@
 package com.momentum.releaser.domain.project.application;
 
+import com.momentum.releaser.domain.issue.dao.IssueNumRepository;
+import com.momentum.releaser.domain.issue.dao.IssueRepository;
 import com.momentum.releaser.domain.project.dao.ProjectMemberRepository;
 import com.momentum.releaser.domain.project.dao.ProjectRepository;
 import com.momentum.releaser.domain.project.domain.Project;
@@ -30,6 +32,7 @@ public class ProjectServiceImpl implements ProjectService {
     private final ProjectRepository projectRepository;
     private final ProjectMemberRepository projectMemberRepository;
     private final UserRepository userRepository;
+    private final IssueRepository issueRepository;
     private final ModelMapper modelMapper;
 
     /**
@@ -140,6 +143,8 @@ public class ProjectServiceImpl implements ProjectService {
         Project project = projectRepository.findById(projectId).orElseThrow(() -> new CustomException(NOT_EXISTS_PROJECT));
 
         projectRepository.deleteById(project.getProjectId());
+        issueRepository.deleteByIssueNum();
+
         return "프로젝트가 삭제되었습니다.";
     }
 

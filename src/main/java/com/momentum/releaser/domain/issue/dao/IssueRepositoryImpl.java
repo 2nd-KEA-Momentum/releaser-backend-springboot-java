@@ -1,10 +1,8 @@
 package com.momentum.releaser.domain.issue.dao;
 
-import com.momentum.releaser.domain.issue.domain.Issue;
 import com.momentum.releaser.domain.issue.domain.IssueNum;
 import com.momentum.releaser.domain.issue.domain.QIssue;
 import com.momentum.releaser.domain.issue.domain.QIssueNum;
-import com.momentum.releaser.domain.issue.dto.IssueResDto;
 import com.momentum.releaser.domain.issue.dto.IssueResDto.IssueInfoRes;
 import com.momentum.releaser.domain.issue.dto.QIssueResDto_IssueInfoRes;
 import com.momentum.releaser.domain.project.domain.Project;
@@ -70,5 +68,16 @@ public class IssueRepositoryImpl implements IssueRepositoryCustom{
             number = result.get().getIssueNum();
         }
         return number;
+    }
+
+    @Override
+    public void deleteByIssueNum() {
+        QIssueNum issueNum = QIssueNum.issueNum1;
+
+        queryFactory
+                .delete(issueNum)
+                .where(issueNum.project.isNull()
+                        .or(issueNum.issue.isNull()))
+                .execute();
     }
 }

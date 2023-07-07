@@ -7,5 +7,5 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 @RepositoryRestResource(collectionResourceRel="issue-num", path="issue-num")
 
-public interface IssueNumRepository extends JpaRepository<IssueNum, Long> {
+public interface IssueNumRepository extends JpaRepository<IssueNum, Long>{
 }
