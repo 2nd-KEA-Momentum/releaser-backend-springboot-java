@@ -162,7 +162,8 @@ public class IssueServiceImpl implements IssueService {
      */
     @Override
     public List<IssueInfoRes> getIssues(Long projectId) {
-        List<IssueInfoRes> getAllIssue = issueRepository.getIssues();
+        List<IssueInfoRes> getAllIssue = new ArrayList<>();
+        getAllIssue.add((IssueInfoRes) issueRepository.getIssues());
 
         return getAllIssue;
     }
