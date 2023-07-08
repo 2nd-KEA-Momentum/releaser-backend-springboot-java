@@ -15,6 +15,8 @@ import com.momentum.releaser.domain.project.dao.ProjectMemberRepository;
 import com.momentum.releaser.domain.project.dao.ProjectRepository;
 import com.momentum.releaser.domain.project.domain.Project;
 import com.momentum.releaser.domain.project.domain.ProjectMember;
+import com.momentum.releaser.domain.release.dao.ReleaseRepository;
+import com.momentum.releaser.domain.release.domain.ReleaseNote;
 import com.momentum.releaser.global.config.BaseResponseStatus;
 import com.momentum.releaser.global.error.CustomException;
 import lombok.RequiredArgsConstructor;
@@ -42,6 +44,7 @@ public class IssueServiceImpl implements IssueService {
     private final IssueNumRepository issueNumRepository;
     private final ProjectRepository projectRepository;
     private final ProjectMemberRepository projectMemberRepository;
+    private final ReleaseRepository releaseRepository;
     private final ModelMapper modelMapper;
 
     /**
@@ -162,7 +165,7 @@ public class IssueServiceImpl implements IssueService {
      * 7.4 프로젝트별 모든 이슈 조회
      */
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public GetIssuesList getIssues(Long projectId) {
         Project findProject = findProject(projectId);
         List<IssueInfoRes> getAllIssue = issueRepository.getIssues(findProject);
@@ -189,10 +192,32 @@ public class IssueServiceImpl implements IssueService {
     /**
      * 7.5 프로젝트별 해결 & 미연결 이슈 조회
      */
+    @Override
+    @Transactional(readOnly = true)
+    public List<GetDoneIssues> getDoneIssues(Long projectId) {
+        Project findProject = findProject(projectId);
+        List<GetDoneIssues> getDoneIssue = issueRepository.getDoneIssues(findProject);
 
+        return getDoneIssue;
+    }
     /**
      * 7.6 릴리즈 노트별 연결된 이슈 조회
      */
+    @Override
+    public List<GetConnectionIssues> getConnectRelese(Long projectId, Long releaseId) {
+        Project findProject = findProject(projectId);
+        ReleaseNote findReleaseNote = findReleaseNote(releaseId);
+
+        List<GetConnectionIssues> getConnectionIssues = issueRepository.getConnectionIssues(findProject, findReleaseNote);
+
+        return getConnectionIssues;
+    }
+
+    //releaseId로 releaseNote 찾기
+    private ReleaseNote findReleaseNote(Long releaseId) {
+        return releaseRepository.findById(releaseId)
+                .orElseThrow(() -> new CustomException(NOT_EXISTS_RELEASE_NOTE));
+    }
 
     /**
      * 7.7 이슈 검색

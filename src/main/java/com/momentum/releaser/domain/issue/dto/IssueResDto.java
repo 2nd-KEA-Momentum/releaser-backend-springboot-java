@@ -28,6 +28,7 @@ public class IssueResDto {
             this.getDoneList = getDoneList;
         }
     }
+
     /**
      * 이슈 정보
      */
@@ -61,5 +62,62 @@ public class IssueResDto {
             this.lifeCycle = lifeCycle;
         }
     }
+
+    /**
+     * 프로젝트별 연결 가능한 이슈
+     */
+    @Data
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    public static class GetDoneIssues {
+        private Long issueId;
+        private String title;
+        private String tag;
+        private Long memberId;
+        private String memberName;
+        private String memberImg;
+
+        @QueryProjection
+        @Builder
+        public GetDoneIssues(Long issueId, String title, String tag, Long memberId, String memberName, String memberImg) {
+            this.issueId = issueId;
+            this.title = title;
+            this.tag = tag;
+            this.memberId = memberId;
+            this.memberName = memberName;
+            this.memberImg = memberImg;
+        }
+    }
+
+    /**
+     * 프로젝트별 릴리즈와 연결된 이슈
+     */
+    @Data
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    public static class GetConnectionIssues {
+        private Long issueId;
+        private String title;
+        private String tag;
+        private char edit;
+        private Long memberId;
+        private String memberName;
+        private String memberImg;
+        private String releaseVersion;
+
+        @QueryProjection
+        @Builder
+        public GetConnectionIssues(Long issueId, String title, String tag, char edit, Long memberId, String memberName, String memberImg, String releaseVersion) {
+            this.issueId = issueId;
+            this.title = title;
+            this.tag = tag;
+            this.edit = edit;
+            this.memberId = memberId;
+            this.memberName = memberName;
+            this.memberImg = memberImg;
+            this.releaseVersion = releaseVersion;
+        }
+    }
+
+
+
 
 }
