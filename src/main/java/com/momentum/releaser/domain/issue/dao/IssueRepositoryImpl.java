@@ -5,7 +5,9 @@ import com.momentum.releaser.domain.issue.dto.*;
 import com.momentum.releaser.domain.issue.dto.IssueResDto.GetConnectionIssues;
 import com.momentum.releaser.domain.issue.dto.IssueResDto.GetDoneIssues;
 import com.momentum.releaser.domain.issue.dto.IssueResDto.IssueInfoRes;
+import com.momentum.releaser.domain.issue.dto.IssueResDto.OpinionInfoRes;
 import com.momentum.releaser.domain.project.domain.Project;
+import com.momentum.releaser.domain.project.domain.ProjectMember;
 import com.momentum.releaser.domain.project.domain.QProjectMember;
 import com.momentum.releaser.domain.release.domain.QReleaseNote;
 import com.momentum.releaser.domain.release.domain.ReleaseNote;
@@ -144,5 +146,25 @@ public class IssueRepositoryImpl implements IssueRepositoryCustom{
         return getConnectionIssues;
     }
 
+    @Override
+    public List<OpinionInfoRes> getIssueOpinion(Issue issue) {
+        QIssueOpinion issueOpinion = QIssueOpinion.issueOpinion;
+        QProjectMember member = QProjectMember.projectMember;
+        QUser user = QUser.user;
 
+        List<OpinionInfoRes> opinionInfoRes = queryFactory
+                .select(new QIssueResDto_OpinionInfoRes(
+                        member.memberId,
+                        user.name.as("memberName"),
+                        user.img.as("memberImg"),
+                        issueOpinion.issueOpinionId.as("opinionId"),
+                        issueOpinion.opinion
+                ))
+                .from(issueOpinion)
+                .leftJoin(issueOpinion.member, member)
+                .leftJoin(member.user, user)
+                .where(issueOpinion.issue.eq(issue))
+                .fetch();
+        return opinionInfoRes;
+    }
 }

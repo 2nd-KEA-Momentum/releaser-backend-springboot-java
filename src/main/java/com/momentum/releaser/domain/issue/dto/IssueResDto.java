@@ -1,5 +1,6 @@
 package com.momentum.releaser.domain.issue.dto;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.momentum.releaser.domain.issue.domain.LifeCycle;
 import com.momentum.releaser.domain.issue.domain.Tag;
 import com.momentum.releaser.domain.project.dto.ProjectResDto;
@@ -10,10 +11,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
-public class IssueResDto {
+public class IssueResDto{
     /**
      * 이슈 상태 구분
      */
@@ -123,6 +125,29 @@ public class IssueResDto {
             this.memberName = memberName;
             this.memberImg = memberImg;
             this.releaseVersion = releaseVersion;
+        }
+    }
+
+    /**
+     * 이슈 의견 정보
+     */
+    @Data
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    public static class OpinionInfoRes {
+        private Long memberId;
+        private String memberName;
+        private String memberImg;
+        private Long opinionId;
+        private String opinion;
+
+        @Builder
+        @QueryProjection
+        public OpinionInfoRes(Long memberId, String memberName, String memberImg, Long opinionId, String opinion) {
+            this.memberId = memberId;
+            this.memberName = memberName;
+            this.memberImg = memberImg;
+            this.opinionId = opinionId;
+            this.opinion = opinion;
         }
     }
 

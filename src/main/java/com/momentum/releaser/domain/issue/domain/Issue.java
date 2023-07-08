@@ -162,6 +162,9 @@ public class Issue extends BaseTime {
     public void updateIssueEdit(char status){
         this.edit = status;
     }
+    public void updateLifeCycle(LifeCycle lifeCycleIssue) {
+        this.lifeCycle = lifeCycleIssue;
+    }
 
     /**
      * insert 되기전 (persist 되기전) 실행된다.
@@ -172,4 +175,6 @@ public class Issue extends BaseTime {
         this.edit = (this.edit == '\0') ? 'N' : this.edit;
         this.status = (this.status == '\0') ? 'Y' : this.status;
     }
+
+
 }

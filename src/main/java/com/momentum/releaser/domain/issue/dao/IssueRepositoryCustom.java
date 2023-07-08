@@ -5,6 +5,7 @@ import com.momentum.releaser.domain.issue.domain.IssueNum;
 import com.momentum.releaser.domain.issue.dto.IssueResDto;
 import com.momentum.releaser.domain.issue.dto.IssueResDto.*;
 import com.momentum.releaser.domain.project.domain.Project;
+import com.momentum.releaser.domain.project.domain.ProjectMember;
 import com.momentum.releaser.domain.release.domain.ReleaseNote;
 
 import javax.swing.text.html.Option;
@@ -22,6 +23,9 @@ public interface IssueRepositoryCustom {
     List<GetDoneIssues> getDoneIssues(Project findProject);
 
     List<GetConnectionIssues> getConnectionIssues(Project findProject, ReleaseNote findReleaseNote);
+
+
+    List<OpinionInfoRes> getIssueOpinion(Issue issue);
 
 
 }

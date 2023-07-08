@@ -1,13 +1,13 @@
 package com.momentum.releaser.domain.issue.api;
 
 import com.momentum.releaser.domain.issue.application.IssueService;
-import com.momentum.releaser.domain.issue.dto.IssueReqDto;
 import com.momentum.releaser.domain.issue.dto.IssueReqDto.IssueInfoReq;
+import com.momentum.releaser.domain.issue.dto.IssueReqDto.UpdateLifeCycleReq;
 import com.momentum.releaser.domain.issue.dto.IssueResDto.GetConnectionIssues;
 import com.momentum.releaser.domain.issue.dto.IssueResDto.GetDoneIssues;
 import com.momentum.releaser.domain.issue.dto.IssueResDto.GetIssuesList;
+import com.momentum.releaser.domain.issue.dto.IssueResDto.OpinionInfoRes;
 import com.momentum.releaser.global.config.BaseResponse;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
@@ -15,8 +15,9 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
 import java.util.List;
+
+import static com.momentum.releaser.domain.issue.dto.IssueReqDto.*;
 
 @Slf4j
 @RestController
@@ -27,6 +28,7 @@ import java.util.List;
 public class IssueController {
 
     private final IssueService issueService;
+
     /**
      * 7.1 이슈 생성
      */
@@ -73,7 +75,7 @@ public class IssueController {
      */
     @GetMapping("/project/{projectId}/release/{releaseId}")
     public BaseResponse<List<GetConnectionIssues>> getConnectRelease(@PathVariable @Min(1) Long projectId,
-                                                               @PathVariable @Min(1) Long releaseId) {
+                                                                     @PathVariable @Min(1) Long releaseId) {
         return new BaseResponse<>(issueService.getConnectRelease(projectId, releaseId));
     }
 
@@ -89,16 +91,30 @@ public class IssueController {
     /**
      * 7.8 이슈 상태 변경
      */
+    @PatchMapping("/{issueId}")
+    public BaseResponse<String> updateLifeCycle(@PathVariable @Min(1) Long issueId,
+                                                @Valid @RequestBody UpdateLifeCycleReq lifeCycleReq) {
+        return new BaseResponse<>(issueService.updateLifeCycle(issueId, lifeCycleReq));
+    }
 
     /**
      * 8.1 이슈 의견 추가
      */
+    @PostMapping("/{issueId}/{memberId}/opinion")
+    public BaseResponse<List<OpinionInfoRes>> registerOpinion(@PathVariable @Min(1) Long issueId,
+                                                        @PathVariable @Min(1) Long memberId,
+                                                        @Valid @RequestBody RegisterOpinionReq opinionReq) {
+        return new BaseResponse<>(issueService.registerOpinion(issueId, memberId, opinionReq));
+
+    }
 
     /**
      * 8.2 이슈 의견 삭제
      */
+    @PostMapping("/opinion/{opinionId}")
+    public BaseResponse<String> deleteOpinion(@PathVariable @Min(1) Long opinionId) {
+        return new BaseResponse<>(issueService.deleteOpinion(opinionId));
+    }
 
-    /**
-     * 8.3 이슈 의견 조회
-     */
+
 }

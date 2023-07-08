@@ -2,6 +2,7 @@ package com.momentum.releaser.domain.issue.application;
 
 import com.momentum.releaser.domain.issue.dto.IssueReqDto;
 import com.momentum.releaser.domain.issue.dto.IssueReqDto.IssueInfoReq;
+import com.momentum.releaser.domain.issue.dto.IssueReqDto.RegisterOpinionReq;
 import com.momentum.releaser.domain.issue.dto.IssueResDto;
 import com.momentum.releaser.domain.issue.dto.IssueResDto.*;
 
@@ -41,20 +42,30 @@ public interface IssueService {
      */
     List<GetConnectionIssues> getConnectRelease(Long projectId, Long releaseId);
 
+    /**
+     * 7.7 이슈별 조회
+     */
+
 
     /**
-     * 7.7 이슈 검색
+     * 7.8 이슈 상태 변경
      */
+    String updateLifeCycle(Long issueId, IssueReqDto.UpdateLifeCycleReq lifeCycleReq);
+
+
 
     /**
      * 8.1 이슈 의견 추가
      */
 
+    List<OpinionInfoRes> registerOpinion(Long issueId, Long memberId, RegisterOpinionReq opinionReq);
+
+
     /**
      * 8.2 이슈 의견 삭제
      */
+    String deleteOpinion(Long opinionId);
 
-    /**
-     * 8.3 이슈 의견 조회
-     */
+
+
 }
