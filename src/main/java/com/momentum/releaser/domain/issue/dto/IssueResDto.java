@@ -51,8 +51,8 @@ public class IssueResDto {
         private char edit;
         private String lifeCycle;
 
-        @QueryProjection
         @Builder
+        @QueryProjection
         public IssueInfoRes(Long issueId, Long issueNum, String title, String content, Long memberId, String memberName, String memberImg, String tag, String releaseVersion, char edit, String lifeCycle) {
             this.issueId = issueId;
             this.issueNum = issueNum;
@@ -82,8 +82,8 @@ public class IssueResDto {
         private String memberName;
         private String memberImg;
 
-        @QueryProjection
         @Builder
+        @QueryProjection
         public GetDoneIssues(Long issueId, Long issueNum, String title, String tag, Long memberId, String memberName, String memberImg) {
             this.issueId = issueId;
             this.issueNum = issueNum;
@@ -111,9 +111,8 @@ public class IssueResDto {
         private String memberImg;
         private String releaseVersion;
 
-
-        @QueryProjection
         @Builder
+        @QueryProjection
         public GetConnectionIssues(Long issueId, Long issueNum, String title, String tag, char edit, Long memberId, String memberName, String memberImg, String releaseVersion) {
             this.issueId = issueId;
             this.issueNum = issueNum;
@@ -125,67 +124,7 @@ public class IssueResDto {
             this.memberImg = memberImg;
             this.releaseVersion = releaseVersion;
         }
-
     }
-
-    /**
-     * 이슈 조회
-     */
-    @Data
-    @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    public static class GetIssue {
-        private Long issueNum;
-        private String title;
-        private String content;
-        private String tag;
-        private Date endDate;
-        private char edit;
-        private Long manager; //현 담당자 식별번호
-        private List<GetMembersRes> getMemberList;
-        private List<IssueOpinionInfoRes> getOpinionList;
-
-
-        @QueryProjection
-        @Builder
-        public GetIssue(Long issueNum, String title, String content, String tag, Date endDate, char edit, Long manager, List<GetMembersRes> getMemberList, List<IssueOpinionInfoRes> getOpinionList) {
-            this.issueNum = issueNum;
-            this.title = title;
-            this.content = content;
-            this.tag = tag;
-            this.endDate = endDate;
-            this.edit = edit;
-            this.manager = manager;
-            this.getMemberList = getMemberList;
-            this.getOpinionList = getOpinionList;
-        }
-    }
-
-    /**
-     * 이슈 의견 정보
-     */
-    @Data
-    @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    public static class IssueOpinionInfoRes {
-        private Long opinionId;
-        private String opinion;
-        private Long memberId;
-        private String memberName;
-        private String memberImg;
-
-        @QueryProjection
-        @Builder
-        public IssueOpinionInfoRes(Long opinionId, String opinion, Long memberId, String memberName, String memberImg) {
-            this.opinionId = opinionId;
-            this.opinion = opinion;
-            this.memberId = memberId;
-            this.memberName = memberName;
-            this.memberImg = memberImg;
-        }
-    }
-
-
-
-
 
 
 }

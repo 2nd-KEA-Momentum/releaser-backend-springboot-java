@@ -2,7 +2,9 @@ package com.momentum.releaser.domain.issue.dao;
 
 import com.momentum.releaser.domain.issue.domain.*;
 import com.momentum.releaser.domain.issue.dto.*;
-import com.momentum.releaser.domain.issue.dto.IssueResDto.*;
+import com.momentum.releaser.domain.issue.dto.IssueResDto.GetConnectionIssues;
+import com.momentum.releaser.domain.issue.dto.IssueResDto.GetDoneIssues;
+import com.momentum.releaser.domain.issue.dto.IssueResDto.IssueInfoRes;
 import com.momentum.releaser.domain.project.domain.Project;
 import com.momentum.releaser.domain.project.domain.QProjectMember;
 import com.momentum.releaser.domain.release.domain.QReleaseNote;
@@ -56,7 +58,6 @@ public class IssueRepositoryImpl implements IssueRepositoryCustom{
     @Override
     public List<IssueInfoRes> getIssues(Project getProject) {
         QIssue issue = QIssue.issue;
-        QIssueNum issueNum = QIssueNum.issueNum1;
         QProjectMember member = QProjectMember.projectMember;
         QUser user = QUser.user;
         QReleaseNote releaseNote = QReleaseNote.releaseNote;
@@ -66,7 +67,7 @@ public class IssueRepositoryImpl implements IssueRepositoryCustom{
                 .select(
                         new QIssueResDto_IssueInfoRes(
                                 issue.issueId,
-                                issueNum.issueNum,
+                                issue.issueNum.issueNum,
                                 issue.title,
                                 issue.content,
                                 member.memberId,
@@ -78,7 +79,6 @@ public class IssueRepositoryImpl implements IssueRepositoryCustom{
                                 Expressions.stringTemplate("CAST({0} AS string)", issue.lifeCycle))
                 )
                 .from(issue)  // Issue 테이블을 지정
-                .leftJoin(issue.issueNum, issueNum)
                 .leftJoin(issue.member, member)
                 .leftJoin(member.user, user)
                 .leftJoin(issue.release, releaseNote)
@@ -90,14 +90,13 @@ public class IssueRepositoryImpl implements IssueRepositoryCustom{
     @Override
     public List<GetDoneIssues> getDoneIssues(Project getProject) {
         QIssue issue = QIssue.issue;
-        QIssueNum issueNum = QIssueNum.issueNum1;
         QProjectMember member = QProjectMember.projectMember;
         QUser user = QUser.user;
 
         List<GetDoneIssues> getDoneIssues = queryFactory
                 .select(new QIssueResDto_GetDoneIssues(
                         issue.issueId,
-                        issueNum.issueNum,
+                        issue.issueNum.issueNum,
                         issue.title,
                         Expressions.stringTemplate("CAST({0} AS string)", issue.tag),
                         member.memberId,
@@ -105,7 +104,6 @@ public class IssueRepositoryImpl implements IssueRepositoryCustom{
                         user.img.as("memberImg"))
                 )
                 .from(issue)
-                .leftJoin(issue.issueNum, issueNum)
                 .leftJoin(issue.member, member)
                 .leftJoin(member.user, user)
                 .where(issue.project.eq(getProject)
@@ -119,7 +117,6 @@ public class IssueRepositoryImpl implements IssueRepositoryCustom{
     @Override
     public List<GetConnectionIssues> getConnectionIssues(Project getProject, ReleaseNote getReleaseNote) {
         QIssue issue = QIssue.issue;
-        QIssueNum issueNum = QIssueNum.issueNum1;
         QProjectMember member = QProjectMember.projectMember;
         QUser user = QUser.user;
         QReleaseNote releaseNote = QReleaseNote.releaseNote;
@@ -127,7 +124,7 @@ public class IssueRepositoryImpl implements IssueRepositoryCustom{
         List<GetConnectionIssues> getConnectionIssues = queryFactory
                 .select(new QIssueResDto_GetConnectionIssues(
                         issue.issueId,
-                        issueNum.issueNum,
+                        issue.issueNum.issueNum,
                         issue.title,
                         Expressions.stringTemplate("CAST({0} AS string)", issue.tag),
                         issue.edit,
@@ -137,7 +134,6 @@ public class IssueRepositoryImpl implements IssueRepositoryCustom{
                         releaseNote.version)
                 )
                 .from(issue)  // Issue 테이블을 지정
-                .leftJoin(issue.issueNum, issueNum)
                 .leftJoin(issue.member, member)
                 .leftJoin(member.user, user)
                 .leftJoin(issue.release, releaseNote)
@@ -148,21 +144,5 @@ public class IssueRepositoryImpl implements IssueRepositoryCustom{
         return getConnectionIssues;
     }
 
-    @Override
-    public List<IssueOpinionInfoRes> getIssueOpinionList(Issue getIssue) {
-        QIssueOpinion issueOpinion = QIssueOpinion.issueOpinion;
 
-        List<IssueOpinionInfoRes> issueOpinionInfoRes = queryFactory
-                .select(new QIssueResDto_IssueOpinionInfoRes(
-                        issueOpinion.issueOpinionId,
-                        issueOpinion.opinion,
-                        issueOpinion.member.memberId,
-                        issueOpinion.member.user.name.as("memberName"),
-                        issueOpinion.member.user.img.as("memberImg")
-                ))
-                .from(issueOpinion)
-                .where(issueOpinion.issue.eq(getIssue))
-                .fetchResults().getResults();
-        return issueOpinionInfoRes;
-    }
 }

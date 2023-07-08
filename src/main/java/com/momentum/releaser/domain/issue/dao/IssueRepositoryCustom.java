@@ -23,6 +23,5 @@ public interface IssueRepositoryCustom {
 
     List<GetConnectionIssues> getConnectionIssues(Project findProject, ReleaseNote findReleaseNote);
 
-    List<IssueOpinionInfoRes> getIssueOpinionList(Issue issue);
 
 }

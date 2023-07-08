@@ -1,13 +1,13 @@
 package com.momentum.releaser.domain.issue.api;
 
 import com.momentum.releaser.domain.issue.application.IssueService;
+import com.momentum.releaser.domain.issue.dto.IssueReqDto;
 import com.momentum.releaser.domain.issue.dto.IssueReqDto.IssueInfoReq;
-import com.momentum.releaser.domain.issue.dto.IssueResDto;
 import com.momentum.releaser.domain.issue.dto.IssueResDto.GetConnectionIssues;
 import com.momentum.releaser.domain.issue.dto.IssueResDto.GetDoneIssues;
-import com.momentum.releaser.domain.issue.dto.IssueResDto.GetIssue;
 import com.momentum.releaser.domain.issue.dto.IssueResDto.GetIssuesList;
 import com.momentum.releaser.global.config.BaseResponse;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Slf4j
@@ -73,21 +74,22 @@ public class IssueController {
     @GetMapping("/project/{projectId}/release/{releaseId}")
     public BaseResponse<List<GetConnectionIssues>> getConnectRelease(@PathVariable @Min(1) Long projectId,
                                                                @PathVariable @Min(1) Long releaseId) {
-        return new BaseResponse<>(issueService.getConnectRelese(projectId, releaseId));
+        return new BaseResponse<>(issueService.getConnectRelease(projectId, releaseId));
     }
 
     /**
      * 7.7 이슈별 조회
      */
-    @GetMapping("/{issueId}/member/{memberId}")
-    public BaseResponse<GetIssue> getIssue(@PathVariable @Min(1) Long issueId,
-                                           @PathVariable @Min(1) Long memberId) {
-        return new BaseResponse<>(issueService.getIssue(issueId, memberId));
-    }
+//    @GetMapping("/{issueId}/member/{memberId}")
+//    public BaseResponse<GetIssue> getIssue(@PathVariable @Min(1) Long issueId,
+//                                           @PathVariable @Min(1) Long memberId) {
+//        return new BaseResponse<>(issueService.getIssue(issueId, memberId));
+//    }
 
     /**
      * 7.8 이슈 상태 변경
      */
+
     /**
      * 8.1 이슈 의견 추가
      */

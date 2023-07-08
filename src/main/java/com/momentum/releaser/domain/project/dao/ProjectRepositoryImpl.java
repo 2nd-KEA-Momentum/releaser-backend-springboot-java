@@ -23,27 +23,4 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom{
     private final JPAQueryFactory queryFactory;
 
 
-    @Override
-    public List<GetMembersRes> getMembersByProject(Project getProject) {
-        QProjectMember member = QProjectMember.projectMember;
-
-        List<ProjectMember> projectMembers = queryFactory
-                .select(member)
-                .from(member)
-                .where(member.project.eq(getProject))
-                .fetch();
-
-        List<GetMembersRes> membersRes = projectMembers.stream()
-                .map(projectMember -> new GetMembersRes(
-                        projectMember.getMemberId(),
-                        projectMember.getUser().getUserId(),
-                        projectMember.getUser().getName(),
-                        projectMember.getUser().getImg(),
-                        projectMember.getPosition()
-                ))
-                .collect(Collectors.toList());
-
-
-        return membersRes;
-    }
 }
