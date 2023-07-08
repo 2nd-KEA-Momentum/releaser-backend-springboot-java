@@ -19,4 +19,9 @@ public interface ProjectMemberService {
      * 4.3 프로젝트 멤버 제거
      */
     String deleteMember(Long memberId);
+
+    /**
+     * 4.4 프로젝트 멤버 탈퇴
+     */
+    String withdrawMember(Long userId, Long projectId);
 }
