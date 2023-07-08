@@ -1,24 +1,14 @@
 package com.momentum.releaser.domain.issue.dao;
 
-import com.momentum.releaser.domain.issue.domain.IssueNum;
-import com.momentum.releaser.domain.issue.domain.LifeCycle;
-import com.momentum.releaser.domain.issue.domain.QIssue;
-import com.momentum.releaser.domain.issue.domain.QIssueNum;
-import com.momentum.releaser.domain.issue.dto.IssueResDto;
-import com.momentum.releaser.domain.issue.dto.IssueResDto.GetConnectionIssues;
-import com.momentum.releaser.domain.issue.dto.IssueResDto.GetDoneIssues;
-import com.momentum.releaser.domain.issue.dto.IssueResDto.IssueInfoRes;
-import com.momentum.releaser.domain.issue.dto.QIssueResDto_GetConnectionIssues;
-import com.momentum.releaser.domain.issue.dto.QIssueResDto_GetDoneIssues;
-import com.momentum.releaser.domain.issue.dto.QIssueResDto_IssueInfoRes;
+import com.momentum.releaser.domain.issue.domain.*;
+import com.momentum.releaser.domain.issue.dto.*;
+import com.momentum.releaser.domain.issue.dto.IssueResDto.*;
 import com.momentum.releaser.domain.project.domain.Project;
 import com.momentum.releaser.domain.project.domain.QProjectMember;
 import com.momentum.releaser.domain.release.domain.QReleaseNote;
 import com.momentum.releaser.domain.release.domain.ReleaseNote;
 import com.momentum.releaser.domain.user.domain.QUser;
-import com.querydsl.core.Tuple;
 import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.core.types.dsl.StringExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -104,7 +94,7 @@ public class IssueRepositoryImpl implements IssueRepositoryCustom{
         QProjectMember member = QProjectMember.projectMember;
         QUser user = QUser.user;
 
-        List<GetDoneIssues> reuslt = queryFactory
+        List<GetDoneIssues> getDoneIssues = queryFactory
                 .select(new QIssueResDto_GetDoneIssues(
                         issue.issueId,
                         issueNum.issueNum,
@@ -123,7 +113,7 @@ public class IssueRepositoryImpl implements IssueRepositoryCustom{
                         .and(issue.release.isNull()))
                 .fetchResults().getResults();
 
-        return reuslt;
+        return getDoneIssues;
     }
 
     @Override
@@ -134,7 +124,7 @@ public class IssueRepositoryImpl implements IssueRepositoryCustom{
         QUser user = QUser.user;
         QReleaseNote releaseNote = QReleaseNote.releaseNote;
 
-        List<GetConnectionIssues> reuslt = queryFactory
+        List<GetConnectionIssues> getConnectionIssues = queryFactory
                 .select(new QIssueResDto_GetConnectionIssues(
                         issue.issueId,
                         issueNum.issueNum,
@@ -155,6 +145,24 @@ public class IssueRepositoryImpl implements IssueRepositoryCustom{
                         .and(issue.release.eq(getReleaseNote)))
                 .fetchResults().getResults();
 
-        return reuslt;
+        return getConnectionIssues;
+    }
+
+    @Override
+    public List<IssueOpinionInfoRes> getIssueOpinionList(Issue getIssue) {
+        QIssueOpinion issueOpinion = QIssueOpinion.issueOpinion;
+
+        List<IssueOpinionInfoRes> issueOpinionInfoRes = queryFactory
+                .select(new QIssueResDto_IssueOpinionInfoRes(
+                        issueOpinion.issueOpinionId,
+                        issueOpinion.opinion,
+                        issueOpinion.member.memberId,
+                        issueOpinion.member.user.name.as("memberName"),
+                        issueOpinion.member.user.img.as("memberImg")
+                ))
+                .from(issueOpinion)
+                .where(issueOpinion.issue.eq(getIssue))
+                .fetchResults().getResults();
+        return issueOpinionInfoRes;
     }
 }

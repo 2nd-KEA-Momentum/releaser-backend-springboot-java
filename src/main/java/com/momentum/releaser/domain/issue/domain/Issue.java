@@ -158,6 +158,11 @@ public class Issue extends BaseTime {
         this.issueNum = issueNum;
     }
 
+    //issue edit 변경
+    public void updateIssueEdit(char status){
+        this.edit = status;
+    }
+
     /**
      * insert 되기전 (persist 되기전) 실행된다.
      */

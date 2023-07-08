@@ -2,8 +2,10 @@ package com.momentum.releaser.domain.issue.api;
 
 import com.momentum.releaser.domain.issue.application.IssueService;
 import com.momentum.releaser.domain.issue.dto.IssueReqDto.IssueInfoReq;
+import com.momentum.releaser.domain.issue.dto.IssueResDto;
 import com.momentum.releaser.domain.issue.dto.IssueResDto.GetConnectionIssues;
 import com.momentum.releaser.domain.issue.dto.IssueResDto.GetDoneIssues;
+import com.momentum.releaser.domain.issue.dto.IssueResDto.GetIssue;
 import com.momentum.releaser.domain.issue.dto.IssueResDto.GetIssuesList;
 import com.momentum.releaser.global.config.BaseResponse;
 import lombok.RequiredArgsConstructor;
@@ -75,9 +77,17 @@ public class IssueController {
     }
 
     /**
-     * 7.7 이슈 검색
+     * 7.7 이슈별 조회
      */
+    @GetMapping("/{issueId}/member/{memberId}")
+    public BaseResponse<GetIssue> getIssue(@PathVariable @Min(1) Long issueId,
+                                           @PathVariable @Min(1) Long memberId) {
+        return new BaseResponse<>(issueService.getIssue(issueId, memberId));
+    }
 
+    /**
+     * 7.8 이슈 상태 변경
+     */
     /**
      * 8.1 이슈 의견 추가
      */

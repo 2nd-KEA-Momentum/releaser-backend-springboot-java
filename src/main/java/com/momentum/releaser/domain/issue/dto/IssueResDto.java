@@ -2,12 +2,15 @@ package com.momentum.releaser.domain.issue.dto;
 
 import com.momentum.releaser.domain.issue.domain.LifeCycle;
 import com.momentum.releaser.domain.issue.domain.Tag;
+import com.momentum.releaser.domain.project.dto.ProjectResDto;
+import com.momentum.releaser.domain.project.dto.ProjectResDto.GetMembersRes;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
 import java.util.List;
 
 public class IssueResDto {
@@ -124,6 +127,63 @@ public class IssueResDto {
         }
 
     }
+
+    /**
+     * 이슈 조회
+     */
+    @Data
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    public static class GetIssue {
+        private Long issueNum;
+        private String title;
+        private String content;
+        private String tag;
+        private Date endDate;
+        private char edit;
+        private Long manager; //현 담당자 식별번호
+        private List<GetMembersRes> getMemberList;
+        private List<IssueOpinionInfoRes> getOpinionList;
+
+
+        @QueryProjection
+        @Builder
+        public GetIssue(Long issueNum, String title, String content, String tag, Date endDate, char edit, Long manager, List<GetMembersRes> getMemberList, List<IssueOpinionInfoRes> getOpinionList) {
+            this.issueNum = issueNum;
+            this.title = title;
+            this.content = content;
+            this.tag = tag;
+            this.endDate = endDate;
+            this.edit = edit;
+            this.manager = manager;
+            this.getMemberList = getMemberList;
+            this.getOpinionList = getOpinionList;
+        }
+    }
+
+    /**
+     * 이슈 의견 정보
+     */
+    @Data
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    public static class IssueOpinionInfoRes {
+        private Long opinionId;
+        private String opinion;
+        private Long memberId;
+        private String memberName;
+        private String memberImg;
+
+        @QueryProjection
+        @Builder
+        public IssueOpinionInfoRes(Long opinionId, String opinion, Long memberId, String memberName, String memberImg) {
+            this.opinionId = opinionId;
+            this.opinion = opinion;
+            this.memberId = memberId;
+            this.memberName = memberName;
+            this.memberImg = memberImg;
+        }
+    }
+
+
 
 
 

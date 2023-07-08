@@ -3,10 +3,7 @@ package com.momentum.releaser.domain.issue.application;
 import com.momentum.releaser.domain.issue.dto.IssueReqDto;
 import com.momentum.releaser.domain.issue.dto.IssueReqDto.IssueInfoReq;
 import com.momentum.releaser.domain.issue.dto.IssueResDto;
-import com.momentum.releaser.domain.issue.dto.IssueResDto.GetConnectionIssues;
-import com.momentum.releaser.domain.issue.dto.IssueResDto.GetDoneIssues;
-import com.momentum.releaser.domain.issue.dto.IssueResDto.GetIssuesList;
-import com.momentum.releaser.domain.issue.dto.IssueResDto.IssueInfoRes;
+import com.momentum.releaser.domain.issue.dto.IssueResDto.*;
 
 import java.util.List;
 
@@ -44,9 +41,11 @@ public interface IssueService {
     List<GetConnectionIssues> getConnectRelese(Long projectId, Long releaseId);
 
 
+
     /**
      * 7.7 이슈별 조회
      */
+    GetIssue getIssue(Long issueId, Long memberId);
 
     /**
      * 7.8 이슈 상태 변경

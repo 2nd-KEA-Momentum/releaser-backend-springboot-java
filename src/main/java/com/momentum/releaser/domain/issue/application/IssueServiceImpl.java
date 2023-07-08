@@ -15,6 +15,8 @@ import com.momentum.releaser.domain.project.dao.ProjectMemberRepository;
 import com.momentum.releaser.domain.project.dao.ProjectRepository;
 import com.momentum.releaser.domain.project.domain.Project;
 import com.momentum.releaser.domain.project.domain.ProjectMember;
+import com.momentum.releaser.domain.project.dto.ProjectResDto;
+import com.momentum.releaser.domain.project.dto.ProjectResDto.GetMembersRes;
 import com.momentum.releaser.domain.release.dao.ReleaseRepository;
 import com.momentum.releaser.domain.release.domain.ReleaseNote;
 import com.momentum.releaser.global.config.BaseResponseStatus;
@@ -124,7 +126,7 @@ public class IssueServiceImpl implements IssueService {
         // 이슈 정보 조회
         Issue issue = findIssue(issueId);
 
-        //edit check
+        //멤버가 수정시 edit = 'Y'로 변경
         char edit = editCheck(memberId);
 
         ProjectMember projectMember = null;
@@ -165,7 +167,7 @@ public class IssueServiceImpl implements IssueService {
      * 7.4 프로젝트별 모든 이슈 조회
      */
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public GetIssuesList getIssues(Long projectId) {
         Project findProject = findProject(projectId);
         List<IssueInfoRes> getAllIssue = issueRepository.getIssues(findProject);
@@ -193,13 +195,14 @@ public class IssueServiceImpl implements IssueService {
      * 7.5 프로젝트별 해결 & 미연결 이슈 조회
      */
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public List<GetDoneIssues> getDoneIssues(Long projectId) {
         Project findProject = findProject(projectId);
         List<GetDoneIssues> getDoneIssue = issueRepository.getDoneIssues(findProject);
 
         return getDoneIssue;
     }
+
     /**
      * 7.6 릴리즈 노트별 연결된 이슈 조회
      */
@@ -222,6 +225,31 @@ public class IssueServiceImpl implements IssueService {
     /**
      * 7.7 이슈별 조회
      */
+    @Override
+    @Transactional
+    public GetIssue getIssue(Long issueId, Long memberId) {
+        Issue issue = findIssue(issueId);
+        Project project = findProject(issue.getProject().getProjectId());
+        IssueNum issueNum = issueNumRepository.findByIssue(issue);
+        char status = issue.getEdit();
+        ProjectMember projectMember = findProjectMember(memberId);
+        //pm이 조회 시 edit = 'N', 멤버가 조회 시 기존 edit 상태 유지
+        issue.updateIssueEdit(projectMember.getPosition() == 'P' ? 'N' : status );
+
+        List<GetMembersRes> membersRes = projectMemberRepository.getMembersByProject(project);
+        List<IssueOpinionInfoRes> issueOpinionRes = issueRepository.getIssueOpinionList(issue);
+
+        GetIssue getIssueRes = modelMapper.map(issue, GetIssue.class);
+        getIssueRes.setIssueNum(issueNum.getIssueNum());
+        getIssueRes.setManager(memberId);
+        getIssueRes.setGetMemberList(membersRes);
+        getIssueRes.setGetOpinionList(issueOpinionRes);
+
+
+
+        return getIssueRes;
+    }
+
 
     /**
      * 7.8 이슈 상태 변경

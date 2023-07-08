@@ -3,9 +3,7 @@ package com.momentum.releaser.domain.issue.dao;
 import com.momentum.releaser.domain.issue.domain.Issue;
 import com.momentum.releaser.domain.issue.domain.IssueNum;
 import com.momentum.releaser.domain.issue.dto.IssueResDto;
-import com.momentum.releaser.domain.issue.dto.IssueResDto.GetConnectionIssues;
-import com.momentum.releaser.domain.issue.dto.IssueResDto.GetDoneIssues;
-import com.momentum.releaser.domain.issue.dto.IssueResDto.IssueInfoRes;
+import com.momentum.releaser.domain.issue.dto.IssueResDto.*;
 import com.momentum.releaser.domain.project.domain.Project;
 import com.momentum.releaser.domain.release.domain.ReleaseNote;
 
@@ -24,4 +22,7 @@ public interface IssueRepositoryCustom {
     List<GetDoneIssues> getDoneIssues(Project findProject);
 
     List<GetConnectionIssues> getConnectionIssues(Project findProject, ReleaseNote findReleaseNote);
+
+    List<IssueOpinionInfoRes> getIssueOpinionList(Issue issue);
+
 }
