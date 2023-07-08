@@ -37,6 +37,7 @@ public class IssueResDto {
     public static class IssueInfoRes {
 
         private Long issueId;
+        private Long issueNum;
         private String title;
         private String content;
         private Long memberId;
@@ -49,8 +50,9 @@ public class IssueResDto {
 
         @QueryProjection
         @Builder
-        public IssueInfoRes(Long issueId, String title, String content, Long memberId, String memberName, String memberImg, String tag, String releaseVersion, char edit, String lifeCycle) {
+        public IssueInfoRes(Long issueId, Long issueNum, String title, String content, Long memberId, String memberName, String memberImg, String tag, String releaseVersion, char edit, String lifeCycle) {
             this.issueId = issueId;
+            this.issueNum = issueNum;
             this.title = title;
             this.content = content;
             this.memberId = memberId;
@@ -70,6 +72,7 @@ public class IssueResDto {
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     public static class GetDoneIssues {
         private Long issueId;
+        private Long issueNum;
         private String title;
         private String tag;
         private Long memberId;
@@ -78,8 +81,9 @@ public class IssueResDto {
 
         @QueryProjection
         @Builder
-        public GetDoneIssues(Long issueId, String title, String tag, Long memberId, String memberName, String memberImg) {
+        public GetDoneIssues(Long issueId, Long issueNum, String title, String tag, Long memberId, String memberName, String memberImg) {
             this.issueId = issueId;
+            this.issueNum = issueNum;
             this.title = title;
             this.tag = tag;
             this.memberId = memberId;
@@ -95,6 +99,7 @@ public class IssueResDto {
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     public static class GetConnectionIssues {
         private Long issueId;
+        private Long issueNum;
         private String title;
         private String tag;
         private char edit;
@@ -103,10 +108,12 @@ public class IssueResDto {
         private String memberImg;
         private String releaseVersion;
 
+
         @QueryProjection
         @Builder
-        public GetConnectionIssues(Long issueId, String title, String tag, char edit, Long memberId, String memberName, String memberImg, String releaseVersion) {
+        public GetConnectionIssues(Long issueId, Long issueNum, String title, String tag, char edit, Long memberId, String memberName, String memberImg, String releaseVersion) {
             this.issueId = issueId;
+            this.issueNum = issueNum;
             this.title = title;
             this.tag = tag;
             this.edit = edit;
@@ -115,6 +122,7 @@ public class IssueResDto {
             this.memberImg = memberImg;
             this.releaseVersion = releaseVersion;
         }
+
     }
 
 

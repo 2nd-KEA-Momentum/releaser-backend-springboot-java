@@ -31,21 +31,27 @@ public interface IssueService {
      */
     GetIssuesList getIssues(Long projectId);
 
-    List<GetDoneIssues> getDoneIssues(Long projectId);
-
-    List<GetConnectionIssues> getConnectRelese(Long projectId, Long releaseId);
 
     /**
      * 7.5 프로젝트별 해결 & 미연결 이슈 조회
      */
+    List<GetDoneIssues> getDoneIssues(Long projectId);
+
 
     /**
      * 7.6 릴리즈 노트별 연결된 이슈 조회
      */
+    List<GetConnectionIssues> getConnectRelese(Long projectId, Long releaseId);
+
 
     /**
-     * 7.7 이슈 검색
+     * 7.7 이슈별 조회
      */
+
+    /**
+     * 7.8 이슈 상태 변경
+     */
+
 
     /**
      * 8.1 이슈 의견 추가

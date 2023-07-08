@@ -220,7 +220,15 @@ public class IssueServiceImpl implements IssueService {
     }
 
     /**
-     * 7.7 이슈 검색
+     * 7.7 이슈별 조회
+     */
+
+    /**
+     * 7.8 이슈 상태 변경
+     */
+
+    /**
+     * 7.8 이슈 상태 변경
      */
 
     /**
