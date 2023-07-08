@@ -7,6 +7,7 @@ import com.momentum.releaser.domain.project.domain.ProjectMember;
 import com.momentum.releaser.domain.project.dto.ProjectResDto;
 import com.momentum.releaser.domain.project.dto.ProjectResDto.GetMembersRes;
 import com.momentum.releaser.domain.user.dao.UserRepository;
+import com.momentum.releaser.domain.user.domain.User;
 import com.momentum.releaser.global.config.BaseResponseStatus;
 import com.momentum.releaser.global.error.CustomException;
 import lombok.RequiredArgsConstructor;
@@ -17,9 +18,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
-import static com.momentum.releaser.global.config.BaseResponseStatus.NOT_EXISTS_PROJECT;
-import static com.momentum.releaser.global.config.BaseResponseStatus.NOT_EXISTS_PROJECT_MEMBER;
+import static com.momentum.releaser.global.config.BaseResponseStatus.*;
 
 @Slf4j
 @Service
@@ -37,27 +38,32 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
     @Override
     @Transactional
     public List<GetMembersRes> getMembers(Long projectId) {
-        //project 정보
-        Project project = projectRepository.findById(projectId).orElseThrow(() -> new CustomException(NOT_EXISTS_PROJECT));
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new CustomException(NOT_EXISTS_PROJECT));
 
-        //project member 정보
-        List<ProjectMember> member = projectMemberRepository.findByProject(project);
 
-        //Response : project member 조회
-        List<GetMembersRes> getMembersRes = new ArrayList<>();
-
-        for (ProjectMember projectMember : member) {
-            getMembersRes.add(GetMembersRes.builder()
-                    .memberId(projectMember.getMemberId())
-                    .userId(projectMember.getUser().getUserId())
-                    .name(projectMember.getUser().getName())
-                    .img(projectMember.getUser().getImg())
-                    .position(projectMember.getPosition())
-                    .build());
-        }
+        List<GetMembersRes> getMembersRes = projectMemberRepository.findByProject(project)
+                .stream()
+                .map(this::createGetMembersRes)
+                .collect(Collectors.toList());
 
         return getMembersRes;
     }
+
+    //GetMembersRes 객체를 생성
+    private GetMembersRes createGetMembersRes(ProjectMember projectMember) {
+        User user = projectMember.getUser();
+
+        return new GetMembersRes(
+                projectMember.getMemberId(),
+                user.getUserId(),
+                user.getName(),
+                user.getImg(),
+                projectMember.getPosition()
+        );
+    }
+
+
     /**
      * 4.2 프로젝트 멤버 추가
      */
@@ -75,4 +81,35 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
         String result = "프로젝트 멤버가 제거되었습니다.";
         return result;
     }
+
+    /**
+     * 4.4 프로젝트 멤버 탈퇴
+     */
+    @Override
+    @Transactional
+    public String withdrawMember(Long userId, Long projectId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(NOT_EXISTS_USER));
+
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new CustomException(NOT_EXISTS_PROJECT));
+
+        //project member 찾기
+        ProjectMember member = findProjectMember(user, project);
+        //project member status = 'N'
+        deactivateProjectMember(member);
+
+        return "프로젝트 탈퇴가 완료되었습니다.";
+    }
+
+    //project member 찾기
+    private ProjectMember findProjectMember(User user, Project project) {
+        return projectMemberRepository.findByUserAndProject(user, project);
+    }
+
+    //project member status = 'N'
+    private void deactivateProjectMember(ProjectMember member) {
+        member.statusToInactive();
+    }
+
 }

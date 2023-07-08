@@ -43,4 +43,14 @@ public class ProjectMemberController {
     public BaseResponse<String> deleteProjectMember(@PathVariable @Min(1) Long memberId) {
         return new BaseResponse<>(projectMemberService.deleteMember(memberId));
     }
+
+    /**
+     * 4.4 프로젝트 멤버 탈퇴
+     */
+    @PostMapping("/{userId}/project/{projectId}/withdraw")
+    public BaseResponse<String> withdrawProjectMember(
+            @PathVariable @Min(1) Long userId,
+            @PathVariable @Min(1) Long projectId){
+        return new BaseResponse<>(projectMemberService.withdrawMember(userId, projectId));
+    }
 }
