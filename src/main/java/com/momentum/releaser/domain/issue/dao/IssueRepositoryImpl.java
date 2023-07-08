@@ -9,6 +9,8 @@ import com.momentum.releaser.domain.project.domain.Project;
 import com.momentum.releaser.domain.project.domain.QProjectMember;
 import com.momentum.releaser.domain.release.domain.QReleaseNote;
 import com.momentum.releaser.domain.user.domain.QUser;
+import com.querydsl.core.Tuple;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +27,7 @@ public class IssueRepositoryImpl implements IssueRepositoryCustom{
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public List<IssueInfoRes> getIssues() {
+    public List<IssueInfoRes> getIssues(Project getProject) {
         QIssue issue = QIssue.issue;
         QProjectMember member = QProjectMember.projectMember;
         QUser user = QUser.user;
@@ -39,18 +41,19 @@ public class IssueRepositoryImpl implements IssueRepositoryCustom{
                                 issue.title,
                                 issue.content,
                                 member.memberId,
-                                user.name,
-                                user.img,
-                                issue.tag.stringValue(),
-                                releaseNote.version,
+                                user.name.as("memberName"),
+                                user.img.as("memberImg"),
+                                Expressions.stringTemplate("CAST({0} AS string)", issue.tag),
+                                releaseNote.version.as("releaseVersion"),
                                 issue.edit,
-                                issue.lifeCycle.stringValue())
+                                Expressions.stringTemplate("CAST({0} AS string)", issue.lifeCycle))
                 )
                 .from(issue)  // Issue 테이블을 지정
                 .leftJoin(issue.member, member)
                 .leftJoin(member.user, user)
                 .leftJoin(issue.release, releaseNote)
-                .fetch();
+                .where(issue.project.eq(getProject))
+                .fetchResults().getResults();
         return result;
     }
 

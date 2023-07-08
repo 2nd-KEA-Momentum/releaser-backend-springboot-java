@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.momentum.releaser.domain.issue.dto.IssueResDto.*;
 import static com.momentum.releaser.global.config.BaseResponseStatus.*;
@@ -161,12 +162,30 @@ public class IssueServiceImpl implements IssueService {
      * 7.4 프로젝트별 모든 이슈 조회
      */
     @Override
-    public List<IssueInfoRes> getIssues(Long projectId) {
-        List<IssueInfoRes> getAllIssue = new ArrayList<>();
-        getAllIssue.add((IssueInfoRes) issueRepository.getIssues());
+    @Transactional
+    public GetIssuesList getIssues(Long projectId) {
+        Project findProject = findProject(projectId);
+        List<IssueInfoRes> getAllIssue = issueRepository.getIssues(findProject);
 
-        return getAllIssue;
+        List<IssueInfoRes> notStartedList = filterIssuesByLifeCycle(getAllIssue, "Not_Started");
+        List<IssueInfoRes> inProgressList = filterIssuesByLifeCycle(getAllIssue, "In_Progress");
+        List<IssueInfoRes> doneList = filterIssuesByLifeCycle(getAllIssue, "Done");
+
+        return GetIssuesList.builder()
+                .getNotStartedList(notStartedList)
+                .getInProgressList(inProgressList)
+                .getDoneList(doneList)
+                .build();
     }
+
+    private List<IssueInfoRes> filterIssuesByLifeCycle(List<IssueInfoRes> issues, String lifeCycle) {
+        return issues.stream()
+                .filter(issue -> lifeCycle.equals(issue.getLifeCycle()))
+                .map(issue -> modelMapper.map(issue, IssueInfoRes.class))
+                .collect(Collectors.toList());
+    }
+
+
     /**
      * 7.5 프로젝트별 해결 & 미연결 이슈 조회
      */

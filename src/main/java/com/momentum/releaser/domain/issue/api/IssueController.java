@@ -4,6 +4,7 @@ import com.momentum.releaser.domain.issue.application.IssueService;
 import com.momentum.releaser.domain.issue.dto.IssueReqDto;
 import com.momentum.releaser.domain.issue.dto.IssueReqDto.IssueInfoReq;
 import com.momentum.releaser.domain.issue.dto.IssueResDto;
+import com.momentum.releaser.domain.issue.dto.IssueResDto.GetIssuesList;
 import com.momentum.releaser.domain.issue.dto.IssueResDto.IssueInfoRes;
 import com.momentum.releaser.global.config.BaseResponse;
 import lombok.Getter;
@@ -55,7 +56,7 @@ public class IssueController {
      * 7.4 프로젝트별 모든 이슈 조회
      */
     @GetMapping("/project/{projectId}")
-    public BaseResponse<List<IssueInfoRes>> getIssues(
+    public BaseResponse<GetIssuesList> getIssues(
             @PathVariable @Min(1) Long projectId) {
         return new BaseResponse<>(issueService.getIssues(projectId));
     }

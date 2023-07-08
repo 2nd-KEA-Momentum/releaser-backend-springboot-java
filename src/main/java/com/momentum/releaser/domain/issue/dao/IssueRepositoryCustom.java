@@ -12,7 +12,7 @@ import java.util.Optional;
 
 public interface IssueRepositoryCustom {
 
-    List<IssueInfoRes> getIssues();
+    List<IssueInfoRes> getIssues(Project project);
 
     Long getIssueNum(Project project);
 
