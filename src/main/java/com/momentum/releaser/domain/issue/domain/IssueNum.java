@@ -44,11 +44,14 @@ public class IssueNum extends BaseTime {
         if (issue != null) {
             issue.deleteToIssueNum();
         }
+        project.removeIssueNum(this);
     }
 
-    public void deleteToIssue() {
-        this.issue = null;
+    public void deleteToIssueNum() {
+        issue.deleteToIssueNum();
+        project.removeIssueNum(this);
     }
+
 
     public void deleteToProject() {
         this.project = null;

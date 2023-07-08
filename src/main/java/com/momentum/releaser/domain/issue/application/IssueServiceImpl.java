@@ -154,6 +154,22 @@ public class IssueServiceImpl implements IssueService {
     /**
      * 7.3 이슈 제거
      */
+    @Override
+    @Transactional
+    public String deleteIssue(Long issueId) {
+        //issue
+        Issue issue = findIssue(issueId);
+
+        //issue와 연결된 릴리즈가 있으면 삭제 안됨
+        if (issue.getRelease() != null) {
+            throw new CustomException(CONNECTED_RELEASE_EXISTS);
+        }
+
+        issueRepository.deleteIssueByIssueNum();
+        issueRepository.deleteById(issue.getIssueId());
+
+        return "이슈가 삭제되었습니다.";
+    }
 
     /**
      * 7.4 프로젝트별 모든 이슈 조회

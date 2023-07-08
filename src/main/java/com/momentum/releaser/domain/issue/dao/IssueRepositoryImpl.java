@@ -58,6 +58,19 @@ public class IssueRepositoryImpl implements IssueRepositoryCustom{
     }
 
     @Override
+    public void deleteIssueByIssueNum() {
+        QIssueNum issueNum = QIssueNum.issueNum1;
+
+
+        // issue_num 레코드 삭제
+        queryFactory
+                .delete(issueNum)
+                .where(issueNum.project.isNull()
+                        .and(issueNum.issue.isNull()))
+                .execute();
+    }
+
+    @Override
     public List<IssueInfoRes> getIssues(Project getProject) {
         QIssue issue = QIssue.issue;
         QProjectMember member = QProjectMember.projectMember;

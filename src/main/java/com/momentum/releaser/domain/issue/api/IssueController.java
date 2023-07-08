@@ -51,6 +51,10 @@ public class IssueController {
     /**
      * 7.3 이슈 제거
      */
+    @PostMapping("/{issueId}/delete")
+    public BaseResponse<String> deleteIssue(@PathVariable @Min(1) Long issueId) {
+        return new BaseResponse<>(issueService.deleteIssue(issueId));
+    }
 
     /**
      * 7.4 프로젝트별 모든 이슈 조회

@@ -131,10 +131,12 @@ public class Issue extends BaseTime {
 
     @PreRemove
     private void preRemove() {
+        deleteToIssueNum();
         for (IssueOpinion opinion : issueOpinions) {
             opinion.statusToInactive();
         }
-        issueNum.deleteToIssue();
+
+
     }
 
     public void deleteToIssueNum() {

@@ -67,5 +67,5 @@ public interface IssueService {
     String deleteOpinion(Long opinionId);
 
 
-
+    String deleteIssue(Long issueId);
 }
