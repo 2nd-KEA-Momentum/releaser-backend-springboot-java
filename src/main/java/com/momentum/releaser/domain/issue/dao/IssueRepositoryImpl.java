@@ -32,7 +32,7 @@ public class IssueRepositoryImpl implements IssueRepositoryCustom{
         QReleaseNote releaseNote = QReleaseNote.releaseNote;
 
 
-        List<IssueInfoRes> fetch = queryFactory
+        List<IssueInfoRes> result = queryFactory
                 .select(
                         new QIssueResDto_IssueInfoRes(
                                 issue.issueId,
@@ -51,7 +51,7 @@ public class IssueRepositoryImpl implements IssueRepositoryCustom{
                 .leftJoin(member.user, user)
                 .leftJoin(issue.release, releaseNote)
                 .fetch();
-        return null;
+        return result;
     }
 
     @Override
