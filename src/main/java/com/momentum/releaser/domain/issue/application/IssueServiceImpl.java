@@ -288,6 +288,10 @@ public class IssueServiceImpl implements IssueService {
      */
     @Override
     public String deleteOpinion(Long opinionId) {
-        return null;
+        //opinion
+        IssueOpinion issueOpinion = issueOpinionRepository.findById(opinionId).orElseThrow(() -> new CustomException(NOT_EXISTS_ISSUE_OPINION));
+        //opinion soft delete
+        issueOpinionRepository.deleteById(opinionId);
+        return "해당 이슈 의견이 삭제되었습니다.";
     }
 }

@@ -48,7 +48,8 @@ public enum BaseResponseStatus {
     NOT_EXISTS_ISSUE(false, 4500, "존재하지 않는 이슈입니다."),
     INVALID_ISSUE_WITH_COMPLETED(false, 4501, "이미 연결된 이슈가 포함되어 있습니다."),
     INVALID_ISSUE_WITH_NOT_DONE(false, 4502, "완료되지 않은 이슈는 연결할 수 없습니다."),
-    FAILED_TO_CONNECT_ISSUE_WITH_RELEASE_NOTE(false, 4501, "이슈 연결에 실패하였습니다.");
+    FAILED_TO_CONNECT_ISSUE_WITH_RELEASE_NOTE(false, 4503, "이슈 연결에 실패하였습니다."),
+    NOT_EXISTS_ISSUE_OPINION(false, 4504, "존재하지 않는 이슈 의견입니다.");
 
     private final boolean isSuccess;
     private final int code;
