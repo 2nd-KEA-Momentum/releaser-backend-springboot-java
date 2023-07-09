@@ -3,10 +3,14 @@ package com.momentum.releaser.domain.release.application;
 import com.momentum.releaser.domain.issue.dao.IssueRepository;
 import com.momentum.releaser.domain.issue.domain.Issue;
 import com.momentum.releaser.domain.issue.domain.LifeCycle;
+import com.momentum.releaser.domain.project.dao.ProjectMemberRepository;
 import com.momentum.releaser.domain.project.dao.ProjectRepository;
 import com.momentum.releaser.domain.project.domain.Project;
+import com.momentum.releaser.domain.project.domain.ProjectMember;
 import com.momentum.releaser.domain.project.mapper.ProjectMapper;
+import com.momentum.releaser.domain.release.dao.ReleaseApprovalRepository;
 import com.momentum.releaser.domain.release.dao.ReleaseRepository;
+import com.momentum.releaser.domain.release.domain.ReleaseApproval;
 import com.momentum.releaser.domain.release.domain.ReleaseEnum;
 import com.momentum.releaser.domain.release.domain.ReleaseNote;
 import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.ReleaseCreateRequestDto;
@@ -34,7 +38,9 @@ import static com.momentum.releaser.global.config.BaseResponseStatus.*;
 public class ReleaseServiceImpl implements ReleaseService {
 
     private final ProjectRepository projectRepository;
+    private final ProjectMemberRepository projectMemberRepository;
     private final ReleaseRepository releaseRepository;
+    private final ReleaseApprovalRepository releaseApprovalRepository;
     private final IssueRepository issueRepository;
 
     /**
@@ -61,6 +67,9 @@ public class ReleaseServiceImpl implements ReleaseService {
 
         // 생성된 릴리즈 노트에 대한 알림을 보낸다.
         alertCreatedReleaseNote(projectId, savedReleaseNote.getReleaseId());
+
+        // 생성한 릴리즈 노트에 대한 동의 테이블을 생성한다.
+        createReleaseApprovals(savedReleaseNote);
 
         return ReleaseMapper.INSTANCE.toReleaseCreateResponseDto(savedReleaseNote);
     }
@@ -246,6 +255,24 @@ public class ReleaseServiceImpl implements ReleaseService {
      */
     private void alertCreatedReleaseNote(Long projectId, Long releaseId) {
         // TODO: 이후 RabbitMQ를 적용시킬 때 구현한다.
+    }
+
+    /**
+     * 생성된 릴리즈 노트의 동의 여부에 대한 멤버의 목록을 생성한다.
+     */
+    private void createReleaseApprovals(ReleaseNote releaseNote) {
+        // 해당 릴리즈 노트가 들어있는 프로젝트의 멤버 목록을 가져온다.
+        List<ProjectMember> members = projectMemberRepository.findByProject(releaseNote.getProject());
+
+        // 릴리즈 노트의 식별 번호와 프로젝트 멤버 식별 번호를 가지고 동의 여부 테이블에 데이터를 생성한다.
+        for (ProjectMember member : members) {
+            ReleaseApproval releaseApproval = ReleaseApproval.builder()
+                    .member(member)
+                    .release(releaseNote)
+                    .build();
+
+            releaseApprovalRepository.save(releaseApproval);
+        }
     }
 
     /**
