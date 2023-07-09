@@ -20,6 +20,9 @@ public enum BaseResponseStatus {
     INVALID_REQUEST_BODY(false, 2000, "요청 데이터가 잘못되었습니다."),
     INVALID_RELEASE_VERSION_TYPE(false, 2400, "릴리즈 버전 타입이 올바르지 않습니다. MAJOR, MINOR, PATCH 중 하나여야 합니다."),
     INVALID_ISSUE_TAG(false, 2500, "이슈 태그가 올바르지 않습니다."),
+    INVALID_LIFECYCLE(false, 2501, "이슈 상태가 올바르지 않습니다."),
+    CONNECTED_ISSUE_EXISTS(false, 2502, "릴리즈와 연결된 이슈이므로 상태 변경이 불가능합니다."),
+    CONNECTED_RELEASE_EXISTS(false, 2503, "연결된 릴리즈가 존재하므로 삭제할 수 없습니다."),
 
     /**
      * 3000 : Response 오류
@@ -50,7 +53,12 @@ public enum BaseResponseStatus {
     NOT_EXISTS_ISSUE(false, 4500, "존재하지 않는 이슈입니다."),
     INVALID_ISSUE_WITH_COMPLETED(false, 4501, "이미 연결된 이슈가 포함되어 있습니다."),
     INVALID_ISSUE_WITH_NOT_DONE(false, 4502, "완료되지 않은 이슈는 연결할 수 없습니다."),
-    FAILED_TO_CONNECT_ISSUE_WITH_RELEASE_NOTE(false, 4503, "이슈 연결에 실패하였습니다.");
+
+    FAILED_TO_CONNECT_ISSUE_WITH_RELEASE_NOTE(false, 4503, "이슈 연결에 실패하였습니다."),
+    NOT_EXISTS_ISSUE_OPINION(false, 4504, "존재하지 않는 이슈 의견입니다.");
+
+
+
 
     private final boolean isSuccess;
     private final int code;
@@ -61,4 +69,8 @@ public enum BaseResponseStatus {
         this.code = code;
         this.message = message;
     }
+
+
+
+
 }

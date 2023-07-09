@@ -131,11 +131,13 @@ public class Issue extends BaseTime {
 
     @PreRemove
     private void preRemove() {
+        deleteToIssueNum();
         for (IssueOpinion opinion : issueOpinions) {
             opinion.statusToInactive();
         }
-        issueNum.deleteToIssue();
+
     }
+
 
     public void deleteToIssueNum() {
         this.issueNum = null;
@@ -158,6 +160,14 @@ public class Issue extends BaseTime {
         this.issueNum = issueNum;
     }
 
+    //issue edit 변경
+    public void updateIssueEdit(char status){
+        this.edit = status;
+    }
+    public void updateLifeCycle(LifeCycle lifeCycleIssue) {
+        this.lifeCycle = lifeCycleIssue;
+    }
+
     /**
      * insert 되기전 (persist 되기전) 실행된다.
      */
@@ -167,4 +177,6 @@ public class Issue extends BaseTime {
         this.edit = (this.edit == '\0') ? 'N' : this.edit;
         this.status = (this.status == '\0') ? 'Y' : this.status;
     }
+
+
 }

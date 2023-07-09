@@ -96,8 +96,11 @@ public class Project extends BaseTime {
             issue.deleteToIssueNum();
             issue.softDelete();
         }
+    }
 
 
+    public void removeIssueNum(IssueNum issueNum) {
+        issueNums.remove(issueNum);
     }
 
 

@@ -9,4 +9,6 @@ import lombok.Getter;
 @Getter
 public class CustomException extends RuntimeException {
     private final BaseResponseStatus exceptionStatus;
+
+
 }
