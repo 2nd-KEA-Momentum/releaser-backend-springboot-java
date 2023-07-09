@@ -4,6 +4,7 @@ package com.momentum.releaser.domain.project.domain;
 import com.momentum.releaser.domain.issue.domain.Issue;
 import com.momentum.releaser.domain.issue.domain.IssueNum;
 import com.momentum.releaser.domain.project.dto.ProjectReqDto.ProjectInfoReq;
+import com.momentum.releaser.domain.release.domain.ReleaseApproval;
 import com.momentum.releaser.domain.release.domain.ReleaseNote;
 import com.momentum.releaser.global.common.BaseTime;
 import com.sun.istack.NotNull;
@@ -86,7 +87,6 @@ public class Project extends BaseTime {
         for (ReleaseNote releaseNote : releases) {
             releaseNote.statusToInactive();
             releaseNote.softDelete();
-
         }
         for (IssueNum issueNum : issueNums){
             issueNum.deleteToProject();
@@ -96,6 +96,7 @@ public class Project extends BaseTime {
             issue.deleteToIssueNum();
             issue.softDelete();
         }
+
     }
 
 

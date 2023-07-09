@@ -8,4 +8,6 @@ import com.momentum.releaser.domain.release.domain.ReleaseNote;
 public interface ReleaseApprovalCustom {
 
     void deleteByReleaseNote(ReleaseNote releaseNote);
+
+    void deleteByReleaseApproval();
 }

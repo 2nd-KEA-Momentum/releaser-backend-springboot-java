@@ -1,6 +1,7 @@
 package com.momentum.releaser.domain.release.domain;
 
 import com.momentum.releaser.domain.issue.domain.Issue;
+import com.momentum.releaser.domain.issue.domain.IssueNum;
 import com.momentum.releaser.domain.project.domain.Project;
 import com.momentum.releaser.domain.release.domain.ReleaseEnum.ReleaseDeployStatus;
 import com.momentum.releaser.global.common.BaseTime;
@@ -118,6 +119,13 @@ public class ReleaseNote extends BaseTime {
         for (ReleaseOpinion opinion : releaseOpinions) {
             opinion.statusToInactive();
         }
+        for (ReleaseApproval approval : approvals) {
+            approval.deleteToProject();
+        }
+    }
+
+    public void removeReleaseApproval(ReleaseApproval approval) {
+        approvals.remove(approval);
     }
 
     /**

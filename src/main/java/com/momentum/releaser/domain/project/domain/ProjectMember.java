@@ -71,6 +71,10 @@ public class ProjectMember extends BaseTime {
         this.status = 'N';
     }
 
+    public void removeReleaseApproval(ReleaseApproval approval) {
+        approvals.remove(approval);
+    }
+
     /**
      * insert 되기전 (persist 되기전) 실행된다.
      */
