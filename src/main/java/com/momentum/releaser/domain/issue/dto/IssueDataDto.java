@@ -18,17 +18,17 @@ public class IssueDataDto {
     public static class ConnectedIssuesDataDto {
         private Long issueId;
         private String title;
-        private String lifeCycle;
+        private String tag;
         private Date endDate;
         private Long memberId;
         private String memberName;
         private String memberProfileImg;
 
         @Builder
-        public ConnectedIssuesDataDto(Long issueId, String title, Long memberId, String memberName, String memberProfileImg, String lifeCycle, Date endDate) {
+        public ConnectedIssuesDataDto(Long issueId, String title, Long memberId, String memberName, String memberProfileImg, String tag, Date endDate) {
             this.issueId = issueId;
             this.title = title;
-            this.lifeCycle = lifeCycle;
+            this.tag = tag;
             this.endDate = endDate;
             this.memberId = memberId;
             this.memberName = memberName;

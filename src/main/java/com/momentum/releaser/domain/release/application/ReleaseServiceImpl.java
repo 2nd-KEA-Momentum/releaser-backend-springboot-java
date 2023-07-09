@@ -15,7 +15,9 @@ import com.momentum.releaser.domain.release.domain.ReleaseEnum.ReleaseDeployStat
 import com.momentum.releaser.domain.release.domain.ReleaseNote;
 import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.ReleaseCreateRequestDto;
 import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.ReleaseUpdateRequestDto;
+import com.momentum.releaser.domain.release.dto.ReleaseResponseDto;
 import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.ReleaseCreateResponseDto;
+import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.ReleaseInfoResponseDto;
 import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.ReleasesResponseDto;
 import com.momentum.releaser.domain.release.mapper.ReleaseMapper;
 import com.momentum.releaser.global.error.CustomException;
@@ -109,6 +111,17 @@ public class ReleaseServiceImpl implements ReleaseService {
         releaseRepository.deleteById(releaseId);
 
         return "릴리즈 노트 삭제에 성공하였습니다.";
+    }
+
+    /**
+     * 5.5 릴리즈 노트 조회
+     */
+    @Override
+    public ReleaseInfoResponseDto getReleaseNoteInfo(Long releaseId) {
+
+        ReleaseNote releaseNote = getReleaseNoteById(releaseId);
+
+        return ReleaseMapper.INSTANCE.toReleaseInfoResponseDto(releaseNote);
     }
 
     // =================================================================================================================
