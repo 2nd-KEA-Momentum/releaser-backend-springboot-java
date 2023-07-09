@@ -47,10 +47,6 @@ public class IssueNum extends BaseTime {
         project.removeIssueNum(this);
     }
 
-    public void deleteToIssueNum() {
-        issue.deleteToIssueNum();
-        project.removeIssueNum(this);
-    }
 
 
     public void deleteToProject() {

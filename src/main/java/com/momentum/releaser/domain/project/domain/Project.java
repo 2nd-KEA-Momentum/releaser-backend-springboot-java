@@ -99,10 +99,6 @@ public class Project extends BaseTime {
     }
 
 
-    public void deleteIssueNum() {
-        this.issueNums = null;
-    }
-
     public void removeIssueNum(IssueNum issueNum) {
         issueNums.remove(issueNum);
     }

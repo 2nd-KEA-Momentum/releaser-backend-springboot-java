@@ -165,7 +165,7 @@ public class IssueServiceImpl implements IssueService {
             throw new CustomException(CONNECTED_RELEASE_EXISTS);
         }
 
-        issueRepository.deleteIssueByIssueNum();
+        issueNumRepository.deleteById(issue.getIssueNum().getIssueNumId());
         issueRepository.deleteById(issue.getIssueId());
 
         return "이슈가 삭제되었습니다.";

@@ -136,8 +136,8 @@ public class Issue extends BaseTime {
             opinion.statusToInactive();
         }
 
-
     }
+
 
     public void deleteToIssueNum() {
         this.issueNum = null;
