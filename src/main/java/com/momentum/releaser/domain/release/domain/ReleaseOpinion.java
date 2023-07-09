@@ -49,6 +49,7 @@ public class ReleaseOpinion extends BaseTime {
         this.release = release;
         this.member = member;
     }
+
     public void statusToInactive() {
         this.status = 'N';
     }

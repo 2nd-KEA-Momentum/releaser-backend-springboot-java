@@ -118,9 +118,7 @@ public class ReleaseServiceImpl implements ReleaseService {
      */
     @Override
     public ReleaseInfoResponseDto getReleaseNoteInfo(Long releaseId) {
-
         ReleaseNote releaseNote = getReleaseNoteById(releaseId);
-
         return ReleaseMapper.INSTANCE.toReleaseInfoResponseDto(releaseNote);
     }
 
