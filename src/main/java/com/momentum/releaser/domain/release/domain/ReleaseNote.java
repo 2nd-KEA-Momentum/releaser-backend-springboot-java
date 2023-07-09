@@ -78,33 +78,51 @@ public class ReleaseNote extends BaseTime {
     @OneToMany(mappedBy = "release")
     private List<Issue> issues = new ArrayList<>();
 
+    @OneToMany(mappedBy = "release")
+    private List<ReleaseApproval> approvals = new ArrayList<>();
+
     @Builder
-    public ReleaseNote(Long releaseId, String title, String content, String summary, String version, Date deployDate, Project project) {
+    public ReleaseNote(Long releaseId, String title, String content, String summary, String version, Date deployDate, ReleaseDeployStatus deployStatus, Project project, Double coordX, Double coordY) {
         this.releaseId = releaseId;
         this.title = title;
         this.content = content;
         this.summary = summary;
         this.version = version;
         this.deployDate = deployDate;
+        this.deployStatus = deployStatus;
         this.project = project;
+        this.coordX = coordX;
+        this.coordY = coordY;
     }
 
+    /**
+     * 릴리즈 노트를 삭제하기 전에 연관 관계로 매핑된 엔티티와의 관게를 끊거나 삭제한다.
+     */
     @PreRemove
     private void preRemove() {
+        // 릴리즈 노트 의견 삭제
         for (ReleaseOpinion opinion : releaseOpinions) {
             opinion.statusToInactive();
         }
+
+        // 릴리즈 노트와 연결된 이슈 삭제
         for (Issue issue : issues) {
             issue.statusToInactive();
         }
     }
 
+    /**
+     * 연관 관계로 매핑되어 있는 릴리즈 노트의 의견들을 삭제할 때 사용한다.
+     */
     public void softDelete() {
         for (ReleaseOpinion opinion : releaseOpinions) {
             opinion.statusToInactive();
         }
     }
 
+    /**
+     * 릴리즈 노트를 삭제할 때 사용한다.
+     */
     public void statusToInactive() {
         this.status = 'N';
     }
@@ -121,11 +139,12 @@ public class ReleaseNote extends BaseTime {
     /**
      * 릴리즈 노트 정보를 업데이트할 때 사용한다.
      */
-    public void updateReleaseNote(String title, String content, String summary, String version, Date deployDate) {
+    public void updateReleaseNote(String title, String content, String summary, String version, Date deployDate, ReleaseDeployStatus deployStatus) {
         this.title = title;
         this.content = content;
         this.version = version;
         this.summary = summary;
         this.deployDate = deployDate;
+        this.deployStatus = deployStatus;
     }
 }

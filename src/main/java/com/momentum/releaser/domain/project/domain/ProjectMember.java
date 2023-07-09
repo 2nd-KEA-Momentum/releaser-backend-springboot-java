@@ -2,6 +2,7 @@ package com.momentum.releaser.domain.project.domain;
 
 import com.momentum.releaser.domain.issue.domain.Issue;
 import com.momentum.releaser.domain.issue.domain.IssueOpinion;
+import com.momentum.releaser.domain.release.domain.ReleaseApproval;
 import com.momentum.releaser.domain.release.domain.ReleaseOpinion;
 import com.momentum.releaser.domain.user.domain.User;
 import com.momentum.releaser.global.common.BaseTime;
@@ -55,7 +56,8 @@ public class ProjectMember extends BaseTime {
     @OneToMany(mappedBy = "member")
     private List<IssueOpinion> issueOpinions = new ArrayList<>();
 
-
+    @OneToMany(mappedBy = "member")
+    private List<ReleaseApproval> approvals = new ArrayList<>();
 
     @Builder
     public ProjectMember(char position, char status, User user, Project project) {
