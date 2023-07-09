@@ -33,15 +33,23 @@ public class ReleaseRequestDto {
         @NotNull(message = "릴리즈 배포 날짜를 입력해 주세요.")
         private Date deployDate;
 
+        @NotNull(message = "릴리즈 노트의 x 좌표를 입력해 주세요.")
+        private Double coordX;
+
+        @NotNull(message = "릴리즈 노트의 y 좌표를 입력해 주세요.")
+        private Double coordY;
+
         List<Long> issues;
 
         @Builder
-        public ReleaseCreateRequestDto(String title, String versionType, String content, String summary, Date deployDate, List<Long> issues) {
+        public ReleaseCreateRequestDto(String title, String versionType, String content, String summary, Date deployDate, Double coordX, Double coordY, List<Long> issues) {
             this.title = title;
             this.versionType = versionType;
             this.content = content;
             this.summary = summary;
             this.deployDate = deployDate;
+            this.coordX = coordX;
+            this.coordY = coordY;
             this.issues = issues;
         }
     }

@@ -197,10 +197,6 @@ public class ReleaseServiceImpl implements ReleaseService {
     private ReleaseNote saveReleaseNote(Long projectId, ReleaseCreateRequestDto releaseCreateRequestDto, String newVersion) {
         Project project = getProjectById(projectId);
 
-        // FIXME: 좌표 기본 값을 넣는다.
-        Double x = 0.0;
-        Double y = 0.0;
-
         // 새로운 릴리즈 노트 생성
         ReleaseNote newReleaseNote = ReleaseNote.builder()
                 .title(releaseCreateRequestDto.getTitle())
@@ -209,8 +205,8 @@ public class ReleaseServiceImpl implements ReleaseService {
                 .version(newVersion)
                 .deployDate(releaseCreateRequestDto.getDeployDate())
                 .project(project)
-                .coordX(x)
-                .coordY(y)
+                .coordX(releaseCreateRequestDto.getCoordX())
+                .coordY(releaseCreateRequestDto.getCoordY())
                 .build();
 
         // 릴리즈 노트 엔티티 저장
