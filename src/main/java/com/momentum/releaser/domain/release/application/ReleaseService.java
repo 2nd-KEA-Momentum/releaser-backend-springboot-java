@@ -3,6 +3,7 @@ package com.momentum.releaser.domain.release.application;
 import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.ReleaseCreateRequestDto;
 import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.ReleaseUpdateRequestDto;
 import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.ReleaseCreateResponseDto;
+import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.ReleaseInfoResponseDto;
 import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.ReleasesResponseDto;
 
 public interface ReleaseService {
@@ -20,5 +21,15 @@ public interface ReleaseService {
     /**
      * 5.3 릴리즈 노트 수정
      */
-    int updateReleaseNote(Long releaseId, ReleaseUpdateRequestDto releaseUpdateRequestDto);
+    String updateReleaseNote(Long releaseId, ReleaseUpdateRequestDto releaseUpdateRequestDto);
+
+    /**
+     * 5.4 릴리즈 노트 삭제
+     */
+    String deleteReleaseNote(Long releaseId);
+
+    /**
+     * 5.5 릴리즈 노트 조회
+     */
+    ReleaseInfoResponseDto getReleaseNoteInfo(Long releaseId);
 }

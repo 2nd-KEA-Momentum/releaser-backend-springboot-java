@@ -4,9 +4,9 @@ import com.momentum.releaser.domain.release.application.ReleaseServiceImpl;
 import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.ReleaseCreateRequestDto;
 import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.ReleaseUpdateRequestDto;
 import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.ReleaseCreateResponseDto;
+import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.ReleaseInfoResponseDto;
 import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.ReleasesResponseDto;
 import com.momentum.releaser.global.config.BaseResponse;
-import com.momentum.releaser.global.error.CustomException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
@@ -14,8 +14,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
-
-import static com.momentum.releaser.global.config.BaseResponseStatus.*;
 
 @Slf4j
 @RestController
@@ -32,7 +30,7 @@ public class ReleaseController {
      */
     @GetMapping(value = "/projects")
     public BaseResponse<ReleasesResponseDto> getReleases(
-            @RequestParam @Min(1) Long projectId) {
+            @RequestParam @Min(value = 1, message = "프로젝트 식별 번호는 1 이상의 숫자여야 합니다.") Long projectId) {
 
         return new BaseResponse<>(releaseService.getReleasesByProject(projectId));
     }
@@ -42,7 +40,7 @@ public class ReleaseController {
      */
     @PostMapping(value = "/projects/{projectId}")
     public BaseResponse<ReleaseCreateResponseDto> createReleaseNote(
-            @PathVariable @Min(1) Long projectId,
+            @PathVariable @Min(value = 1, message = "프로젝트 식별 번호는 1 이상의 숫자여야 합니다.") Long projectId,
             @RequestBody @Valid ReleaseCreateRequestDto releaseCreateRequestDto) {
 
         return new BaseResponse<>(releaseService.createReleaseNote(projectId, releaseCreateRequestDto));
@@ -56,10 +54,30 @@ public class ReleaseController {
             @PathVariable @Min(value = 1, message = "릴리즈 식별 번호는 1 이상의 숫자여야 합니다.") Long releaseId,
             @RequestBody @Valid ReleaseUpdateRequestDto releaseUpdateRequestDto) {
 
-        if (releaseService.updateReleaseNote(releaseId, releaseUpdateRequestDto) == 1) {
-            return new BaseResponse<>("릴리즈 노트 수정에 성공하였습니다.");
-        } else {
-            throw new CustomException(FAILED_TO_UPDATE_RELEASE_NOTE);
-        }
+        return new BaseResponse<>(releaseService.updateReleaseNote(releaseId, releaseUpdateRequestDto));
     }
+
+    /**
+     * 5.4 릴리즈 노트 삭제
+     */
+    @PostMapping(value = "/{releaseId}")
+    public BaseResponse<String> deleteReleaseNote(
+            @PathVariable @Min(value = 1, message = "릴리즈 식별 번호는 1 이상의 숫자여야 합니다.") Long releaseId) {
+
+        return new BaseResponse<>(releaseService.deleteReleaseNote(releaseId));
+    }
+
+    /**
+     * 5.5 릴리즈 노트 조회
+     */
+    @GetMapping(value = "/{releaseId}")
+    public BaseResponse<ReleaseInfoResponseDto> getReleaseNote(
+            @PathVariable @Min(value = 1, message = "릴리즈 식별 번호는 1 이상의 숫자여야 합니다.") Long releaseId) {
+
+        return new BaseResponse<>(releaseService.getReleaseNoteInfo(releaseId));
+    }
+
+    /**
+     * 5.7 릴리즈 노트 그래프 좌표 추가
+     */
 }

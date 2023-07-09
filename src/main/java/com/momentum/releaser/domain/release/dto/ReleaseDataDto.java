@@ -19,14 +19,18 @@ public class ReleaseDataDto {
         private String summary;
         private Date deployDate;
         private ReleaseDeployStatus deployStatus;
+        private Double coordX;
+        private Double coordY;
 
         @Builder
-        public ReleasesDataDto(Long releaseId, String version, String summary, Date deployDate, ReleaseDeployStatus deployStatus) {
+        public ReleasesDataDto(Long releaseId, String version, String summary, Date deployDate, ReleaseDeployStatus deployStatus, Double coordX, Double coordY) {
             this.releaseId = releaseId;
             this.version = version;
             this.summary = summary;
             this.deployDate = deployDate;
             this.deployStatus = deployStatus;
+            this.coordX = coordX;
+            this.coordY = coordY;
         }
     }
 

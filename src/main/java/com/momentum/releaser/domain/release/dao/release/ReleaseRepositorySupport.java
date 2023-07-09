@@ -1,4 +1,4 @@
-package com.momentum.releaser.domain.release.dao;
+package com.momentum.releaser.domain.release.dao.release;
 
 import com.momentum.releaser.domain.release.domain.ReleaseNote;
 import com.querydsl.jpa.impl.JPAQueryFactory;
