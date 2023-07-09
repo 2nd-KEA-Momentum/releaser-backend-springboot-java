@@ -13,9 +13,10 @@ import com.momentum.releaser.domain.release.dao.release.ReleaseRepository;
 import com.momentum.releaser.domain.release.domain.ReleaseApproval;
 import com.momentum.releaser.domain.release.domain.ReleaseEnum.ReleaseDeployStatus;
 import com.momentum.releaser.domain.release.domain.ReleaseNote;
+import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.ReleaseApprovalRequestDto;
 import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.ReleaseCreateRequestDto;
 import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.ReleaseUpdateRequestDto;
-import com.momentum.releaser.domain.release.dto.ReleaseResponseDto;
+import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.ReleaseApprovalsResponseDto;
 import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.ReleaseCreateResponseDto;
 import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.ReleaseInfoResponseDto;
 import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.ReleasesResponseDto;
@@ -120,6 +121,22 @@ public class ReleaseServiceImpl implements ReleaseService {
     public ReleaseInfoResponseDto getReleaseNoteInfo(Long releaseId) {
         ReleaseNote releaseNote = getReleaseNoteById(releaseId);
         return ReleaseMapper.INSTANCE.toReleaseInfoResponseDto(releaseNote);
+    }
+
+    /**
+     * 5.6 릴리즈 노트 배포 동의 여부 선택 (멤버용)
+     */
+    @Override
+    public ReleaseApprovalsResponseDto decideOnApprovalByMember(Long releaseId, ReleaseApprovalRequestDto releaseApprovalRequestDto) {
+        ReleaseNote releaseNote = getReleaseNoteById(releaseId);
+
+        // 배포 동의 여부를 선택할 수 있는 릴리즈인지 확인한다.
+        validateReleaseNoteApproval(releaseNote);
+
+        // 릴리즈 노트에 대한 배포 동의 여부를 업데이트한다.
+        updateReleaseNoteApproval(releaseNote, releaseApprovalRequestDto);
+
+        return null;
     }
 
     // =================================================================================================================
@@ -500,5 +517,17 @@ public class ReleaseServiceImpl implements ReleaseService {
         if (releaseNotes.size() > 0) {
             throw new CustomException(FAILED_TO_DELETE_RELEASE_NOTE);
         }
+    }
+
+    /**
+     * 릴리즈 노트 배포 동의 여부를 선택할 수 있는 건지 확인한다.
+     */
+    private void validateReleaseNoteApproval(ReleaseNote releaseNote) {
+    }
+
+    /**
+     * 릴리즈 노트의 배포 동의 여부를 업데이트한다.
+     */
+    private void updateReleaseNoteApproval(ReleaseNote releaseNote, ReleaseApprovalRequestDto releaseApprovalRequestDto) {
     }
 }

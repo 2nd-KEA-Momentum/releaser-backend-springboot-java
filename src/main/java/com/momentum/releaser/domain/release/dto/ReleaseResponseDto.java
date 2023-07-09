@@ -84,4 +84,24 @@ public class ReleaseResponseDto {
             this.approvals = approvals;
         }
     }
+
+    /**
+     * 5.6 릴리즈 노트 배포 동의 여부 선택 (멤버용)
+     */
+    @Getter
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    public static class ReleaseApprovalsResponseDto {
+        private Long memberId;
+        private String memberName;
+        private String memberProfileImg;
+        private char approval;
+
+        @Builder
+        public ReleaseApprovalsResponseDto(Long memberId, String memberName, String memberProfileImg, char approval) {
+            this.memberId = memberId;
+            this.memberName = memberName;
+            this.memberProfileImg = memberProfileImg;
+            this.approval = approval;
+        }
+    }
 }
