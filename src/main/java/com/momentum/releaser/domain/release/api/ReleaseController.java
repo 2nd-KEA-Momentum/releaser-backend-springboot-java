@@ -56,11 +56,17 @@ public class ReleaseController {
             @PathVariable @Min(value = 1, message = "릴리즈 식별 번호는 1 이상의 숫자여야 합니다.") Long releaseId,
             @RequestBody @Valid ReleaseUpdateRequestDto releaseUpdateRequestDto) {
 
-        if (releaseService.updateReleaseNote(releaseId, releaseUpdateRequestDto) == 1) {
-            return new BaseResponse<>("릴리즈 노트 수정에 성공하였습니다.");
-        } else {
-            throw new CustomException(FAILED_TO_UPDATE_RELEASE_NOTE);
-        }
+        return new BaseResponse<>(releaseService.updateReleaseNote(releaseId, releaseUpdateRequestDto));
+    }
+
+    /**
+     * 5.4 릴리즈 노트 삭제
+     */
+    @PostMapping(value = "/{releaseId}")
+    public BaseResponse<String> deleteReleaseNote(
+            @PathVariable @Min(value = 1, message = "릴리즈 식별 번호는 1 이상의 숫자여야 합니다.") Long releaseId) {
+
+        return new BaseResponse<>(releaseService.deleteReleaseNote(releaseId));
     }
 
     /**

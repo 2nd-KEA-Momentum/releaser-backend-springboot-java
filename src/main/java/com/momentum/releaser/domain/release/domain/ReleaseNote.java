@@ -95,22 +95,34 @@ public class ReleaseNote extends BaseTime {
         this.coordY = coordY;
     }
 
+    /**
+     * 릴리즈 노트를 삭제하기 전에 연관 관계로 매핑된 엔티티와의 관게를 끊거나 삭제한다.
+     */
     @PreRemove
     private void preRemove() {
+        // 릴리즈 노트 의견 삭제
         for (ReleaseOpinion opinion : releaseOpinions) {
             opinion.statusToInactive();
         }
+
+        // 릴리즈 노트와 연결된 이슈 삭제
         for (Issue issue : issues) {
             issue.statusToInactive();
         }
     }
 
+    /**
+     * 연관 관계로 매핑되어 있는 릴리즈 노트의 의견들을 삭제할 때 사용한다.
+     */
     public void softDelete() {
         for (ReleaseOpinion opinion : releaseOpinions) {
             opinion.statusToInactive();
         }
     }
 
+    /**
+     * 릴리즈 노트를 삭제할 때 사용한다.
+     */
     public void statusToInactive() {
         this.status = 'N';
     }

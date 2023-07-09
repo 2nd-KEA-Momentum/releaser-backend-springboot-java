@@ -1,4 +1,4 @@
-package com.momentum.releaser.domain.release.dao;
+package com.momentum.releaser.domain.release.dao.release;
 
 import com.momentum.releaser.domain.project.domain.Project;
 import com.momentum.releaser.domain.release.domain.ReleaseNote;
@@ -74,4 +74,16 @@ public class ReleaseRepositoryImpl implements ReleaseRepositoryCustom {
                 .fetch();
     }
 
+    /**
+     * 삭제하려는 릴리즈 노트의 이후 릴리즈 노트들을 가져온다.
+     */
+    @Override
+    public List<ReleaseNote> findNextReleaseNotes(Project project, String version) {
+        return queryFactory
+                .selectFrom(releaseNote)
+                .where(releaseNote.project.eq(project))
+                .where(releaseNote.version.gt(version))
+                .orderBy(releaseNote.version.desc())
+                .fetch();
+    }
 }

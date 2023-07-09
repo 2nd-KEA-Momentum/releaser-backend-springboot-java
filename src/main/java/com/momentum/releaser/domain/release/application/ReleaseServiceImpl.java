@@ -8,10 +8,9 @@ import com.momentum.releaser.domain.project.dao.ProjectRepository;
 import com.momentum.releaser.domain.project.domain.Project;
 import com.momentum.releaser.domain.project.domain.ProjectMember;
 import com.momentum.releaser.domain.project.mapper.ProjectMapper;
-import com.momentum.releaser.domain.release.dao.ReleaseApprovalRepository;
-import com.momentum.releaser.domain.release.dao.ReleaseRepository;
+import com.momentum.releaser.domain.release.dao.approval.ReleaseApprovalRepository;
+import com.momentum.releaser.domain.release.dao.release.ReleaseRepository;
 import com.momentum.releaser.domain.release.domain.ReleaseApproval;
-import com.momentum.releaser.domain.release.domain.ReleaseEnum;
 import com.momentum.releaser.domain.release.domain.ReleaseEnum.ReleaseDeployStatus;
 import com.momentum.releaser.domain.release.domain.ReleaseNote;
 import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.ReleaseCreateRequestDto;
@@ -80,7 +79,7 @@ public class ReleaseServiceImpl implements ReleaseService {
      */
     @Transactional
     @Override
-    public int updateReleaseNote(Long releaseId, ReleaseUpdateRequestDto releaseUpdateRequestDto) {
+    public String updateReleaseNote(Long releaseId, ReleaseUpdateRequestDto releaseUpdateRequestDto) {
         // 수정된 릴리즈 노트 내용을 반영 및 저장한다.
         ReleaseNote updatedReleaseNote = updateAndSaveReleaseNote(releaseId, releaseUpdateRequestDto, updateReleaseVersion(releaseId, releaseUpdateRequestDto.getVersion()));
 
@@ -90,7 +89,26 @@ public class ReleaseServiceImpl implements ReleaseService {
         // 배포 상태에 따른 알림을 보낸다.
         alertReleaseNoteDeploy(updatedReleaseNote);
 
-        return 1;
+        return "릴리즈 노트 수정에 성공하였습니다.";
+    }
+
+    /**
+     * 5.4 릴리즈 노트 삭제
+     */
+    @Transactional
+    @Override
+    public String deleteReleaseNote(Long releaseId) {
+        // 해당 릴리즈 노트 삭제가 가능한지 확인한다.
+        ReleaseNote releaseNote = getReleaseNoteById(releaseId);
+        validateReleaseNoteDelete(releaseNote);
+
+        // 해당 릴리즈 노트에 대한 배포 동의 여부 데이터를 모두 삭제한다.
+        releaseApprovalRepository.deleteByReleaseNote(releaseNote);
+
+        // 해당 릴리즈 노트를 삭제한다.
+        releaseRepository.deleteById(releaseId);
+
+        return "릴리즈 삭제에 성공하였습니다.";
     }
 
     // =================================================================================================================
@@ -227,7 +245,7 @@ public class ReleaseServiceImpl implements ReleaseService {
     /**
      * 릴리즈 노트 수정 및 배포가 가능한지 검사한다.
      */
-    private int validateReleaseNoteUpdate(ReleaseNote releaseNote, ReleaseUpdateRequestDto releaseUpdateRequestDto) {
+    private void validateReleaseNoteUpdate(ReleaseNote releaseNote, ReleaseUpdateRequestDto releaseUpdateRequestDto) {
         // 릴리즈 노트가 수정 가능한 상태(PLANNING, DENIED)인지 검사한다.
         if (releaseNote.getDeployStatus().equals(ReleaseDeployStatus.DEPLOYED)) {
             // 만약 이미 DEPLOYED 된 릴리즈 노트인 경우 예외를 발생시킨다.
@@ -247,8 +265,6 @@ public class ReleaseServiceImpl implements ReleaseService {
                         }
                     });
         }
-
-        return 1;
     }
 
     /**
@@ -458,6 +474,24 @@ public class ReleaseServiceImpl implements ReleaseService {
             if ((nextPatch - currentPatch > 1) || (nextPatch - currentPatch < 0)) {
                 throw new CustomException(INVALID_RELEASE_VERSION);
             }
+        }
+    }
+
+    /**
+     * 릴리즈 노트 삭제가 가능한지 유효성 검사를 진행한다.
+     */
+    private void validateReleaseNoteDelete(ReleaseNote releaseNote) {
+
+        // 릴리즈 노트가 삭제 가능한 상태(PLANNING, DENIED)인지 검사한다.
+        if (releaseNote.getDeployStatus().equals(ReleaseDeployStatus.DEPLOYED)) {
+            // 만약 이미 DEPLOYED 된 릴리즈 노트인 경우 예외를 발생시킨다.
+            throw new CustomException(FAILED_TO_UPDATE_DEPLOYED_RELEASE_VERSION);
+        }
+
+        // 만약 해당 릴리즈 노트 앞에 추가로 생성된 릴리즈 노트가 있을 경우 삭제할 수 없다.
+        List<ReleaseNote> releaseNotes = releaseRepository.findNextReleaseNotes(releaseNote.getProject(), releaseNote.getVersion());
+        if (releaseNotes.size() > 0) {
+            throw new CustomException(FAILED_TO_DELETE_RELEASE_NOTE);
         }
     }
 }

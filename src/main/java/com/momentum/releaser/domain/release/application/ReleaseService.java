@@ -20,7 +20,12 @@ public interface ReleaseService {
     /**
      * 5.3 릴리즈 노트 수정
      */
-    int updateReleaseNote(Long releaseId, ReleaseUpdateRequestDto releaseUpdateRequestDto);
+    String updateReleaseNote(Long releaseId, ReleaseUpdateRequestDto releaseUpdateRequestDto);
+
+    /**
+     * 5.4 릴리즈 노트 삭제
+     */
+    String deleteReleaseNote(Long releaseId);
 
     /**
      * 5.5 릴리즈 노트 조회
