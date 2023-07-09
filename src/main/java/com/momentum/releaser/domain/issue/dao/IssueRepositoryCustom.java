@@ -19,7 +19,6 @@ public interface IssueRepositoryCustom {
     Long getIssueNum(Project project);
 
     void deleteByIssueNum();
-    void deleteIssueByIssueNum();
 
     List<GetDoneIssues> getDoneIssues(Project findProject);
 

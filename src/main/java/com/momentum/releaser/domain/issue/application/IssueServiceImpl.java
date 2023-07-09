@@ -13,7 +13,7 @@ import com.momentum.releaser.domain.project.domain.Project;
 import com.momentum.releaser.domain.project.domain.ProjectMember;
 import com.momentum.releaser.domain.project.dto.ProjectResDto;
 import com.momentum.releaser.domain.project.dto.ProjectResDto.GetMembersRes;
-import com.momentum.releaser.domain.release.dao.ReleaseRepository;
+import com.momentum.releaser.domain.release.dao.release.ReleaseRepository;
 import com.momentum.releaser.domain.release.domain.ReleaseNote;
 import com.momentum.releaser.global.config.BaseException;
 import com.momentum.releaser.global.config.BaseResponseStatus;

@@ -138,7 +138,6 @@ public class Issue extends BaseTime {
 
     }
 
-
     public void deleteToIssueNum() {
         this.issueNum = null;
     }
