@@ -43,6 +43,8 @@ public enum BaseResponseStatus {
     DUPLICATED_RELEASE_VERSION(false, 4404, "이미 존재하는 릴리즈 버전입니다."),
     INVALID_RELEASE_VERSION(false, 4405, "올바르지 않은 릴리즈 버전입니다."),
     FAILED_TO_UPDATE_INITIAL_RELEASE_VERSION(false, 4406, "릴리즈 노트 1.0.0은 버전을 수정할 수 없습니다."),
+    FAILED_TO_UPDATE_DEPLOYED_RELEASE_VERSION(false, 4407, "이미 배포된 릴리즈 노트는 수정할 수 없습니다."),
+    FAILED_TO_UPDATE_RELEASE_DEPLOY_STATUS(false, 4408, "해당 릴리즈 노트의 배포 상태는 수정할 수 없습니다."),
     NOT_EXISTS_ISSUE(false, 4500, "존재하지 않는 이슈입니다."),
     INVALID_ISSUE_WITH_COMPLETED(false, 4501, "이미 연결된 이슈가 포함되어 있습니다."),
     INVALID_ISSUE_WITH_NOT_DONE(false, 4502, "완료되지 않은 이슈는 연결할 수 없습니다."),

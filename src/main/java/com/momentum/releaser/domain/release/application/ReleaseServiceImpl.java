@@ -12,6 +12,7 @@ import com.momentum.releaser.domain.release.dao.ReleaseApprovalRepository;
 import com.momentum.releaser.domain.release.dao.ReleaseRepository;
 import com.momentum.releaser.domain.release.domain.ReleaseApproval;
 import com.momentum.releaser.domain.release.domain.ReleaseEnum;
+import com.momentum.releaser.domain.release.domain.ReleaseEnum.ReleaseDeployStatus;
 import com.momentum.releaser.domain.release.domain.ReleaseNote;
 import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.ReleaseCreateRequestDto;
 import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.ReleaseUpdateRequestDto;
@@ -80,9 +81,6 @@ public class ReleaseServiceImpl implements ReleaseService {
     @Transactional
     @Override
     public int updateReleaseNote(Long releaseId, ReleaseUpdateRequestDto releaseUpdateRequestDto) {
-        // 먼저 연결된 이슈를 모두 해제한다.
-        disconnectIssues(releaseId);
-
         // 수정된 릴리즈 노트 내용을 반영 및 저장한다.
         ReleaseNote updatedReleaseNote = updateAndSaveReleaseNote(releaseId, releaseUpdateRequestDto, updateReleaseVersion(releaseId, releaseUpdateRequestDto.getVersion()));
 
@@ -207,23 +205,56 @@ public class ReleaseServiceImpl implements ReleaseService {
     private ReleaseNote updateAndSaveReleaseNote(Long releaseId, ReleaseUpdateRequestDto releaseUpdateRequestDto, String updatedVersion) {
         ReleaseNote releaseNote = getReleaseNoteById(releaseId);
 
+        // 수정이 가능한 릴리즈 노트인지 유효성 검사를 진행한다.
+        validateReleaseNoteUpdate(releaseNote, releaseUpdateRequestDto);
+
+        // 먼저 연결된 이슈를 모두 해제한다.
+        disconnectIssues(releaseNote);
+
+        // 수정된 내용을 반영한다.
         releaseNote.updateReleaseNote(
                 releaseUpdateRequestDto.getTitle(),
                 releaseUpdateRequestDto.getContent(),
                 releaseUpdateRequestDto.getSummary(),
                 updatedVersion,
                 releaseUpdateRequestDto.getDeployDate(),
-                ReleaseEnum.ReleaseDeployStatus.valueOf(releaseUpdateRequestDto.getDeployStatus())
+                ReleaseDeployStatus.valueOf(releaseUpdateRequestDto.getDeployStatus())
         );
 
         return releaseRepository.save(releaseNote);
     }
 
     /**
+     * 릴리즈 노트 수정 및 배포가 가능한지 검사한다.
+     */
+    private int validateReleaseNoteUpdate(ReleaseNote releaseNote, ReleaseUpdateRequestDto releaseUpdateRequestDto) {
+        // 릴리즈 노트가 수정 가능한 상태(PLANNING, DENIED)인지 검사한다.
+        if (releaseNote.getDeployStatus().equals(ReleaseDeployStatus.DEPLOYED)) {
+            // 만약 이미 DEPLOYED 된 릴리즈 노트인 경우 예외를 발생시킨다.
+            throw new CustomException(FAILED_TO_UPDATE_DEPLOYED_RELEASE_VERSION);
+        }
+
+        // 만약 요청된 릴리즈 노트의 배포 상태가 DEPLOYED인 경우
+        if (releaseUpdateRequestDto.getDeployStatus().equals("DEPLOYED")) {
+            Project project = releaseNote.getProject();
+            List<ReleaseNote> releaseNotes = releaseRepository.findPreviousReleaseNotes(project, releaseUpdateRequestDto.getVersion());
+
+            // 이전 릴리즈 노트 중 배포되지 않은 것이 있는지 검증하고, 아닌 경우 예외를 발생시킨다.
+            releaseNotes
+                    .forEach(r -> {
+                        if (!r.getDeployStatus().equals(ReleaseDeployStatus.DEPLOYED)) {
+                            throw new CustomException(FAILED_TO_UPDATE_RELEASE_DEPLOY_STATUS);
+                        }
+                    });
+        }
+
+        return 1;
+    }
+
+    /**
      * 기존의 이슈들에 대해 연결을 해제한다.
      */
-    private void disconnectIssues(Long releaseId) {
-        ReleaseNote releaseNote = getReleaseNoteById(releaseId);
+    private void disconnectIssues(ReleaseNote releaseNote) {
         releaseNote.getIssues().forEach(Issue::disconnectReleaseNote);
     }
 
@@ -363,6 +394,7 @@ public class ReleaseServiceImpl implements ReleaseService {
             if (nextMajor - currentMajor == 1) {
                 validateMinorVersion(minors, patches, majorStartIdx, i, minorStartIdx);
                 majorStartIdx = i + 1;
+                minorStartIdx = i + 1;
 
                 // 메이저 버전 숫자가 바뀌었을 때 마이너와 패치 버전 숫자는 모두 0이어야 한다.
                 if (minors[majorStartIdx] != 0 || patches[majorStartIdx] != 0) {

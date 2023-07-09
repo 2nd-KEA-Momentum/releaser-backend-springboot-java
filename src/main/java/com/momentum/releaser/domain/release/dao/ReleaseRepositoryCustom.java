@@ -13,4 +13,6 @@ public interface ReleaseRepositoryCustom {
     Optional<ReleaseNote> findLatestVersionByProject(Project project);
 
     List<ReleaseNote> findByProjectAndNotInVersion(Project project, String version);
+
+    List<ReleaseNote> findPreviousReleaseNotes(Project project, String version);
 }

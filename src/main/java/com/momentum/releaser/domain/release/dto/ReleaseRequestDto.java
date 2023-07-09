@@ -17,7 +17,6 @@ public class ReleaseRequestDto {
     @Getter
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     public static class ReleaseCreateRequestDto {
-        @NotBlank(message = "릴리즈 제목을 입력해 주세요.")
         @Size(min = 1, max = 45, message = "릴리즈 제목은 1자 이상 45자 이하여야 합니다.")
         private String title;
 
@@ -53,8 +52,6 @@ public class ReleaseRequestDto {
     @Getter
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     public static class ReleaseUpdateRequestDto {
-        @NotNull(message = "릴리즈 제목을 입력해 주세요.")
-        @NotBlank(message = "릴리즈 제목을 입력해 주세요.")
         @Size(min = 1, max = 45, message = "릴리즈 제목은 1자 이상 45자 이하여야 합니다.")
         private String title;
 

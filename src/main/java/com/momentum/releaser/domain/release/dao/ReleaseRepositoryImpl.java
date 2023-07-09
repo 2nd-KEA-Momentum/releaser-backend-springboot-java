@@ -59,4 +59,19 @@ public class ReleaseRepositoryImpl implements ReleaseRepositoryCustom {
                 .where(releaseNote.version.ne(version))
                 .fetch();
     }
+
+    /**
+     * 수정하려는 릴리즈 노트의 이전 릴리즈 노트들을 가져온다.
+     */
+    @Override
+    public List<ReleaseNote> findPreviousReleaseNotes(Project project, String version) {
+        // 같은 프로젝트 안의 모든 릴리즈 노트 중 전달받은 버전보다 낮은 버전의 릴리즈 노트 목록을 가져온다.
+        return queryFactory
+                .selectFrom(releaseNote)
+                .where(releaseNote.project.eq(project))
+                .where(releaseNote.version.lt(version))
+                .orderBy(releaseNote.version.desc())
+                .fetch();
+    }
+
 }
