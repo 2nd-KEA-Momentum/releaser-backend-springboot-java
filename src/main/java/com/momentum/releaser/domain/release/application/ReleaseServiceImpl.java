@@ -108,7 +108,7 @@ public class ReleaseServiceImpl implements ReleaseService {
         // 해당 릴리즈 노트를 삭제한다.
         releaseRepository.deleteById(releaseId);
 
-        return "릴리즈 삭제에 성공하였습니다.";
+        return "릴리즈 노트 삭제에 성공하였습니다.";
     }
 
     // =================================================================================================================
@@ -485,7 +485,7 @@ public class ReleaseServiceImpl implements ReleaseService {
         // 릴리즈 노트가 삭제 가능한 상태(PLANNING, DENIED)인지 검사한다.
         if (releaseNote.getDeployStatus().equals(ReleaseDeployStatus.DEPLOYED)) {
             // 만약 이미 DEPLOYED 된 릴리즈 노트인 경우 예외를 발생시킨다.
-            throw new CustomException(FAILED_TO_UPDATE_DEPLOYED_RELEASE_VERSION);
+            throw new CustomException(FAILED_TO_DELETE_DEPLOYED_RELEASE_NOTE);
         }
 
         // 만약 해당 릴리즈 노트 앞에 추가로 생성된 릴리즈 노트가 있을 경우 삭제할 수 없다.
