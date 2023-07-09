@@ -70,6 +70,7 @@ public class ReleaseRequestDto {
         private String summary;
 
         @NotNull(message = "릴리즈 배포 날짜를 입력해 주세요.")
+        @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "배포 날짜 형식은 yyyy-mm-dd여야 합니다.")
         private Date deployDate;
 
         @NotNull(message = "릴리즈 배포 상태를 입력해 주세요.")

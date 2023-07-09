@@ -7,7 +7,7 @@ import com.momentum.releaser.domain.project.dao.ProjectRepository;
 import com.momentum.releaser.domain.project.domain.Project;
 import com.momentum.releaser.domain.project.mapper.ProjectMapper;
 import com.momentum.releaser.domain.release.dao.ReleaseRepository;
-import com.momentum.releaser.domain.release.domain.ReleaseEnum.ReleaseDeployStatus;
+import com.momentum.releaser.domain.release.domain.ReleaseEnum;
 import com.momentum.releaser.domain.release.domain.ReleaseNote;
 import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.ReleaseCreateRequestDto;
 import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.ReleaseUpdateRequestDto;
@@ -62,7 +62,6 @@ public class ReleaseServiceImpl implements ReleaseService {
         // 생성된 릴리즈 노트에 대한 알림을 보낸다.
         alertCreatedReleaseNote(projectId, savedReleaseNote.getReleaseId());
 
-        // DTO로 반환한다.
         return ReleaseMapper.INSTANCE.toReleaseCreateResponseDto(savedReleaseNote);
     }
 
@@ -72,9 +71,18 @@ public class ReleaseServiceImpl implements ReleaseService {
     @Transactional
     @Override
     public int updateReleaseNote(Long releaseId, ReleaseUpdateRequestDto releaseUpdateRequestDto) {
+        // 먼저 연결된 이슈를 모두 해제한다.
         disconnectIssues(releaseId);
+
+        // 수정된 릴리즈 노트 내용을 반영 및 저장한다.
         ReleaseNote updatedReleaseNote = updateAndSaveReleaseNote(releaseId, releaseUpdateRequestDto, updateReleaseVersion(releaseId, releaseUpdateRequestDto.getVersion()));
+
+        // 이슈를 연결한다.
         connectIssues(releaseUpdateRequestDto.getIssues(), updatedReleaseNote);
+
+        // 배포 상태에 따른 알림을 보낸다.
+        alertReleaseNoteDeploy(updatedReleaseNote);
+
         return 1;
     }
 
@@ -195,7 +203,8 @@ public class ReleaseServiceImpl implements ReleaseService {
                 releaseUpdateRequestDto.getContent(),
                 releaseUpdateRequestDto.getSummary(),
                 updatedVersion,
-                releaseUpdateRequestDto.getDeployDate()
+                releaseUpdateRequestDto.getDeployDate(),
+                ReleaseEnum.ReleaseDeployStatus.valueOf(releaseUpdateRequestDto.getDeployStatus())
         );
 
         return releaseRepository.save(releaseNote);
@@ -237,6 +246,27 @@ public class ReleaseServiceImpl implements ReleaseService {
      */
     private void alertCreatedReleaseNote(Long projectId, Long releaseId) {
         // TODO: 이후 RabbitMQ를 적용시킬 때 구현한다.
+    }
+
+    /**
+     * 릴리즈 노트가 수정되었음을 프로젝트 멤버들에게 알리고, 배포 상태를 알린다.
+     */
+    private void alertReleaseNoteDeploy(ReleaseNote releaseNote) {
+        // TODO: 이후 RabbitMQ를 적용시킬 때 구현한다.
+
+        switch (releaseNote.getDeployStatus().name()) {
+            case "PLANNING":
+                break;
+
+            case "DENIED":
+                break;
+
+            case "DEPLOYED":
+                break;
+
+            default:
+                break;
+        }
     }
 
     /**

@@ -50,10 +50,12 @@ public class ReleaseNote extends BaseTime {
     @Column(name = "version")
     private String version;
 
+    @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "배포 날짜 형식은 yyyy-mm-dd여야 합니다.")
     @Column(name = "deploy_date")
     private Date deployDate;
 
     @NotNull
+    @Pattern(regexp = "(?i)^(PLANNING|DENIED|DEPLOYED)$", message = "배포 상태 값은 PLANNING, DENIED, DEPLOYED 중 하나여야 합니다.")
     @Column(name = "deploy_status")
     @Enumerated(EnumType.STRING)
     private ReleaseDeployStatus deployStatus;
@@ -124,11 +126,12 @@ public class ReleaseNote extends BaseTime {
     /**
      * 릴리즈 노트 정보를 업데이트할 때 사용한다.
      */
-    public void updateReleaseNote(String title, String content, String summary, String version, Date deployDate) {
+    public void updateReleaseNote(String title, String content, String summary, String version, Date deployDate, ReleaseDeployStatus deployStatus) {
         this.title = title;
         this.content = content;
         this.version = version;
         this.summary = summary;
         this.deployDate = deployDate;
+        this.deployStatus = deployStatus;
     }
 }
