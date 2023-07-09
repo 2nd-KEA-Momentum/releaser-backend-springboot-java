@@ -3,6 +3,7 @@ package com.momentum.releaser.domain.issue.api;
 import com.momentum.releaser.domain.issue.application.IssueService;
 import com.momentum.releaser.domain.issue.dto.IssueReqDto.IssueInfoReq;
 import com.momentum.releaser.domain.issue.dto.IssueReqDto.UpdateLifeCycleReq;
+import com.momentum.releaser.domain.issue.dto.IssueResDto;
 import com.momentum.releaser.domain.issue.dto.IssueResDto.GetConnectionIssues;
 import com.momentum.releaser.domain.issue.dto.IssueResDto.GetDoneIssues;
 import com.momentum.releaser.domain.issue.dto.IssueResDto.GetIssuesList;
@@ -18,6 +19,7 @@ import javax.validation.constraints.Min;
 import java.util.List;
 
 import static com.momentum.releaser.domain.issue.dto.IssueReqDto.*;
+import static com.momentum.releaser.domain.issue.dto.IssueResDto.*;
 
 @Slf4j
 @RestController
@@ -86,11 +88,11 @@ public class IssueController {
     /**
      * 7.7 이슈별 조회
      */
-//    @GetMapping("/{issueId}/member/{memberId}")
-//    public BaseResponse<GetIssue> getIssue(@PathVariable @Min(1) Long issueId,
-//                                           @PathVariable @Min(1) Long memberId) {
-//        return new BaseResponse<>(issueService.getIssue(issueId, memberId));
-//    }
+    @GetMapping("/{issueId}/member/{memberId}")
+    public BaseResponse<GetIssue> getIssue(@PathVariable @Min(1) Long issueId,
+                                           @PathVariable @Min(1) Long memberId) {
+        return new BaseResponse<>(issueService.getIssue(issueId, memberId));
+    }
 
     /**
      * 7.8 이슈 상태 변경

@@ -61,4 +61,8 @@ public enum BaseResponseStatus {
         this.code = code;
         this.message = message;
     }
+
+
+
+
 }

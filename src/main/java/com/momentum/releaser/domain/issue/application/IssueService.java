@@ -22,6 +22,7 @@ public interface IssueService {
     /**
      * 7.3 이슈 제거
      */
+    String deleteIssue(Long issueId);
 
 
     /**
@@ -45,6 +46,7 @@ public interface IssueService {
     /**
      * 7.7 이슈별 조회
      */
+    GetIssue getIssue(Long issueId, Long memberId);
 
 
     /**
@@ -67,5 +69,4 @@ public interface IssueService {
     String deleteOpinion(Long opinionId);
 
 
-    String deleteIssue(Long issueId);
 }

@@ -9,4 +9,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class BaseException extends Exception {
     private final BaseResponseStatus status;  //BaseResoinseStatus 객체에 매핑
+
+
+
 }

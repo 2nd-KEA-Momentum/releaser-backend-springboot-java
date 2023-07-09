@@ -4,6 +4,8 @@ package com.momentum.releaser.global.config;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.momentum.releaser.domain.issue.dto.IssueResDto;
+import com.momentum.releaser.global.error.CustomException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -41,4 +43,6 @@ public class BaseResponse<T> {//BaseResponse 객체를 사용할때 성공, 실�
         this.code = status.getCode();
         this.result = result;
     }
+
+
 }

@@ -129,6 +129,36 @@ public class IssueResDto{
     }
 
     /**
+     * 이슈별 조회
+     */
+    @Data
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    public static class GetIssue {
+        private Long issueNum;
+        private String title;
+        private String content;
+        private String tag;
+        private Date endDate;
+        private char edit;
+        private Long manager; //담당자
+        private List<GetMembersRes> memberList;
+        private List<OpinionInfoRes> opinionList;
+
+        @Builder
+        public GetIssue(Long issueNum, String title, String content, String tag, Date endDate, char edit, Long manager, List<GetMembersRes> memberList, List<OpinionInfoRes> opinionList) {
+            this.issueNum = issueNum;
+            this.title = title;
+            this.content = content;
+            this.tag = tag;
+            this.endDate = endDate;
+            this.edit = edit;
+            this.manager = manager;
+            this.memberList = memberList;
+            this.opinionList = opinionList;
+        }
+    }
+
+    /**
      * 이슈 의견 정보
      */
     @Data
@@ -139,7 +169,7 @@ public class IssueResDto{
         private String memberImg;
         private Long opinionId;
         private String opinion;
-
+        private char deleteYN;
         @Builder
         @QueryProjection
         public OpinionInfoRes(Long memberId, String memberName, String memberImg, Long opinionId, String opinion) {
@@ -150,6 +180,7 @@ public class IssueResDto{
             this.opinion = opinion;
         }
     }
+
 
 
 }

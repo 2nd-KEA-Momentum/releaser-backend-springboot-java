@@ -11,8 +11,11 @@ import com.momentum.releaser.domain.project.dao.ProjectMemberRepository;
 import com.momentum.releaser.domain.project.dao.ProjectRepository;
 import com.momentum.releaser.domain.project.domain.Project;
 import com.momentum.releaser.domain.project.domain.ProjectMember;
+import com.momentum.releaser.domain.project.dto.ProjectResDto;
+import com.momentum.releaser.domain.project.dto.ProjectResDto.GetMembersRes;
 import com.momentum.releaser.domain.release.dao.ReleaseRepository;
 import com.momentum.releaser.domain.release.domain.ReleaseNote;
+import com.momentum.releaser.global.config.BaseException;
 import com.momentum.releaser.global.config.BaseResponseStatus;
 import com.momentum.releaser.global.error.CustomException;
 import lombok.RequiredArgsConstructor;
@@ -160,6 +163,7 @@ public class IssueServiceImpl implements IssueService {
         //issue
         Issue issue = findIssue(issueId);
 
+
         //issue와 연결된 릴리즈가 있으면 삭제 안됨
         if (issue.getRelease() != null) {
             throw new CustomException(CONNECTED_RELEASE_EXISTS);
@@ -175,7 +179,7 @@ public class IssueServiceImpl implements IssueService {
      * 7.4 프로젝트별 모든 이슈 조회
      */
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public GetIssuesList getIssues(Long projectId) {
         Project findProject = findProject(projectId);
         List<IssueInfoRes> getAllIssue = issueRepository.getIssues(findProject);
@@ -203,7 +207,7 @@ public class IssueServiceImpl implements IssueService {
      * 7.5 프로젝트별 해결 & 미연결 이슈 조회
      */
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public List<GetDoneIssues> getDoneIssues(Long projectId) {
         Project findProject = findProject(projectId);
         List<GetDoneIssues> getDoneIssue = issueRepository.getDoneIssues(findProject);
@@ -214,6 +218,7 @@ public class IssueServiceImpl implements IssueService {
      * 7.6 릴리즈 노트별 연결된 이슈 조회
      */
     @Override
+    @Transactional
     public List<GetConnectionIssues> getConnectRelease(Long projectId, Long releaseId) {
         Project findProject = findProject(projectId);
         ReleaseNote findReleaseNote = findReleaseNote(releaseId);
@@ -232,11 +237,72 @@ public class IssueServiceImpl implements IssueService {
     /**
      * 7.7 이슈별 조회
      */
+    @Override
+    @Transactional
+    public GetIssue getIssue(Long issueId, Long memberId) {
+        Issue issue = findIssue(issueId);
+        ProjectMember member = findProjectMember(memberId);
+        //pm이 조회할 경우 edit 상태 변경
+        updateIssueEdit(issue, member);
+
+        //의견 리스트
+        List<OpinionInfoRes> opinionRes = getIssueOpinion(issue, memberId);
+
+        //프로젝트 멤버 리스트
+        List<GetMembersRes> memberRes = getMemberList(member.getProject());
+
+        GetIssue getIssue = createGetIssue(issue, memberRes, opinionRes);
+
+        return getIssue;
+    }
+
+    private GetIssue createGetIssue(Issue issue, List<GetMembersRes> memberRes, List<OpinionInfoRes> opinionRes) {
+        GetIssue getIssue = mapIssueToGetIssue(issue);
+        getIssue.setIssueNum(issue.getIssueNum().getIssueNum());
+        getIssue.setManager(issue.getMember().getMemberId());
+        getIssue.setMemberList(memberRes);
+        getIssue.setOpinionList(opinionRes);
+        return getIssue;
+    }
+
+    private void updateIssueEdit(Issue issue, ProjectMember member) {
+        Project project = issue.getProject();
+        boolean found = project.getMembers().stream()
+                .anyMatch(m -> m.getPosition() == 'L' && m.getMemberId() == member.getMemberId());
+
+        if (found) {
+            issue.updateIssueEdit('N');
+        }
+    }
+
+    private GetIssue mapIssueToGetIssue(Issue issue) {
+        return modelMapper.map(issue, GetIssue.class);
+    }
+
+    private List<OpinionInfoRes> getIssueOpinion(Issue issue, Long memberId) {
+        List<OpinionInfoRes> issueOpinion = issueRepository.getIssueOpinion(issue);
+        for (OpinionInfoRes opinion : issueOpinion) {
+            if (opinion.getMemberId() == memberId) {
+                opinion.setDeleteYN('Y');
+            } else {
+                opinion.setDeleteYN('N');
+            }
+        }
+        return issueOpinion;
+    }
+
+    private List<GetMembersRes> getMemberList(Project project) {
+        return projectRepository.getMemberList(project);
+    }
+
+
+
 
     /**
      * 7.8 이슈 상태 변경
      */
     @Override
+    @Transactional
     public String updateLifeCycle(Long issueId, UpdateLifeCycleReq lifeCycleReq) {
         //issue 정보
         Issue issue = findIssue(issueId);
@@ -276,6 +342,7 @@ public class IssueServiceImpl implements IssueService {
      * 8.1 이슈 의견 추가
      */
     @Override
+    @Transactional
     public List<OpinionInfoRes> registerOpinion(Long issueId, Long memberId, RegisterOpinionReq issueOpinionReq) {
         //issue
         Issue issue = findIssue(issueId);
@@ -285,7 +352,7 @@ public class IssueServiceImpl implements IssueService {
         //save opinion
         IssueOpinion issueOpinion = saveOpinion(issue, member, issueOpinionReq.getOpinion());
 
-        List<OpinionInfoRes> opinionRes = issueRepository.getIssueOpinion(issue);
+        List<OpinionInfoRes> opinionRes = getIssueOpinion(issue, memberId);
 
         return opinionRes;
     }
@@ -303,6 +370,7 @@ public class IssueServiceImpl implements IssueService {
      * 8.2 이슈 의견 삭제
      */
     @Override
+    @Transactional
     public String deleteOpinion(Long opinionId) {
         //opinion
         IssueOpinion issueOpinion = issueOpinionRepository.findById(opinionId).orElseThrow(() -> new CustomException(NOT_EXISTS_ISSUE_OPINION));
