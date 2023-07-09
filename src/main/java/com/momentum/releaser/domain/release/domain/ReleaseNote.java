@@ -79,14 +79,17 @@ public class ReleaseNote extends BaseTime {
     private List<Issue> issues = new ArrayList<>();
 
     @Builder
-    public ReleaseNote(Long releaseId, String title, String content, String summary, String version, Date deployDate, Project project) {
+    public ReleaseNote(Long releaseId, String title, String content, String summary, String version, Date deployDate, ReleaseDeployStatus deployStatus, Project project, Double coordX, Double coordY) {
         this.releaseId = releaseId;
         this.title = title;
         this.content = content;
         this.summary = summary;
         this.version = version;
         this.deployDate = deployDate;
+        this.deployStatus = deployStatus;
         this.project = project;
+        this.coordX = coordX;
+        this.coordY = coordY;
     }
 
     @PreRemove

@@ -7,6 +7,7 @@ import com.momentum.releaser.domain.project.dao.ProjectRepository;
 import com.momentum.releaser.domain.project.domain.Project;
 import com.momentum.releaser.domain.project.mapper.ProjectMapper;
 import com.momentum.releaser.domain.release.dao.ReleaseRepository;
+import com.momentum.releaser.domain.release.domain.ReleaseEnum.ReleaseDeployStatus;
 import com.momentum.releaser.domain.release.domain.ReleaseNote;
 import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.ReleaseCreateRequestDto;
 import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.ReleaseUpdateRequestDto;
@@ -52,9 +53,16 @@ public class ReleaseServiceImpl implements ReleaseService {
     @Transactional
     @Override
     public ReleaseCreateResponseDto createReleaseNote(Long projectId, ReleaseCreateRequestDto releaseCreateRequestDto) {
-        String newVersion = createReleaseVersion(projectId, releaseCreateRequestDto.getVersionType());
-        ReleaseNote savedReleaseNote = saveReleaseNote(projectId, releaseCreateRequestDto, newVersion);
+        // 먼저, 클라이언트로부터 받아온 릴리즈 노트를 저장한다.
+        ReleaseNote savedReleaseNote = saveReleaseNote(projectId, releaseCreateRequestDto, createReleaseVersion(projectId, releaseCreateRequestDto.getVersionType()));
+
+        // 이슈들을 연결한다.
         connectIssues(releaseCreateRequestDto.getIssues(), savedReleaseNote);
+
+        // 생성된 릴리즈 노트에 대한 알림을 보낸다.
+        alertCreatedReleaseNote(projectId, savedReleaseNote.getReleaseId());
+
+        // DTO로 반환한다.
         return ReleaseMapper.INSTANCE.toReleaseCreateResponseDto(savedReleaseNote);
     }
 
@@ -65,8 +73,7 @@ public class ReleaseServiceImpl implements ReleaseService {
     @Override
     public int updateReleaseNote(Long releaseId, ReleaseUpdateRequestDto releaseUpdateRequestDto) {
         disconnectIssues(releaseId);
-        String updatedVersion = updateReleaseVersion(releaseId, releaseUpdateRequestDto.getVersion());
-        ReleaseNote updatedReleaseNote = updateAndSaveReleaseNote(releaseId, releaseUpdateRequestDto, updatedVersion);
+        ReleaseNote updatedReleaseNote = updateAndSaveReleaseNote(releaseId, releaseUpdateRequestDto, updateReleaseVersion(releaseId, releaseUpdateRequestDto.getVersion()));
         connectIssues(releaseUpdateRequestDto.getIssues(), updatedReleaseNote);
         return 1;
     }
@@ -157,6 +164,10 @@ public class ReleaseServiceImpl implements ReleaseService {
     private ReleaseNote saveReleaseNote(Long projectId, ReleaseCreateRequestDto releaseCreateRequestDto, String newVersion) {
         Project project = getProjectById(projectId);
 
+        // FIXME: 좌표 기본 값을 넣는다.
+        Double x = 0.0;
+        Double y = 0.0;
+
         // 새로운 릴리즈 노트 생성
         ReleaseNote newReleaseNote = ReleaseNote.builder()
                 .title(releaseCreateRequestDto.getTitle())
@@ -165,6 +176,8 @@ public class ReleaseServiceImpl implements ReleaseService {
                 .version(newVersion)
                 .deployDate(releaseCreateRequestDto.getDeployDate())
                 .project(project)
+                .coordX(x)
+                .coordY(y)
                 .build();
 
         // 릴리즈 노트 엔티티 저장
@@ -217,6 +230,13 @@ public class ReleaseServiceImpl implements ReleaseService {
             i.updateReleaseNote(savedReleaseNote);
             issueRepository.save(i);
         });
+    }
+
+    /**
+     * 릴리즈 노트가 생성되었음을 프로젝트 멤버들에게 알리고, 동의를 구하도록 한다.
+     */
+    private void alertCreatedReleaseNote(Long projectId, Long releaseId) {
+        // TODO: 이후 RabbitMQ를 적용시킬 때 구현한다.
     }
 
     /**

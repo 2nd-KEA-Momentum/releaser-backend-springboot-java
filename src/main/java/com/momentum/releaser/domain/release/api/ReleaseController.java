@@ -70,4 +70,8 @@ public class ReleaseController {
     public void getReleaseNote(
             @PathVariable @Min(value = 1, message = "릴리즈 식별 번호는 1 이상의 숫자여야 합니다.") Long releaseId) {
     }
+
+    /**
+     * 5.7 릴리즈 노트 그래프 좌표 추가
+     */
 }
