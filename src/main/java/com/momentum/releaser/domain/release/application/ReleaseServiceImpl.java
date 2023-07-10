@@ -13,8 +13,10 @@ import com.momentum.releaser.domain.release.dao.release.ReleaseRepository;
 import com.momentum.releaser.domain.release.domain.ReleaseApproval;
 import com.momentum.releaser.domain.release.domain.ReleaseEnum.ReleaseDeployStatus;
 import com.momentum.releaser.domain.release.domain.ReleaseNote;
+import com.momentum.releaser.domain.release.dto.ReleaseDataDto.CoordinateDataDto;
 import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.ReleaseApprovalRequestDto;
 import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.ReleaseCreateRequestDto;
+import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.ReleaseNoteCoordinateRequestDto;
 import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.ReleaseUpdateRequestDto;
 import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.ReleaseApprovalsResponseDto;
 import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.ReleaseCreateResponseDto;
@@ -140,6 +142,16 @@ public class ReleaseServiceImpl implements ReleaseService {
 
         // 프로젝트 멤버들의 업데이트된 동의 여부 목록을 반환한다.
         return getReleaseApprovals(releaseNote);
+    }
+
+    /**
+     * 5.7 릴리즈 노트 그래프 좌표 추가
+     */
+    @Transactional
+    @Override
+    public String updateReleaseNoteCoordinate(ReleaseNoteCoordinateRequestDto releaseNoteCoordinateRequestDto) {
+        updateCoordinates(releaseNoteCoordinateRequestDto.getCoordinates());
+        return "릴리즈 노트 좌표 업데이트에 성공하였습니다.";
     }
 
     // =================================================================================================================
@@ -567,5 +579,41 @@ public class ReleaseServiceImpl implements ReleaseService {
         return releaseApprovals.stream()
                 .map(ReleaseMapper.INSTANCE::toReleaseApprovalsResponseDto)
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * 릴리즈 노트 좌표를 클라이언트에서 새로 받은 값으로 업데이트한다.
+     */
+    private void updateCoordinates(List<CoordinateDataDto> datas) {
+        for (CoordinateDataDto data : datas) {
+
+            // 해당 릴리즈 식별 번호에 대항하는 릴리즈 노트 엔티티를 가져온다.
+            ReleaseNote releaseNote = getReleaseNoteById(data.getReleaseId());
+
+            // 해당 릴리즈 노트의 이전 좌표 값과 새로 전달받은 좌표 값이 같은 경우 업데이트를 생략한다.
+            Double prevX = releaseNote.getCoordX();
+            Double prevY = releaseNote.getCoordY();
+            Double newX = data.getCoordX();
+            Double newY = data.getCoordY();
+
+            if (!Objects.equals(prevX, newX) && !Objects.equals(prevY, newY)) {
+                // x, y 좌표 모두 다른 경우 업데이트 한다.
+                releaseNote.updateCoordinates(newX, newY);
+
+            } else if (!Objects.equals(prevX, newX)) {
+                // x 좌표가 다른 경우 업데이트한다.
+                releaseNote.updateCoordX(newX);
+
+            } else if (!Objects.equals(prevY, newY)) {
+                // y 좌표가 다른 경우 업데이트한다.
+                releaseNote.updateCoordY(newY);
+
+            } else {
+                // 만약 변경된 값이 없는 경우 업데이트를 하지 않고 넘어간다.
+                continue;
+            }
+
+            releaseRepository.save(releaseNote);
+        }
     }
 }

@@ -1,8 +1,10 @@
 package com.momentum.releaser.domain.release.api;
 
 import com.momentum.releaser.domain.release.application.ReleaseServiceImpl;
+import com.momentum.releaser.domain.release.dto.ReleaseRequestDto;
 import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.ReleaseApprovalRequestDto;
 import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.ReleaseCreateRequestDto;
+import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.ReleaseNoteCoordinateRequestDto;
 import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.ReleaseUpdateRequestDto;
 import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.ReleaseApprovalsResponseDto;
 import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.ReleaseCreateResponseDto;
@@ -94,4 +96,10 @@ public class ReleaseController {
     /**
      * 5.7 릴리즈 노트 그래프 좌표 추가
      */
+    @PostMapping(value = "/coordinates")
+    public BaseResponse<String> updateReleaseNoteCoordinate(
+            @RequestBody @Valid ReleaseNoteCoordinateRequestDto releaseNoteCoordinateRequestDto) {
+
+        return new BaseResponse<>(releaseService.updateReleaseNoteCoordinate(releaseNoteCoordinateRequestDto));
+    }
 }
