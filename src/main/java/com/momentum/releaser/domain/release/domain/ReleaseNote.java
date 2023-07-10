@@ -155,4 +155,26 @@ public class ReleaseNote extends BaseTime {
         this.deployDate = deployDate;
         this.deployStatus = deployStatus;
     }
+
+    /**
+     * 릴리즈 노트의 x 좌표를 업데이트한다.
+     */
+    public void updateCoordX(Double coordX) {
+        this.coordX = coordX;
+    }
+
+    /**
+     * 릴리즈 노트의 y 좌표를 업데이트한다.
+     */
+    public void updateCoordY(Double coordY) {
+        this.coordY = coordY;
+    }
+
+    /**
+     * 릴리즈 x, y 좌표를 업데이트한다.
+     */
+    public void updateCoordinates(Double coordX, Double coordY) {
+        this.coordX = coordX;
+        this.coordY = coordY;
+    }
 }

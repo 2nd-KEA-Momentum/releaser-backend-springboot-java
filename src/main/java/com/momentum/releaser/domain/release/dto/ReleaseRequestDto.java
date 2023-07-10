@@ -1,10 +1,12 @@
 package com.momentum.releaser.domain.release.dto;
 
+import com.momentum.releaser.domain.release.dto.ReleaseDataDto.CoordinateDataDto;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import javax.validation.Valid;
 import javax.validation.constraints.*;
 import java.util.Date;
 import java.util.List;
@@ -91,6 +93,42 @@ public class ReleaseRequestDto {
             this.deployDate = deployDate;
             this.deployStatus = deployStatus;
             this.issues = issues;
+        }
+    }
+
+    /**
+     * 5.6 릴리즈 노트 배포 동의 여부 선택 (멤버용)
+     */
+    @Getter
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    public static class ReleaseApprovalRequestDto {
+        @NotNull(message = "프로젝트 멤버 식별 번호는 1 이상의 숫자여야 합니다.")
+        @Min(value = 1, message = "프로젝트 멤버 식별 번호는 1 이상의 숫자여야 합니다.")
+        private Long memberId;
+
+        @Pattern(regexp = "(?i)^[YN]$", message = "Y 또는 N 값을 입력해 주세요.")
+        private String approval;
+
+        @Builder
+        public ReleaseApprovalRequestDto(Long memberId, String approval) {
+            this.memberId = memberId;
+            this.approval = approval;
+        }
+    }
+
+    /**
+     * 5.7 릴리즈 노트 그래프 좌표 추가
+     */
+    @Getter
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    public static class ReleaseNoteCoordinateRequestDto {
+
+        @Valid
+        List<CoordinateDataDto> coordinates;
+
+        @Builder
+        public ReleaseNoteCoordinateRequestDto(List<CoordinateDataDto> coordinates) {
+            this.coordinates = coordinates;
         }
     }
 }

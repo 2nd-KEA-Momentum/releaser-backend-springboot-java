@@ -1,7 +1,7 @@
 package com.momentum.releaser.domain.release.dto;
 
 import com.momentum.releaser.domain.issue.dto.IssueDataDto.ConnectedIssuesDataDto;
-import com.momentum.releaser.domain.project.dto.ProjectMemberDatoDto.ProjectMembersDataDto;
+import com.momentum.releaser.domain.release.dto.ReleaseDataDto.ReleaseApprovalsDataDto;
 import com.momentum.releaser.domain.release.dto.ReleaseDataDto.ReleaseOpinionsDataDto;
 import com.momentum.releaser.domain.release.dto.ReleaseDataDto.ReleasesDataDto;
 import lombok.AccessLevel;
@@ -68,10 +68,10 @@ public class ReleaseResponseDto {
         private String deployStatus;
         private List<ConnectedIssuesDataDto> issues;
         private List<ReleaseOpinionsDataDto> opinions;
-        private List<ProjectMembersDataDto> members;
+        private List<ReleaseApprovalsDataDto> approvals;
 
         @Builder
-        public ReleaseInfoResponseDto(Long releaseId, String title, String content, String summary, String version, Date deployDate, String deployStatus, List<ConnectedIssuesDataDto> issues, List<ReleaseOpinionsDataDto> opinions, List<ProjectMembersDataDto> members) {
+        public ReleaseInfoResponseDto(Long releaseId, String title, String content, String summary, String version, Date deployDate, String deployStatus, List<ConnectedIssuesDataDto> issues, List<ReleaseOpinionsDataDto> opinions, List<ReleaseApprovalsDataDto> approvals) {
             this.releaseId = releaseId;
             this.title = title;
             this.content = content;
@@ -81,7 +81,27 @@ public class ReleaseResponseDto {
             this.deployStatus = deployStatus;
             this.issues = issues;
             this.opinions = opinions;
-            this.members = members;
+            this.approvals = approvals;
+        }
+    }
+
+    /**
+     * 5.6 릴리즈 노트 배포 동의 여부 선택 (멤버용)
+     */
+    @Getter
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    public static class ReleaseApprovalsResponseDto {
+        private Long memberId;
+        private String memberName;
+        private String memberProfileImg;
+        private char approval;
+
+        @Builder
+        public ReleaseApprovalsResponseDto(Long memberId, String memberName, String memberProfileImg, char approval) {
+            this.memberId = memberId;
+            this.memberName = memberName;
+            this.memberProfileImg = memberProfileImg;
+            this.approval = approval;
         }
     }
 }

@@ -13,9 +13,12 @@ import com.momentum.releaser.domain.release.dao.release.ReleaseRepository;
 import com.momentum.releaser.domain.release.domain.ReleaseApproval;
 import com.momentum.releaser.domain.release.domain.ReleaseEnum.ReleaseDeployStatus;
 import com.momentum.releaser.domain.release.domain.ReleaseNote;
+import com.momentum.releaser.domain.release.dto.ReleaseDataDto.CoordinateDataDto;
+import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.ReleaseApprovalRequestDto;
 import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.ReleaseCreateRequestDto;
+import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.ReleaseNoteCoordinateRequestDto;
 import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.ReleaseUpdateRequestDto;
-import com.momentum.releaser.domain.release.dto.ReleaseResponseDto;
+import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.ReleaseApprovalsResponseDto;
 import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.ReleaseCreateResponseDto;
 import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.ReleaseInfoResponseDto;
 import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.ReleasesResponseDto;
@@ -118,10 +121,37 @@ public class ReleaseServiceImpl implements ReleaseService {
      */
     @Override
     public ReleaseInfoResponseDto getReleaseNoteInfo(Long releaseId) {
-
         ReleaseNote releaseNote = getReleaseNoteById(releaseId);
-
         return ReleaseMapper.INSTANCE.toReleaseInfoResponseDto(releaseNote);
+    }
+
+    /**
+     * 5.6 릴리즈 노트 배포 동의 여부 선택 (멤버용)
+     */
+    @Transactional
+    @Override
+    public List<ReleaseApprovalsResponseDto> decideOnApprovalByMember(Long releaseId, ReleaseApprovalRequestDto releaseApprovalRequestDto) {
+        ReleaseNote releaseNote = getReleaseNoteById(releaseId);
+        ProjectMember projectMember = getProjectMemberById(releaseApprovalRequestDto.getMemberId());
+
+        // 배포 동의 여부를 선택할 수 있는 릴리즈인지 확인한다.
+        validateReleaseNoteApproval(projectMember, releaseNote);
+
+        // 릴리즈 노트에 대한 배포 동의 여부를 업데이트한다.
+        updateReleaseNoteApproval(projectMember, releaseNote, releaseApprovalRequestDto.getApproval().charAt(0));
+
+        // 프로젝트 멤버들의 업데이트된 동의 여부 목록을 반환한다.
+        return getReleaseApprovals(releaseNote);
+    }
+
+    /**
+     * 5.7 릴리즈 노트 그래프 좌표 추가
+     */
+    @Transactional
+    @Override
+    public String updateReleaseNoteCoordinate(ReleaseNoteCoordinateRequestDto releaseNoteCoordinateRequestDto) {
+        updateCoordinates(releaseNoteCoordinateRequestDto.getCoordinates());
+        return "릴리즈 노트 좌표 업데이트에 성공하였습니다.";
     }
 
     // =================================================================================================================
@@ -131,6 +161,13 @@ public class ReleaseServiceImpl implements ReleaseService {
      */
     private Project getProjectById(Long projectId) {
         return projectRepository.findById(projectId).orElseThrow(() -> new CustomException(NOT_EXISTS_PROJECT));
+    }
+
+    /**
+     * 프로젝트 멤버 식별 번호를 통해 프로젝트 멤버 엔티티를 가져온다.
+     */
+    private ProjectMember getProjectMemberById(Long memberId) {
+        return projectMemberRepository.findById(memberId).orElseThrow(() -> new CustomException(NOT_EXISTS_PROJECT_MEMBER));
     }
 
     /**
@@ -501,6 +538,82 @@ public class ReleaseServiceImpl implements ReleaseService {
         List<ReleaseNote> releaseNotes = releaseRepository.findNextReleaseNotes(releaseNote.getProject(), releaseNote.getVersion());
         if (releaseNotes.size() > 0) {
             throw new CustomException(FAILED_TO_DELETE_RELEASE_NOTE);
+        }
+    }
+
+    /**
+     * 릴리즈 노트 배포 동의 여부를 선택할 수 있는 건지 확인한다.
+     */
+    private void validateReleaseNoteApproval(ProjectMember member, ReleaseNote releaseNote) {
+
+        // 만약 릴리즈 노트가 배포된 상태(DEPLOYED)라면 배포 동의를 체크할 수 없다.
+        if (releaseNote.getDeployStatus().equals(ReleaseDeployStatus.DEPLOYED)) {
+            throw new CustomException(FAILED_TO_APPROVE_RELEASE_NOTE);
+        }
+
+        // 만약 릴리즈 노트가 멤버가 속한 프로젝트의 릴리즈 노트가 아닌 경우 예외를 발생시킨다.
+        if (!releaseNote.getProject().equals(member.getProject())) {
+            throw new CustomException(UNAUTHORIZED_RELEASE_NOTE);
+        }
+    }
+
+    /**
+     * 릴리즈 노트의 배포 동의 여부를 업데이트한다.
+     */
+    private void updateReleaseNoteApproval(ProjectMember member, ReleaseNote releaseNote, char approval) {
+        ReleaseApproval releaseApproval = releaseApprovalRepository.findByMemberAndRelease(member, releaseNote).orElseThrow(() -> new CustomException(NOT_EXISTS_RELEASE_APPROVAL));
+        releaseApproval.updateApproval(approval);
+        releaseApprovalRepository.save(releaseApproval);
+    }
+
+    /**
+     * 해당 릴리즈 노트에 대한 프로젝트 멤버들의 업데이트된 배포 동의 여부 목록을 반환한다.
+     */
+    private List<ReleaseApprovalsResponseDto> getReleaseApprovals(ReleaseNote releaseNote) {
+        List<ReleaseApproval> releaseApprovals = releaseApprovalRepository.findAllByRelease(releaseNote);
+
+        if (releaseApprovals == null || releaseApprovals.size() == 0) {
+            throw new CustomException(FAILED_TO_GET_RELEASE_APPROVALS);
+        }
+
+        return releaseApprovals.stream()
+                .map(ReleaseMapper.INSTANCE::toReleaseApprovalsResponseDto)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 릴리즈 노트 좌표를 클라이언트에서 새로 받은 값으로 업데이트한다.
+     */
+    private void updateCoordinates(List<CoordinateDataDto> datas) {
+        for (CoordinateDataDto data : datas) {
+
+            // 해당 릴리즈 식별 번호에 대항하는 릴리즈 노트 엔티티를 가져온다.
+            ReleaseNote releaseNote = getReleaseNoteById(data.getReleaseId());
+
+            // 해당 릴리즈 노트의 이전 좌표 값과 새로 전달받은 좌표 값이 같은 경우 업데이트를 생략한다.
+            Double prevX = releaseNote.getCoordX();
+            Double prevY = releaseNote.getCoordY();
+            Double newX = data.getCoordX();
+            Double newY = data.getCoordY();
+
+            if (!Objects.equals(prevX, newX) && !Objects.equals(prevY, newY)) {
+                // x, y 좌표 모두 다른 경우 업데이트 한다.
+                releaseNote.updateCoordinates(newX, newY);
+
+            } else if (!Objects.equals(prevX, newX)) {
+                // x 좌표가 다른 경우 업데이트한다.
+                releaseNote.updateCoordX(newX);
+
+            } else if (!Objects.equals(prevY, newY)) {
+                // y 좌표가 다른 경우 업데이트한다.
+                releaseNote.updateCoordY(newY);
+
+            } else {
+                // 만약 변경된 값이 없는 경우 업데이트를 하지 않고 넘어간다.
+                continue;
+            }
+
+            releaseRepository.save(releaseNote);
         }
     }
 }
