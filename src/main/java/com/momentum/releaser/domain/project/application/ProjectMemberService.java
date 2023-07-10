@@ -9,7 +9,7 @@ public interface ProjectMemberService {
     /**
      * 4.1 프로젝트 멤버 조회
      */
-    List<GetMembersRes> getMembers(Long projectId);
+    List<GetMembersRes> getMembers(Long memberId, Long projectId);
 
     /**
      * 4.2 프로젝트 멤버 추가

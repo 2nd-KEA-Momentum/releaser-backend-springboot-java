@@ -37,34 +37,37 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
      */
     @Override
     @Transactional
-    public List<GetMembersRes> getMembers(Long projectId) {
+    public List<GetMembersRes> getMembers(Long memberId, Long projectId) {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new CustomException(NOT_EXISTS_PROJECT));
 
 
         List<GetMembersRes> getMembersRes = projectMemberRepository.findByProject(project)
                 .stream()
-                .map(this::createGetMembersRes)
+                .map(member -> createGetMembersRes(member, memberId))
                 .collect(Collectors.toList());
 
         return getMembersRes;
     }
 
     //GetMembersRes 객체를 생성
-    private GetMembersRes createGetMembersRes(ProjectMember projectMember) {
+    private GetMembersRes createGetMembersRes(ProjectMember projectMember, Long memberId) {
         User user = projectMember.getUser();
+        GetMembersRes getMembersRes = modelMapper.map(projectMember, GetMembersRes.class);
+        getMembersRes.setUserId(user.getUserId());
+        getMembersRes.setName(user.getName());
+        getMembersRes.setImg(user.getImg());
+        getMembersRes.setPosition(projectMember.getPosition());
 
-        //pm이면 모든 멤버를 제거할 수 있음
-        //member는 자신만 제거 가능 -> 토큰 구별
+        ProjectMember accessMember = projectMemberRepository.findById(memberId).orElseThrow(() -> new CustomException(NOT_EXISTS_PROJECT_MEMBER));
 
-        return new GetMembersRes(
-                projectMember.getMemberId(),
-                user.getUserId(),
-                user.getName(),
-                user.getImg(),
-                projectMember.getPosition()
-        );
+        char position = accessMember.getPosition();
+        char deleteYN = (position == 'L') ? 'Y' : 'N';
+        getMembersRes.setDeleteYN(deleteYN);
+
+        return getMembersRes;
     }
+
 
 
     /**
