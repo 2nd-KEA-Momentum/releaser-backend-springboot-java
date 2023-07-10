@@ -37,7 +37,7 @@ public class ReleaseDataDto {
 
     /**
      * 5.5 릴리즈 노트 조회
-     * 6.4 릴리즈 노트 의견 목록 조회
+     * 6.3 릴리즈 노트 의견 목록 조회
      */
     @Getter
     @NoArgsConstructor(access = AccessLevel.PROTECTED)

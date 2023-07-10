@@ -116,4 +116,14 @@ public class ReleaseController {
 
         return new BaseResponse<>(releaseService.deleteReleaseOpinion(opinionId));
     }
+
+    /**
+     * 6.3 릴리즈 노트 의견 목록 조회
+     */
+    @GetMapping("/{releaseId}/opinions")
+    public BaseResponse<List<ReleaseOpinionsResponseDto>> getReleaseOpinions(
+            @PathVariable @Min(value = 1, message = "릴리즈 식별 번호는 1 이상의 숫자여야 합니다.") Long releaseId) {
+
+        return new BaseResponse<>(releaseService.getReleaseOpinions(releaseId));
+    }
 }

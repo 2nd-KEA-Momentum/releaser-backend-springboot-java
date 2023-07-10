@@ -15,7 +15,9 @@ import com.momentum.releaser.domain.release.domain.ReleaseApproval;
 import com.momentum.releaser.domain.release.domain.ReleaseEnum.ReleaseDeployStatus;
 import com.momentum.releaser.domain.release.domain.ReleaseNote;
 import com.momentum.releaser.domain.release.domain.ReleaseOpinion;
+import com.momentum.releaser.domain.release.dto.ReleaseDataDto;
 import com.momentum.releaser.domain.release.dto.ReleaseDataDto.CoordinateDataDto;
+import com.momentum.releaser.domain.release.dto.ReleaseDataDto.ReleaseOpinionsDataDto;
 import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.*;
 import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.*;
 import com.momentum.releaser.domain.release.mapper.ReleaseMapper;
@@ -172,6 +174,16 @@ public class ReleaseServiceImpl implements ReleaseService {
     public String deleteReleaseOpinion(Long opinionId) {
         releaseOpinionRepository.deleteById(opinionId);
         return "릴리즈 노트 의견 삭제에 성공하였습니다.";
+    }
+
+    /**
+     * 6.3 릴리즈 노트 의견 목록 조회
+     */
+    @Transactional(readOnly = true)
+    @Override
+    public List<ReleaseOpinionsResponseDto> getReleaseOpinions(Long releaseId) {
+        ReleaseNote releaseNote = getReleaseNoteById(releaseId);
+        return getReleaseOpinionsResponseDto(releaseNote.getReleaseOpinions());
     }
 
     // =================================================================================================================
@@ -638,7 +650,7 @@ public class ReleaseServiceImpl implements ReleaseService {
     }
 
     /**
-     * 릴리즈 의견을 저장한다.
+     * 릴리즈 노트 의견을 저장한다.
      */
     private ReleaseOpinion saveReleaseOpinion(ReleaseNote releaseNote, ProjectMember member, ReleaseOpinionCreateRequestDto releaseOpinionCreateRequestDto) {
         ReleaseOpinion releaseOpinion = ReleaseOpinion.builder()
@@ -648,5 +660,14 @@ public class ReleaseServiceImpl implements ReleaseService {
                 .build();
 
         return releaseOpinionRepository.save(releaseOpinion);
+    }
+
+    /**
+     * 릴리즈 노트 의견 조회 결과를 DTO 리스트로 변환한다.
+     */
+    private List<ReleaseOpinionsResponseDto> getReleaseOpinionsResponseDto(List<ReleaseOpinion> releaseOpinions) {
+        return releaseOpinions.stream()
+                .map(ReleaseMapper.INSTANCE::toReleaseOpinionsResponseDto)
+                .collect(Collectors.toList());
     }
 }

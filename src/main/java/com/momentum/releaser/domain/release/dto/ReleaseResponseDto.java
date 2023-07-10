@@ -118,4 +118,26 @@ public class ReleaseResponseDto {
             this.releaseOpinionId = releaseOpinionId;
         }
     }
+
+    /**
+     * 6.3 릴리즈 노트 의견 목록 조회
+     */
+    @Getter
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    public static class ReleaseOpinionsResponseDto {
+        private Long releaseOpinionId;
+        private String opinion;
+        private Long memberId;
+        private String memberName;
+        private String memberProfileImg;
+
+        @Builder
+        public ReleaseOpinionsResponseDto(Long releaseOpinionId, String opinion, Long memberId, String memberName, String memberProfileImg) {
+            this.releaseOpinionId = releaseOpinionId;
+            this.opinion = opinion;
+            this.memberId = memberId;
+            this.memberName = memberName;
+            this.memberProfileImg = memberProfileImg;
+        }
+    }
 }
