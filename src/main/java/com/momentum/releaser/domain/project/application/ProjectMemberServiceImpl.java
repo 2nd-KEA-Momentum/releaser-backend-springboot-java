@@ -6,6 +6,7 @@ import com.momentum.releaser.domain.project.domain.Project;
 import com.momentum.releaser.domain.project.domain.ProjectMember;
 import com.momentum.releaser.domain.project.dto.ProjectResDto;
 import com.momentum.releaser.domain.project.dto.ProjectResDto.GetMembersRes;
+import com.momentum.releaser.domain.release.dao.approval.ReleaseApprovalRepository;
 import com.momentum.releaser.domain.user.dao.UserRepository;
 import com.momentum.releaser.domain.user.domain.User;
 import com.momentum.releaser.global.config.BaseResponseStatus;
@@ -30,6 +31,7 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
     private final ProjectMemberRepository projectMemberRepository;
     private final ProjectRepository projectRepository;
     private final UserRepository userRepository;
+    private final ReleaseApprovalRepository releaseApprovalRepository;
     private final ModelMapper modelMapper;
 
     /**
@@ -82,9 +84,8 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
     public String deleteMember(Long memberId) {
         //project member 정보
         ProjectMember projectMember = projectMemberRepository.findById(memberId).orElseThrow(() -> new CustomException(NOT_EXISTS_PROJECT_MEMBER));
-
-
         projectMemberRepository.deleteById(projectMember.getMemberId());
+        releaseApprovalRepository.deleteByReleaseApproval();
         String result = "프로젝트 멤버가 제거되었습니다.";
         return result;
     }
@@ -104,7 +105,9 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
         //project member 찾기
         ProjectMember member = findProjectMember(user, project);
         //project member status = 'N'
-        deactivateProjectMember(member);
+        projectMemberRepository.deleteById(member.getMemberId());
+        //approval delete
+        releaseApprovalRepository.deleteByReleaseApproval();
 
         return "프로젝트 탈퇴가 완료되었습니다.";
     }
@@ -116,6 +119,7 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
 
     //project member status = 'N'
     private void deactivateProjectMember(ProjectMember member) {
+
         member.statusToInactive();
     }
 

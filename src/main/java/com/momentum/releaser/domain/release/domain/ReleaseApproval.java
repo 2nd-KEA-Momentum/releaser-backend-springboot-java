@@ -47,6 +47,11 @@ public class ReleaseApproval extends BaseTime {
         this.release = null;
         this.member = null;
     }
+
+    public void deleteToMember() {
+        this.release = null;
+        this.member = null;
+    }
     @PrePersist
     public void prePersist() {
         this.approval = (this.approval == '\0') ? 'N' : this.approval;
