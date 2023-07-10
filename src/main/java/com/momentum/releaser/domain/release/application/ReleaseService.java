@@ -1,9 +1,8 @@
 package com.momentum.releaser.domain.release.application;
 
-import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.ReleaseApprovalRequestDto;
-import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.ReleaseCreateRequestDto;
-import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.ReleaseNoteCoordinateRequestDto;
-import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.ReleaseUpdateRequestDto;
+import com.momentum.releaser.domain.release.dto.ReleaseRequestDto;
+import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.*;
+import com.momentum.releaser.domain.release.dto.ReleaseResponseDto;
 import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.ReleaseApprovalsResponseDto;
 import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.ReleaseCreateResponseDto;
 import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.ReleaseInfoResponseDto;
@@ -47,4 +46,9 @@ public interface ReleaseService {
      * 5.7 릴리즈 노트 그래프 좌표 추가
      */
     String updateReleaseNoteCoordinate(ReleaseNoteCoordinateRequestDto releaseNoteCoordinateRequestDto);
+
+    /**
+     * 6.1 릴리즈 노트 의견 추가
+     */
+    ReleaseResponseDto.ReleaseOpinionCreateResponseDto addReleaseOpinion(Long releaseId, ReleaseOpinionCreateRequestDto releaseOpinionCreateRequestDto);
 }

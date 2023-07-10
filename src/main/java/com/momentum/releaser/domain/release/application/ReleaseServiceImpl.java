@@ -9,19 +9,15 @@ import com.momentum.releaser.domain.project.domain.Project;
 import com.momentum.releaser.domain.project.domain.ProjectMember;
 import com.momentum.releaser.domain.project.mapper.ProjectMapper;
 import com.momentum.releaser.domain.release.dao.approval.ReleaseApprovalRepository;
+import com.momentum.releaser.domain.release.dao.opinion.ReleaseOpinionRepository;
 import com.momentum.releaser.domain.release.dao.release.ReleaseRepository;
 import com.momentum.releaser.domain.release.domain.ReleaseApproval;
 import com.momentum.releaser.domain.release.domain.ReleaseEnum.ReleaseDeployStatus;
 import com.momentum.releaser.domain.release.domain.ReleaseNote;
+import com.momentum.releaser.domain.release.domain.ReleaseOpinion;
 import com.momentum.releaser.domain.release.dto.ReleaseDataDto.CoordinateDataDto;
-import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.ReleaseApprovalRequestDto;
-import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.ReleaseCreateRequestDto;
-import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.ReleaseNoteCoordinateRequestDto;
-import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.ReleaseUpdateRequestDto;
-import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.ReleaseApprovalsResponseDto;
-import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.ReleaseCreateResponseDto;
-import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.ReleaseInfoResponseDto;
-import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.ReleasesResponseDto;
+import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.*;
+import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.*;
 import com.momentum.releaser.domain.release.mapper.ReleaseMapper;
 import com.momentum.releaser.global.error.CustomException;
 import lombok.RequiredArgsConstructor;
@@ -45,6 +41,7 @@ public class ReleaseServiceImpl implements ReleaseService {
     private final ProjectRepository projectRepository;
     private final ProjectMemberRepository projectMemberRepository;
     private final ReleaseRepository releaseRepository;
+    private final ReleaseOpinionRepository releaseOpinionRepository;
     private final ReleaseApprovalRepository releaseApprovalRepository;
     private final IssueRepository issueRepository;
 
@@ -119,6 +116,7 @@ public class ReleaseServiceImpl implements ReleaseService {
     /**
      * 5.5 릴리즈 노트 조회
      */
+    @Transactional(readOnly = true)
     @Override
     public ReleaseInfoResponseDto getReleaseNoteInfo(Long releaseId) {
         ReleaseNote releaseNote = getReleaseNoteById(releaseId);
@@ -152,6 +150,18 @@ public class ReleaseServiceImpl implements ReleaseService {
     public String updateReleaseNoteCoordinate(ReleaseNoteCoordinateRequestDto releaseNoteCoordinateRequestDto) {
         updateCoordinates(releaseNoteCoordinateRequestDto.getCoordinates());
         return "릴리즈 노트 좌표 업데이트에 성공하였습니다.";
+    }
+
+    /**
+     * 6.1 릴리즈 노트 의견 추가
+     */
+    @Transactional
+    @Override
+    public ReleaseOpinionCreateResponseDto addReleaseOpinion(Long releaseId, ReleaseOpinionCreateRequestDto releaseOpinionCreateRequestDto) {
+        ReleaseNote releaseNote = getReleaseNoteById(releaseId);
+        ProjectMember projectMember = getProjectMemberById(releaseOpinionCreateRequestDto.getMemberId());
+        ReleaseOpinion savedReleaseOpinion = saveReleaseOpinion(releaseNote, projectMember, releaseOpinionCreateRequestDto);
+        return ReleaseMapper.INSTANCE.toReleaseOpinionCreateResponseDto(savedReleaseOpinion);
     }
 
     // =================================================================================================================
@@ -615,5 +625,18 @@ public class ReleaseServiceImpl implements ReleaseService {
 
             releaseRepository.save(releaseNote);
         }
+    }
+
+    /**
+     * 릴리즈 의견을 저장한다.
+     */
+    private ReleaseOpinion saveReleaseOpinion(ReleaseNote releaseNote, ProjectMember member, ReleaseOpinionCreateRequestDto releaseOpinionCreateRequestDto) {
+        ReleaseOpinion releaseOpinion = ReleaseOpinion.builder()
+                .opinion(releaseOpinionCreateRequestDto.getOpinion())
+                .release(releaseNote)
+                .member(member)
+                .build();
+
+        return releaseOpinionRepository.save(releaseOpinion);
     }
 }

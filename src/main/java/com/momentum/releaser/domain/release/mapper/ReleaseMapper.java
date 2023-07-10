@@ -8,10 +8,10 @@ import com.momentum.releaser.domain.release.domain.ReleaseOpinion;
 import com.momentum.releaser.domain.release.dto.ReleaseDataDto.ReleaseApprovalsDataDto;
 import com.momentum.releaser.domain.release.dto.ReleaseDataDto.ReleaseOpinionsDataDto;
 import com.momentum.releaser.domain.release.dto.ReleaseDataDto.ReleasesDataDto;
-import com.momentum.releaser.domain.release.dto.ReleaseResponseDto;
 import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.ReleaseApprovalsResponseDto;
 import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.ReleaseCreateResponseDto;
 import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.ReleaseInfoResponseDto;
+import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.ReleaseOpinionCreateResponseDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
@@ -60,4 +60,9 @@ public interface ReleaseMapper {
     @Mapping(target = "memberName", source = "releaseApproval.member.user.name")
     @Mapping(target = "memberProfileImg", source = "releaseApproval.member.user.img")
     ReleaseApprovalsResponseDto toReleaseApprovalsResponseDto(ReleaseApproval releaseApproval);
+
+    /**
+     * Entity(ReleaseOpinion) -> DTO(ReleaseOpinionCreateResponseDto)
+     */
+    ReleaseOpinionCreateResponseDto toReleaseOpinionCreateResponseDto(ReleaseOpinion releaseOpinion);
 }

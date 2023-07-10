@@ -104,4 +104,18 @@ public class ReleaseResponseDto {
             this.approval = approval;
         }
     }
+
+    /**
+     * 6.1 릴리즈 노트 의견 추가
+     */
+    @Getter
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    public static class ReleaseOpinionCreateResponseDto {
+        private Long releaseOpinionId;
+
+        @Builder
+        public ReleaseOpinionCreateResponseDto(Long releaseOpinionId) {
+            this.releaseOpinionId = releaseOpinionId;
+        }
+    }
 }
