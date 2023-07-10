@@ -168,8 +168,7 @@ public class IssueServiceImpl implements IssueService {
         Long releaseId = issue.getRelease().getReleaseId();
         //issue와 연결된 릴리즈가 있으면 삭제 안됨
         if (issue.getRelease() != null) {
-//            throw new CustomException(CONNECTED_RELEASE_EXISTS, releaseId);
-
+            throw new CustomException(CONNECTED_RELEASE_EXISTS, releaseId);
         }
 
         issueNumRepository.deleteById(issue.getIssueNum().getIssueNumId());
