@@ -3,10 +3,7 @@ package com.momentum.releaser.domain.release.application;
 import com.momentum.releaser.domain.release.dto.ReleaseRequestDto;
 import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.*;
 import com.momentum.releaser.domain.release.dto.ReleaseResponseDto;
-import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.ReleaseApprovalsResponseDto;
-import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.ReleaseCreateResponseDto;
-import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.ReleaseInfoResponseDto;
-import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.ReleasesResponseDto;
+import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.*;
 
 import java.util.List;
 
@@ -50,5 +47,10 @@ public interface ReleaseService {
     /**
      * 6.1 릴리즈 노트 의견 추가
      */
-    ReleaseResponseDto.ReleaseOpinionCreateResponseDto addReleaseOpinion(Long releaseId, ReleaseOpinionCreateRequestDto releaseOpinionCreateRequestDto);
+    ReleaseOpinionCreateResponseDto addReleaseOpinion(Long releaseId, ReleaseOpinionCreateRequestDto releaseOpinionCreateRequestDto);
+
+    /**
+     * 6.2 릴리즈 노트 의견 삭제
+     */
+    String deleteReleaseOpinion(Long opinionId);
 }

@@ -106,4 +106,14 @@ public class ReleaseController {
 
         return new BaseResponse<>(releaseService.addReleaseOpinion(releaseId, releaseOpinionCreateRequestDto));
     }
+
+    /**
+     * 6.2 릴리즈 노트 의견 삭제
+     */
+    @DeleteMapping("/opinions/{opinionId}")
+    public BaseResponse<String> deleteReleaseOpinion(
+            @PathVariable @Min(value = 1, message = "릴리즈 의견 식별 번호는 1 이상의 숫자여야 합니다.") Long opinionId) {
+
+        return new BaseResponse<>(releaseService.deleteReleaseOpinion(opinionId));
+    }
 }

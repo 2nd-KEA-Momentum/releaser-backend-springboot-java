@@ -164,6 +164,16 @@ public class ReleaseServiceImpl implements ReleaseService {
         return ReleaseMapper.INSTANCE.toReleaseOpinionCreateResponseDto(savedReleaseOpinion);
     }
 
+    /**
+     * 6.2 릴리즈 노트 의견 삭제
+     */
+    @Transactional
+    @Override
+    public String deleteReleaseOpinion(Long opinionId) {
+        releaseOpinionRepository.deleteById(opinionId);
+        return "릴리즈 노트 의견 삭제에 성공하였습니다.";
+    }
+
     // =================================================================================================================
 
     /**
@@ -188,10 +198,10 @@ public class ReleaseServiceImpl implements ReleaseService {
     }
 
     /**
-     * 프로젝트 식별 번호를 통해 릴리즈 엔티티 목록을 가져온다.
+     * 릴리즈 노트 의견 식별 번호를 통해 릴리즈 노트 의견 엔티티를 가져온다.
      */
-    private List<ReleaseNote> getReleaseNotesById(Project project) {
-        return releaseRepository.findAllByProject(project);
+    private ReleaseOpinion getReleaseOpinionById(Long opinionId) {
+        return releaseOpinionRepository.findById(opinionId).orElseThrow(() -> new CustomException(NOT_EXISTS_RELEASE_OPINION));
     }
 
     /**
