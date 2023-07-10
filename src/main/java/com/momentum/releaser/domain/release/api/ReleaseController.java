@@ -1,15 +1,8 @@
 package com.momentum.releaser.domain.release.api;
 
 import com.momentum.releaser.domain.release.application.ReleaseServiceImpl;
-import com.momentum.releaser.domain.release.dto.ReleaseRequestDto;
-import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.ReleaseApprovalRequestDto;
-import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.ReleaseCreateRequestDto;
-import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.ReleaseNoteCoordinateRequestDto;
-import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.ReleaseUpdateRequestDto;
-import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.ReleaseApprovalsResponseDto;
-import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.ReleaseCreateResponseDto;
-import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.ReleaseInfoResponseDto;
-import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.ReleasesResponseDto;
+import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.*;
+import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.*;
 import com.momentum.releaser.global.config.BaseResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -101,5 +94,36 @@ public class ReleaseController {
             @RequestBody @Valid ReleaseNoteCoordinateRequestDto releaseNoteCoordinateRequestDto) {
 
         return new BaseResponse<>(releaseService.updateReleaseNoteCoordinate(releaseNoteCoordinateRequestDto));
+    }
+
+    /**
+     * 6.1 릴리즈 노트 의견 추가
+     */
+    @PostMapping(value = "/{releaseId}/opinions")
+    public BaseResponse<ReleaseOpinionCreateResponseDto> addReleaseOpinion(
+            @PathVariable @Min(value = 1, message = "릴리즈 식별 번호는 1 이상의 숫자여야 합니다.") Long releaseId,
+            @RequestBody @Valid ReleaseOpinionCreateRequestDto releaseOpinionCreateRequestDto) {
+
+        return new BaseResponse<>(releaseService.addReleaseOpinion(releaseId, releaseOpinionCreateRequestDto));
+    }
+
+    /**
+     * 6.2 릴리즈 노트 의견 삭제
+     */
+    @DeleteMapping("/opinions/{opinionId}")
+    public BaseResponse<String> deleteReleaseOpinion(
+            @PathVariable @Min(value = 1, message = "릴리즈 의견 식별 번호는 1 이상의 숫자여야 합니다.") Long opinionId) {
+
+        return new BaseResponse<>(releaseService.deleteReleaseOpinion(opinionId));
+    }
+
+    /**
+     * 6.3 릴리즈 노트 의견 목록 조회
+     */
+    @GetMapping("/{releaseId}/opinions")
+    public BaseResponse<List<ReleaseOpinionsResponseDto>> getReleaseOpinions(
+            @PathVariable @Min(value = 1, message = "릴리즈 식별 번호는 1 이상의 숫자여야 합니다.") Long releaseId) {
+
+        return new BaseResponse<>(releaseService.getReleaseOpinions(releaseId));
     }
 }

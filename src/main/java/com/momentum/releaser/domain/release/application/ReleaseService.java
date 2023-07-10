@@ -1,13 +1,7 @@
 package com.momentum.releaser.domain.release.application;
 
-import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.ReleaseApprovalRequestDto;
-import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.ReleaseCreateRequestDto;
-import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.ReleaseNoteCoordinateRequestDto;
-import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.ReleaseUpdateRequestDto;
-import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.ReleaseApprovalsResponseDto;
-import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.ReleaseCreateResponseDto;
-import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.ReleaseInfoResponseDto;
-import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.ReleasesResponseDto;
+import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.*;
+import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.*;
 
 import java.util.List;
 
@@ -47,4 +41,19 @@ public interface ReleaseService {
      * 5.7 릴리즈 노트 그래프 좌표 추가
      */
     String updateReleaseNoteCoordinate(ReleaseNoteCoordinateRequestDto releaseNoteCoordinateRequestDto);
+
+    /**
+     * 6.1 릴리즈 노트 의견 추가
+     */
+    ReleaseOpinionCreateResponseDto addReleaseOpinion(Long releaseId, ReleaseOpinionCreateRequestDto releaseOpinionCreateRequestDto);
+
+    /**
+     * 6.2 릴리즈 노트 의견 삭제
+     */
+    String deleteReleaseOpinion(Long opinionId);
+
+    /**
+     * 6.3 릴리즈 노트 의견 목록 조회
+     */
+    List<ReleaseOpinionsResponseDto> getReleaseOpinions(Long releaseId);
 }

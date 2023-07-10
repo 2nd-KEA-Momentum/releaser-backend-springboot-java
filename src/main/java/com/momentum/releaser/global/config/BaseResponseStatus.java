@@ -54,6 +54,7 @@ public enum BaseResponseStatus {
     UNAUTHORIZED_RELEASE_NOTE(false, 4412, "해당 프로젝트 멤버는 해당 릴리즈 노트에 접근 권한이 없습니다."),
     NOT_EXISTS_RELEASE_APPROVAL(false, 4413, "존재하지 않는 릴리즈 배포 동의 여부 데이터입니다."),
     FAILED_TO_GET_RELEASE_APPROVALS(false, 4414, "릴리즈 노트 배포 동의 데이터를 불러오기에 실패하였습니다."),
+    NOT_EXISTS_RELEASE_OPINION(false, 4415, "존재하지 않는 릴리즈 노트 이슈입니다."),
     NOT_EXISTS_ISSUE(false, 4500, "존재하지 않는 이슈입니다."),
     INVALID_ISSUE_WITH_COMPLETED(false, 4501, "이미 연결된 이슈가 포함되어 있습니다."),
     INVALID_ISSUE_WITH_NOT_DONE(false, 4502, "완료되지 않은 이슈는 연결할 수 없습니다."),

@@ -43,9 +43,8 @@ public class ReleaseOpinion extends BaseTime {
     private ProjectMember member;
 
     @Builder
-    public ReleaseOpinion(String opinion, char status, ReleaseNote release, ProjectMember member) {
+    public ReleaseOpinion(String opinion, ReleaseNote release, ProjectMember member) {
         this.opinion = opinion;
-        this.status = status;
         this.release = release;
         this.member = member;
     }
