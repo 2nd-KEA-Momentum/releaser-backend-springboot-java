@@ -6,6 +6,7 @@ import com.momentum.releaser.domain.project.domain.Project;
 import com.momentum.releaser.domain.project.domain.ProjectMember;
 import com.momentum.releaser.domain.project.dto.ProjectResDto;
 import com.momentum.releaser.domain.project.dto.ProjectResDto.GetMembersRes;
+import com.momentum.releaser.domain.release.dao.approval.ReleaseApprovalRepository;
 import com.momentum.releaser.domain.user.dao.UserRepository;
 import com.momentum.releaser.domain.user.domain.User;
 import com.momentum.releaser.global.config.BaseResponseStatus;
@@ -30,6 +31,7 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
     private final ProjectMemberRepository projectMemberRepository;
     private final ProjectRepository projectRepository;
     private final UserRepository userRepository;
+    private final ReleaseApprovalRepository releaseApprovalRepository;
     private final ModelMapper modelMapper;
 
     /**
@@ -37,34 +39,37 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
      */
     @Override
     @Transactional
-    public List<GetMembersRes> getMembers(Long projectId) {
+    public List<GetMembersRes> getMembers(Long memberId, Long projectId) {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new CustomException(NOT_EXISTS_PROJECT));
 
 
         List<GetMembersRes> getMembersRes = projectMemberRepository.findByProject(project)
                 .stream()
-                .map(this::createGetMembersRes)
+                .map(member -> createGetMembersRes(member, memberId))
                 .collect(Collectors.toList());
 
         return getMembersRes;
     }
 
     //GetMembersRes 객체를 생성
-    private GetMembersRes createGetMembersRes(ProjectMember projectMember) {
+    private GetMembersRes createGetMembersRes(ProjectMember projectMember, Long memberId) {
         User user = projectMember.getUser();
+        GetMembersRes getMembersRes = modelMapper.map(projectMember, GetMembersRes.class);
+        getMembersRes.setUserId(user.getUserId());
+        getMembersRes.setName(user.getName());
+        getMembersRes.setImg(user.getImg());
+        getMembersRes.setPosition(projectMember.getPosition());
 
-        //pm이면 모든 멤버를 제거할 수 있음
-        //member는 자신만 제거 가능 -> 토큰 구별
+        ProjectMember accessMember = projectMemberRepository.findById(memberId).orElseThrow(() -> new CustomException(NOT_EXISTS_PROJECT_MEMBER));
 
-        return new GetMembersRes(
-                projectMember.getMemberId(),
-                user.getUserId(),
-                user.getName(),
-                user.getImg(),
-                projectMember.getPosition()
-        );
+        char position = accessMember.getPosition();
+        char deleteYN = (position == 'L') ? 'Y' : 'N';
+        getMembersRes.setDeleteYN(deleteYN);
+
+        return getMembersRes;
     }
+
 
 
     /**
@@ -79,9 +84,8 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
     public String deleteMember(Long memberId) {
         //project member 정보
         ProjectMember projectMember = projectMemberRepository.findById(memberId).orElseThrow(() -> new CustomException(NOT_EXISTS_PROJECT_MEMBER));
-
-
         projectMemberRepository.deleteById(projectMember.getMemberId());
+        releaseApprovalRepository.deleteByReleaseApproval();
         String result = "프로젝트 멤버가 제거되었습니다.";
         return result;
     }
@@ -101,7 +105,9 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
         //project member 찾기
         ProjectMember member = findProjectMember(user, project);
         //project member status = 'N'
-        deactivateProjectMember(member);
+        projectMemberRepository.deleteById(member.getMemberId());
+        //approval delete
+        releaseApprovalRepository.deleteByReleaseApproval();
 
         return "프로젝트 탈퇴가 완료되었습니다.";
     }
@@ -113,6 +119,7 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
 
     //project member status = 'N'
     private void deactivateProjectMember(ProjectMember member) {
+
         member.statusToInactive();
     }
 

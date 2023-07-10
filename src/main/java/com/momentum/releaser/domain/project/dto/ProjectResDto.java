@@ -83,6 +83,7 @@ public class ProjectResDto {
         private String name;
         private String img;
         private char position;
+        private char deleteYN;
 
         @QueryProjection
         @Builder

@@ -27,9 +27,10 @@ public class ProjectMemberController {
     /**
      * 4.1 프로젝트 멤버 조회
      */
-    @GetMapping("/{projectId}")
-    public BaseResponse<List<GetMembersRes>> getMembers(@PathVariable @Min(1) Long projectId) {
-        return new BaseResponse<>(projectMemberService.getMembers(projectId));
+    @GetMapping("/{memberId}/project/{projectId}")
+    public BaseResponse<List<GetMembersRes>> getMembers(@PathVariable @Min(1) Long projectId,
+                                                        @PathVariable @Min(2) Long memberId) {
+        return new BaseResponse<>(projectMemberService.getMembers(memberId, projectId));
     }
 
     /**
