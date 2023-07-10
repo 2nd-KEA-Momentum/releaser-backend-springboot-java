@@ -54,6 +54,9 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
     private GetMembersRes createGetMembersRes(ProjectMember projectMember) {
         User user = projectMember.getUser();
 
+        //pm이면 모든 멤버를 제거할 수 있음
+        //member는 자신만 제거 가능 -> 토큰 구별
+
         return new GetMembersRes(
                 projectMember.getMemberId(),
                 user.getUserId(),
@@ -76,6 +79,7 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
     public String deleteMember(Long memberId) {
         //project member 정보
         ProjectMember projectMember = projectMemberRepository.findById(memberId).orElseThrow(() -> new CustomException(NOT_EXISTS_PROJECT_MEMBER));
+
 
         projectMemberRepository.deleteById(projectMember.getMemberId());
         String result = "프로젝트 멤버가 제거되었습니다.";
