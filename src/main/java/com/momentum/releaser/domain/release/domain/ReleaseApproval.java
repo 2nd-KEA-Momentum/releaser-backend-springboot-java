@@ -41,4 +41,11 @@ public class ReleaseApproval extends BaseTime {
     public void prePersist() {
         this.approval = (this.approval == '\0') ? 'N' : this.approval;
     }
+
+    /**
+     * 릴리즈 노트 배포 동의 여부
+     */
+    public void updateApproval(char approval) {
+        this.approval = approval;
+    }
 }

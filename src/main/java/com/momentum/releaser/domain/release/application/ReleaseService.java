@@ -8,6 +8,8 @@ import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.ReleaseCreate
 import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.ReleaseInfoResponseDto;
 import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.ReleasesResponseDto;
 
+import java.util.List;
+
 public interface ReleaseService {
 
     /**
@@ -38,5 +40,5 @@ public interface ReleaseService {
     /**
      * 5.6 릴리즈 노트 배포 동의 여부 선택 (멤버용)
      */
-    ReleaseApprovalsResponseDto decideOnApprovalByMember(Long releaseId, ReleaseApprovalRequestDto releaseApprovalRequestDto);
+    List<ReleaseApprovalsResponseDto> decideOnApprovalByMember(Long releaseId, ReleaseApprovalRequestDto releaseApprovalRequestDto);
 }

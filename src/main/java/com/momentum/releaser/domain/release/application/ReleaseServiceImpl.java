@@ -126,17 +126,20 @@ public class ReleaseServiceImpl implements ReleaseService {
     /**
      * 5.6 릴리즈 노트 배포 동의 여부 선택 (멤버용)
      */
+    @Transactional
     @Override
-    public ReleaseApprovalsResponseDto decideOnApprovalByMember(Long releaseId, ReleaseApprovalRequestDto releaseApprovalRequestDto) {
+    public List<ReleaseApprovalsResponseDto> decideOnApprovalByMember(Long releaseId, ReleaseApprovalRequestDto releaseApprovalRequestDto) {
         ReleaseNote releaseNote = getReleaseNoteById(releaseId);
+        ProjectMember projectMember = getProjectMemberById(releaseApprovalRequestDto.getMemberId());
 
         // 배포 동의 여부를 선택할 수 있는 릴리즈인지 확인한다.
-        validateReleaseNoteApproval(releaseNote);
+        validateReleaseNoteApproval(projectMember, releaseNote);
 
         // 릴리즈 노트에 대한 배포 동의 여부를 업데이트한다.
-        updateReleaseNoteApproval(releaseNote, releaseApprovalRequestDto);
+        updateReleaseNoteApproval(projectMember, releaseNote, releaseApprovalRequestDto.getApproval().charAt(0));
 
-        return null;
+        // 프로젝트 멤버들의 업데이트된 동의 여부 목록을 반환한다.
+        return getReleaseApprovals(releaseNote);
     }
 
     // =================================================================================================================
@@ -146,6 +149,13 @@ public class ReleaseServiceImpl implements ReleaseService {
      */
     private Project getProjectById(Long projectId) {
         return projectRepository.findById(projectId).orElseThrow(() -> new CustomException(NOT_EXISTS_PROJECT));
+    }
+
+    /**
+     * 프로젝트 멤버 식별 번호를 통해 프로젝트 멤버 엔티티를 가져온다.
+     */
+    private ProjectMember getProjectMemberById(Long memberId) {
+        return projectMemberRepository.findById(memberId).orElseThrow(() -> new CustomException(NOT_EXISTS_PROJECT_MEMBER));
     }
 
     /**
@@ -522,12 +532,40 @@ public class ReleaseServiceImpl implements ReleaseService {
     /**
      * 릴리즈 노트 배포 동의 여부를 선택할 수 있는 건지 확인한다.
      */
-    private void validateReleaseNoteApproval(ReleaseNote releaseNote) {
+    private void validateReleaseNoteApproval(ProjectMember member, ReleaseNote releaseNote) {
+
+        // 만약 릴리즈 노트가 배포된 상태(DEPLOYED)라면 배포 동의를 체크할 수 없다.
+        if (releaseNote.getDeployStatus().equals(ReleaseDeployStatus.DEPLOYED)) {
+            throw new CustomException(FAILED_TO_APPROVE_RELEASE_NOTE);
+        }
+
+        // 만약 릴리즈 노트가 멤버가 속한 프로젝트의 릴리즈 노트가 아닌 경우 예외를 발생시킨다.
+        if (!releaseNote.getProject().equals(member.getProject())) {
+            throw new CustomException(UNAUTHORIZED_RELEASE_NOTE);
+        }
     }
 
     /**
      * 릴리즈 노트의 배포 동의 여부를 업데이트한다.
      */
-    private void updateReleaseNoteApproval(ReleaseNote releaseNote, ReleaseApprovalRequestDto releaseApprovalRequestDto) {
+    private void updateReleaseNoteApproval(ProjectMember member, ReleaseNote releaseNote, char approval) {
+        ReleaseApproval releaseApproval = releaseApprovalRepository.findByMemberAndRelease(member, releaseNote).orElseThrow(() -> new CustomException(NOT_EXISTS_RELEASE_APPROVAL));
+        releaseApproval.updateApproval(approval);
+        releaseApprovalRepository.save(releaseApproval);
+    }
+
+    /**
+     * 해당 릴리즈 노트에 대한 프로젝트 멤버들의 업데이트된 배포 동의 여부 목록을 반환한다.
+     */
+    private List<ReleaseApprovalsResponseDto> getReleaseApprovals(ReleaseNote releaseNote) {
+        List<ReleaseApproval> releaseApprovals = releaseApprovalRepository.findAllByRelease(releaseNote);
+
+        if (releaseApprovals == null || releaseApprovals.size() == 0) {
+            throw new CustomException(FAILED_TO_GET_RELEASE_APPROVALS);
+        }
+
+        return releaseApprovals.stream()
+                .map(ReleaseMapper.INSTANCE::toReleaseApprovalsResponseDto)
+                .collect(Collectors.toList());
     }
 }

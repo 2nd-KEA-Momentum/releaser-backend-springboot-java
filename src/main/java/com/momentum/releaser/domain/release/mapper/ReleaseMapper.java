@@ -5,10 +5,11 @@ import com.momentum.releaser.domain.project.mapper.ProjectMemberMapper;
 import com.momentum.releaser.domain.release.domain.ReleaseApproval;
 import com.momentum.releaser.domain.release.domain.ReleaseNote;
 import com.momentum.releaser.domain.release.domain.ReleaseOpinion;
-import com.momentum.releaser.domain.release.dto.ReleaseDataDto;
 import com.momentum.releaser.domain.release.dto.ReleaseDataDto.ReleaseApprovalsDataDto;
 import com.momentum.releaser.domain.release.dto.ReleaseDataDto.ReleaseOpinionsDataDto;
 import com.momentum.releaser.domain.release.dto.ReleaseDataDto.ReleasesDataDto;
+import com.momentum.releaser.domain.release.dto.ReleaseResponseDto;
+import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.ReleaseApprovalsResponseDto;
 import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.ReleaseCreateResponseDto;
 import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.ReleaseInfoResponseDto;
 import org.mapstruct.Mapper;
@@ -51,4 +52,12 @@ public interface ReleaseMapper {
     @Mapping(target = "memberName", source = "releaseOpinion.member.user.name")
     @Mapping(target = "memberProfileImg", source = "releaseOpinion.member.user.img")
     ReleaseOpinionsDataDto toReleaseOpinionsDataDto(ReleaseOpinion releaseOpinion);
+
+    /**
+     * Entity(ReleaseApproval) -> DTO(ReleaseApprovalsResponseDto)
+     */
+    @Mapping(target = "memberId", source = "releaseApproval.member.memberId")
+    @Mapping(target = "memberName", source = "releaseApproval.member.user.name")
+    @Mapping(target = "memberProfileImg", source = "releaseApproval.member.user.img")
+    ReleaseApprovalsResponseDto toReleaseApprovalsResponseDto(ReleaseApproval releaseApproval);
 }
