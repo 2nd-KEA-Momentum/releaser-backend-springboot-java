@@ -13,9 +13,10 @@ import com.momentum.releaser.domain.project.domain.Project;
 import com.momentum.releaser.domain.project.domain.ProjectMember;
 import com.momentum.releaser.domain.project.dto.ProjectResDto;
 import com.momentum.releaser.domain.project.dto.ProjectResDto.GetMembersRes;
-import com.momentum.releaser.domain.release.dao.ReleaseRepository;
+import com.momentum.releaser.domain.release.dao.release.ReleaseRepository;
 import com.momentum.releaser.domain.release.domain.ReleaseNote;
 import com.momentum.releaser.global.config.BaseException;
+import com.momentum.releaser.global.config.BaseResponse;
 import com.momentum.releaser.global.config.BaseResponseStatus;
 import com.momentum.releaser.global.error.CustomException;
 import lombok.RequiredArgsConstructor;
@@ -164,9 +165,11 @@ public class IssueServiceImpl implements IssueService {
         Issue issue = findIssue(issueId);
 
 
+        Long releaseId = issue.getRelease().getReleaseId();
         //issue와 연결된 릴리즈가 있으면 삭제 안됨
         if (issue.getRelease() != null) {
-            throw new CustomException(CONNECTED_RELEASE_EXISTS);
+//            throw new CustomException(CONNECTED_RELEASE_EXISTS, releaseId);
+
         }
 
         issueNumRepository.deleteById(issue.getIssueNum().getIssueNumId());

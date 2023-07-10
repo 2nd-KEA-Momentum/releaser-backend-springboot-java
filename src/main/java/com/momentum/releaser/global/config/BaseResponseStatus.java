@@ -70,6 +70,9 @@ public enum BaseResponseStatus {
         this.message = message;
     }
 
+    public String getErrorMessage(Long releaseId) {
+        return message + " (releaseId: " + releaseId + ")";
+    }
 
 
 
