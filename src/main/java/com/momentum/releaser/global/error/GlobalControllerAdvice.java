@@ -47,8 +47,14 @@ public class GlobalControllerAdvice {
     }
 
     @ExceptionHandler({ CustomException.class })
-    protected BaseResponse<BaseResponseStatus> handleCustomException(CustomException e) {
-        return new BaseResponse<>(e.getExceptionStatus());
+    protected BaseResponse handleCustomException(CustomException e) {
+        if (e.getReleaseId() != null) {
+            Map<String, Long> error = new HashMap<>();
+            error.put("releaseId", e.getReleaseId());
+            return new BaseResponse<>(e.getExceptionStatus(), error);
+        } else {
+            return new BaseResponse<>(e.getExceptionStatus());
+        }
     }
 
     /**

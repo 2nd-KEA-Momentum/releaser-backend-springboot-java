@@ -67,8 +67,21 @@ public class ProjectMember extends BaseTime {
         this.project = project;
     }
 
+    @PreRemove
+    private void preRemove() {
+        for (ReleaseApproval approval : approvals) {
+            approval.deleteToMember();
+        }
+    }
+
+
+
     public void statusToInactive() {
         this.status = 'N';
+    }
+
+    public void removeReleaseApproval(ReleaseApproval approval) {
+        approvals.remove(approval);
     }
 
     /**

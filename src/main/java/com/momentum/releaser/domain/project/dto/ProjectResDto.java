@@ -1,5 +1,6 @@
 package com.momentum.releaser.domain.project.dto;
 
+import com.querydsl.core.annotations.QueryProjection;
 import lombok.*;
 
 import javax.validation.constraints.NotNull;
@@ -82,7 +83,9 @@ public class ProjectResDto {
         private String name;
         private String img;
         private char position;
+        private char deleteYN;
 
+        @QueryProjection
         @Builder
         public GetMembersRes(Long memberId, Long userId, String name, String img, char position) {
             this.memberId = memberId;

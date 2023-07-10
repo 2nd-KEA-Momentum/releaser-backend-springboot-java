@@ -6,6 +6,7 @@ files:
     destination: /home/ubuntu/releaser-app
     overwrite: yes
 
+
 permissions:
   - object: / 
     pattern: "**"

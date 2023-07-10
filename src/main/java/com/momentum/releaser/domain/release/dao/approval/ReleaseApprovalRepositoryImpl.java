@@ -22,4 +22,13 @@ public class ReleaseApprovalRepositoryImpl implements ReleaseApprovalCustom {
                 .where(releaseApproval.release.eq(releaseNote))
                 .execute();
     }
+
+    @Override
+    public void deleteByReleaseApproval() {
+        queryFactory
+                .delete(releaseApproval)
+                .where(releaseApproval.release.isNull()
+                        .or(releaseApproval.member.isNull()))
+                .execute();
+    }
 }

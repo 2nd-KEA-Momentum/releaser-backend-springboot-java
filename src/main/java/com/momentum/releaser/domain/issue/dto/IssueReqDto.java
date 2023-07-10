@@ -62,4 +62,22 @@ public class IssueReqDto {
         }
     }
 
+    /**
+     * 이슈 상태 변경
+     */
+    @Data
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    public static class UpdateLifeCycleReq {
+        @NotBlank
+        @NotNull(message = "이슈 상태를 입력해주세요.")
+        private String lifeCycle;
+
+        @Builder
+        public UpdateLifeCycleReq(String lifeCycle) {
+            this.lifeCycle = lifeCycle;
+        }
+    }
+
+
+
 }

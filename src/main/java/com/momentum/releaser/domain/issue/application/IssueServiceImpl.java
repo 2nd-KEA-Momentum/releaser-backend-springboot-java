@@ -3,30 +3,31 @@ package com.momentum.releaser.domain.issue.application;
 import com.momentum.releaser.domain.issue.dao.IssueNumRepository;
 import com.momentum.releaser.domain.issue.dao.IssueOpinionRepository;
 import com.momentum.releaser.domain.issue.dao.IssueRepository;
-import com.momentum.releaser.domain.issue.domain.Issue;
-import com.momentum.releaser.domain.issue.domain.IssueNum;
-import com.momentum.releaser.domain.issue.domain.IssueOpinion;
-import com.momentum.releaser.domain.issue.domain.Tag;
-import com.momentum.releaser.domain.issue.dto.IssueReqDto;
+import com.momentum.releaser.domain.issue.domain.*;
 import com.momentum.releaser.domain.issue.dto.IssueReqDto.IssueInfoReq;
 import com.momentum.releaser.domain.issue.dto.IssueReqDto.RegisterOpinionReq;
-import com.momentum.releaser.domain.issue.dto.IssueResDto;
+import com.momentum.releaser.domain.issue.dto.IssueReqDto.UpdateLifeCycleReq;
 import com.momentum.releaser.domain.project.dao.ProjectMemberRepository;
 import com.momentum.releaser.domain.project.dao.ProjectRepository;
 import com.momentum.releaser.domain.project.domain.Project;
 import com.momentum.releaser.domain.project.domain.ProjectMember;
+import com.momentum.releaser.domain.project.dto.ProjectResDto;
+import com.momentum.releaser.domain.project.dto.ProjectResDto.GetMembersRes;
+import com.momentum.releaser.domain.release.dao.release.ReleaseRepository;
+import com.momentum.releaser.domain.release.domain.ReleaseNote;
+import com.momentum.releaser.global.config.BaseException;
+import com.momentum.releaser.global.config.BaseResponse;
 import com.momentum.releaser.global.config.BaseResponseStatus;
 import com.momentum.releaser.global.error.CustomException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.catalina.valves.rewrite.InternalRewriteMap;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.momentum.releaser.domain.issue.dto.IssueResDto.*;
 import static com.momentum.releaser.global.config.BaseResponseStatus.*;
@@ -41,6 +42,7 @@ public class IssueServiceImpl implements IssueService {
     private final IssueNumRepository issueNumRepository;
     private final ProjectRepository projectRepository;
     private final ProjectMemberRepository projectMemberRepository;
+    private final ReleaseRepository releaseRepository;
     private final ModelMapper modelMapper;
 
     /**
@@ -156,37 +158,226 @@ public class IssueServiceImpl implements IssueService {
     /**
      * 7.3 이슈 제거
      */
+    @Override
+    @Transactional
+    public String deleteIssue(Long issueId) {
+        //issue
+        Issue issue = findIssue(issueId);
+
+
+        Long releaseId = issue.getRelease().getReleaseId();
+        //issue와 연결된 릴리즈가 있으면 삭제 안됨
+        if (issue.getRelease() != null) {
+            throw new CustomException(CONNECTED_RELEASE_EXISTS, releaseId);
+        }
+
+        issueNumRepository.deleteById(issue.getIssueNum().getIssueNumId());
+        issueRepository.deleteById(issue.getIssueId());
+
+        return "이슈가 삭제되었습니다.";
+    }
 
     /**
      * 7.4 프로젝트별 모든 이슈 조회
      */
     @Override
-    public List<IssueInfoRes> getIssues(Long projectId) {
-        List<IssueInfoRes> getAllIssue = issueRepository.getIssues();
+    @Transactional
+    public GetIssuesList getIssues(Long projectId) {
+        Project findProject = findProject(projectId);
+        List<IssueInfoRes> getAllIssue = issueRepository.getIssues(findProject);
 
-        return getAllIssue;
+        List<IssueInfoRes> notStartedList = filterIssuesByLifeCycle(getAllIssue, "Not_Started");
+        List<IssueInfoRes> inProgressList = filterIssuesByLifeCycle(getAllIssue, "In_Progress");
+        List<IssueInfoRes> doneList = filterIssuesByLifeCycle(getAllIssue, "Done");
+
+        return GetIssuesList.builder()
+                .getNotStartedList(notStartedList)
+                .getInProgressList(inProgressList)
+                .getDoneList(doneList)
+                .build();
     }
+
+    private List<IssueInfoRes> filterIssuesByLifeCycle(List<IssueInfoRes> issues, String lifeCycle) {
+        return issues.stream()
+                .filter(issue -> lifeCycle.equals(issue.getLifeCycle()))
+                .map(issue -> modelMapper.map(issue, IssueInfoRes.class))
+                .collect(Collectors.toList());
+    }
+
+
     /**
      * 7.5 프로젝트별 해결 & 미연결 이슈 조회
      */
+    @Override
+    @Transactional
+    public List<GetDoneIssues> getDoneIssues(Long projectId) {
+        Project findProject = findProject(projectId);
+        List<GetDoneIssues> getDoneIssue = issueRepository.getDoneIssues(findProject);
 
+        return getDoneIssue;
+    }
     /**
      * 7.6 릴리즈 노트별 연결된 이슈 조회
      */
+    @Override
+    @Transactional
+    public List<GetConnectionIssues> getConnectRelease(Long projectId, Long releaseId) {
+        Project findProject = findProject(projectId);
+        ReleaseNote findReleaseNote = findReleaseNote(releaseId);
+
+        List<GetConnectionIssues> getConnectionIssues = issueRepository.getConnectionIssues(findProject, findReleaseNote);
+
+        return getConnectionIssues;
+    }
+
+    //releaseId로 releaseNote 찾기
+    private ReleaseNote findReleaseNote(Long releaseId) {
+        return releaseRepository.findById(releaseId)
+                .orElseThrow(() -> new CustomException(NOT_EXISTS_RELEASE_NOTE));
+    }
 
     /**
-     * 7.7 이슈 검색
+     * 7.7 이슈별 조회
      */
+    @Override
+    @Transactional
+    public GetIssue getIssue(Long issueId, Long memberId) {
+        Issue issue = findIssue(issueId);
+        ProjectMember member = findProjectMember(memberId);
+        //pm이 조회할 경우 edit 상태 변경
+        updateIssueEdit(issue, member);
+
+        //의견 리스트
+        List<OpinionInfoRes> opinionRes = getIssueOpinion(issue, memberId);
+
+        //프로젝트 멤버 리스트
+        List<GetMembersRes> memberRes = getMemberList(member.getProject());
+
+        GetIssue getIssue = createGetIssue(issue, memberRes, opinionRes);
+
+        return getIssue;
+    }
+
+    private GetIssue createGetIssue(Issue issue, List<GetMembersRes> memberRes, List<OpinionInfoRes> opinionRes) {
+        GetIssue getIssue = mapIssueToGetIssue(issue);
+        getIssue.setIssueNum(issue.getIssueNum().getIssueNum());
+        getIssue.setManager(issue.getMember().getMemberId());
+        getIssue.setMemberList(memberRes);
+        getIssue.setOpinionList(opinionRes);
+        return getIssue;
+    }
+
+    private void updateIssueEdit(Issue issue, ProjectMember member) {
+        Project project = issue.getProject();
+        boolean found = project.getMembers().stream()
+                .anyMatch(m -> m.getPosition() == 'L' && m.getMemberId() == member.getMemberId());
+
+        if (found) {
+            issue.updateIssueEdit('N');
+        }
+    }
+
+    private GetIssue mapIssueToGetIssue(Issue issue) {
+        return modelMapper.map(issue, GetIssue.class);
+    }
+
+    private List<OpinionInfoRes> getIssueOpinion(Issue issue, Long memberId) {
+        List<OpinionInfoRes> issueOpinion = issueRepository.getIssueOpinion(issue);
+        for (OpinionInfoRes opinion : issueOpinion) {
+            if (opinion.getMemberId() == memberId) {
+                opinion.setDeleteYN('Y');
+            } else {
+                opinion.setDeleteYN('N');
+            }
+        }
+        return issueOpinion;
+    }
+
+    private List<GetMembersRes> getMemberList(Project project) {
+        return projectRepository.getMemberList(project);
+    }
+
+
+
+
+    /**
+     * 7.8 이슈 상태 변경
+     */
+    @Override
+    @Transactional
+    public String updateLifeCycle(Long issueId, UpdateLifeCycleReq lifeCycleReq) {
+        //issue 정보
+        Issue issue = findIssue(issueId);
+
+        //연결된 이슈가 있을 경우 validation
+        if (issue.getRelease() != null) {
+            throw new CustomException(CONNECTED_ISSUE_EXISTS);
+        }
+
+        //이슈 상태 변경
+        String result = changeLifeCycle(issue, lifeCycleReq.getLifeCycle());
+        return result;
+    }
+
+    private String changeLifeCycle(Issue issue, String lifeCycle) {
+        //check lifeCycle
+        LifeCycle lifeCycleIssue = checkLifeCycleEnum(lifeCycle);
+
+        issue.updateLifeCycle(lifeCycleIssue);
+        issueRepository.save(issue);
+        return "이슈 상태 변경이 완료되었습니다.";
+
+    }
+
+    //check lifeCycle
+    private LifeCycle checkLifeCycleEnum(String lifeCycleValue) {
+        EnumSet<LifeCycle> lifeCycleEnum = EnumSet.allOf(LifeCycle.class);
+        for (LifeCycle lifeCycle : lifeCycleEnum) {
+            if (lifeCycle.name().equalsIgnoreCase(lifeCycleValue)) {
+                return lifeCycle;
+            }
+        }
+        throw new CustomException(INVALID_LIFECYCLE);
+    }
 
     /**
      * 8.1 이슈 의견 추가
      */
+    @Override
+    @Transactional
+    public List<OpinionInfoRes> registerOpinion(Long issueId, Long memberId, RegisterOpinionReq issueOpinionReq) {
+        //issue
+        Issue issue = findIssue(issueId);
+        //project member
+        ProjectMember member = findProjectMember(memberId);
+
+        //save opinion
+        IssueOpinion issueOpinion = saveOpinion(issue, member, issueOpinionReq.getOpinion());
+
+        List<OpinionInfoRes> opinionRes = getIssueOpinion(issue, memberId);
+
+        return opinionRes;
+    }
+
+    private IssueOpinion saveOpinion(Issue issue, ProjectMember member, String opinion) {
+        //Add issue
+        return issueOpinionRepository.save(IssueOpinion.builder()
+                .opinion(opinion)
+                .issue(issue)
+                .member(member)
+                .build());
+    }
 
     /**
      * 8.2 이슈 의견 삭제
      */
-
-    /**
-     * 8.3 이슈 의견 조회
-     */
+    @Override
+    @Transactional
+    public String deleteOpinion(Long opinionId) {
+        //opinion
+        IssueOpinion issueOpinion = issueOpinionRepository.findById(opinionId).orElseThrow(() -> new CustomException(NOT_EXISTS_ISSUE_OPINION));
+        //opinion soft delete
+        issueOpinionRepository.deleteById(opinionId);
+        return "해당 이슈 의견이 삭제되었습니다.";
+    }
 }
