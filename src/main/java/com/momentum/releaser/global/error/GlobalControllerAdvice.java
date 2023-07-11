@@ -10,6 +10,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.ConstraintViolationException;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
@@ -106,5 +107,14 @@ public class GlobalControllerAdvice {
     @ExceptionHandler(SQLException.class)
     public BaseResponse<String> handleSQLException(SQLException e) {
         return new BaseResponse<>(BaseResponseStatus.DATABASE_ERROR);
+    }
+
+    /**
+     * 입출력 에러
+     */
+    @ExceptionHandler(IOException.class)
+    public BaseResponse<String> handleIOException(IOException e) {
+        log.debug(e.getMessage());
+        return new BaseResponse<>(BaseResponseStatus.IO_ERROR);
     }
 }
