@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.util.Date;
 
@@ -31,6 +32,7 @@ public class IssueReqDto {
         private String content;
 
         @NotNull(message = "태그를 선택해주세요.")
+        @Pattern(regexp = "(?i)^(DEPRECATED|CHANGED|NEW|FEATURE|FIXED)$", message = "태그는 DEPRECATED, CHANGED, NEW, FEATURE, FIXED 중 하나여야 합니다.")
         private String tag;
 
         private Date endDate;
@@ -70,6 +72,7 @@ public class IssueReqDto {
     public static class UpdateLifeCycleReq {
         @NotBlank
         @NotNull(message = "이슈 상태를 입력해주세요.")
+        @Pattern(regexp = "(?i)^(NOT_STARTED|IN_PROGRESS|DONE)$", message = "이슈 상태는 NOT_STARTED, IN_PROGRESS, DONE 중 하나여야 합니다.")
         private String lifeCycle;
 
         @Builder
