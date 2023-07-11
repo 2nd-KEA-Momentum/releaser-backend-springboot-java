@@ -3,6 +3,8 @@ package com.momentum.releaser.domain.user.application;
 
 import com.momentum.releaser.domain.user.dao.UserRepository;
 import com.momentum.releaser.domain.user.domain.User;
+import com.momentum.releaser.domain.user.dto.UserResponseDto;
+import com.momentum.releaser.domain.user.mapper.UserMapper;
 import com.momentum.releaser.global.config.BaseResponseStatus;
 import com.momentum.releaser.global.config.aws.S3Upload;
 import com.momentum.releaser.global.error.CustomException;
@@ -25,14 +27,23 @@ public class UserServiceImpl implements UserService {
     private final S3Upload s3Upload;
 
     /**
-     * 1.2 사용자 프로필 이미지 수정 및 삭제
+     * 1.1 사용자 프로필 이미지 조회
+     */
+    @Override
+    public UserResponseDto.UserProfileImgResponseDto getUserProfileImg(Long userId) {
+        User user = getUserById(userId);
+        return UserMapper.INSTANCE.toUserProfileImgResponseDto(user);
+    }
+
+    /**
+     * 1.2 사용자 프로필 이미지 변경
      */
     @Transactional
     @Override
     public String updateUserProfileImg(Long userId, MultipartFile multipartFile) throws IOException {
         User user = getUserById(userId);
         user.updateImg(uploadUserProfileImg(multipartFile));
-        return "사용자 프로필 이미지 수정에 성공하였습니다.";
+        return "사용자 프로필 이미지 변경에 성공하였습니다.";
     }
 
     // =================================================================================================================
@@ -48,15 +59,7 @@ public class UserServiceImpl implements UserService {
      * 사용자로부터 받은 프로필 이미지를 S3에 업로드한다.
      */
     private String uploadUserProfileImg(MultipartFile multipartFile) throws IOException {
-        String profileImgUrl =  multipartFile == null ? null : s3Upload.upload(multipartFile);
-
-        log.info("UserServiceImpl/uploadUserProfileImg/profileImgUrl: {}", profileImgUrl);
-
-        if (profileImgUrl == null) {
-            deleteUserProfileImg(profileImgUrl);
-        }
-
-        return profileImgUrl;
+        return multipartFile == null ? null : s3Upload.upload(multipartFile, "users");
     }
 
     /**
