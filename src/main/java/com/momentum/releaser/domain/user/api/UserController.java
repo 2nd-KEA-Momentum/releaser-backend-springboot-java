@@ -20,12 +20,12 @@ public class UserController {
     private final UserServiceImpl userService;
 
     /**
-     * 1.2 사용자 프로필 이미지 수정 및 삭제
+     * 1.2 사용자 프로필 이미지 변경
      */
-    @PatchMapping("/{userId}/profiles")
+    @PatchMapping(value = "/{userId}/images")
     public BaseResponse<String> updateUserProfileImg(
             @PathVariable @Min(value = 1, message = "사용자 식별 번호는 1 이상의 숫자여야 합니다.") Long userId,
-            @RequestParam("profiles") MultipartFile multipartFile) throws IOException {
+            @RequestParam("images") MultipartFile multipartFile) throws IOException {
 
         return new BaseResponse<>(userService.updateUserProfileImg(userId, multipartFile));
     }
