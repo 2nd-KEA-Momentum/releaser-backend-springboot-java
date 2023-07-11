@@ -5,6 +5,7 @@ import com.momentum.releaser.domain.user.dto.UserResponseDto.UserProfileImgRespo
 import com.momentum.releaser.global.config.BaseResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,6 +18,7 @@ import java.io.IOException;
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*", allowedHeaders = "*")
+@Validated
 public class UserController {
 
     private final UserServiceImpl userService;
