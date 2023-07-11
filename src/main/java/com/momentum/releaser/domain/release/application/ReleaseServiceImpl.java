@@ -362,11 +362,11 @@ public class ReleaseServiceImpl implements ReleaseService {
 
             // 각각의 이슈들에 이미 연결된 릴리즈 노트가 없는지, 각 이슈들은 완료된 상태인지를 한 번 더 확인한다.
 
-            if (i.getLifeCycle() == LifeCycle.Completed || i.getRelease() != null) {
+            if (i.getRelease() != null) {
                 throw new CustomException(INVALID_ISSUE_WITH_COMPLETED);
             }
 
-            if (i.getLifeCycle() != LifeCycle.Done) {
+            if (i.getLifeCycle() != LifeCycle.DONE) {
                 throw new CustomException(INVALID_ISSUE_WITH_NOT_DONE);
             }
 

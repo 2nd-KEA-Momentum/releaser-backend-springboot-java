@@ -14,6 +14,8 @@ import com.momentum.releaser.domain.project.domain.ProjectMember;
 import com.momentum.releaser.domain.project.dto.ProjectResDto;
 import com.momentum.releaser.domain.project.dto.ProjectResDto.GetMembersRes;
 import com.momentum.releaser.domain.release.dao.release.ReleaseRepository;
+import com.momentum.releaser.domain.release.domain.ReleaseEnum;
+import com.momentum.releaser.domain.release.domain.ReleaseEnum.ReleaseDeployStatus;
 import com.momentum.releaser.domain.release.domain.ReleaseNote;
 import com.momentum.releaser.global.config.BaseException;
 import com.momentum.releaser.global.config.BaseResponse;
@@ -57,8 +59,7 @@ public class IssueServiceImpl implements IssueService {
             projectMember = findProjectMember(createReq.getMemberId());
         }
         Project project = findProject(projectId);
-        Tag tagIssue = checkTagEnum(createReq.getTag());
-        Issue newIssue = saveIssue(createReq, project, projectMember, tagIssue);
+        Issue newIssue = saveIssue(createReq, project, projectMember);
         String result = "이슈 생성이 완료되었습니다.";
         return result;
     }
@@ -84,24 +85,13 @@ public class IssueServiceImpl implements IssueService {
                 .orElseThrow(() -> new CustomException(BaseResponseStatus.NOT_EXISTS_PROJECT));
     }
 
-    // Tag enum check
-    private Tag checkTagEnum(String tagValue) {
-        EnumSet<Tag> tagEnum = EnumSet.allOf(Tag.class);
-        for (Tag tag : tagEnum) {
-            if (tag.name().equalsIgnoreCase(tagValue)) {
-                return tag;
-            }
-        }
-        throw new CustomException(INVALID_ISSUE_TAG);
-    }
-
     // 이슈 저장
-    private Issue saveIssue(IssueInfoReq issueInfoReq, Project project, ProjectMember projectMember, Tag tagIssue) {
+    private Issue saveIssue(IssueInfoReq issueInfoReq, Project project, ProjectMember projectMember) {
         Long number = issueRepository.getIssueNum(project) + 1;
         Issue issue = issueRepository.save(Issue.builder()
                 .title(issueInfoReq.getTitle())
                 .content(issueInfoReq.getContent())
-                .tag(tagIssue)
+                .tag(Tag.valueOf(issueInfoReq.getTag().toUpperCase()))
                 .endDate(issueInfoReq.getEndDate())
                 .project(project)
                 .member(projectMember)
@@ -131,11 +121,9 @@ public class IssueServiceImpl implements IssueService {
             projectMember = findProjectMember(updateReq.getMemberId());
         }
 
-        // 태그 확인
-        Tag tagIssue = checkTagEnum(updateReq.getTag());
 
         // 이슈 업데이트
-        issue.updateIssue(updateReq, edit, projectMember, tagIssue);
+        issue.updateIssue(updateReq, edit, projectMember);
         issueRepository.save(issue);
 
         String result = "이슈 수정이 완료되었습니다.";
@@ -186,9 +174,9 @@ public class IssueServiceImpl implements IssueService {
         Project findProject = findProject(projectId);
         List<IssueInfoRes> getAllIssue = issueRepository.getIssues(findProject);
 
-        List<IssueInfoRes> notStartedList = filterIssuesByLifeCycle(getAllIssue, "Not_Started");
-        List<IssueInfoRes> inProgressList = filterIssuesByLifeCycle(getAllIssue, "In_Progress");
-        List<IssueInfoRes> doneList = filterIssuesByLifeCycle(getAllIssue, "Done");
+        List<IssueInfoRes> notStartedList = filterAndSetDeployStatus(getAllIssue, "NOT_STARTED");
+        List<IssueInfoRes> inProgressList = filterAndSetDeployStatus(getAllIssue, "IN_PROGRESS");
+        List<IssueInfoRes> doneList = filterAndSetDeployStatus(getAllIssue, "DONE");
 
         return GetIssuesList.builder()
                 .getNotStartedList(notStartedList)
@@ -197,9 +185,20 @@ public class IssueServiceImpl implements IssueService {
                 .build();
     }
 
-    private List<IssueInfoRes> filterIssuesByLifeCycle(List<IssueInfoRes> issues, String lifeCycle) {
+
+    private List<IssueInfoRes> filterAndSetDeployStatus(List<IssueInfoRes> issues, String lifeCycle) {
         return issues.stream()
                 .filter(issue -> lifeCycle.equals(issue.getLifeCycle()))
+                .peek(issueInfoRes -> {
+                    Issue issue = findIssue(issueInfoRes.getIssueId());
+                    if (issue.getRelease() != null) {
+                        String deployStatus = String.valueOf(issue.getRelease().getDeployStatus());
+                        issueInfoRes.setDeployYN(deployStatus.equals("DEPLOYED") ? 'Y' : 'N');
+                    } else {
+                        issueInfoRes.setDeployYN('N');
+                    }
+
+                })
                 .map(issue -> modelMapper.map(issue, IssueInfoRes.class))
                 .collect(Collectors.toList());
     }
@@ -259,9 +258,18 @@ public class IssueServiceImpl implements IssueService {
     }
 
     private GetIssue createGetIssue(Issue issue, List<GetMembersRes> memberRes, List<OpinionInfoRes> opinionRes) {
+
         GetIssue getIssue = mapIssueToGetIssue(issue);
         getIssue.setIssueNum(issue.getIssueNum().getIssueNum());
         getIssue.setManager(issue.getMember().getMemberId());
+
+        if (issue.getRelease() != null) {
+            String deployStatus = String.valueOf(issue.getRelease().getDeployStatus());
+            getIssue.setDeployYN(deployStatus.equals("DEPLOYED") ? 'Y' : 'N');
+        } else {
+            getIssue.setDeployYN('N');
+        }
+
         getIssue.setMemberList(memberRes);
         getIssue.setOpinionList(opinionRes);
         return getIssue;
@@ -271,7 +279,6 @@ public class IssueServiceImpl implements IssueService {
         Project project = issue.getProject();
         boolean found = project.getMembers().stream()
                 .anyMatch(m -> m.getPosition() == 'L' && m.getMemberId() == member.getMemberId());
-
         if (found) {
             issue.updateIssueEdit('N');
         }
@@ -284,17 +291,17 @@ public class IssueServiceImpl implements IssueService {
     private List<OpinionInfoRes> getIssueOpinion(Issue issue, Long memberId) {
         List<OpinionInfoRes> issueOpinion = issueRepository.getIssueOpinion(issue);
         for (OpinionInfoRes opinion : issueOpinion) {
-            if (opinion.getMemberId() == memberId) {
-                opinion.setDeleteYN('Y');
-            } else {
-                opinion.setDeleteYN('N');
-            }
+            opinion.setDeleteYN(opinion.getMemberId() == memberId ? 'Y' : 'N');
         }
         return issueOpinion;
     }
 
     private List<GetMembersRes> getMemberList(Project project) {
-        return projectRepository.getMemberList(project);
+        List<GetMembersRes> issueMember = projectRepository.getMemberList(project);
+        for (GetMembersRes member : issueMember) {
+            member.setDeleteYN('N');
+        }
+        return issueMember;
     }
 
 
@@ -315,30 +322,18 @@ public class IssueServiceImpl implements IssueService {
         }
 
         //이슈 상태 변경
-        String result = changeLifeCycle(issue, lifeCycleReq.getLifeCycle());
+        String result = changeLifeCycle(issue, lifeCycleReq.getLifeCycle().toUpperCase());
         return result;
     }
 
     private String changeLifeCycle(Issue issue, String lifeCycle) {
-        //check lifeCycle
-        LifeCycle lifeCycleIssue = checkLifeCycleEnum(lifeCycle);
 
-        issue.updateLifeCycle(lifeCycleIssue);
+        issue.updateLifeCycle(lifeCycle);
         issueRepository.save(issue);
         return "이슈 상태 변경이 완료되었습니다.";
 
     }
 
-    //check lifeCycle
-    private LifeCycle checkLifeCycleEnum(String lifeCycleValue) {
-        EnumSet<LifeCycle> lifeCycleEnum = EnumSet.allOf(LifeCycle.class);
-        for (LifeCycle lifeCycle : lifeCycleEnum) {
-            if (lifeCycle.name().equalsIgnoreCase(lifeCycleValue)) {
-                return lifeCycle;
-            }
-        }
-        throw new CustomException(INVALID_LIFECYCLE);
-    }
 
     /**
      * 8.1 이슈 의견 추가

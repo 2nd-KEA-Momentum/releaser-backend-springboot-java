@@ -52,6 +52,7 @@ public class IssueResDto{
         private String releaseVersion;
         private char edit;
         private String lifeCycle;
+        private char deployYN;
 
         @Builder
         @QueryProjection
@@ -141,6 +142,7 @@ public class IssueResDto{
         private Date endDate;
         private char edit;
         private Long manager; //담당자
+        private char deployYN;
         private List<GetMembersRes> memberList;
         private List<OpinionInfoRes> opinionList;
 

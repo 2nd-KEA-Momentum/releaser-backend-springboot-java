@@ -119,11 +119,11 @@ public class Issue extends BaseTime {
     /**
      * 이슈 수정
      */
-    public void updateIssue(IssueInfoReq updateReq, char edit, ProjectMember member, Tag tagIssue) {
+    public void updateIssue(IssueInfoReq updateReq, char edit, ProjectMember member) {
         this.title = updateReq.getTitle();
         this.content = updateReq.getContent();
         this.edit = edit;
-        this.tag = tagIssue;
+        this.tag = Tag.valueOf(updateReq.getTag().toUpperCase());
         this.endDate = updateReq.getEndDate();
         this.member = member;
     }
@@ -163,8 +163,8 @@ public class Issue extends BaseTime {
     public void updateIssueEdit(char status){
         this.edit = status;
     }
-    public void updateLifeCycle(LifeCycle lifeCycleIssue) {
-        this.lifeCycle = lifeCycleIssue;
+    public void updateLifeCycle(String lifeCycle) {
+        this.lifeCycle = LifeCycle.valueOf(lifeCycle);
     }
 
     /**
@@ -172,7 +172,7 @@ public class Issue extends BaseTime {
      */
     @PrePersist
     public void prePersist() {
-        this.lifeCycle = lifeCycle == null ? LifeCycle.Not_Started : this.lifeCycle;
+        this.lifeCycle = lifeCycle == null ? LifeCycle.NOT_STARTED : this.lifeCycle;
         this.edit = (this.edit == '\0') ? 'N' : this.edit;
         this.status = (this.status == '\0') ? 'Y' : this.status;
     }
