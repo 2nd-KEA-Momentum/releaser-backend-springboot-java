@@ -1,5 +1,9 @@
 /src/main/generated/
 
+#application-aws.yml
+#application-credentials.yml
+#application-dev.yml
+
 HELP.md
 .gradle
 build/
