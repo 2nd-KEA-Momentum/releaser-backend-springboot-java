@@ -4,16 +4,16 @@ server:
 ---
 # Spring 설정
 spring:
-  security:
-    oauth2:
-      client:
-        registration:
-          google:
-            client-id: ${SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_ID}
-            client-secret: ${SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET}
-            scope:
-              - email
-              - profile
+	security:
+	    oauth2:
+	      client:
+	        registration:
+	          google:
+	            client-id: ${SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT-ID}
+	            client-secret: ${SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT-SECRET}
+	            scope:
+	              - email
+	              - profile
   datasource:
     url: ${DEV_DB_URL}
     username: ${DEV_DB_USERNAME}
