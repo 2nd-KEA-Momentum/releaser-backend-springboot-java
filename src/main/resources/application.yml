@@ -9,9 +9,9 @@ spring:
           google:
             client-id: ${SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_ID}
             client-secret: ${SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET}
-	          scope:
-             - email
-             - profile
+	    	scope:
+	  		  - email
+	   		  - profile
   datasource:
     url: ${DEV_DB_URL}
     username: ${DEV_DB_USERNAME}
