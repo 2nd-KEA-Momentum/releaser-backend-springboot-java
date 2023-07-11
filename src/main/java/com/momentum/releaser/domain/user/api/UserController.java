@@ -43,4 +43,14 @@ public class UserController {
 
         return new BaseResponse<>(userService.updateUserProfileImg(userId, multipartFile));
     }
+
+    /**
+     * 1.3 사용자 프로필 이미지 삭제
+     */
+    @PostMapping(value = "/{userId}/images")
+    public BaseResponse<String> deleteUserProfileImg(
+            @PathVariable @Min(value = 1, message = "사용자 식별 번호는 1 이상의 숫자여야 합니다.") Long userId) {
+
+        return new BaseResponse<>(userService.deleteUserProfileImg(userId));
+    }
 }
