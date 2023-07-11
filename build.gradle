@@ -60,8 +60,13 @@ dependencies {
     // Gson
     implementation 'com.google.code.gson:gson:2.9.0'
 
+
     // redis
 //    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+    // S3
+    implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+
 
     // Spring Security
 //    implementation "org.springframework.boot:spring-boot-starter-security"

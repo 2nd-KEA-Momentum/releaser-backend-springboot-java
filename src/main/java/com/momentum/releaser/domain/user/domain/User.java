@@ -51,7 +51,6 @@ public class User extends BaseTime {
     @OneToMany(mappedBy = "user")
     private List<ProjectMember> members = new ArrayList<>();
 
-
     @Builder
     public User(String name, String email, String img, char status) {
         this.name = name;
@@ -66,5 +65,12 @@ public class User extends BaseTime {
     @PrePersist
     public void prePersist() {
         this.status = (this.status == '\0') ? 'Y' : this.status;
+    }
+
+    /**
+     * 사용자 프로필 이미지를 업데이트한다.
+     */
+    public void updateImg(String img) {
+        this.img = img;
     }
 }

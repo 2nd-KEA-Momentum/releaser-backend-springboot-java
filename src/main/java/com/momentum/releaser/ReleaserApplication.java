@@ -14,12 +14,10 @@ import javax.persistence.PersistenceContext;
 @SpringBootApplication
 public class ReleaserApplication {
 
-    public static void main(String[] args) {
-        SpringApplication.run(ReleaserApplication.class, args);
-    }
-
     @PersistenceContext
     private EntityManager entityManager;
 
-
+    public static void main(String[] args) {
+        SpringApplication.run(ReleaserApplication.class, args);
+    }
 }
