@@ -14,6 +14,8 @@ import com.momentum.releaser.domain.project.domain.ProjectMember;
 import com.momentum.releaser.domain.project.dto.ProjectResDto;
 import com.momentum.releaser.domain.project.dto.ProjectResDto.GetMembersRes;
 import com.momentum.releaser.domain.release.dao.release.ReleaseRepository;
+import com.momentum.releaser.domain.release.domain.ReleaseEnum;
+import com.momentum.releaser.domain.release.domain.ReleaseEnum.ReleaseDeployStatus;
 import com.momentum.releaser.domain.release.domain.ReleaseNote;
 import com.momentum.releaser.global.config.BaseException;
 import com.momentum.releaser.global.config.BaseResponse;
@@ -172,9 +174,9 @@ public class IssueServiceImpl implements IssueService {
         Project findProject = findProject(projectId);
         List<IssueInfoRes> getAllIssue = issueRepository.getIssues(findProject);
 
-        List<IssueInfoRes> notStartedList = filterIssuesByLifeCycle(getAllIssue, "Not_Started");
-        List<IssueInfoRes> inProgressList = filterIssuesByLifeCycle(getAllIssue, "In_Progress");
-        List<IssueInfoRes> doneList = filterIssuesByLifeCycle(getAllIssue, "Done");
+        List<IssueInfoRes> notStartedList = filterAndSetDeployStatus(getAllIssue, "NOT_STARTED");
+        List<IssueInfoRes> inProgressList = filterAndSetDeployStatus(getAllIssue, "IN_PROGRESS");
+        List<IssueInfoRes> doneList = filterAndSetDeployStatus(getAllIssue, "DONE");
 
         return GetIssuesList.builder()
                 .getNotStartedList(notStartedList)
@@ -183,9 +185,20 @@ public class IssueServiceImpl implements IssueService {
                 .build();
     }
 
-    private List<IssueInfoRes> filterIssuesByLifeCycle(List<IssueInfoRes> issues, String lifeCycle) {
+
+    private List<IssueInfoRes> filterAndSetDeployStatus(List<IssueInfoRes> issues, String lifeCycle) {
         return issues.stream()
                 .filter(issue -> lifeCycle.equals(issue.getLifeCycle()))
+                .peek(issueInfoRes -> {
+                    Issue issue = findIssue(issueInfoRes.getIssueId());
+                    if (issue.getRelease() != null) {
+                        String deployStatus = String.valueOf(issue.getRelease().getDeployStatus());
+                        issueInfoRes.setDeployYN(deployStatus.equals("DEPLOYED") ? 'Y' : 'N');
+                    } else {
+                        issueInfoRes.setDeployYN('N');
+                    }
+
+                })
                 .map(issue -> modelMapper.map(issue, IssueInfoRes.class))
                 .collect(Collectors.toList());
     }
@@ -245,9 +258,18 @@ public class IssueServiceImpl implements IssueService {
     }
 
     private GetIssue createGetIssue(Issue issue, List<GetMembersRes> memberRes, List<OpinionInfoRes> opinionRes) {
+
         GetIssue getIssue = mapIssueToGetIssue(issue);
         getIssue.setIssueNum(issue.getIssueNum().getIssueNum());
         getIssue.setManager(issue.getMember().getMemberId());
+
+        if (issue.getRelease() != null) {
+            String deployStatus = String.valueOf(issue.getRelease().getDeployStatus());
+            getIssue.setDeployYN(deployStatus.equals("DEPLOYED") ? 'Y' : 'N');
+        } else {
+            getIssue.setDeployYN('N');
+        }
+
         getIssue.setMemberList(memberRes);
         getIssue.setOpinionList(opinionRes);
         return getIssue;
@@ -257,7 +279,6 @@ public class IssueServiceImpl implements IssueService {
         Project project = issue.getProject();
         boolean found = project.getMembers().stream()
                 .anyMatch(m -> m.getPosition() == 'L' && m.getMemberId() == member.getMemberId());
-
         if (found) {
             issue.updateIssueEdit('N');
         }
@@ -270,17 +291,17 @@ public class IssueServiceImpl implements IssueService {
     private List<OpinionInfoRes> getIssueOpinion(Issue issue, Long memberId) {
         List<OpinionInfoRes> issueOpinion = issueRepository.getIssueOpinion(issue);
         for (OpinionInfoRes opinion : issueOpinion) {
-            if (opinion.getMemberId() == memberId) {
-                opinion.setDeleteYN('Y');
-            } else {
-                opinion.setDeleteYN('N');
-            }
+            opinion.setDeleteYN(opinion.getMemberId() == memberId ? 'Y' : 'N');
         }
         return issueOpinion;
     }
 
     private List<GetMembersRes> getMemberList(Project project) {
-        return projectRepository.getMemberList(project);
+        List<GetMembersRes> issueMember = projectRepository.getMemberList(project);
+        for (GetMembersRes member : issueMember) {
+            member.setDeleteYN('N');
+        }
+        return issueMember;
     }
 
 
