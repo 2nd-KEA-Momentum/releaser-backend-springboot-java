@@ -4,29 +4,19 @@ server:
 ---
 # Spring 설정
 spring:
-	security:
-	    oauth2:
-	      client:
-	        registration:
-	          google:
-	            client-id: ${SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_ID}
-	            client-secret: ${SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET}
-	            scope:
-	              - email
-	              - profile
-  	datasource:
-	    url: ${DEV_DB_URL}
-	    username: ${DEV_DB_USERNAME}
-	    password: ${DEV_DB_PASSWORD}
-	    driver-class-name: com.mysql.cj.jdbc.Driver
-	  jpa:
-	    hibernate:
-	      ddl-auto: update
-	    properties:
-	      hibernate:
-	        #        show_sql: true
-	        format_sql: true
-	        use_sql_comments: true
+  datasource:
+    url: ${DEV_DB_URL}
+    username: ${DEV_DB_USERNAME}
+    password: ${DEV_DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        #        show_sql: true
+        format_sql: true
+        use_sql_comments: true
 
 ---
 # AWS 설정
