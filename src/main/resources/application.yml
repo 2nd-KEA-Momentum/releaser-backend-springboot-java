@@ -1,8 +1,6 @@
 server:
   port: 8080
 
----
-# Spring 설정
 spring:
   datasource:
     url: ${DEV_DB_URL}
@@ -17,7 +15,6 @@ spring:
         #        show_sql: true
         format_sql: true
         use_sql_comments: true
-
 
 logging.level:
   org.hibernate.SQL: debug
