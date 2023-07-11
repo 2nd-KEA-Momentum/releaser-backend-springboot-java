@@ -26,6 +26,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-rest'
     implementation 'org.springframework.boot:spring-boot-starter-hateoas'
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    //jwt
     implementation 'io.jsonwebtoken:jjwt:0.9.1'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     runtimeOnly 'com.mysql:mysql-connector-j'
@@ -59,12 +60,20 @@ dependencies {
     // Gson
     implementation 'com.google.code.gson:gson:2.9.0'
 
+
+    // redis
+//    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
     // S3
     implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+
 
     // Spring Security
 //    implementation "org.springframework.boot:spring-boot-starter-security"
 //    implementation "org.springframework.security:spring-security-test"
+
+    //oauth2
+//    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 }
 
 tasks.named('test') {

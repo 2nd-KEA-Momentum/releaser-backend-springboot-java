@@ -48,6 +48,10 @@ public class Project extends BaseTime {
     private String img;
 
     @NotNull
+    @Column(name = "link")
+    private String link;
+
+    @NotNull
     @Column(name = "status")
     private char status;
 
@@ -64,11 +68,12 @@ public class Project extends BaseTime {
     private List<IssueNum> issueNums = new ArrayList<>();
 
     @Builder
-    public Project(String title, String content, String team, String img, char status) {
+    public Project(String title, String content, String team, String img, String link, char status) {
         this.title = title;
         this.content = content;
         this.team = team;
         this.img = img;
+        this.link = link;
         this.status = status;
     }
 

@@ -1,8 +1,6 @@
 server:
   port: 8080
 
----
-# Spring 설정
 spring:
   datasource:
     url: ${DEV_DB_URL}
@@ -18,20 +16,21 @@ spring:
         format_sql: true
         use_sql_comments: true
 
----
-# AWS 설정
-cloud:
-  aws:
-    s3:
-      bucket: ${AWS_BUCKET_NAME}
-    credentials:
-      access-key: ${AWS_ACCESS_KEY}
-      secret-key: ${AWS_SECRET_KEY}
-    region:
-      static: ap-northeast-2
-      auto: false
-    stack:
-      auto: false
+  cloud:
+    aws:
+      s3:
+        bucket: ${AWS_BUCKET_NAME}
+      credentials:
+        access-key: ${AWS_ACCESS_KEY}
+        secret-key: ${AWS_SECRET_KEY}
+      region:
+        static: ap-northeast-2
+        auto: false
+      stack:
+        auto: false
 
+
+
+      
 logging.level:
   org.hibernate.SQL: debug

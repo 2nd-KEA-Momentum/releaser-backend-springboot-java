@@ -6,7 +6,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
+//@EnableWebSecurity
 public class SpringConfig {
+
 
     /**
      * - 반복되는 객체 간 변환을 간단하게 줄이는 데 사용하는 ModelMapper
