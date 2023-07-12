@@ -5,11 +5,15 @@ import com.momentum.releaser.domain.project.dto.ProjectReqDto.ProjectInfoReq;
 import com.momentum.releaser.global.config.BaseResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
+
+import java.io.IOException;
 
 import static com.momentum.releaser.domain.project.dto.ProjectResDto.*;
 
@@ -26,21 +30,25 @@ public class ProjectController {
     /**
      * 3.1 프로젝트 생성
      */
-    @PostMapping("/{userId}/project")
+    @PostMapping(value = "/{userId}/project", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public BaseResponse<ProjectInfoRes> createProject(
             @PathVariable @Min(1) Long userId,
-            @Valid @RequestBody ProjectInfoReq registerReq) {
-        return new BaseResponse<>(projectService.createProject(userId, registerReq));
+            @RequestPart @Valid ProjectInfoReq request,
+            @RequestPart MultipartFile img) throws IOException {
+
+        return new BaseResponse<>(projectService.createProject(userId, request, img));
     }
 
     /**
      * 3.2 프로젝트 수정
      */
-    @PatchMapping("/{projectId}")
+    @PatchMapping(value = "/{projectId}", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public BaseResponse<ProjectInfoRes> updateProject(
             @PathVariable @Min(1) Long projectId,
-            @Valid @RequestBody ProjectInfoReq updateReq) {
-        return new BaseResponse<>(projectService.updateProject(projectId, updateReq));
+            @RequestPart @Valid ProjectInfoReq request,
+            @RequestPart MultipartFile img) throws IOException {
+
+        return new BaseResponse<>(projectService.updateProject(projectId, request, img));
     }
 
     /**
@@ -52,7 +60,6 @@ public class ProjectController {
         return new BaseResponse<>(projectService.deleteProject(projectId));
     }
 
-
     /**
      * 3.4 프로젝트 목록 조회
      */
@@ -60,7 +67,4 @@ public class ProjectController {
     public BaseResponse<GetProjectRes> getProjects(@PathVariable @Min(1) Long userId) {
         return new BaseResponse<>(projectService.getProjects(userId));
     }
-
-
-
 }

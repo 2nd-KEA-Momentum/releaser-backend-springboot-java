@@ -77,11 +77,11 @@ public class Project extends BaseTime {
         this.status = status;
     }
 
-    public void updateProject(ProjectInfoReq updateReq) {
+    public void updateProject(ProjectInfoReq updateReq, String url) {
         this.title = updateReq.getTitle();
         this.content = updateReq.getContent();
         this.team = updateReq.getTeam();
-        this.img = updateReq.getImg();
+        this.img = url;
     }
 
     @PreRemove
