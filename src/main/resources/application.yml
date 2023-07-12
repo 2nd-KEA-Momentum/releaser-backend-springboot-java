@@ -28,7 +28,6 @@ spring:
         format_sql: true
         use_sql_comments: true
 
----
 # AWS 설정
 cloud:
   aws:
