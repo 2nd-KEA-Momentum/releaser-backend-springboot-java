@@ -35,25 +35,24 @@ public class UserServiceImpl implements UserService {
 
     /**
      * 1.2 사용자 프로필 이미지 변경
-     * FIXME: 생성 시 한 번 파일을 지우고, 다시 생성하는 걸로 바꿔야 한다.
      */
     @Transactional
     @Override
     public String updateUserProfileImg(Long userId, MultipartFile multipartFile) throws IOException {
         User user = getUserById(userId);
+        deleteIfExistProfileImg(user);
         user.updateImg(uploadUserProfileImg(multipartFile));
         return "사용자 프로필 이미지 변경에 성공하였습니다.";
     }
 
     /**
      * 1.3 사용자 프로필 이미지 삭제
-     * FIXME: 삭제 시 파일 지우고, 데이터베이스 값도 지워야 한다.
-     * TODO: 기본 이미지를 어디 쪽에서 설정할 것인지를 프론트엔드와 상의 후 결정해야 한다.
      */
     @Override
     public String deleteUserProfileImg(Long userId) {
         User user = getUserById(userId);
         s3Upload.delete(user.getImg().substring(55));
+        saveAfterDeleteProfileImg(user);
         return "사용자 프로필 이미지 삭제에 성공하였습니다.";
     }
 
@@ -73,4 +72,20 @@ public class UserServiceImpl implements UserService {
         return multipartFile == null ? null : s3Upload.upload(multipartFile, "users");
     }
 
+    /**
+     * 사용자의 이미지 값이 null이 아닌 경우 한 번 지운다.
+     */
+    private void deleteIfExistProfileImg(User user) {
+        if (user.getImg() != null) {
+            s3Upload.delete(user.getImg().substring(55));
+        }
+    }
+
+    /**
+     * 사용자의 프로필 이미지 파일을 S3에서 삭제한 후 데이터베이스에서 값을 지운다.
+     */
+    private void saveAfterDeleteProfileImg(User user) {
+        user.updateImg(null);
+        userRepository.save(user);
+    }
 }
