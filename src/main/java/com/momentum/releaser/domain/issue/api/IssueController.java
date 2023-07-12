@@ -3,7 +3,6 @@ package com.momentum.releaser.domain.issue.api;
 import com.momentum.releaser.domain.issue.application.IssueService;
 import com.momentum.releaser.domain.issue.dto.IssueReqDto.IssueInfoReq;
 import com.momentum.releaser.domain.issue.dto.IssueReqDto.UpdateLifeCycleReq;
-import com.momentum.releaser.domain.issue.dto.IssueResDto;
 import com.momentum.releaser.domain.issue.dto.IssueResDto.GetConnectionIssues;
 import com.momentum.releaser.domain.issue.dto.IssueResDto.GetDoneIssues;
 import com.momentum.releaser.domain.issue.dto.IssueResDto.GetIssuesList;
