@@ -4,6 +4,7 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.momentum.releaser.global.error.CustomException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -13,6 +14,7 @@ import java.util.UUID;
 
 import static com.momentum.releaser.global.config.BaseResponseStatus.NOT_EXISTS_S3_FILE;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class S3Upload {
@@ -69,6 +71,8 @@ public class S3Upload {
      * S3 파일 삭제 요청이 들어온 경우 해당 파일이 존재하는 파일인지 검사한다.
      */
     private void validateFileExist(String fileName) {
+        log.info("S3Upload/validateFileExist/fileName: {}", fileName);
+
         if (!amazonS3.doesObjectExist(bucket, fileName)) {
             throw new CustomException(NOT_EXISTS_S3_FILE);
         }

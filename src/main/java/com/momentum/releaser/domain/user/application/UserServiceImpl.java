@@ -1,11 +1,9 @@
 package com.momentum.releaser.domain.user.application;
 
-
 import com.momentum.releaser.domain.user.dao.UserRepository;
 import com.momentum.releaser.domain.user.domain.User;
 import com.momentum.releaser.domain.user.dto.UserResponseDto;
 import com.momentum.releaser.domain.user.mapper.UserMapper;
-import com.momentum.releaser.global.config.BaseResponseStatus;
 import com.momentum.releaser.global.config.aws.S3Upload;
 import com.momentum.releaser.global.error.CustomException;
 import lombok.RequiredArgsConstructor;
@@ -42,8 +40,20 @@ public class UserServiceImpl implements UserService {
     @Override
     public String updateUserProfileImg(Long userId, MultipartFile multipartFile) throws IOException {
         User user = getUserById(userId);
+        deleteIfExistProfileImg(user);
         user.updateImg(uploadUserProfileImg(multipartFile));
         return "사용자 프로필 이미지 변경에 성공하였습니다.";
+    }
+
+    /**
+     * 1.3 사용자 프로필 이미지 삭제
+     */
+    @Override
+    public String deleteUserProfileImg(Long userId) {
+        User user = getUserById(userId);
+        s3Upload.delete(user.getImg().substring(55));
+        saveAfterDeleteProfileImg(user);
+        return "사용자 프로필 이미지 삭제에 성공하였습니다.";
     }
 
     // =================================================================================================================
@@ -63,9 +73,19 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-     * 프로필 이미지를 S3에서 삭제한다.
+     * 사용자의 이미지 값이 null이 아닌 경우 한 번 지운다.
      */
-    private void deleteUserProfileImg(String url) {
+    private void deleteIfExistProfileImg(User user) {
+        if (user.getImg() != null) {
+            s3Upload.delete(user.getImg().substring(55));
+        }
     }
 
+    /**
+     * 사용자의 프로필 이미지 파일을 S3에서 삭제한 후 데이터베이스에서 값을 지운다.
+     */
+    private void saveAfterDeleteProfileImg(User user) {
+        user.updateImg(null);
+        userRepository.save(user);
+    }
 }

@@ -16,4 +16,9 @@ public interface UserService {
      * 1.2 사용자 프로필 이미지 변경
      */
     String updateUserProfileImg(Long userId, MultipartFile multipartFile) throws IOException;
+
+    /**
+     * 1.3 사용자 프로필 이미지 삭제
+     */
+    String deleteUserProfileImg(Long userId);
 }

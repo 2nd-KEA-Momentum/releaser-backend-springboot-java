@@ -5,6 +5,7 @@ import com.momentum.releaser.domain.user.dto.UserResponseDto.UserProfileImgRespo
 import com.momentum.releaser.global.config.BaseResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,6 +18,7 @@ import java.io.IOException;
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*", allowedHeaders = "*")
+@Validated
 public class UserController {
 
     private final UserServiceImpl userService;
@@ -40,5 +42,15 @@ public class UserController {
             @RequestParam("images") @NotNull(message = "파일을 등록해 주세요.") MultipartFile multipartFile) throws IOException {
 
         return new BaseResponse<>(userService.updateUserProfileImg(userId, multipartFile));
+    }
+
+    /**
+     * 1.3 사용자 프로필 이미지 삭제
+     */
+    @PostMapping(value = "/{userId}/images")
+    public BaseResponse<String> deleteUserProfileImg(
+            @PathVariable @Min(value = 1, message = "사용자 식별 번호는 1 이상의 숫자여야 합니다.") Long userId) {
+
+        return new BaseResponse<>(userService.deleteUserProfileImg(userId));
     }
 }
