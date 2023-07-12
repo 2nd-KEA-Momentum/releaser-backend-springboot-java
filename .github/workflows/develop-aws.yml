@@ -10,7 +10,7 @@ on:
 
 env:
   AWS_REGION: ap-northeast-2
-  S3_BUCKET_NAME: releaserbucket
+  S3_BUCKET_NAME: ${{ secrets.AWS_BUCKET_NAME }}
   CODE_DEPLOY_APPLICATION_NAME: releaser-codedeploy-app
   CODE_DEPLOY_DEPLOYMENT_GROUP_NAME: releaser-codedeploy-app-group
 
@@ -44,8 +44,14 @@ jobs:
           spring.datasource.url: ${{ secrets.DEV_DB_URL }} 
           spring.datasource.username: ${{ secrets.DEV_DB_USERNAME }} 
           spring.datasource.password: ${{ secrets.DEV_DB_PASSWORD }}
-          spring.security.oauth2.client.registration.google.client-id: ${{secrets.SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT-ID}}
-          spring.security.oauth2.client.registration.google.client-secret: ${{secrets.SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT-SECRET}}
+          spring.security.oauth2.client.registration.google.client-id: ${{ secrets.SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_ID }}
+          spring.security.oauth2.client.registration.google.client-secret: ${{ secrets.SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET }}
+          cloud.aws.s3.bucket: ${{ secrets.AWS_BUCKET_NAME }}
+          cloud.aws.credentials.access-key: ${{ secrets.AWS_ACCESS_KEY }}
+          cloud.aws.credentials.secret-key: ${{ secrets.AWS_SECRET_KEY }}
+          
+          
+          
           
 
       #Gradle 권한 설정
