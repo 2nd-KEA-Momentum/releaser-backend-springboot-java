@@ -38,6 +38,8 @@ public enum BaseResponseStatus {
     NOT_EXISTS_S3_FILE(false, 4003, "존재하지 않는 파일입니다."),
 
     NOT_EXISTS_USER(false, 4100, "존재하지 않는 유저입니다."),
+    OVERLAP_CHECK_EMAIL(false, 4101, "중복된 이메일입니다."),
+    NOT_MATCHES_PASSWORD(false, 4102, "일치하는 비밀번호가 없습니다."),
     NOT_EXISTS_PROJECT(false, 4200, "존재하지 않는 프로젝트입니다."),
     NOT_EXISTS_PROJECT_MEMBER(false, 4300, "존재하지 않는 멤버입니다."),
     NOT_EXISTS_ADMIN_MEMBER(false, 4301, "관리자가 존재하지 않습니다."),
