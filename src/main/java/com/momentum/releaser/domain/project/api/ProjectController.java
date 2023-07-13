@@ -34,7 +34,7 @@ public class ProjectController {
     public BaseResponse<ProjectInfoRes> createProject(
             @PathVariable @Min(value = 1, message = "사용자 식별 번호는 1 이상의 숫자여야 합니다.") Long userId,
             @RequestPart @Valid ProjectInfoReq request,
-            @RequestPart MultipartFile img) throws IOException {
+            @RequestPart(required = false) MultipartFile img) throws IOException {
 
         return new BaseResponse<>(projectService.createProject(userId, request, img));
     }
@@ -46,7 +46,7 @@ public class ProjectController {
     public BaseResponse<ProjectInfoRes> updateProject(
             @PathVariable @Min(value = 1, message = "프로젝트 식별 번호는 1 이상의 숫자여야 합니다.") Long projectId,
             @RequestPart @Valid ProjectInfoReq request,
-            @RequestPart MultipartFile img) throws IOException {
+            @RequestPart(required = false) MultipartFile img) throws IOException {
 
         return new BaseResponse<>(projectService.updateProject(projectId, request, img));
     }

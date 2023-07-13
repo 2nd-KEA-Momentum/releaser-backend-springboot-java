@@ -25,7 +25,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -242,10 +241,16 @@ public class ReleaseServiceImpl implements ReleaseService {
 
         } else {  // 데이터베이스에서 가장 최신의 버전을 가져온 경우
             String latestVersion = optionalReleaseNote.get().getVersion();
+            log.info("latestVersion: {}", latestVersion);
 
-            int latestMajorVersion = latestVersion.charAt(0) - 48;
-            int latestMinorVersion = latestVersion.charAt(2) - 48;
-            int latestPatchVersion = latestVersion.charAt(4) - 48;
+//            int latestMajorVersion = latestVersion.charAt(0) - 48;
+//            int latestMinorVersion = latestVersion.charAt(2) - 48;
+//            int latestPatchVersion = latestVersion.charAt(4) - 48;
+
+            String[] eachVersion = latestVersion.split("\\.");
+            int latestMajorVersion = Integer.parseInt(eachVersion[0]);
+            int latestMinorVersion = Integer.parseInt(eachVersion[1]);
+            int latestPatchVersion = Integer.parseInt(eachVersion[2]);
 
             // 버전 종류에 따른 버전을 생성한다.
             switch (versionType.toUpperCase()) {
