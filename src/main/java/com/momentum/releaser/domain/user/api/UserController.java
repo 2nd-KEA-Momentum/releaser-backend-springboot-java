@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
 import java.io.IOException;
 
 @Slf4j
@@ -39,7 +38,7 @@ public class UserController {
     @PatchMapping(value = "/{userId}/images")
     public BaseResponse<String> updateUserProfileImg(
             @PathVariable @Min(value = 1, message = "사용자 식별 번호는 1 이상의 숫자여야 합니다.") Long userId,
-            @RequestParam("images") @NotNull(message = "파일을 등록해 주세요.") MultipartFile multipartFile) throws IOException {
+            @RequestPart("img") MultipartFile multipartFile) throws IOException {
 
         return new BaseResponse<>(userService.updateUserProfileImg(userId, multipartFile));
     }

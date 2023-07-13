@@ -2,7 +2,7 @@ package com.momentum.releaser.domain.user.application;
 
 import com.momentum.releaser.domain.user.dao.UserRepository;
 import com.momentum.releaser.domain.user.domain.User;
-import com.momentum.releaser.domain.user.dto.UserResponseDto;
+import com.momentum.releaser.domain.user.dto.UserResponseDto.UserProfileImgResponseDto;
 import com.momentum.releaser.domain.user.mapper.UserMapper;
 import com.momentum.releaser.global.config.aws.S3Upload;
 import com.momentum.releaser.global.error.CustomException;
@@ -13,7 +13,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Objects;
 
+import static com.momentum.releaser.global.common.CommonEnum.DEFAULT_USER_PROFILE_IMG;
 import static com.momentum.releaser.global.config.BaseResponseStatus.NOT_EXISTS_USER;
 
 @Slf4j
@@ -28,7 +30,7 @@ public class UserServiceImpl implements UserService {
      * 1.1 사용자 프로필 이미지 조회
      */
     @Override
-    public UserResponseDto.UserProfileImgResponseDto getUserProfileImg(Long userId) {
+    public UserProfileImgResponseDto getUserProfileImg(Long userId) {
         User user = getUserById(userId);
         return UserMapper.INSTANCE.toUserProfileImgResponseDto(user);
     }
@@ -51,7 +53,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public String deleteUserProfileImg(Long userId) {
         User user = getUserById(userId);
-        s3Upload.delete(user.getImg().substring(55));
+        deleteIfExistProfileImg(user);
         saveAfterDeleteProfileImg(user);
         return "사용자 프로필 이미지 삭제에 성공하였습니다.";
     }
@@ -69,14 +71,15 @@ public class UserServiceImpl implements UserService {
      * 사용자로부터 받은 프로필 이미지를 S3에 업로드한다.
      */
     private String uploadUserProfileImg(MultipartFile multipartFile) throws IOException {
-        return multipartFile == null ? null : s3Upload.upload(multipartFile, "users");
+        return multipartFile.isEmpty() ? DEFAULT_USER_PROFILE_IMG.url() : s3Upload.upload(multipartFile, "users");
     }
 
     /**
      * 사용자의 이미지 값이 null이 아닌 경우 한 번 지운다.
      */
     private void deleteIfExistProfileImg(User user) {
-        if (user.getImg() != null) {
+        // 사용자의 프로필 이미지가 기본 이미지도, null도 아닌 경우 기존에 저장된 파일을 S3에서 삭제한다.
+        if (!Objects.equals(user.getImg(), DEFAULT_USER_PROFILE_IMG.url()) && user.getImg() != null) {
             s3Upload.delete(user.getImg().substring(55));
         }
     }
@@ -85,7 +88,7 @@ public class UserServiceImpl implements UserService {
      * 사용자의 프로필 이미지 파일을 S3에서 삭제한 후 데이터베이스에서 값을 지운다.
      */
     private void saveAfterDeleteProfileImg(User user) {
-        user.updateImg(null);
+        user.updateImg(DEFAULT_USER_PROFILE_IMG.url());
         userRepository.save(user);
     }
 }
