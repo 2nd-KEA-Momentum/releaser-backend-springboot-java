@@ -84,6 +84,10 @@ public class Project extends BaseTime {
         this.img = url;
     }
 
+    public void updateImg(String img) {
+        this.img = img;
+    }
+
     @PreRemove
     private void preRemove() {
         for (ProjectMember member : members) {

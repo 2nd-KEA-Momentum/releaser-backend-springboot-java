@@ -78,6 +78,7 @@ public class UserServiceImpl implements UserService {
      * 사용자의 이미지 값이 null이 아닌 경우 한 번 지운다.
      */
     private void deleteIfExistProfileImg(User user) {
+        // 사용자의 프로필 이미지가 기본 이미지도, null도 아닌 경우 기존에 저장된 파일을 S3에서 삭제한다.
         if (!Objects.equals(user.getImg(), DEFAULT_USER_PROFILE_IMG.url()) && user.getImg() != null) {
             s3Upload.delete(user.getImg().substring(55));
         }

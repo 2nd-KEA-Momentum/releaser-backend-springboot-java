@@ -9,6 +9,7 @@ import com.momentum.releaser.domain.project.dto.ProjectReqDto.ProjectInfoReq;
 import com.momentum.releaser.domain.project.dto.ProjectResDto.GetProject;
 import com.momentum.releaser.domain.project.dto.ProjectResDto.GetProjectRes;
 import com.momentum.releaser.domain.project.dto.ProjectResDto.ProjectInfoRes;
+import com.momentum.releaser.domain.project.mapper.ProjectMapper;
 import com.momentum.releaser.domain.release.dao.approval.ReleaseApprovalRepository;
 import com.momentum.releaser.domain.user.dao.UserRepository;
 import com.momentum.releaser.domain.user.domain.User;
@@ -57,10 +58,10 @@ public class ProjectServiceImpl implements ProjectService {
         Project newProject = createNewProject(registerReq, url);
 
         // 프로젝트 멤버 추가
-        ProjectMember projectMember = addProjectMember(newProject, user);
+        addProjectMember(newProject, user);
 
         // 프로젝트 응답 객체 생성
-        return createProjectInfoResponse(newProject, user, projectMember);
+        return ProjectMapper.INSTANCE.toProjectInfoRes(newProject);
     }
 
     /**
@@ -77,12 +78,8 @@ public class ProjectServiceImpl implements ProjectService {
         // 프로젝트 정보 가져오기 및 업데이트
         Project updatedProject = getAndUpdateProject(project, updateReq, url);
 
-        // 프로젝트 멤버 정보
-        ProjectMember adminMember = getAdminMember(updatedProject);
-        User adminUser = getAdminUser(adminMember);
-
         // 프로젝트 응답 객체 생성
-        return createProjectInfoResponse(updatedProject, adminUser, adminMember);
+        return ProjectMapper.INSTANCE.toProjectInfoRes(updatedProject);
     }
 
     /**
@@ -169,9 +166,17 @@ public class ProjectServiceImpl implements ProjectService {
      * 프로젝트 이미지 값이 null이 아닌 경우 한 번 지운다.
      */
     private void deleteIfExistsProjectImg(Project project) {
+        Project updatedProject = project;
+
+        // 만약 "" 값이 들어가 있는 경우 null로 바꾼다.
+        if (project.getImg().isEmpty() || project.getImg().isBlank()) {
+            project.updateImg(null);
+            updatedProject = projectRepository.save(project);
+        }
+
         // 만약 프로젝트 이미지가 기본 이미지가 아닌 다른 파일이 들어가 있는 경우 파일을 삭제한다.
-        if (!Objects.equals(project.getImg(), DEFAULT_PROJECT_IMG.url()) && project.getImg() != null) {
-            s3Upload.delete(project.getImg().substring(55));
+        if (!Objects.equals(updatedProject.getImg(), DEFAULT_PROJECT_IMG.url()) && updatedProject.getImg() != null) {
+            s3Upload.delete(updatedProject.getImg().substring(55));
         }
     }
 
@@ -197,21 +202,9 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     /**
-     * 프로젝트 응답 객체 생성
-     */
-    private ProjectInfoRes createProjectInfoResponse(Project project, User user, ProjectMember projectMember) {
-        ProjectInfoRes projectInfoRes = modelMapper.map(project, ProjectInfoRes.class);
-        projectInfoRes.setProjectId(project.getProjectId());
-        projectInfoRes.setAdmin(user.getName());
-        projectInfoRes.setMemberId(projectMember.getMemberId());
-        projectInfoRes.setAdminImg(user.getImg());
-        return projectInfoRes;
-    }
-
-    /**
      * 프로젝트 멤버 추가
      */
-    private ProjectMember addProjectMember(Project project, User user) {
+    private void addProjectMember(Project project, User user) {
         ProjectMember projectMember = ProjectMember.builder()
                 .position('L')
                 .user(user)
@@ -219,7 +212,7 @@ public class ProjectServiceImpl implements ProjectService {
                 .status('Y')
                 .build();
 
-        return projectMemberRepository.save(projectMember);
+        projectMemberRepository.save(projectMember);
     }
 
     /**

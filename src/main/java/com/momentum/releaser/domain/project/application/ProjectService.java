@@ -7,6 +7,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
+/**
+ * @see ProjectServiceImpl
+ */
 public interface ProjectService {
 
     /**

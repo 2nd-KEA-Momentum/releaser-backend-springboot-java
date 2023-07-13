@@ -16,18 +16,15 @@ public class ProjectReqDto {
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     public static class ProjectInfoReq {
 
-        @NotBlank
-        @NotNull(message = "프로젝트명을 입력해주세요.")
-        @Size(min = 1, max = 45)
+        @NotBlank(message = "프로젝트명은 공백일 수 없습니다.")
+        @Size(min = 1, max = 45, message = "프로젝트명은 1자 이상 45자 이하여야 합니다.")
         private String title;
 
-        @NotBlank
-        @NotNull(message = "프로젝트 설명을 입력해주세요.")
-        @Size(min = 1, max = 100)
+        @NotBlank(message = "프로젝트 설명은 공백일 수 없습니다.")
+        @Size(min = 1, max = 100, message = "프로젝트 설명은 1자 이상 100자 이하여야 합니다.")
         private String content;
 
-        @NotBlank
-        @NotNull(message = "팀명을 입력해주세요.")
+        @NotBlank(message = "팀명은 공백일 수 없습니다.")
         private String team;
 
         @Builder

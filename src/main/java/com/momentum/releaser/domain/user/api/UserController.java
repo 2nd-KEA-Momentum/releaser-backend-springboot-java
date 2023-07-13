@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
 import java.io.IOException;
 
 @Slf4j

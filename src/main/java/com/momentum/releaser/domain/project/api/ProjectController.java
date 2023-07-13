@@ -32,7 +32,7 @@ public class ProjectController {
      */
     @PostMapping(value = "/{userId}/project", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public BaseResponse<ProjectInfoRes> createProject(
-            @PathVariable @Min(1) Long userId,
+            @PathVariable @Min(value = 1, message = "사용자 식별 번호는 1 이상의 숫자여야 합니다.") Long userId,
             @RequestPart @Valid ProjectInfoReq request,
             @RequestPart MultipartFile img) throws IOException {
 
@@ -44,7 +44,7 @@ public class ProjectController {
      */
     @PatchMapping(value = "/{projectId}", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public BaseResponse<ProjectInfoRes> updateProject(
-            @PathVariable @Min(1) Long projectId,
+            @PathVariable @Min(value = 1, message = "프로젝트 식별 번호는 1 이상의 숫자여야 합니다.") Long projectId,
             @RequestPart @Valid ProjectInfoReq request,
             @RequestPart MultipartFile img) throws IOException {
 
