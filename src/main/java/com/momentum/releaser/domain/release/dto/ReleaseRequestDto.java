@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.Valid;
 import javax.validation.constraints.*;
-import java.util.Date;
 import java.util.List;
 
 public class ReleaseRequestDto {
@@ -32,9 +31,6 @@ public class ReleaseRequestDto {
         @Size(max = 100, message = "릴리즈 요약은 100자를 넘을 수 없습니다.")
         private String summary;
 
-        @NotNull(message = "릴리즈 배포 날짜를 입력해 주세요.")
-        private Date deployDate;
-
         @NotNull(message = "릴리즈 노트의 x 좌표를 입력해 주세요.")
         private Double coordX;
 
@@ -44,12 +40,11 @@ public class ReleaseRequestDto {
         List<Long> issues;
 
         @Builder
-        public ReleaseCreateRequestDto(String title, String versionType, String content, String summary, Date deployDate, Double coordX, Double coordY, List<Long> issues) {
+        public ReleaseCreateRequestDto(String title, String versionType, String content, String summary, Double coordX, Double coordY, List<Long> issues) {
             this.title = title;
             this.versionType = versionType;
             this.content = content;
             this.summary = summary;
-            this.deployDate = deployDate;
             this.coordX = coordX;
             this.coordY = coordY;
             this.issues = issues;
@@ -75,9 +70,6 @@ public class ReleaseRequestDto {
         @Size(max = 100, message = "릴리즈 요약은 100자를 넘을 수 없습니다.")
         private String summary;
 
-        @NotNull(message = "릴리즈 배포 날짜를 입력해 주세요.")
-        private Date deployDate;
-
         @NotNull(message = "릴리즈 배포 상태를 입력해 주세요.")
         @Pattern(regexp = "(?i)^(PLANNING|DENIED|DEPLOYED)$", message = "배포 상태 값은 PLANNING, DENIED, DEPLOYED 중 하나여야 합니다.")
         private String deployStatus;
@@ -85,12 +77,11 @@ public class ReleaseRequestDto {
         List<Long> issues;
 
         @Builder
-        public ReleaseUpdateRequestDto(String title, String version, String content, String summary, Date deployDate, String deployStatus, List<Long> issues) {
+        public ReleaseUpdateRequestDto(String title, String version, String content, String summary, String deployStatus, List<Long> issues) {
             this.title = title;
             this.version = version;
             this.content = content;
             this.summary = summary;
-            this.deployDate = deployDate;
             this.deployStatus = deployStatus;
             this.issues = issues;
         }

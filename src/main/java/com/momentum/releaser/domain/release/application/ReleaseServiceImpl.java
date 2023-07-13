@@ -25,10 +25,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.momentum.releaser.global.config.BaseResponseStatus.*;
@@ -283,7 +281,6 @@ public class ReleaseServiceImpl implements ReleaseService {
                 .content(releaseCreateRequestDto.getContent())
                 .summary(releaseCreateRequestDto.getSummary())
                 .version(newVersion)
-                .deployDate(releaseCreateRequestDto.getDeployDate())
                 .project(project)
                 .coordX(releaseCreateRequestDto.getCoordX())
                 .coordY(releaseCreateRequestDto.getCoordY())
@@ -305,13 +302,20 @@ public class ReleaseServiceImpl implements ReleaseService {
         // 먼저 연결된 이슈를 모두 해제한다.
         disconnectIssues(releaseNote);
 
+        Date date = new Date();
+
+        // 배포 상태에 따라 배포 날짜 값을 결정한다.
+        if (releaseUpdateRequestDto.getDeployStatus().equals("DEPLOYED")) {
+            date = new Date();
+        }
+
         // 수정된 내용을 반영한다.
         releaseNote.updateReleaseNote(
                 releaseUpdateRequestDto.getTitle(),
                 releaseUpdateRequestDto.getContent(),
                 releaseUpdateRequestDto.getSummary(),
                 updatedVersion,
-                releaseUpdateRequestDto.getDeployDate(),
+                date,
                 ReleaseDeployStatus.valueOf(releaseUpdateRequestDto.getDeployStatus())
         );
 
