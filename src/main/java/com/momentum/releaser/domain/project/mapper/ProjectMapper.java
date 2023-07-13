@@ -2,6 +2,7 @@ package com.momentum.releaser.domain.project.mapper;
 
 import com.momentum.releaser.domain.project.domain.Project;
 import com.momentum.releaser.domain.project.dto.ProjectResDto;
+import com.momentum.releaser.domain.project.dto.ProjectResDto.GetProjectRes;
 import com.momentum.releaser.domain.project.dto.ProjectResDto.ProjectInfoRes;
 import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.ReleasesResponseDto;
 import com.momentum.releaser.domain.release.mapper.ReleaseMapper;
