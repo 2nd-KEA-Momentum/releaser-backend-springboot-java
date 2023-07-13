@@ -2,13 +2,14 @@ package com.momentum.releaser.global.config.aws;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.momentum.releaser.global.error.CustomException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
 
@@ -27,12 +28,9 @@ public class S3Upload {
     /**
      * S3 파일 업로드
      */
-    public String upload(MultipartFile multipartFile, String dirName) throws IOException {
-        // 파일 이름이 중복되지 않게 생성
-        String fileName = createS3FileName(multipartFile, dirName);
-
-        // S3에 파일 업로드
-        return uploadFileToS3(multipartFile, fileName);
+    public String upload(File file, String fileName, String dirName) throws IOException {
+        // 파일 이름이 중복되지 않게 생성하고 S3에 파일을 업로드한다.
+        return uploadFileToS3(file, createS3FileName(fileName, dirName));
     }
 
     /**
@@ -48,20 +46,20 @@ public class S3Upload {
     /**
      * S3에 업로드하는 파일의 이름을 중복되지 않게 생성한다.
      */
-    private String createS3FileName(MultipartFile multipartFile, String dirName) {
-        return dirName + "/" + UUID.randomUUID() + "-" + multipartFile.getOriginalFilename();
+    private String createS3FileName(String fileName, String dirName) {
+        return dirName + "/" + UUID.randomUUID() + "-" + fileName;
     }
 
     /**
      * S3에 파일을 업로드한다.
      */
-    private String uploadFileToS3(MultipartFile multipartFile, String fileName) throws IOException {
+    private String uploadFileToS3(File file, String fileName) throws IOException {
         // 파일의 사이즈를 ContentLength로 S3에게 알려준다.
         ObjectMetadata objectMetadata = new ObjectMetadata();
-        objectMetadata.setContentLength(multipartFile.getInputStream().available());
+        objectMetadata.setContentLength(file.length());
 
         // S3 API 메서드인 putObject를 이용하여 파일 스트림(Stream)을 열어 S3에 파일을 업로드한다.
-        amazonS3.putObject(bucket, fileName, multipartFile.getInputStream(), objectMetadata);
+        amazonS3.putObject(new PutObjectRequest(bucket, fileName, file).withMetadata(objectMetadata));
 
         // getUrl 메서드를 통해서 S3에 업로드된 사진 URL을 가져온다.
         return amazonS3.getUrl(bucket, fileName).toString();

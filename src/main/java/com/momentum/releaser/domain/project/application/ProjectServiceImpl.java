@@ -1,5 +1,7 @@
 package com.momentum.releaser.domain.project.application;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.momentum.releaser.domain.issue.dao.IssueRepository;
 import com.momentum.releaser.domain.project.dao.ProjectMemberRepository;
 import com.momentum.releaser.domain.project.dao.ProjectRepository;
@@ -22,11 +24,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import static com.momentum.releaser.global.common.Base64.getImageUrlFromBase64;
 import static com.momentum.releaser.global.common.CommonEnum.DEFAULT_PROJECT_IMG;
 import static com.momentum.releaser.global.config.BaseResponseStatus.*;
 
@@ -48,14 +52,14 @@ public class ProjectServiceImpl implements ProjectService {
      */
     @Override
     @Transactional
-    public ProjectInfoRes createProject(Long userId, ProjectInfoReq registerReq, MultipartFile multipartFile) throws IOException {
+    public ProjectInfoRes createProject(Long userId, ProjectInfoReq projectInfoReq) throws IOException {
         User user = getUserById(userId);
 
         // S3 URL 생성한다.
-        String url = uploadProjectImg(multipartFile);
+        String url = uploadProjectImg(projectInfoReq);
 
         // 프로젝트 생성
-        Project newProject = createNewProject(registerReq, url);
+        Project newProject = createNewProject(projectInfoReq, url);
 
         // 프로젝트 멤버 추가
         addProjectMember(newProject, user);
@@ -69,14 +73,14 @@ public class ProjectServiceImpl implements ProjectService {
      */
     @Transactional
     @Override
-    public ProjectInfoRes updateProject(Long projectId, ProjectInfoReq updateReq, MultipartFile multipartFile) throws IOException {
+    public ProjectInfoRes updateProject(Long projectId, ProjectInfoReq projectInfoReq) throws IOException {
         Project project = getProjectById(projectId);
 
         // S3 URL 생성
-        String url = updateProjectImg(project, multipartFile);
+        String url = updateProjectImg(project, projectInfoReq);
 
         // 프로젝트 정보 가져오기 및 업데이트
-        Project updatedProject = getAndUpdateProject(project, updateReq, url);
+        Project updatedProject = getAndUpdateProject(project, projectInfoReq, url);
 
         // 프로젝트 응답 객체 생성
         return ProjectMapper.INSTANCE.toProjectInfoRes(updatedProject);
@@ -149,17 +153,33 @@ public class ProjectServiceImpl implements ProjectService {
     /**
      * 클라이언트로부터 받은 프로젝트 이미지를 S3에 업로드한다.
      */
-    private String uploadProjectImg(MultipartFile multipartFile) throws IOException {
-        // 만약 전달받은 이미지 파일이 없다면, 기본 이미지를 반환한다.
-        return multipartFile.isEmpty() ? DEFAULT_PROJECT_IMG.url() : s3Upload.upload(multipartFile, "projects");
+    private String uploadProjectImg(ProjectInfoReq projectInfoReq) throws IOException {
+        String img = projectInfoReq.getImg();
+        String fileName = projectInfoReq.getTitle();
+
+        if (img.isEmpty()) {
+            // 만약 사용자로부터 받은 이미지 데이터가 없는 경우 기본 프로필로 대체한다.
+            return DEFAULT_PROJECT_IMG.url();
+        }
+
+        // Base64로 인코딩된 이미지 파일을 파일 형태로 가져온다.
+        File file = getImageUrlFromBase64(img);
+
+        String url = s3Upload.upload(file, file.getName(), "projects");
+
+        if (file.delete()) {
+            return url;
+        } else {
+            throw new CustomException(FAILED_TO_CREATE_PROJECT);
+        }
     }
 
     /**
      * 클라이언트로부터 받은 프로젝트 이미지로 수정한다.
      */
-    private String updateProjectImg(Project project, MultipartFile multipartFile) throws IOException {
+    private String updateProjectImg(Project project, ProjectInfoReq projectInfoReq) throws IOException {
         deleteIfExistsProjectImg(project);
-        return uploadProjectImg(multipartFile);
+        return uploadProjectImg(projectInfoReq);
     }
 
     /**

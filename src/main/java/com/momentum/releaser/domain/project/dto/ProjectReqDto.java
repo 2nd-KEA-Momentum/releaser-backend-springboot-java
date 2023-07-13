@@ -1,10 +1,8 @@
 package com.momentum.releaser.domain.project.dto;
 
 import lombok.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 public class ProjectReqDto {
@@ -27,11 +25,14 @@ public class ProjectReqDto {
         @NotBlank(message = "팀명은 공백일 수 없습니다.")
         private String team;
 
+        private String img;
+
         @Builder
-        public ProjectInfoReq(String title,String content, String team, MultipartFile img) {
+        public ProjectInfoReq(String title,String content, String team, String img) {
             this.title = title;
             this.content = content;
             this.team = team;
+            this.img = img;
         }
     }
 }

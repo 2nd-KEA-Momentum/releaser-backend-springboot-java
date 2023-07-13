@@ -5,10 +5,8 @@ import com.momentum.releaser.domain.project.dto.ProjectReqDto.ProjectInfoReq;
 import com.momentum.releaser.global.config.BaseResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
@@ -30,25 +28,23 @@ public class ProjectController {
     /**
      * 3.1 프로젝트 생성
      */
-    @PostMapping(value = "/{userId}/project", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PostMapping(value = "/{userId}/project")
     public BaseResponse<ProjectInfoRes> createProject(
             @PathVariable @Min(value = 1, message = "사용자 식별 번호는 1 이상의 숫자여야 합니다.") Long userId,
-            @RequestPart @Valid ProjectInfoReq request,
-            @RequestPart(required = false) MultipartFile img) throws IOException {
+            @RequestBody ProjectInfoReq projectInfoReq) throws IOException {
 
-        return new BaseResponse<>(projectService.createProject(userId, request, img));
+        return new BaseResponse<>(projectService.createProject(userId, projectInfoReq));
     }
 
     /**
      * 3.2 프로젝트 수정
      */
-    @PatchMapping(value = "/{projectId}", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PatchMapping(value = "/{projectId}")
     public BaseResponse<ProjectInfoRes> updateProject(
             @PathVariable @Min(value = 1, message = "프로젝트 식별 번호는 1 이상의 숫자여야 합니다.") Long projectId,
-            @RequestPart @Valid ProjectInfoReq request,
-            @RequestPart(required = false) MultipartFile img) throws IOException {
+            @RequestBody @Valid ProjectInfoReq projectInfoReq) throws IOException {
 
-        return new BaseResponse<>(projectService.updateProject(projectId, request, img));
+        return new BaseResponse<>(projectService.updateProject(projectId, projectInfoReq));
     }
 
     /**
