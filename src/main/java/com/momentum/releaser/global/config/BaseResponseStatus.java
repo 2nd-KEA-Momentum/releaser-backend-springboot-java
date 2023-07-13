@@ -38,7 +38,9 @@ public enum BaseResponseStatus {
     NOT_EXISTS_S3_FILE(false, 4003, "존재하지 않는 파일입니다."),
 
     NOT_EXISTS_USER(false, 4100, "존재하지 않는 유저입니다."),
+    FAILED_TO_UPDATE_USER_PROFILE_IMG(false, 4101, "사용자 프로필 이미지 변경에 실패하였습니다."),
     NOT_EXISTS_PROJECT(false, 4200, "존재하지 않는 프로젝트입니다."),
+    FAILED_TO_CREATE_PROJECT(false, 4201, "프로젝트 생성에 실패하였습니다."),
     NOT_EXISTS_PROJECT_MEMBER(false, 4300, "존재하지 않는 멤버입니다."),
     NOT_EXISTS_ADMIN_MEMBER(false, 4301, "관리자가 존재하지 않습니다."),
     NOT_EXISTS_RELEASE_NOTE(false, 4400, "존재하지 않는 릴리즈 노트입니다."),
