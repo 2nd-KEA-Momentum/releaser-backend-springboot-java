@@ -243,10 +243,6 @@ public class ReleaseServiceImpl implements ReleaseService {
             String latestVersion = optionalReleaseNote.get().getVersion();
             log.info("latestVersion: {}", latestVersion);
 
-//            int latestMajorVersion = latestVersion.charAt(0) - 48;
-//            int latestMinorVersion = latestVersion.charAt(2) - 48;
-//            int latestPatchVersion = latestVersion.charAt(4) - 48;
-
             String[] eachVersion = latestVersion.split("\\.");
             int latestMajorVersion = Integer.parseInt(eachVersion[0]);
             int latestMinorVersion = Integer.parseInt(eachVersion[1]);

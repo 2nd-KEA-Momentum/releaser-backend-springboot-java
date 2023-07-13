@@ -155,7 +155,6 @@ public class ProjectServiceImpl implements ProjectService {
      */
     private String uploadProjectImg(ProjectInfoReq projectInfoReq) throws IOException {
         String img = projectInfoReq.getImg();
-        String fileName = projectInfoReq.getTitle();
 
         if (img.isEmpty()) {
             // 만약 사용자로부터 받은 이미지 데이터가 없는 경우 기본 프로필로 대체한다.

@@ -31,7 +31,7 @@ public class ProjectController {
     @PostMapping(value = "/{userId}/project")
     public BaseResponse<ProjectInfoRes> createProject(
             @PathVariable @Min(value = 1, message = "사용자 식별 번호는 1 이상의 숫자여야 합니다.") Long userId,
-            @RequestBody ProjectInfoReq projectInfoReq) throws IOException {
+            @RequestBody @Valid ProjectInfoReq projectInfoReq) throws IOException {
 
         return new BaseResponse<>(projectService.createProject(userId, projectInfoReq));
     }

@@ -1,6 +1,6 @@
 package com.momentum.releaser.domain.release.api;
 
-import com.momentum.releaser.domain.release.application.ReleaseServiceImpl;
+import com.momentum.releaser.domain.release.application.ReleaseService;
 import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.*;
 import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.*;
 import com.momentum.releaser.global.config.BaseResponse;
@@ -21,7 +21,7 @@ import java.util.List;
 @Validated
 public class ReleaseController {
 
-    private final ReleaseServiceImpl releaseService;
+    private final ReleaseService releaseService;
 
     /**
      * 5.1 프로젝트별 릴리즈 노트 목록 조회
