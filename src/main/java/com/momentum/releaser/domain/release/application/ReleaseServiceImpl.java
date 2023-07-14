@@ -228,9 +228,10 @@ public class ReleaseServiceImpl implements ReleaseService {
         String newVersion = "";
 
         // 데이터베이스로부터 가장 최신의 버전을 가져온다.
-        Optional<ReleaseNote> optionalReleaseNote = releaseRepository.findLatestVersionByProject(project);
+//        Optional<ReleaseNote> optionalReleaseNote = releaseRepository.findLatestVersionByProject(project);
+        List<String> releaseVersions = releaseRepository.findAllVersionsByProject(project);
 
-        if (optionalReleaseNote.isEmpty()) {  // 데이터베이스에서 가장 최신의 버전을 가져오지 못한 경우
+        if (releaseVersions.isEmpty()) {  // 데이터베이스에서 가장 최신의 버전을 가져오지 못한 경우
             int size = releaseRepository.findAllByProject(project).size();
 
             if (size != 0) {
@@ -240,7 +241,8 @@ public class ReleaseServiceImpl implements ReleaseService {
             }
 
         } else {  // 데이터베이스에서 가장 최신의 버전을 가져온 경우
-            String latestVersion = optionalReleaseNote.get().getVersion();
+            releaseVersions = getLatestVersion(releaseVersions);
+            String latestVersion = releaseVersions.get(0);
             log.info("latestVersion: {}", latestVersion);
 
             String[] eachVersion = latestVersion.split("\\.");
@@ -268,6 +270,67 @@ public class ReleaseServiceImpl implements ReleaseService {
             }
         }
         return newVersion;
+    }
+
+    /**
+     * 버전을 내림차순으로 정렬한다. 이렇게 되면 가장 첫 번째 요소가 제일 큰/최신 버전이 된다.
+     */
+    private List<String> getLatestVersion(List<String> versions) {
+        versions.sort(new Comparator<String>() {
+            @Override
+            public int compare(String v1, String v2) {
+                String[] v1s = v1.split("\\.");
+                String[] v2s = v2.split("\\.");
+
+                int majorV1 = Integer.parseInt(v1s[0]);
+                int minorV1 = Integer.parseInt(v1s[1]);
+                int patchV1 = Integer.parseInt(v1s[2]);
+
+                int majorV2 = Integer.parseInt(v2s[0]);
+                int minorV2 = Integer.parseInt(v2s[1]);
+                int patchV2 = Integer.parseInt(v2s[2]);
+
+                if (majorV1 != majorV2) {
+                    return Integer.compare(majorV2, majorV1);
+                } else if (minorV1 != minorV2) {
+                    return Integer.compare(minorV2, minorV1);
+                } else {
+                    return Integer.compare(patchV2, patchV1);
+                }
+            }
+        });
+
+        return versions;
+    }
+
+    private List<String> sortVersionByAsc(List<String> versions) {
+
+        versions.sort(new Comparator<String>() {
+
+            @Override
+            public int compare(String v1, String v2) {
+                String[] v1s = v1.split("\\.");
+                String[] v2s = v2.split("\\.");
+
+                int majorV1 = Integer.parseInt(v1s[0]);
+                int minorV1 = Integer.parseInt(v1s[1]);
+                int patchV1 = Integer.parseInt(v1s[2]);
+
+                int majorV2 = Integer.parseInt(v2s[0]);
+                int minorV2 = Integer.parseInt(v2s[1]);
+                int patchV2 = Integer.parseInt(v2s[2]);
+
+                if (majorV1 != majorV2) {
+                    return Integer.compare(majorV1, majorV2);
+                } else if (minorV1 != minorV2) {
+                    return Integer.compare(minorV1, minorV2);
+                } else {
+                    return Integer.compare(patchV1, patchV2);
+                }
+            }
+        });
+
+        return versions;
     }
 
     /**
@@ -445,7 +508,9 @@ public class ReleaseServiceImpl implements ReleaseService {
         versions.add(version);
 
         // 4. 변경하려는 버전이 포함된 릴리즈 버전 배열을 오름차순으로 정렬한다.
-        Collections.sort(versions);
+//        Collections.sort(versions);
+        versions = sortVersionByAsc(versions);
+        log.info("updateReleaseVersion/versions: {}", versions);
 
         // 5. 바꾸려는 버전 값이 올바른 버전 값인지를 확인한다.
         validateCorrectVersion(versions);
