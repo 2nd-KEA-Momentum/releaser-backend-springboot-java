@@ -457,9 +457,9 @@ public class ReleaseServiceImpl implements ReleaseService {
      * 클라이언트가 수정하고자 하는 버전이 올바른 버전인지 검증한다.
      */
     private void validateCorrectVersion(List<String> versions) {
-        int[] majors = versions.stream().mapToInt(v -> v.charAt(0) - 48).toArray();
-        int[] minors = versions.stream().mapToInt(v -> v.charAt(2) - 48).toArray();
-        int[] patches = versions.stream().mapToInt(v -> v.charAt(4) - 48).toArray();
+        int[] majors = versions.stream().mapToInt(v -> Integer.parseInt(v.split("\\.")[0])).toArray();
+        int[] minors = versions.stream().mapToInt(v -> Integer.parseInt(v.split("\\.")[1])).toArray();
+        int[] patches = versions.stream().mapToInt(v -> Integer.parseInt(v.split("\\.")[2])).toArray();
 
         int majorStartIdx = 0;
         int minorStartIdx = 0;
@@ -506,7 +506,7 @@ public class ReleaseServiceImpl implements ReleaseService {
      */
     private void validateMinorVersion(int[] minors, int[] patches, int start, int end, int minorStartIdx) {
 
-        if (end == 0) {
+        if (end - start == 0) {
             return;
         }
 
@@ -527,7 +527,7 @@ public class ReleaseServiceImpl implements ReleaseService {
 
             // 만약 그 다음 번째 마이너 버전 숫자가 바뀌는 경우 넘어가기 전에 패치 버전 숫자를 확인한다.
             if (nextMinor - currentMinor == 1) {
-                validatePatchVersion(patches, minorStartIdx, i + 1);
+                validatePatchVersion(patches, minorStartIdx, i);
                 minorStartIdx = i + 1;
 
                 // 마이너 버전 숫자가 바뀌었을 때 패치 버전 숫자는 0이어야 한다.
@@ -543,7 +543,7 @@ public class ReleaseServiceImpl implements ReleaseService {
      */
     private void validatePatchVersion(int[] patches, int start, int end) {
 
-        if (end == 0) {
+        if (end - start == 0) {
             return;
         }
 
