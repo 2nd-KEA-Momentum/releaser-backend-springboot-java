@@ -37,7 +37,7 @@ public class ReleaseController {
      * 5.2 릴리즈 노트 생성
      */
     @PostMapping(value = "/projects/{projectId}")
-    public BaseResponse<ReleaseCreateResponseDto> createReleaseNote(
+    public BaseResponse<ReleaseCreateAndUpdateResponseDto> createReleaseNote(
             @PathVariable @Min(value = 1, message = "프로젝트 식별 번호는 1 이상의 숫자여야 합니다.") Long projectId,
             @RequestBody @Valid ReleaseCreateRequestDto releaseCreateRequestDto) {
 
@@ -48,7 +48,7 @@ public class ReleaseController {
      * 5.3 릴리즈 노트 수정
      */
     @PatchMapping(value = "/{releaseId}")
-    public BaseResponse<String> updateReleaseNote(
+    public BaseResponse<ReleaseCreateAndUpdateResponseDto> updateReleaseNote(
             @PathVariable @Min(value = 1, message = "릴리즈 식별 번호는 1 이상의 숫자여야 합니다.") Long releaseId,
             @RequestBody @Valid ReleaseUpdateRequestDto releaseUpdateRequestDto) {
 

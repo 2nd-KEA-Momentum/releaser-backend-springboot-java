@@ -15,12 +15,12 @@ public interface ReleaseService {
     /**
      * 5.2 릴리즈 노트 생성
      */
-    ReleaseCreateResponseDto createReleaseNote(Long project, ReleaseCreateRequestDto releaseCreateRequestDto);
+    ReleaseCreateAndUpdateResponseDto createReleaseNote(Long project, ReleaseCreateRequestDto releaseCreateRequestDto);
 
     /**
      * 5.3 릴리즈 노트 수정
      */
-    String updateReleaseNote(Long releaseId, ReleaseUpdateRequestDto releaseUpdateRequestDto);
+    ReleaseCreateAndUpdateResponseDto updateReleaseNote(Long releaseId, ReleaseUpdateRequestDto releaseUpdateRequestDto);
 
     /**
      * 5.4 릴리즈 노트 삭제

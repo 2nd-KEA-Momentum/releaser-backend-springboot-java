@@ -57,7 +57,7 @@ public class ReleaseServiceImpl implements ReleaseService {
      */
     @Transactional
     @Override
-    public ReleaseCreateResponseDto createReleaseNote(Long projectId, ReleaseCreateRequestDto releaseCreateRequestDto) {
+    public ReleaseCreateAndUpdateResponseDto createReleaseNote(Long projectId, ReleaseCreateRequestDto releaseCreateRequestDto) {
         // 먼저, 클라이언트로부터 받아온 릴리즈 노트를 저장한다.
         ReleaseNote savedReleaseNote = saveReleaseNote(projectId, releaseCreateRequestDto, createReleaseVersion(projectId, releaseCreateRequestDto.getVersionType()));
 
@@ -70,7 +70,7 @@ public class ReleaseServiceImpl implements ReleaseService {
         // 생성한 릴리즈 노트에 대한 동의 테이블을 생성한다.
         createReleaseApprovals(savedReleaseNote);
 
-        return ReleaseMapper.INSTANCE.toReleaseCreateResponseDto(savedReleaseNote);
+        return ReleaseMapper.INSTANCE.toReleaseCreateAndUpdateResponseDto(savedReleaseNote);
     }
 
     /**
@@ -78,7 +78,7 @@ public class ReleaseServiceImpl implements ReleaseService {
      */
     @Transactional
     @Override
-    public String updateReleaseNote(Long releaseId, ReleaseUpdateRequestDto releaseUpdateRequestDto) {
+    public ReleaseCreateAndUpdateResponseDto updateReleaseNote(Long releaseId, ReleaseUpdateRequestDto releaseUpdateRequestDto) {
         // 수정된 릴리즈 노트 내용을 반영 및 저장한다.
         ReleaseNote updatedReleaseNote = updateAndSaveReleaseNote(releaseId, releaseUpdateRequestDto, updateReleaseVersion(releaseId, releaseUpdateRequestDto.getVersion()));
 
@@ -88,7 +88,7 @@ public class ReleaseServiceImpl implements ReleaseService {
         // 배포 상태에 따른 알림을 보낸다.
         alertReleaseNoteDeploy(updatedReleaseNote);
 
-        return "릴리즈 노트 수정에 성공하였습니다.";
+        return ReleaseMapper.INSTANCE.toReleaseCreateAndUpdateResponseDto(updatedReleaseNote);
     }
 
     /**

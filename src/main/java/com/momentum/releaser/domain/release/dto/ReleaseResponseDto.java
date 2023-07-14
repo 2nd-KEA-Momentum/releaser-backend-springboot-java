@@ -2,6 +2,7 @@ package com.momentum.releaser.domain.release.dto;
 
 import com.momentum.releaser.domain.issue.dto.IssueDataDto.ConnectedIssuesDataDto;
 import com.momentum.releaser.domain.release.domain.ReleaseEnum;
+import com.momentum.releaser.domain.release.domain.ReleaseEnum.ReleaseDeployStatus;
 import com.momentum.releaser.domain.release.dto.ReleaseDataDto.ReleaseApprovalsDataDto;
 import com.momentum.releaser.domain.release.dto.ReleaseDataDto.ReleaseOpinionsDataDto;
 import com.momentum.releaser.domain.release.dto.ReleaseDataDto.ReleasesDataDto;
@@ -45,18 +46,18 @@ public class ReleaseResponseDto {
      */
     @Getter
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    public static class ReleaseCreateResponseDto {
+    public static class ReleaseCreateAndUpdateResponseDto {
         private Long releaseId;
         private String version;
         private String summary;
         private Date deployDate;
-        private ReleaseEnum.ReleaseDeployStatus deployStatus;
+        private ReleaseDeployStatus deployStatus;
         private Double coordX;
         private Double coordY;
 
         @Builder
 
-        public ReleaseCreateResponseDto(Long releaseId, String version, String summary, Date deployDate, ReleaseEnum.ReleaseDeployStatus deployStatus, Double coordX, Double coordY) {
+        public ReleaseCreateAndUpdateResponseDto(Long releaseId, String version, String summary, Date deployDate, ReleaseDeployStatus deployStatus, Double coordX, Double coordY) {
             this.releaseId = releaseId;
             this.version = version;
             this.summary = summary;

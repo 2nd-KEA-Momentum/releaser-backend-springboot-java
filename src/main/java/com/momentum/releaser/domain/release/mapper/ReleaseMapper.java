@@ -24,9 +24,9 @@ public interface ReleaseMapper {
     ReleasesDataDto toReleasesDataDto(ReleaseNote releaseNote);
 
     /**
-     * Entity (ReleaseNote) -> DTO(ReleaseCreateResponseDto)
+     * Entity (ReleaseNote) -> DTO(ReleaseCreateAndUpdateResponseDto)
      */
-    ReleaseCreateResponseDto toReleaseCreateResponseDto(ReleaseNote releaseNote);
+    ReleaseCreateAndUpdateResponseDto toReleaseCreateAndUpdateResponseDto(ReleaseNote releaseNote);
 
     /**
      * Entity (ReleaseNote) -> DTO(ReleaseInfoResponseDto)
