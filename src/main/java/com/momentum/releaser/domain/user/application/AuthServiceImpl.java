@@ -4,6 +4,7 @@ import com.momentum.releaser.domain.user.dao.AuthPasswordRepository;
 import com.momentum.releaser.domain.user.dao.RefreshTokenRepository;
 import com.momentum.releaser.domain.user.dao.UserRepository;
 import com.momentum.releaser.domain.user.domain.AuthPassword;
+import com.momentum.releaser.domain.user.domain.RefreshToken;
 import com.momentum.releaser.domain.user.domain.User;
 import com.momentum.releaser.domain.user.dto.AuthReqDto.UserInfoReq;
 import com.momentum.releaser.domain.user.dto.AuthReqDto.UserLoginReq;
@@ -19,6 +20,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 import static com.momentum.releaser.global.config.BaseResponseStatus.*;
 
@@ -74,6 +77,18 @@ public class AuthServiceImpl implements AuthService{
 
         // 3. 인증 정보를 기반으로 JWT 토큰 생성
         TokenDto tokenDto = jwtTokenProvider.generateToken(authentication);
+
+        // Refresh토큰 있는지 확인
+        Optional<RefreshToken> refreshToken = refreshTokenRepository.findByUserEmail(userLoginReq.getEmail());
+
+        // 있다면 새토큰 발급후 업데이트
+        // 없다면 새로 만들고 디비 저장
+        if(refreshToken.isPresent()) {
+            refreshTokenRepository.save(refreshToken.get().updateToken(tokenDto.getRefreshToken()));
+        }else {
+            RefreshToken newToken = new RefreshToken(tokenDto.getRefreshToken(), userLoginReq.getEmail());
+            refreshTokenRepository.save(newToken);
+        }
 
         return tokenDto;
 

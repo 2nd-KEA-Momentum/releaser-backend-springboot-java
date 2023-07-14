@@ -66,8 +66,9 @@ public class JwtTokenProvider {
                 .compact();
 
         // Refresh Token 생성
+        // 7일: 7*24*60*60*1000 = 604,800,000
         String refreshToken = Jwts.builder()
-                .setExpiration(new Date(now + 86400000))
+                .setExpiration(new Date(now + 604800000))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
 
