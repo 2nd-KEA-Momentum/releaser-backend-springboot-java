@@ -30,22 +30,24 @@ public class ProjectController {
     /**
      * 3.1 프로젝트 생성
      */
-    @PostMapping("/{userId}/project")
+    @PostMapping(value = "/{userId}/project")
     public BaseResponse<ProjectInfoRes> createProject(
-            @PathVariable @Min(1) Long userId,
-            @Valid @RequestBody ProjectInfoReq registerReq) {
-        return new BaseResponse<>(projectService.createProject(userId, registerReq));
+            @PathVariable @Min(value = 1, message = "사용자 식별 번호는 1 이상의 숫자여야 합니다.") Long userId,
+            @RequestBody @Valid ProjectInfoReq projectInfoReq) throws IOException {
+
+        return new BaseResponse<>(projectService.createProject(userId, projectInfoReq));
     }
 
 
     /**
      * 3.2 프로젝트 수정
      */
-    @PatchMapping("/{projectId}")
+    @PatchMapping(value = "/{projectId}")
     public BaseResponse<ProjectInfoRes> updateProject(
-            @PathVariable @Min(1) Long projectId,
-            @Valid @RequestBody ProjectInfoReq updateReq) {
-        return new BaseResponse<>(projectService.updateProject(projectId, updateReq));
+            @PathVariable @Min(value = 1, message = "프로젝트 식별 번호는 1 이상의 숫자여야 합니다.") Long projectId,
+            @RequestBody @Valid ProjectInfoReq projectInfoReq) throws IOException {
+
+        return new BaseResponse<>(projectService.updateProject(projectId, projectInfoReq));
     }
 
     /**
@@ -57,7 +59,6 @@ public class ProjectController {
         return new BaseResponse<>(projectService.deleteProject(projectId));
     }
 
-
     /**
      * 3.4 프로젝트 목록 조회
      */
@@ -65,7 +66,4 @@ public class ProjectController {
     public BaseResponse<GetProjectRes> getProjects(@PathVariable @Min(1) Long userId) {
         return new BaseResponse<>(projectService.getProjects(userId));
     }
-
-
-
 }

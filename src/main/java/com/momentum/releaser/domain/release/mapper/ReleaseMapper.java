@@ -8,7 +8,6 @@ import com.momentum.releaser.domain.release.domain.ReleaseOpinion;
 import com.momentum.releaser.domain.release.dto.ReleaseDataDto.ReleaseApprovalsDataDto;
 import com.momentum.releaser.domain.release.dto.ReleaseDataDto.ReleaseOpinionsDataDto;
 import com.momentum.releaser.domain.release.dto.ReleaseDataDto.ReleasesDataDto;
-import com.momentum.releaser.domain.release.dto.ReleaseResponseDto;
 import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.*;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -25,9 +24,9 @@ public interface ReleaseMapper {
     ReleasesDataDto toReleasesDataDto(ReleaseNote releaseNote);
 
     /**
-     * Entity (ReleaseNote) -> DTO(ReleaseCreateResponseDto)
+     * Entity (ReleaseNote) -> DTO(ReleaseCreateAndUpdateResponseDto)
      */
-    ReleaseCreateResponseDto toReleaseCreateResponseDto(ReleaseNote releaseNote);
+    ReleaseCreateAndUpdateResponseDto toReleaseCreateAndUpdateResponseDto(ReleaseNote releaseNote);
 
     /**
      * Entity (ReleaseNote) -> DTO(ReleaseInfoResponseDto)

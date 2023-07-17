@@ -38,9 +38,12 @@ public enum BaseResponseStatus {
     NOT_EXISTS_S3_FILE(false, 4003, "존재하지 않는 파일입니다."),
 
     NOT_EXISTS_USER(false, 4100, "존재하지 않는 유저입니다."),
-    OVERLAP_CHECK_EMAIL(false, 4101, "중복된 이메일입니다."),
-    NOT_MATCHES_PASSWORD(false, 4102, "일치하는 비밀번호가 없습니다."),
+    FAILED_TO_UPDATE_USER_PROFILE_IMG(false, 4101, "사용자 프로필 이미지 변경에 실패하였습니다."),
+    OVERLAP_CHECK_EMAIL(false, 4102, "중복된 이메일입니다."),
+    NOT_MATCHES_PASSWORD(false, 4103, "일치하는 비밀번호가 없습니다."),
     NOT_EXISTS_PROJECT(false, 4200, "존재하지 않는 프로젝트입니다."),
+    FAILED_TO_CREATE_PROJECT(false, 4201, "프로젝트 생성에 실패하였습니다."),
+
     NOT_EXISTS_PROJECT_MEMBER(false, 4300, "존재하지 않는 멤버입니다."),
     NOT_EXISTS_ADMIN_MEMBER(false, 4301, "관리자가 존재하지 않습니다."),
     NOT_EXISTS_RELEASE_NOTE(false, 4400, "존재하지 않는 릴리즈 노트입니다."),
@@ -58,7 +61,7 @@ public enum BaseResponseStatus {
     UNAUTHORIZED_RELEASE_NOTE(false, 4412, "해당 프로젝트 멤버는 해당 릴리즈 노트에 접근 권한이 없습니다."),
     NOT_EXISTS_RELEASE_APPROVAL(false, 4413, "존재하지 않는 릴리즈 배포 동의 여부 데이터입니다."),
     FAILED_TO_GET_RELEASE_APPROVALS(false, 4414, "릴리즈 노트 배포 동의 데이터를 불러오기에 실패하였습니다."),
-    NOT_EXISTS_RELEASE_OPINION(false, 4415, "존재하지 않는 릴리즈 노트 이슈입니다."),
+    NOT_EXISTS_RELEASE_OPINION(false, 4415, "존재하지 않는 릴리즈 노트 의견입니다."),
     NOT_EXISTS_ISSUE(false, 4500, "존재하지 않는 이슈입니다."),
     INVALID_ISSUE_WITH_COMPLETED(false, 4501, "이미 연결된 이슈가 포함되어 있습니다."),
     INVALID_ISSUE_WITH_NOT_DONE(false, 4502, "완료되지 않은 이슈는 연결할 수 없습니다."),
