@@ -24,6 +24,7 @@ public enum BaseResponseStatus {
     CONNECTED_ISSUE_EXISTS(false, 2502, "릴리즈와 연결된 이슈이므로 상태 변경이 불가능합니다."),
     CONNECTED_RELEASE_EXISTS(false, 2503, "연결된 릴리즈가 존재하므로 삭제할 수 없습니다."),
 
+
     /**
      * 3000 : Response 오류
      */

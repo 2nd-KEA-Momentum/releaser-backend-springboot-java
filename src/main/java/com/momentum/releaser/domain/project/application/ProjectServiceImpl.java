@@ -1,7 +1,5 @@
 package com.momentum.releaser.domain.project.application;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.momentum.releaser.domain.issue.dao.IssueRepository;
 import com.momentum.releaser.domain.project.dao.ProjectMemberRepository;
 import com.momentum.releaser.domain.project.dao.ProjectRepository;
@@ -22,7 +20,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
@@ -52,8 +49,9 @@ public class ProjectServiceImpl implements ProjectService {
      */
     @Override
     @Transactional
-    public ProjectInfoRes createProject(Long userId, ProjectInfoReq projectInfoReq) throws IOException {
-        User user = getUserById(userId);
+    public ProjectInfoRes createProject(String email, ProjectInfoReq projectInfoReq) throws IOException {
+        //Token UserInfo
+        User user = findUserByEmail(email);
 
         // S3 URL 생성한다.
         String url = uploadProjectImg(projectInfoReq);
@@ -74,7 +72,9 @@ public class ProjectServiceImpl implements ProjectService {
     @Transactional
     @Override
     public ProjectInfoRes updateProject(Long projectId, ProjectInfoReq projectInfoReq) throws IOException {
+
         Project project = getProjectById(projectId);
+
 
         // S3 URL 생성
         String url = updateProjectImg(project, projectInfoReq);
@@ -84,6 +84,7 @@ public class ProjectServiceImpl implements ProjectService {
 
         // 프로젝트 응답 객체 생성
         return ProjectMapper.INSTANCE.toProjectInfoRes(updatedProject);
+
     }
 
     /**
@@ -92,8 +93,9 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     @Transactional
     public String deleteProject(Long projectId) {
+
         //project 정보
-        Project project = projectRepository.findById(projectId).orElseThrow(() -> new CustomException(NOT_EXISTS_PROJECT));
+        Project project = getProjectById(projectId);
 
         projectRepository.deleteById(project.getProjectId());
         issueRepository.deleteByIssueNum();
@@ -107,10 +109,10 @@ public class ProjectServiceImpl implements ProjectService {
      */
     @Override
     @Transactional
-    public GetProjectRes getProjects(Long userId) {
+    public GetProjectRes getProjects(String email) {
+
         // 사용자 정보
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(NOT_EXISTS_USER));
+        User user = findUserByEmail(email);
 
         // 프로젝트 멤버 정보
         List<ProjectMember> projectMemberList = projectMemberRepository.findByUser(user);
@@ -135,6 +137,13 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     // =================================================================================================================
+
+    /**
+     * 이메일로 User 가져오기
+     */
+    private User findUserByEmail(String email) {
+        return userRepository.findByEmail(email).orElseThrow(() -> new CustomException(NOT_EXISTS_USER));
+    }
 
     /**
      * 사용자 식별 번호를 이용하여 사용자 엔티티 가져오기
@@ -254,13 +263,18 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     /**
-     * 프로젝트 식별 번호를 통해 프로젝트 관리자를 가져온다.
+     * 프로젝트를 통해 프로젝트 관리자를 가져온다.
      */
     private ProjectMember getAdminMember(Project project) {
         List<ProjectMember> projectMembers = projectMemberRepository.findByProject(project);
 
-        // 관리자(L) 멤버 조회
-        return findAdminMember(projectMembers);
+        for (ProjectMember member : projectMembers) {
+            if (member.getPosition() == 'L') {
+                return member;
+            }
+        }
+        throw new CustomException(NOT_EXISTS_ADMIN_MEMBER);
+
     }
 
     /**

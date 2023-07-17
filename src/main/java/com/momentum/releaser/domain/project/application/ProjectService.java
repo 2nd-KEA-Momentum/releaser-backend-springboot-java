@@ -12,7 +12,7 @@ public interface ProjectService {
     /**
      * 3.1 프로젝트 생성
      */
-    ProjectInfoRes createProject(Long userId, ProjectInfoReq projectInfoReq) throws IOException;
+    ProjectInfoRes createProject(String email, ProjectInfoReq projectInfoReq) throws IOException;
 
     /**
      * 3.2 프로젝트 수정
@@ -27,5 +27,5 @@ public interface ProjectService {
     /**
      * 3.4 프로젝트 조회
      */
-    GetProjectRes getProjects(Long userId);
+    GetProjectRes getProjects(String email);
 }
