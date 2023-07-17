@@ -26,7 +26,7 @@ public class ProjectController {
     /**
      * 3.1 프로젝트 생성
      */
-    @PostMapping("/{userId}/project")
+    @PostMapping("/project")
     public BaseResponse<ProjectInfoRes> createProject(
             @PathVariable @Min(1) Long userId,
             @Valid @RequestBody ProjectInfoReq registerReq) {
