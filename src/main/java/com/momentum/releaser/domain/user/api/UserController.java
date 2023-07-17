@@ -3,8 +3,13 @@ package com.momentum.releaser.domain.user.api;
 import com.momentum.releaser.domain.user.application.UserServiceImpl;
 import com.momentum.releaser.domain.user.dto.UserResponseDto.UserProfileImgResponseDto;
 import com.momentum.releaser.global.config.BaseResponse;
+import com.momentum.releaser.global.jwt.UserPrincipal;
+import com.momentum.releaser.global.jwt.UserRoleEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -52,5 +57,12 @@ public class UserController {
             @PathVariable @Min(value = 1, message = "사용자 식별 번호는 1 이상의 숫자여야 합니다.") Long userId) {
 
         return new BaseResponse<>(userService.deleteUserProfileImg(userId));
+    }
+
+//    @Secured(value = UserRoleEnum.Authority.ADMIN)
+    @GetMapping("/test")
+    public String test(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+        String userEmail = userPrincipal.getEmail();
+        return "email : " + userEmail;
     }
 }

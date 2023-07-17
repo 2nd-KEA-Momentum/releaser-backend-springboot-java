@@ -11,11 +11,13 @@ import com.momentum.releaser.domain.user.dto.TokenDto;
 import com.momentum.releaser.global.config.BaseResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotNull;
+import java.nio.file.attribute.UserPrincipal;
 
 @Slf4j
 @RestController
@@ -47,6 +49,8 @@ public class AuthController {
 
     }
 
+
+
     /**
      * 2.3 카카오 로그인
      */
@@ -58,6 +62,7 @@ public class AuthController {
     /**
      * 2.5 로그아웃
      */
+
 
 
 }

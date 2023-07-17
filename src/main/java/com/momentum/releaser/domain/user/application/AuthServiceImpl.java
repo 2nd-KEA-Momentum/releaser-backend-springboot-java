@@ -78,7 +78,7 @@ public class AuthServiceImpl implements AuthService{
         // 3. 인증 정보를 기반으로 JWT 토큰 생성
         TokenDto tokenDto = jwtTokenProvider.generateToken(authentication);
 
-        // Refresh토큰 있는지 확인
+        // Refresh 토큰 있는지 확인
         Optional<RefreshToken> refreshToken = refreshTokenRepository.findByUserEmail(userLoginReq.getEmail());
 
         // 있다면 새토큰 발급후 업데이트
