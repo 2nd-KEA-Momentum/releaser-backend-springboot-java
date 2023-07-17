@@ -49,6 +49,18 @@ public class ReleaseRepositoryImpl implements ReleaseRepositoryCustom {
     }
 
     /**
+     * 특정 프로젝트의 모든 릴리즈 노트 버전을 가져온다.
+     */
+    @Override
+    public List<String> findAllVersionsByProject(Project project) {
+        return queryFactory
+                .select(releaseNote.version)
+                .from(releaseNote)
+                .where(releaseNote.project.eq(project))
+                .fetch();
+    }
+
+    /**
      * 수정하려는 릴리즈의 기존 버전 값을 뺀 나머지를 전달한다.
      */
     @Override

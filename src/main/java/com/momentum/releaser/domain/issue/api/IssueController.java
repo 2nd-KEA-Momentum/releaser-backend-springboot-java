@@ -3,14 +3,15 @@ package com.momentum.releaser.domain.issue.api;
 import com.momentum.releaser.domain.issue.application.IssueService;
 import com.momentum.releaser.domain.issue.dto.IssueReqDto.IssueInfoReq;
 import com.momentum.releaser.domain.issue.dto.IssueReqDto.UpdateLifeCycleReq;
-import com.momentum.releaser.domain.issue.dto.IssueResDto;
 import com.momentum.releaser.domain.issue.dto.IssueResDto.GetConnectionIssues;
 import com.momentum.releaser.domain.issue.dto.IssueResDto.GetDoneIssues;
 import com.momentum.releaser.domain.issue.dto.IssueResDto.GetIssuesList;
 import com.momentum.releaser.domain.issue.dto.IssueResDto.OpinionInfoRes;
 import com.momentum.releaser.global.config.BaseResponse;
+import com.momentum.releaser.global.jwt.UserPrincipal;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -43,11 +44,12 @@ public class IssueController {
     /**
      * 7.2 이슈 수정
      */
-    @PatchMapping("/{issueId}/member/{memberId}")
+    @PatchMapping("/issue/{issueId}")
     public BaseResponse<String> updateIssue(@PathVariable @Min(1) Long issueId,
-                                            @PathVariable @Min(1) Long memberId,
+                                            @AuthenticationPrincipal UserPrincipal userPrincipal,
                                             @Valid @RequestBody IssueInfoReq updateReq) {
-        return new BaseResponse<>(issueService.updateIssue(issueId, memberId, updateReq));
+        String email = userPrincipal.getEmail();
+        return new BaseResponse<>(issueService.updateIssue(issueId, email, updateReq));
     }
 
     /**

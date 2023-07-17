@@ -111,7 +111,7 @@ public class IssueRepositoryImpl implements IssueRepositoryCustom{
                 .leftJoin(issue.member, member)
                 .leftJoin(member.user, user)
                 .where(issue.project.eq(getProject)
-                        .and(issue.lifeCycle.eq(LifeCycle.valueOf("Done")))
+                        .and(issue.lifeCycle.eq(LifeCycle.valueOf("DONE")))
                         .and(issue.release.isNull()))
                 .fetchResults().getResults();
 

@@ -1,6 +1,6 @@
 package com.momentum.releaser.domain.release.api;
 
-import com.momentum.releaser.domain.release.application.ReleaseServiceImpl;
+import com.momentum.releaser.domain.release.application.ReleaseService;
 import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.*;
 import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.*;
 import com.momentum.releaser.global.config.BaseResponse;
@@ -21,7 +21,7 @@ import java.util.List;
 @Validated
 public class ReleaseController {
 
-    private final ReleaseServiceImpl releaseService;
+    private final ReleaseService releaseService;
 
     /**
      * 5.1 프로젝트별 릴리즈 노트 목록 조회
@@ -37,7 +37,7 @@ public class ReleaseController {
      * 5.2 릴리즈 노트 생성
      */
     @PostMapping(value = "/projects/{projectId}")
-    public BaseResponse<ReleaseCreateResponseDto> createReleaseNote(
+    public BaseResponse<ReleaseCreateAndUpdateResponseDto> createReleaseNote(
             @PathVariable @Min(value = 1, message = "프로젝트 식별 번호는 1 이상의 숫자여야 합니다.") Long projectId,
             @RequestBody @Valid ReleaseCreateRequestDto releaseCreateRequestDto) {
 
@@ -48,7 +48,7 @@ public class ReleaseController {
      * 5.3 릴리즈 노트 수정
      */
     @PatchMapping(value = "/{releaseId}")
-    public BaseResponse<String> updateReleaseNote(
+    public BaseResponse<ReleaseCreateAndUpdateResponseDto> updateReleaseNote(
             @PathVariable @Min(value = 1, message = "릴리즈 식별 번호는 1 이상의 숫자여야 합니다.") Long releaseId,
             @RequestBody @Valid ReleaseUpdateRequestDto releaseUpdateRequestDto) {
 

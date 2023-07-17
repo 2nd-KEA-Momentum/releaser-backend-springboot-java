@@ -15,9 +15,7 @@ import com.momentum.releaser.domain.release.domain.ReleaseApproval;
 import com.momentum.releaser.domain.release.domain.ReleaseEnum.ReleaseDeployStatus;
 import com.momentum.releaser.domain.release.domain.ReleaseNote;
 import com.momentum.releaser.domain.release.domain.ReleaseOpinion;
-import com.momentum.releaser.domain.release.dto.ReleaseDataDto;
 import com.momentum.releaser.domain.release.dto.ReleaseDataDto.CoordinateDataDto;
-import com.momentum.releaser.domain.release.dto.ReleaseDataDto.ReleaseOpinionsDataDto;
 import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.*;
 import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.*;
 import com.momentum.releaser.domain.release.mapper.ReleaseMapper;
@@ -27,10 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.momentum.releaser.global.config.BaseResponseStatus.*;
@@ -62,7 +57,7 @@ public class ReleaseServiceImpl implements ReleaseService {
      */
     @Transactional
     @Override
-    public ReleaseCreateResponseDto createReleaseNote(Long projectId, ReleaseCreateRequestDto releaseCreateRequestDto) {
+    public ReleaseCreateAndUpdateResponseDto createReleaseNote(Long projectId, ReleaseCreateRequestDto releaseCreateRequestDto) {
         // 먼저, 클라이언트로부터 받아온 릴리즈 노트를 저장한다.
         ReleaseNote savedReleaseNote = saveReleaseNote(projectId, releaseCreateRequestDto, createReleaseVersion(projectId, releaseCreateRequestDto.getVersionType()));
 
@@ -75,7 +70,7 @@ public class ReleaseServiceImpl implements ReleaseService {
         // 생성한 릴리즈 노트에 대한 동의 테이블을 생성한다.
         createReleaseApprovals(savedReleaseNote);
 
-        return ReleaseMapper.INSTANCE.toReleaseCreateResponseDto(savedReleaseNote);
+        return ReleaseMapper.INSTANCE.toReleaseCreateAndUpdateResponseDto(savedReleaseNote);
     }
 
     /**
@@ -83,7 +78,7 @@ public class ReleaseServiceImpl implements ReleaseService {
      */
     @Transactional
     @Override
-    public String updateReleaseNote(Long releaseId, ReleaseUpdateRequestDto releaseUpdateRequestDto) {
+    public ReleaseCreateAndUpdateResponseDto updateReleaseNote(Long releaseId, ReleaseUpdateRequestDto releaseUpdateRequestDto) {
         // 수정된 릴리즈 노트 내용을 반영 및 저장한다.
         ReleaseNote updatedReleaseNote = updateAndSaveReleaseNote(releaseId, releaseUpdateRequestDto, updateReleaseVersion(releaseId, releaseUpdateRequestDto.getVersion()));
 
@@ -93,7 +88,7 @@ public class ReleaseServiceImpl implements ReleaseService {
         // 배포 상태에 따른 알림을 보낸다.
         alertReleaseNoteDeploy(updatedReleaseNote);
 
-        return "릴리즈 노트 수정에 성공하였습니다.";
+        return ReleaseMapper.INSTANCE.toReleaseCreateAndUpdateResponseDto(updatedReleaseNote);
     }
 
     /**
@@ -233,9 +228,10 @@ public class ReleaseServiceImpl implements ReleaseService {
         String newVersion = "";
 
         // 데이터베이스로부터 가장 최신의 버전을 가져온다.
-        Optional<ReleaseNote> optionalReleaseNote = releaseRepository.findLatestVersionByProject(project);
+//        Optional<ReleaseNote> optionalReleaseNote = releaseRepository.findLatestVersionByProject(project);
+        List<String> releaseVersions = releaseRepository.findAllVersionsByProject(project);
 
-        if (optionalReleaseNote.isEmpty()) {  // 데이터베이스에서 가장 최신의 버전을 가져오지 못한 경우
+        if (releaseVersions.isEmpty()) {  // 데이터베이스에서 가장 최신의 버전을 가져오지 못한 경우
             int size = releaseRepository.findAllByProject(project).size();
 
             if (size != 0) {
@@ -245,11 +241,14 @@ public class ReleaseServiceImpl implements ReleaseService {
             }
 
         } else {  // 데이터베이스에서 가장 최신의 버전을 가져온 경우
-            String latestVersion = optionalReleaseNote.get().getVersion();
+            releaseVersions = getLatestVersion(releaseVersions);
+            String latestVersion = releaseVersions.get(0);
+            log.info("latestVersion: {}", latestVersion);
 
-            int latestMajorVersion = latestVersion.charAt(0) - 48;
-            int latestMinorVersion = latestVersion.charAt(2) - 48;
-            int latestPatchVersion = latestVersion.charAt(4) - 48;
+            String[] eachVersion = latestVersion.split("\\.");
+            int latestMajorVersion = Integer.parseInt(eachVersion[0]);
+            int latestMinorVersion = Integer.parseInt(eachVersion[1]);
+            int latestPatchVersion = Integer.parseInt(eachVersion[2]);
 
             // 버전 종류에 따른 버전을 생성한다.
             switch (versionType.toUpperCase()) {
@@ -274,6 +273,67 @@ public class ReleaseServiceImpl implements ReleaseService {
     }
 
     /**
+     * 버전을 내림차순으로 정렬한다. 이렇게 되면 가장 첫 번째 요소가 제일 큰/최신 버전이 된다.
+     */
+    private List<String> getLatestVersion(List<String> versions) {
+        versions.sort(new Comparator<String>() {
+            @Override
+            public int compare(String v1, String v2) {
+                String[] v1s = v1.split("\\.");
+                String[] v2s = v2.split("\\.");
+
+                int majorV1 = Integer.parseInt(v1s[0]);
+                int minorV1 = Integer.parseInt(v1s[1]);
+                int patchV1 = Integer.parseInt(v1s[2]);
+
+                int majorV2 = Integer.parseInt(v2s[0]);
+                int minorV2 = Integer.parseInt(v2s[1]);
+                int patchV2 = Integer.parseInt(v2s[2]);
+
+                if (majorV1 != majorV2) {
+                    return Integer.compare(majorV2, majorV1);
+                } else if (minorV1 != minorV2) {
+                    return Integer.compare(minorV2, minorV1);
+                } else {
+                    return Integer.compare(patchV2, patchV1);
+                }
+            }
+        });
+
+        return versions;
+    }
+
+    private List<String> sortVersionByAsc(List<String> versions) {
+
+        versions.sort(new Comparator<String>() {
+
+            @Override
+            public int compare(String v1, String v2) {
+                String[] v1s = v1.split("\\.");
+                String[] v2s = v2.split("\\.");
+
+                int majorV1 = Integer.parseInt(v1s[0]);
+                int minorV1 = Integer.parseInt(v1s[1]);
+                int patchV1 = Integer.parseInt(v1s[2]);
+
+                int majorV2 = Integer.parseInt(v2s[0]);
+                int minorV2 = Integer.parseInt(v2s[1]);
+                int patchV2 = Integer.parseInt(v2s[2]);
+
+                if (majorV1 != majorV2) {
+                    return Integer.compare(majorV1, majorV2);
+                } else if (minorV1 != minorV2) {
+                    return Integer.compare(minorV1, minorV2);
+                } else {
+                    return Integer.compare(patchV1, patchV2);
+                }
+            }
+        });
+
+        return versions;
+    }
+
+    /**
      * 릴리즈 노트 엔티티 객체를 생성한 후, 데이터베이스에 저장한다.
      */
     private ReleaseNote saveReleaseNote(Long projectId, ReleaseCreateRequestDto releaseCreateRequestDto, String newVersion) {
@@ -285,7 +345,6 @@ public class ReleaseServiceImpl implements ReleaseService {
                 .content(releaseCreateRequestDto.getContent())
                 .summary(releaseCreateRequestDto.getSummary())
                 .version(newVersion)
-                .deployDate(releaseCreateRequestDto.getDeployDate())
                 .project(project)
                 .coordX(releaseCreateRequestDto.getCoordX())
                 .coordY(releaseCreateRequestDto.getCoordY())
@@ -307,13 +366,20 @@ public class ReleaseServiceImpl implements ReleaseService {
         // 먼저 연결된 이슈를 모두 해제한다.
         disconnectIssues(releaseNote);
 
+        Date date = new Date();
+
+        // 배포 상태에 따라 배포 날짜 값을 결정한다.
+        if (releaseUpdateRequestDto.getDeployStatus().equals("DEPLOYED")) {
+            date = new Date();
+        }
+
         // 수정된 내용을 반영한다.
         releaseNote.updateReleaseNote(
                 releaseUpdateRequestDto.getTitle(),
                 releaseUpdateRequestDto.getContent(),
                 releaseUpdateRequestDto.getSummary(),
                 updatedVersion,
-                releaseUpdateRequestDto.getDeployDate(),
+                date,
                 ReleaseDeployStatus.valueOf(releaseUpdateRequestDto.getDeployStatus())
         );
 
@@ -442,7 +508,9 @@ public class ReleaseServiceImpl implements ReleaseService {
         versions.add(version);
 
         // 4. 변경하려는 버전이 포함된 릴리즈 버전 배열을 오름차순으로 정렬한다.
-        Collections.sort(versions);
+//        Collections.sort(versions);
+        versions = sortVersionByAsc(versions);
+        log.info("updateReleaseVersion/versions: {}", versions);
 
         // 5. 바꾸려는 버전 값이 올바른 버전 값인지를 확인한다.
         validateCorrectVersion(versions);
@@ -454,9 +522,9 @@ public class ReleaseServiceImpl implements ReleaseService {
      * 클라이언트가 수정하고자 하는 버전이 올바른 버전인지 검증한다.
      */
     private void validateCorrectVersion(List<String> versions) {
-        int[] majors = versions.stream().mapToInt(v -> v.charAt(0) - 48).toArray();
-        int[] minors = versions.stream().mapToInt(v -> v.charAt(2) - 48).toArray();
-        int[] patches = versions.stream().mapToInt(v -> v.charAt(4) - 48).toArray();
+        int[] majors = versions.stream().mapToInt(v -> Integer.parseInt(v.split("\\.")[0])).toArray();
+        int[] minors = versions.stream().mapToInt(v -> Integer.parseInt(v.split("\\.")[1])).toArray();
+        int[] patches = versions.stream().mapToInt(v -> Integer.parseInt(v.split("\\.")[2])).toArray();
 
         int majorStartIdx = 0;
         int minorStartIdx = 0;
@@ -503,7 +571,7 @@ public class ReleaseServiceImpl implements ReleaseService {
      */
     private void validateMinorVersion(int[] minors, int[] patches, int start, int end, int minorStartIdx) {
 
-        if (end == 0) {
+        if (end - start == 0) {
             return;
         }
 
@@ -524,7 +592,7 @@ public class ReleaseServiceImpl implements ReleaseService {
 
             // 만약 그 다음 번째 마이너 버전 숫자가 바뀌는 경우 넘어가기 전에 패치 버전 숫자를 확인한다.
             if (nextMinor - currentMinor == 1) {
-                validatePatchVersion(patches, minorStartIdx, i + 1);
+                validatePatchVersion(patches, minorStartIdx, i);
                 minorStartIdx = i + 1;
 
                 // 마이너 버전 숫자가 바뀌었을 때 패치 버전 숫자는 0이어야 한다.
@@ -540,7 +608,7 @@ public class ReleaseServiceImpl implements ReleaseService {
      */
     private void validatePatchVersion(int[] patches, int start, int end) {
 
-        if (end == 0) {
+        if (end - start == 0) {
             return;
         }
 
