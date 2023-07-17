@@ -1,6 +1,7 @@
 package com.momentum.releaser.domain.user.domain;
 
 import com.momentum.releaser.global.common.BaseTime;
+import com.momentum.releaser.global.jwt.AuthProvider;
 import com.sun.istack.NotNull;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -48,6 +49,7 @@ public class AuthSocial extends BaseTime {
         this.token = token;
         this.status = status;
     }
+
 
     /**
      * insert 되기전 (persist 되기전) 실행된다.

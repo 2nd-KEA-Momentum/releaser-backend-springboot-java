@@ -3,8 +3,10 @@ package com.momentum.releaser.domain.project.api;
 import com.momentum.releaser.domain.project.application.ProjectService;
 import com.momentum.releaser.domain.project.dto.ProjectReqDto.ProjectInfoReq;
 import com.momentum.releaser.global.config.BaseResponse;
+import com.momentum.releaser.global.jwt.UserPrincipal;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,6 +37,7 @@ public class ProjectController {
 
         return new BaseResponse<>(projectService.createProject(userId, projectInfoReq));
     }
+
 
     /**
      * 3.2 프로젝트 수정

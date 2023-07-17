@@ -2,28 +2,32 @@ package com.momentum.releaser.domain.user.dto;
 
 import lombok.AccessLevel;
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
-public class UserResponseDto {
+public class AuthResDto {
 
     /**
-     * 1.1 사용자 프로필 이미지 조회
+     * 회원가입
      */
-    @Getter
+    @Data
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    public static class UserProfileImgResponseDto {
+    public static class UserInfoRes {
         private Long userId;
         private String name;
-        private String img;
+        private String email;
 
         @Builder
-        public UserProfileImgResponseDto(Long userId, String name, String img) {
+        public UserInfoRes(Long userId, String name, String email) {
             this.userId = userId;
             this.name = name;
-            this.img = img;
+            this.email = email;
         }
     }
+
+    /**
+     * 로그인
+     */
 
 
 }

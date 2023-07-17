@@ -17,6 +17,9 @@ import com.momentum.releaser.domain.release.dao.release.ReleaseRepository;
 import com.momentum.releaser.domain.release.domain.ReleaseEnum;
 import com.momentum.releaser.domain.release.domain.ReleaseEnum.ReleaseDeployStatus;
 import com.momentum.releaser.domain.release.domain.ReleaseNote;
+import com.momentum.releaser.domain.user.dao.UserRepository;
+import com.momentum.releaser.domain.user.domain.User;
+import com.momentum.releaser.domain.user.dto.UserResponseDto;
 import com.momentum.releaser.global.config.BaseException;
 import com.momentum.releaser.global.config.BaseResponse;
 import com.momentum.releaser.global.config.BaseResponseStatus;
@@ -44,6 +47,7 @@ public class IssueServiceImpl implements IssueService {
     private final IssueNumRepository issueNumRepository;
     private final ProjectRepository projectRepository;
     private final ProjectMemberRepository projectMemberRepository;
+    private final UserRepository userRepository;
     private final ReleaseRepository releaseRepository;
     private final ModelMapper modelMapper;
 
@@ -79,6 +83,10 @@ public class IssueServiceImpl implements IssueService {
                 .orElseThrow(() -> new CustomException(BaseResponseStatus.NOT_EXISTS_PROJECT_MEMBER));
     }
 
+    private ProjectMember findProjectMemberByUserAndProject (User user, Project project) {
+        return projectMemberRepository.findByUserAndProject(user, project);
+    }
+
     // projectId로 프로젝트 찾기
     private Project findProject(Long projectId) {
         return projectRepository.findById(projectId)
@@ -108,22 +116,26 @@ public class IssueServiceImpl implements IssueService {
      */
     @Override
     @Transactional
-    public String updateIssue(Long issueId, Long memberId, IssueInfoReq updateReq) {
+    public String updateIssue(Long issueId, String email, IssueInfoReq updateReq) {
         // 이슈 정보 조회
         Issue issue = findIssue(issueId);
 
-        //edit check
-        char edit = editCheck(memberId);
+        //User
+        User user = findUserByEmail(email);
+        ProjectMember projectMember = findProjectMemberByUserAndProject(user, issue.getProject());
 
-        ProjectMember projectMember = null;
+        //edit check
+        char edit = editCheck(projectMember.getMemberId());
+
+        ProjectMember manager = null;
         // 담당자 memberId가 null이 아닌 경우 프로젝트 멤버 조회
         if (updateReq.getMemberId() != null) {
-            projectMember = findProjectMember(updateReq.getMemberId());
+            manager = findProjectMember(updateReq.getMemberId());
         }
 
 
         // 이슈 업데이트
-        issue.updateIssue(updateReq, edit, projectMember);
+        issue.updateIssue(updateReq, edit, manager);
         issueRepository.save(issue);
 
         String result = "이슈 수정이 완료되었습니다.";
@@ -134,6 +146,12 @@ public class IssueServiceImpl implements IssueService {
     private Issue findIssue(Long issueId) {
         return issueRepository.findById(issueId)
                 .orElseThrow(() -> new CustomException(NOT_EXISTS_ISSUE));
+    }
+
+    //email로 user 조회
+    private User findUserByEmail(String email) {
+        return userRepository.findOneByEmail(email).orElseThrow(() -> new CustomException(NOT_EXISTS_USER));
+
     }
 
     // 멤버의 역할에 따라 edit 상태를 결정

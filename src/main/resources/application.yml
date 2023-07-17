@@ -15,6 +15,7 @@ spring:
         #        show_sql: true
         format_sql: true
         use_sql_comments: true
+
   security:
     oauth2:
       client:
@@ -22,9 +23,10 @@ spring:
           google:
             client-id: ${SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_ID}
             client-secret: ${SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET}
-            scope:
-              -email
-              -profile
+            scope: email,profile
+jwt:
+  secret:
+    key: ${JWT_SECRET_KEY}
 
 cloud:
   aws:

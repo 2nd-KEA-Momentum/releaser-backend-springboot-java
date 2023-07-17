@@ -3,14 +3,11 @@ package com.momentum.releaser.domain.project.application;
 import com.momentum.releaser.domain.project.dto.ProjectReqDto.ProjectInfoReq;
 import com.momentum.releaser.domain.project.dto.ProjectResDto.GetProjectRes;
 import com.momentum.releaser.domain.project.dto.ProjectResDto.ProjectInfoRes;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
-/**
- * @see ProjectServiceImpl
- */
 public interface ProjectService {
+
 
     /**
      * 3.1 프로젝트 생성

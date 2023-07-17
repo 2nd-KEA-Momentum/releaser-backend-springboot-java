@@ -17,7 +17,7 @@ public interface IssueService {
     /**
      * 7.2 이슈 수정
      */
-    String updateIssue(Long issueId, Long memberId, IssueInfoReq updateReq);
+    String updateIssue(Long issueId, String email, IssueInfoReq updateReq);
 
     /**
      * 7.3 이슈 제거
