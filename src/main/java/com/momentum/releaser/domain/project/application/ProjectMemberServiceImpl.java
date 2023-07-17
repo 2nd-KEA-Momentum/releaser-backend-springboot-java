@@ -6,6 +6,7 @@ import com.momentum.releaser.domain.project.domain.Project;
 import com.momentum.releaser.domain.project.domain.ProjectMember;
 import com.momentum.releaser.domain.project.dto.ProjectResDto;
 import com.momentum.releaser.domain.project.dto.ProjectResDto.GetMembersRes;
+import com.momentum.releaser.domain.project.mapper.ProjectMemberMapper;
 import com.momentum.releaser.domain.release.dao.approval.ReleaseApprovalRepository;
 import com.momentum.releaser.domain.user.dao.UserRepository;
 import com.momentum.releaser.domain.user.domain.User;
@@ -39,32 +40,38 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
      */
     @Override
     @Transactional
-    public List<GetMembersRes> getMembers(Long memberId, Long projectId) {
-        Project project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new CustomException(NOT_EXISTS_PROJECT));
+    public List<GetMembersRes> getMembers(Long projectId, String email) {
+        //Token UserInfo
+        User user = findUserByEmail(email);
+        Project project = findProject(projectId);
 
+        ProjectMember accessMember = findProjectMember(user, project);
 
         List<GetMembersRes> getMembersRes = projectMemberRepository.findByProject(project)
                 .stream()
-                .map(member -> createGetMembersRes(member, memberId))
+                .map(member -> createGetMembersRes(member, accessMember))
                 .collect(Collectors.toList());
 
         return getMembersRes;
     }
 
+    //email로 User 조회
+    private User findUserByEmail(String email) {
+        return userRepository.findByEmail(email).orElseThrow(() -> new CustomException(NOT_EXISTS_USER));
+    }
+
+    //projectId로 project 조회
+    private Project findProject(Long projectId) {
+        return projectRepository.findById(projectId)
+                .orElseThrow(() -> new CustomException(NOT_EXISTS_PROJECT));
+    }
+
     //GetMembersRes 객체를 생성
-    private GetMembersRes createGetMembersRes(ProjectMember projectMember, Long memberId) {
-        User user = projectMember.getUser();
-        GetMembersRes getMembersRes = modelMapper.map(projectMember, GetMembersRes.class);
-        getMembersRes.setUserId(user.getUserId());
-        getMembersRes.setName(user.getName());
-        getMembersRes.setImg(user.getImg());
-        getMembersRes.setPosition(projectMember.getPosition());
-
-        ProjectMember accessMember = projectMemberRepository.findById(memberId).orElseThrow(() -> new CustomException(NOT_EXISTS_PROJECT_MEMBER));
-
+    private GetMembersRes createGetMembersRes(ProjectMember projectMember, ProjectMember accessMember) {
         char position = accessMember.getPosition();
         char deleteYN = (position == 'L') ? 'Y' : 'N';
+
+        GetMembersRes getMembersRes = ProjectMemberMapper.INSTANCE.toGetMembersRes(projectMember);
         getMembersRes.setDeleteYN(deleteYN);
 
         return getMembersRes;
@@ -81,13 +88,24 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
      */
     @Override
     @Transactional
-    public String deleteMember(Long memberId) {
+    public String deleteMember(Long memberId, String email) {
+        //Token UserInfo
+        User user = findUserByEmail(email);
+
         //project member 정보
         ProjectMember projectMember = projectMemberRepository.findById(memberId).orElseThrow(() -> new CustomException(NOT_EXISTS_PROJECT_MEMBER));
-        projectMemberRepository.deleteById(projectMember.getMemberId());
-        releaseApprovalRepository.deleteByReleaseApproval();
-        String result = "프로젝트 멤버가 제거되었습니다.";
-        return result;
+        ProjectMember accessMember = findProjectMember(user, projectMember.getProject());
+
+        //해당 프로젝트의 관리자만 멤버 제거 가능
+        if (accessMember.getPosition() == 'L') {
+            projectMemberRepository.deleteById(projectMember.getMemberId());
+            releaseApprovalRepository.deleteByReleaseApproval();
+            String result = "프로젝트 멤버가 제거되었습니다.";
+            return result;
+        } else {
+            throw new CustomException(NOT_PROJECT_PM);
+        }
+
     }
 
     /**
@@ -95,12 +113,10 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
      */
     @Override
     @Transactional
-    public String withdrawMember(Long userId, Long projectId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(NOT_EXISTS_USER));
+    public String withdrawMember(Long projectId, String email) {
+        User user = findUserByEmail(email);
 
-        Project project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new CustomException(NOT_EXISTS_PROJECT));
+        Project project = findProject(projectId);
 
         //project member 찾기
         ProjectMember member = findProjectMember(user, project);
@@ -119,7 +135,6 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
 
     //project member status = 'N'
     private void deactivateProjectMember(ProjectMember member) {
-
         member.statusToInactive();
     }
 
