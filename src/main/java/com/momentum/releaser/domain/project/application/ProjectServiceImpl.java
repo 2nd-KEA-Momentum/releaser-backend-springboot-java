@@ -10,6 +10,7 @@ import com.momentum.releaser.domain.project.dto.ProjectReqDto.ProjectInfoReq;
 import com.momentum.releaser.domain.project.dto.ProjectResDto.GetProject;
 import com.momentum.releaser.domain.project.dto.ProjectResDto.GetProjectRes;
 import com.momentum.releaser.domain.project.dto.ProjectResDto.ProjectInfoRes;
+import com.momentum.releaser.domain.project.mapper.ProjectMapper;
 import com.momentum.releaser.domain.release.dao.approval.ReleaseApprovalRepository;
 import com.momentum.releaser.domain.user.dao.UserRepository;
 import com.momentum.releaser.domain.user.domain.User;
@@ -20,6 +21,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,6 +59,11 @@ public class ProjectServiceImpl implements ProjectService {
         ProjectInfoRes projectInfoRes = createProjectInfoResponse(newProject, user, projectMember);
 
         return projectInfoRes;
+    }
+
+    //email로 user 조회
+    private User findUserByEmail(String email) {
+        return userRepository.findByEmail(email).orElseThrow(() -> new CustomException(NOT_EXISTS_USER));
     }
 
     // 프로젝트 생성
@@ -100,9 +107,9 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     @Transactional
     public ProjectInfoRes updateProject(Long projectId, ProjectInfoReq updateReq) {
+
         // 프로젝트 정보
-        Project project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new CustomException(NOT_EXISTS_PROJECT));
+        Project project = findProject(projectId);
 
         // 프로젝트 업데이트
         project.updateProject(updateReq);
@@ -132,6 +139,12 @@ public class ProjectServiceImpl implements ProjectService {
             }
         }
         throw new CustomException(NOT_EXISTS_ADMIN_MEMBER);
+    }
+
+    //projectId로 Project 조회
+    private Project findProject(Long projectId) {
+        return projectRepository.findById(projectId)
+                .orElseThrow(() -> new CustomException(NOT_EXISTS_PROJECT));
     }
 
 

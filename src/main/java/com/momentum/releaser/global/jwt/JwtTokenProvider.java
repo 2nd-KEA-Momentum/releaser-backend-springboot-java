@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 
 import com.momentum.releaser.domain.user.dto.TokenDto;
 import com.momentum.releaser.global.security.CustomUserDetailsService;
+import io.jsonwebtoken.io.Decoders;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -53,13 +54,8 @@ public class JwtTokenProvider {
 
     @PostConstruct
     public void init() {
-        try {
-            byte[] bytes = Base64.getDecoder().decode(secretKey);
-            key = Keys.hmacShaKeyFor(bytes);
-        } catch (IllegalArgumentException e) {
-            log.error("Invalid secretKey format. Please check your jwt.secret.key value in the application properties.", e);
-            // 예외 처리 또는 로깅 등 필요한 작업을 수행합니다.
-        }
+        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
+        this.key = Keys.hmacShaKeyFor(keyBytes);
     }
 
 //    public JwtTokenProvider(@Value("${jwt.secret.key}") String secretKey) {
@@ -83,14 +79,14 @@ public class JwtTokenProvider {
                 .setSubject(authentication.getName())
                 .claim("auth", authorities)
                 .setExpiration(accessTokenExpiresIn)
-                .signWith(SignatureAlgorithm.HS256, secretKey)
+                .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
 
         // Refresh Token 생성
         // 7일: 7*24*60*60*1000 = 604,800,000
         String refreshToken = Jwts.builder()
                 .setExpiration(new Date(now + 604800000))
-                .signWith(SignatureAlgorithm.HS256, secretKey)
+                .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
 
         return TokenDto.builder()
@@ -125,7 +121,7 @@ public class JwtTokenProvider {
     // 토큰 정보를 검증하는 메서드
     public boolean validateToken(String token) {
         try {
-            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
+            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
             return true;
         } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
             log.info("Invalid JWT Token", e);
