@@ -18,11 +18,13 @@ public enum BaseResponseStatus {
      */
 
     INVALID_REQUEST_BODY(false, 2000, "요청 데이터가 잘못되었습니다."),
+    NOT_PROJECT_PM(false, 2200, "해당 프로젝트의 관리자가 아닙니다."),
     INVALID_RELEASE_VERSION_TYPE(false, 2400, "릴리즈 버전 타입이 올바르지 않습니다. MAJOR, MINOR, PATCH 중 하나여야 합니다."),
     INVALID_ISSUE_TAG(false, 2500, "이슈 태그가 올바르지 않습니다."),
     INVALID_LIFECYCLE(false, 2501, "이슈 상태가 올바르지 않습니다."),
     CONNECTED_ISSUE_EXISTS(false, 2502, "릴리즈와 연결된 이슈이므로 상태 변경이 불가능합니다."),
     CONNECTED_RELEASE_EXISTS(false, 2503, "연결된 릴리즈가 존재하므로 삭제할 수 없습니다."),
+
 
     /**
      * 3000 : Response 오류

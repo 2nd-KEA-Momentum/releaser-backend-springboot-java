@@ -30,12 +30,13 @@ public class ProjectController {
     /**
      * 3.1 프로젝트 생성
      */
-    @PostMapping(value = "/{userId}/project")
+    @PostMapping(value = "/project")
     public BaseResponse<ProjectInfoRes> createProject(
-            @PathVariable @Min(value = 1, message = "사용자 식별 번호는 1 이상의 숫자여야 합니다.") Long userId,
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
             @RequestBody @Valid ProjectInfoReq projectInfoReq) throws IOException {
 
-        return new BaseResponse<>(projectService.createProject(userId, projectInfoReq));
+        String email = userPrincipal.getEmail();
+        return new BaseResponse<>(projectService.createProject(email, projectInfoReq));
     }
 
 
@@ -46,7 +47,6 @@ public class ProjectController {
     public BaseResponse<ProjectInfoRes> updateProject(
             @PathVariable @Min(value = 1, message = "프로젝트 식별 번호는 1 이상의 숫자여야 합니다.") Long projectId,
             @RequestBody @Valid ProjectInfoReq projectInfoReq) throws IOException {
-
         return new BaseResponse<>(projectService.updateProject(projectId, projectInfoReq));
     }
 
@@ -62,8 +62,9 @@ public class ProjectController {
     /**
      * 3.4 프로젝트 목록 조회
      */
-    @GetMapping("/{userId}")
-    public BaseResponse<GetProjectRes> getProjects(@PathVariable @Min(1) Long userId) {
-        return new BaseResponse<>(projectService.getProjects(userId));
+    @GetMapping("/project")
+    public BaseResponse<GetProjectRes> getProjects(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+        String email = userPrincipal.getEmail();
+        return new BaseResponse<>(projectService.getProjects(email));
     }
 }
