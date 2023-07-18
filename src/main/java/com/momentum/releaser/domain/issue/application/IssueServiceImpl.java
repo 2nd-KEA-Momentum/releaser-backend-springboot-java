@@ -32,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static com.momentum.releaser.domain.issue.dto.IssueResDto.*;
@@ -120,11 +121,12 @@ public class IssueServiceImpl implements IssueService {
         // 이슈 정보 조회
         Issue issue = findIssue(issueId);
 
-        //User
+        //Token UserInfo
         User user = findUserByEmail(email);
         ProjectMember projectMember = findProjectMemberByUserAndProject(user, issue.getProject());
 
         //edit check
+        //접근한 유저가 멤버일 경우 edit 상태 변경
         char edit = editCheck(projectMember.getMemberId());
 
         ProjectMember manager = null;
@@ -211,6 +213,7 @@ public class IssueServiceImpl implements IssueService {
                     Issue issue = findIssue(issueInfoRes.getIssueId());
                     if (issue.getRelease() != null) {
                         String deployStatus = String.valueOf(issue.getRelease().getDeployStatus());
+                        //배포 여부
                         issueInfoRes.setDeployYN(deployStatus.equals("DEPLOYED") ? 'Y' : 'N');
                     } else {
                         issueInfoRes.setDeployYN('N');
@@ -258,8 +261,12 @@ public class IssueServiceImpl implements IssueService {
      */
     @Override
     @Transactional
-    public GetIssue getIssue(Long issueId, Long memberId) {
+    public GetIssue getIssue(Long issueId, String email) {
         Issue issue = findIssue(issueId);
+        //Token UserInfo
+        User user = findUserByEmail(email);
+
+        Long memberId = findProjectMemberByUserAndProject(user, issue.getProject()).getMemberId();
         ProjectMember member = findProjectMember(memberId);
         //pm이 조회할 경우 edit 상태 변경
         updateIssueEdit(issue, member);
@@ -330,7 +337,7 @@ public class IssueServiceImpl implements IssueService {
      */
     @Override
     @Transactional
-    public String updateLifeCycle(Long issueId, UpdateLifeCycleReq lifeCycleReq) {
+    public String updateLifeCycle(Long issueId, String lifeCycle) {
         //issue 정보
         Issue issue = findIssue(issueId);
 
@@ -340,7 +347,7 @@ public class IssueServiceImpl implements IssueService {
         }
 
         //이슈 상태 변경
-        String result = changeLifeCycle(issue, lifeCycleReq.getLifeCycle().toUpperCase());
+        String result = changeLifeCycle(issue, lifeCycle.toUpperCase());
         return result;
     }
 
@@ -358,9 +365,13 @@ public class IssueServiceImpl implements IssueService {
      */
     @Override
     @Transactional
-    public List<OpinionInfoRes> registerOpinion(Long issueId, Long memberId, RegisterOpinionReq issueOpinionReq) {
+    public List<OpinionInfoRes> registerOpinion(Long issueId, String email, RegisterOpinionReq issueOpinionReq) {
         //issue
         Issue issue = findIssue(issueId);
+        //Token UserInfo
+        User user = findUserByEmail(email);
+
+        Long memberId = findProjectMemberByUserAndProject(user, issue.getProject()).getMemberId();
         //project member
         ProjectMember member = findProjectMember(memberId);
 
@@ -386,11 +397,26 @@ public class IssueServiceImpl implements IssueService {
      */
     @Override
     @Transactional
-    public String deleteOpinion(Long opinionId) {
+    public String deleteOpinion(Long opinionId, String email) {
+        //Token UserInfo
+        User user = findUserByEmail(email);
         //opinion
         IssueOpinion issueOpinion = issueOpinionRepository.findById(opinionId).orElseThrow(() -> new CustomException(NOT_EXISTS_ISSUE_OPINION));
-        //opinion soft delete
-        issueOpinionRepository.deleteById(opinionId);
-        return "해당 이슈 의견이 삭제되었습니다.";
+        //접근 유저가 해당 의견 작성자면 삭제
+        if (equalsMember(user, issueOpinion)) {
+            //opinion soft delete
+            issueOpinionRepository.deleteById(opinionId);
+            return "해당 이슈 의견이 삭제되었습니다.";
+        }
+        else {
+            throw new CustomException(NOT_ISSUE_COMMENTER);
+        }
+
+    }
+
+    private boolean equalsMember(User user, IssueOpinion opinion) {
+        Project project = opinion.getIssue().getProject();
+        Long accessMember = findProjectMemberByUserAndProject(user, project).getMemberId();
+        return Objects.equals(accessMember, opinion.getMember().getMemberId());
     }
 }

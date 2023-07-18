@@ -81,17 +81,21 @@ public class IssueResDto{
         private Long issueNum;
         private String title;
         private String tag;
+        private Date endDate;
+        private char edit;
         private Long memberId;
         private String memberName;
         private String memberImg;
 
         @Builder
         @QueryProjection
-        public GetDoneIssues(Long issueId, Long issueNum, String title, String tag, Long memberId, String memberName, String memberImg) {
+        public GetDoneIssues(Long issueId, Long issueNum, String title, String tag, Date endDate, char edit, Long memberId, String memberName, String memberImg) {
             this.issueId = issueId;
             this.issueNum = issueNum;
             this.title = title;
             this.tag = tag;
+            this.endDate = endDate;
+            this.edit = edit;
             this.memberId = memberId;
             this.memberName = memberName;
             this.memberImg = memberImg;

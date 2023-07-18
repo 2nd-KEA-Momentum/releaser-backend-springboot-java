@@ -31,8 +31,9 @@ public class IssueRepositoryImpl implements IssueRepositoryCustom{
     @Override
     public Long getIssueNum(Project project) {
         QIssueNum issueNum = QIssueNum.issueNum1;
-        Optional<IssueNum> result = Optional.ofNullable(queryFactory.
-                selectFrom(issueNum)
+        Optional<Long> result = Optional.ofNullable(queryFactory.
+                select(issueNum.issueNum.max())
+                .from(issueNum)
                 .where(
                         issueNum.project.eq(project)
                 )
@@ -41,7 +42,7 @@ public class IssueRepositoryImpl implements IssueRepositoryCustom{
 
         Long number = 0L;
         if (result.isPresent()) {
-            number = result.get().getIssueNum();
+            number = result.get();
         }
         return number;
     }
@@ -103,6 +104,8 @@ public class IssueRepositoryImpl implements IssueRepositoryCustom{
                         issue.issueNum.issueNum,
                         issue.title,
                         Expressions.stringTemplate("CAST({0} AS string)", issue.tag),
+                        issue.endDate,
+                        issue.edit,
                         member.memberId,
                         user.name.as("memberName"),
                         user.img.as("memberImg"))

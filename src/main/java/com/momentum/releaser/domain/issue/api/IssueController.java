@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.Pattern;
 import java.util.List;
 
 import static com.momentum.releaser.domain.issue.dto.IssueReqDto.*;
@@ -72,7 +73,9 @@ public class IssueController {
      * 7.5 프로젝트별 해결 & 미연결 이슈 조회
      */
     @GetMapping("/project/{projectId}/release")
-    public BaseResponse<List<GetDoneIssues>> getDoneIssues(@PathVariable @Min(1) Long projectId) {
+    public BaseResponse<List<GetDoneIssues>> getDoneIssues(@PathVariable @Min(1) Long projectId,
+                                                           @RequestParam(required =false, defaultValue = "Done") String status,
+                                                           @RequestParam(required =false, defaultValue = "false") boolean connect) {
         return new BaseResponse<>(issueService.getDoneIssues(projectId));
 
     }
@@ -83,17 +86,19 @@ public class IssueController {
      */
     @GetMapping("/project/{projectId}/release/{releaseId}")
     public BaseResponse<List<GetConnectionIssues>> getConnectRelease(@PathVariable @Min(1) Long projectId,
-                                                                     @PathVariable @Min(1) Long releaseId) {
+                                                                     @PathVariable @Min(1) Long releaseId,
+                                                                     @RequestParam(required = false, defaultValue = "false") boolean connect) {
         return new BaseResponse<>(issueService.getConnectRelease(projectId, releaseId));
     }
 
     /**
      * 7.7 이슈별 조회
      */
-    @GetMapping("/{issueId}/member/{memberId}")
+    @GetMapping("/{issueId}")
     public BaseResponse<GetIssue> getIssue(@PathVariable @Min(1) Long issueId,
-                                           @PathVariable @Min(1) Long memberId) {
-        return new BaseResponse<>(issueService.getIssue(issueId, memberId));
+                                           @AuthenticationPrincipal UserPrincipal userPrincipal) {
+        String email = userPrincipal.getEmail();
+        return new BaseResponse<>(issueService.getIssue(issueId, email));
     }
 
     /**
@@ -101,18 +106,21 @@ public class IssueController {
      */
     @PatchMapping("/{issueId}")
     public BaseResponse<String> updateLifeCycle(@PathVariable @Min(1) Long issueId,
-                                                @Valid @RequestBody UpdateLifeCycleReq lifeCycleReq) {
-        return new BaseResponse<>(issueService.updateLifeCycle(issueId, lifeCycleReq));
+                                                @RequestParam(name = "status")
+                                                @Pattern(regexp = "(?i)^(NOT_STARTED|IN_PROGRESS|DONE)$", message = "상태는 NOT_STARTED, IN_PROGRESS, DONE 중 하나여야 합니다.")
+                                                String lifeCycle) {
+        return new BaseResponse<>(issueService.updateLifeCycle(issueId, lifeCycle));
     }
 
     /**
      * 8.1 이슈 의견 추가
      */
-    @PostMapping("/{issueId}/{memberId}/opinion")
+    @PostMapping("/{issueId}/opinion")
     public BaseResponse<List<OpinionInfoRes>> registerOpinion(@PathVariable @Min(1) Long issueId,
-                                                        @PathVariable @Min(1) Long memberId,
+                                                              @AuthenticationPrincipal UserPrincipal userPrincipal,
                                                         @Valid @RequestBody RegisterOpinionReq opinionReq) {
-        return new BaseResponse<>(issueService.registerOpinion(issueId, memberId, opinionReq));
+        String email = userPrincipal.getEmail();
+        return new BaseResponse<>(issueService.registerOpinion(issueId, email, opinionReq));
 
     }
 
@@ -120,8 +128,10 @@ public class IssueController {
      * 8.2 이슈 의견 삭제
      */
     @PostMapping("/opinion/{opinionId}")
-    public BaseResponse<String> deleteOpinion(@PathVariable @Min(1) Long opinionId) {
-        return new BaseResponse<>(issueService.deleteOpinion(opinionId));
+    public BaseResponse<String> deleteOpinion(@PathVariable @Min(1) Long opinionId,
+                                              @AuthenticationPrincipal UserPrincipal userPrincipal) {
+        String email = userPrincipal.getEmail();
+        return new BaseResponse<>(issueService.deleteOpinion(opinionId, email));
     }
 
 
