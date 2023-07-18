@@ -46,13 +46,13 @@ public interface IssueService {
     /**
      * 7.7 이슈별 조회
      */
-    GetIssue getIssue(Long issueId, Long memberId);
+    GetIssue getIssue(Long issueId, String email);
 
 
     /**
      * 7.8 이슈 상태 변경
      */
-    String updateLifeCycle(Long issueId, IssueReqDto.UpdateLifeCycleReq lifeCycleReq);
+    String updateLifeCycle(Long issueId, String lifeCycle);
 
 
 
@@ -60,13 +60,13 @@ public interface IssueService {
      * 8.1 이슈 의견 추가
      */
 
-    List<OpinionInfoRes> registerOpinion(Long issueId, Long memberId, RegisterOpinionReq opinionReq);
+    List<OpinionInfoRes> registerOpinion(Long issueId, String email, RegisterOpinionReq opinionReq);
 
 
     /**
      * 8.2 이슈 의견 삭제
      */
-    String deleteOpinion(Long opinionId);
+    String deleteOpinion(Long opinionId, String email);
 
 
 }

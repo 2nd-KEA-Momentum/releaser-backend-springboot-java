@@ -69,7 +69,8 @@ public enum BaseResponseStatus {
     INVALID_ISSUE_WITH_NOT_DONE(false, 4502, "완료되지 않은 이슈는 연결할 수 없습니다."),
 
     FAILED_TO_CONNECT_ISSUE_WITH_RELEASE_NOTE(false, 4503, "이슈 연결에 실패하였습니다."),
-    NOT_EXISTS_ISSUE_OPINION(false, 4504, "존재하지 않는 이슈 의견입니다.");
+    NOT_EXISTS_ISSUE_OPINION(false, 4504, "존재하지 않는 이슈 의견입니다."),
+    NOT_ISSUE_COMMENTER(false, 4505, "해당 의견 작성자가 아닙니다.");
 
 
 
