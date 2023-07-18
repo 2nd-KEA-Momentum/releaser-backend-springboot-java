@@ -43,6 +43,7 @@ public enum BaseResponseStatus {
     FAILED_TO_UPDATE_USER_PROFILE_IMG(false, 4101, "사용자 프로필 이미지 변경에 실패하였습니다."),
     OVERLAP_CHECK_EMAIL(false, 4102, "중복된 이메일입니다."),
     NOT_MATCHES_PASSWORD(false, 4103, "일치하는 비밀번호가 없습니다."),
+    INVALID_REFRESH_TOKEN(false, 4104, "유효하지 않은 Refresh Token 입니다."),
     NOT_EXISTS_PROJECT(false, 4200, "존재하지 않는 프로젝트입니다."),
     FAILED_TO_CREATE_PROJECT(false, 4201, "프로젝트 생성에 실패하였습니다."),
 

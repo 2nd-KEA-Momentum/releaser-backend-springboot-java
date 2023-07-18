@@ -12,6 +12,7 @@ import com.momentum.releaser.domain.user.dto.AuthResDto.UserInfoRes;
 import com.momentum.releaser.domain.user.dto.TokenDto;
 import com.momentum.releaser.global.jwt.JwtTokenProvider;
 import com.momentum.releaser.global.error.CustomException;
+import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -21,6 +22,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.Optional;
 
 import static com.momentum.releaser.global.config.BaseResponseStatus.*;
@@ -81,7 +83,7 @@ public class AuthServiceImpl implements AuthService{
         // Refresh 토큰 있는지 확인
         Optional<RefreshToken> refreshToken = refreshTokenRepository.findByUserEmail(userLoginReq.getEmail());
 
-        // 있다면 새토큰 발급후 업데이트
+        // 있다면 새 토큰 발급 후 업데이트
         // 없다면 새로 만들고 디비 저장
         if(refreshToken.isPresent()) {
             refreshTokenRepository.save(refreshToken.get().updateToken(tokenDto.getRefreshToken()));
@@ -94,6 +96,31 @@ public class AuthServiceImpl implements AuthService{
 
     }
 
+    /**
+     * 2.3 Token 재발급
+     */
+    @Override
+    @Transactional
+    public TokenDto refreshUser(String accessToken, String refreshToken) {
+        String email = jwtTokenProvider.getEmailFromToken(refreshToken);
+
+        // Refresh 토큰 있는지 확인
+        Optional<RefreshToken> existRefreshToken = refreshTokenRepository.findByUserEmail(email);
+
+        // Refresh Token의 유효성 검사
+        if (existRefreshToken.isEmpty() || !jwtTokenProvider.validateToken(refreshToken)) {
+            throw new CustomException(INVALID_REFRESH_TOKEN);
+        } else {
+            Authentication authentication = jwtTokenProvider.getAuthentication(accessToken);
+            String newAccessToken = jwtTokenProvider.generateAccessToken(authentication);
+            return TokenDto.builder()
+                    .grantType("Bearer")
+                    .accessToken(newAccessToken)
+                    .refreshToken(refreshToken)
+                    .build();
+        }
+
+    }
     /**
      * 2.3 카카오 로그인
      */
