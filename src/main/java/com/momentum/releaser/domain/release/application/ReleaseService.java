@@ -10,7 +10,7 @@ public interface ReleaseService {
     /**
      * 5.1 프로젝트별 릴리즈 노트 목록 조회
      */
-    ReleasesResponseDto getReleasesByProject(Long projectId);
+    ReleasesResponseDto getReleasesByProject(String userEmail, Long projectId);
 
     /**
      * 5.2 릴리즈 노트 생성

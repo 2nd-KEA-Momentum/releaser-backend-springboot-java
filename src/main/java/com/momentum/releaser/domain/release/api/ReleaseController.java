@@ -4,8 +4,10 @@ import com.momentum.releaser.domain.release.application.ReleaseService;
 import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.*;
 import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.*;
 import com.momentum.releaser.global.config.BaseResponse;
+import com.momentum.releaser.global.jwt.UserPrincipal;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,9 +30,10 @@ public class ReleaseController {
      */
     @GetMapping(value = "/projects")
     public BaseResponse<ReleasesResponseDto> getReleases(
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
             @RequestParam @Min(value = 1, message = "프로젝트 식별 번호는 1 이상의 숫자여야 합니다.") Long projectId) {
 
-        return new BaseResponse<>(releaseService.getReleasesByProject(projectId));
+        return new BaseResponse<>(releaseService.getReleasesByProject(userPrincipal.getEmail(), projectId));
     }
 
     /**
