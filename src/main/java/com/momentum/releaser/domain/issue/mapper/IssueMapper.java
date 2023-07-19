@@ -29,6 +29,5 @@ public interface IssueMapper {
 
     @Mapping(source = "issue.issueNum.issueNum", target = "issueNum")
     @Mapping(source = "issue.member.memberId", target = "manager")
-    @Mapping(target = "deployYN", expression = "java(issue.getRelease() != null && issue.getRelease().getDeployStatus().equals(ReleaseStatus.DEPLOYED) ? 'Y' : 'N')")
     GetIssue mapToGetIssue(Issue issue, List<GetMembersRes> memberRes, List<OpinionInfoRes> opinionRes);
 }

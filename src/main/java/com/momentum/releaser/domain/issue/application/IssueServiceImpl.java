@@ -303,6 +303,8 @@ public class IssueServiceImpl implements IssueService {
 
     private GetIssue createGetIssue(Issue issue, List<GetMembersRes> memberRes, List<OpinionInfoRes> opinionRes) {
         GetIssue getIssue = IssueMapper.INSTANCE.mapToGetIssue(issue, memberRes, opinionRes);
+        String deployStatus = String.valueOf(issue.getRelease().getDeployStatus());
+        getIssue.setDeployYN(deployStatus.equals("DEPLOYED") ? 'Y' : 'N');
         return getIssue;
     }
 
