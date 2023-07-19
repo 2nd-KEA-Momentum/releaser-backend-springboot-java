@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 import java.util.List;
+import java.util.Optional;
 
 @RepositoryRestResource(collectionResourceRel="project-member", path="project-member")
 public interface ProjectMemberRepository extends JpaRepository<ProjectMember, Long> {
@@ -15,4 +16,5 @@ public interface ProjectMemberRepository extends JpaRepository<ProjectMember, Lo
     List<ProjectMember> findByUser(User user);
 
     ProjectMember findByUserAndProject(User user, Project project);
+    Optional<ProjectMember> findOneByUserAndProject(User user, Project project);
 }
