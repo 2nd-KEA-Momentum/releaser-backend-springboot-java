@@ -231,9 +231,9 @@ public class IssueServiceImpl implements IssueService {
      */
     @Override
     @Transactional
-    public List<GetDoneIssues> getDoneIssues(Long projectId) {
+    public List<GetDoneIssues> getDoneIssues(Long projectId, String status) {
         Project findProject = findProject(projectId);
-        List<GetDoneIssues> getDoneIssue = issueRepository.getDoneIssues(findProject);
+        List<GetDoneIssues> getDoneIssue = issueRepository.getDoneIssues(findProject, status.toUpperCase());
 
         return getDoneIssue;
     }
@@ -282,24 +282,6 @@ public class IssueServiceImpl implements IssueService {
 
         return getIssue;
     }
-
-//    private GetIssue createGetIssue(Issue issue, List<GetMembersRes> memberRes, List<OpinionInfoRes> opinionRes) {
-//
-//        GetIssue getIssue = mapIssueToGetIssue(issue);
-//        getIssue.setIssueNum(issue.getIssueNum().getIssueNum());
-//        getIssue.setManager(issue.getMember().getMemberId());
-//
-//        if (issue.getRelease() != null) {
-//            String deployStatus = String.valueOf(issue.getRelease().getDeployStatus());
-//            getIssue.setDeployYN(deployStatus.equals("DEPLOYED") ? 'Y' : 'N');
-//        } else {
-//            getIssue.setDeployYN('N');
-//        }
-//
-//        getIssue.setMemberList(memberRes);
-//        getIssue.setOpinionList(opinionRes);
-//        return getIssue;
-//    }
 
     private GetIssue createGetIssue(Issue issue, List<GetMembersRes> memberRes, List<OpinionInfoRes> opinionRes) {
         GetIssue getIssue = IssueMapper.INSTANCE.mapToGetIssue(issue, memberRes, opinionRes);

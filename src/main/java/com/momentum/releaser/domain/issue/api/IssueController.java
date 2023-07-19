@@ -74,9 +74,12 @@ public class IssueController {
      */
     @GetMapping("/project/{projectId}/release")
     public BaseResponse<List<GetDoneIssues>> getDoneIssues(@PathVariable @Min(1) Long projectId,
-                                                           @RequestParam(required =false, defaultValue = "Done") String status,
-                                                           @RequestParam(required =false, defaultValue = "false") boolean connect) {
-        return new BaseResponse<>(issueService.getDoneIssues(projectId));
+                                                           @RequestParam
+                                                           @Pattern(regexp = "(?i)^(DONE)$", message = "상태는 DONE 이어야 합니다.")
+                                                           String status,
+                                                           @RequestParam
+                                                               boolean connect) {
+        return new BaseResponse<>(issueService.getDoneIssues(projectId, status));
 
     }
 

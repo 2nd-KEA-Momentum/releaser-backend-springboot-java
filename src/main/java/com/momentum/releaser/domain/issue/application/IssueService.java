@@ -35,7 +35,7 @@ public interface IssueService {
     /**
      * 7.5 프로젝트별 해결 & 미연결 이슈 조회
      */
-    List<GetDoneIssues> getDoneIssues(Long projectId);
+    List<GetDoneIssues> getDoneIssues(Long projectId, String status);
 
 
     /**
