@@ -20,7 +20,7 @@ public interface IssueRepositoryCustom {
 
     void deleteByIssueNum();
 
-    List<GetDoneIssues> getDoneIssues(Project findProject);
+    List<GetDoneIssues> getDoneIssues(Project findProject, String status);
 
     List<GetConnectionIssues> getConnectionIssues(Project findProject, ReleaseNote findReleaseNote);
 

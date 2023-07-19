@@ -122,14 +122,14 @@ public class AuthServiceImpl implements AuthService{
 
     }
     /**
-     * 2.3 카카오 로그인
+     * 2.4 카카오 로그인
      */
 
     /**
-     * 2.4 구글 로그인
+     * 2.5 구글 로그인
      */
 
     /**
-     * 2.5 로그아웃
+     * 2.6 로그아웃
      */
 }

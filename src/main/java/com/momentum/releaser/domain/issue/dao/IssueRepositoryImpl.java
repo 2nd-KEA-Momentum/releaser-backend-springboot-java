@@ -93,7 +93,7 @@ public class IssueRepositoryImpl implements IssueRepositoryCustom{
     }
 
     @Override
-    public List<GetDoneIssues> getDoneIssues(Project getProject) {
+    public List<GetDoneIssues> getDoneIssues(Project getProject, String status) {
         QIssue issue = QIssue.issue;
         QProjectMember member = QProjectMember.projectMember;
         QUser user = QUser.user;
@@ -114,7 +114,7 @@ public class IssueRepositoryImpl implements IssueRepositoryCustom{
                 .leftJoin(issue.member, member)
                 .leftJoin(member.user, user)
                 .where(issue.project.eq(getProject)
-                        .and(issue.lifeCycle.eq(LifeCycle.valueOf("DONE")))
+                        .and(issue.lifeCycle.eq(LifeCycle.valueOf(status)))
                         .and(issue.release.isNull()))
                 .fetchResults().getResults();
 

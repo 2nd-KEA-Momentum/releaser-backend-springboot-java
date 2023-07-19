@@ -54,7 +54,7 @@ public class AuthController {
     /**
      * 2.3 Token 재발급
      */
-    @PatchMapping("/refresh")
+    @PostMapping("/refresh")
     public BaseResponse<TokenDto> refreshUser(HttpServletRequest request) {
 
         String accessToken = request.getHeader("Access_Token");
