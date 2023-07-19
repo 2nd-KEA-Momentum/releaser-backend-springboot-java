@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.util.List;
 
@@ -78,7 +79,8 @@ public class IssueController {
                                                            @Pattern(regexp = "(?i)^(DONE)$", message = "상태는 DONE 이어야 합니다.")
                                                            String status,
                                                            @RequestParam
-                                                               boolean connect) {
+                                                               @Pattern(regexp = "(?i)^(false)$", message = "연결 상태는 false 이어야 합니다.")
+                                                               String connect) {
         return new BaseResponse<>(issueService.getDoneIssues(projectId, status));
 
     }
