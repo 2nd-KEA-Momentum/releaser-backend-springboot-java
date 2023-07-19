@@ -63,6 +63,7 @@ public class ProjectResDto {
     @Data
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     public static class GetMembersRes {
+        private String link; //초대 링크
         private Long memberId;
         private Long userId;
         private String name;

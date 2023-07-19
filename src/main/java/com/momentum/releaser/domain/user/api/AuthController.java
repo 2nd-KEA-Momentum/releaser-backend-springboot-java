@@ -55,19 +55,17 @@ public class AuthController {
      * 2.3 Token 재발급
      */
     @PostMapping("/refresh")
-    public BaseResponse<TokenDto> refreshUser(HttpServletRequest request) {
+    public BaseResponse<TokenDto> refreshUser(@RequestHeader("Authorization") String authorizationHeader) {
 
-        String accessToken = request.getHeader("Access_Token");
-        // Authorization 헤더에 전달된 토큰에서 "Bearer " 접두사를 제거하여 실제 토큰 값만 추출
-        accessToken = accessToken.replace("Bearer ", "");
+        String accessToken = extractTokenFromAuthorizationHeader(authorizationHeader);
 
-        String refreshToken = request.getHeader("Refresh_Token");
-        // Authorization 헤더에 전달된 토큰에서 "Bearer " 접두사를 제거하여 실제 토큰 값만 추출
-        refreshToken = refreshToken.replace("Bearer ", "");
-
-
+        String refreshToken = extractTokenFromAuthorizationHeader(authorizationHeader);
 
         return new BaseResponse<>(authService.refreshUser(accessToken, refreshToken));
+    }
+
+    private String extractTokenFromAuthorizationHeader(String authorizationHeader) {
+        return authorizationHeader.replace("Bearer ", "");
     }
 
 

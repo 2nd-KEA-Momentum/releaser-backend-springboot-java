@@ -14,6 +14,8 @@ public interface ProjectMemberService {
     /**
      * 4.2 프로젝트 멤버 추가
      */
+    String addMember(String link, String email);
+
 
     /**
      * 4.3 프로젝트 멤버 제거
@@ -24,4 +26,5 @@ public interface ProjectMemberService {
      * 4.4 프로젝트 멤버 탈퇴
      */
     String withdrawMember(Long projectId, String email);
+
 }
