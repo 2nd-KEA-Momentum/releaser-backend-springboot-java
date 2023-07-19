@@ -2,12 +2,11 @@ package com.momentum.releaser.global.jwt;
 
 
 import java.security.Key;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.Collection;
-import java.util.Date;
+import java.util.*;
 import java.util.stream.Collectors;
 
+import com.momentum.releaser.domain.user.dao.RefreshTokenRepository;
+import com.momentum.releaser.domain.user.domain.RefreshToken;
 import com.momentum.releaser.domain.user.dto.TokenDto;
 import com.momentum.releaser.global.security.CustomUserDetailsService;
 import io.jsonwebtoken.io.Decoders;
@@ -52,6 +51,8 @@ public class JwtTokenProvider {
     private String secretKey;
     private Key key;
 
+    private final RefreshTokenRepository refreshTokenRepository;
+
     @PostConstruct
     public void init() {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
@@ -65,29 +66,11 @@ public class JwtTokenProvider {
 
     // 유저 정보를 가지고 AccessToken, RefreshToken 을 생성하는 메서드
     public TokenDto generateToken(Authentication authentication) {
-        // 권한 가져오기
-        String authorities = authentication.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.joining(","));
-
-        long now = (new Date()).getTime();
-        // Access Token 생성
-        // 숫자 86400000은 토큰의 유효기간으로 1일을 나타냅니다. 보통 토큰은 30분 정도로 생성하는데 테스트를 위해 1일로 설정했습니다.
-        // 1일: 24*60*60*1000 = 86400000
-        Date accessTokenExpiresIn = new Date(now + 86400000);
-        String accessToken = Jwts.builder()
-                .setSubject(authentication.getName())
-                .claim("auth", authorities)
-                .setExpiration(accessTokenExpiresIn)
-                .signWith(key, SignatureAlgorithm.HS256)
-                .compact();
+        //Access Token 생성
+        String accessToken = generateAccessToken(authentication);
 
         // Refresh Token 생성
-        // 7일: 7*24*60*60*1000 = 604,800,000
-        String refreshToken = Jwts.builder()
-                .setExpiration(new Date(now + 604800000))
-                .signWith(key, SignatureAlgorithm.HS256)
-                .compact();
+        String refreshToken = generateRefreshToken(authentication);
 
         return TokenDto.builder()
                 .grantType("Bearer")
@@ -95,6 +78,42 @@ public class JwtTokenProvider {
                 .refreshToken(refreshToken)
                 .build();
     }
+
+    public String generateAccessToken(Authentication authentication) {
+        // 권한 가져오기
+        String authorities = authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.joining(","));
+        long now = (new Date()).getTime();
+        // Access Token 생성
+        // 숫자 86400000은 토큰의 유효기간으로 1일을 나타냅니다. 보통 토큰은 30분 정도로 생성하는데 테스트를 위해 1일로 설정했습니다.
+        // 1일: 24*60*60*1000 = 86400000
+        // 2시간 : 2*60*60*1000 = 7200000
+        Date accessTokenExpiresIn = new Date(now + 7200000);
+        String accessToken = Jwts.builder()
+                .setSubject(authentication.getName())
+                .claim("auth", authorities)
+                .setExpiration(accessTokenExpiresIn)
+                .signWith(key, SignatureAlgorithm.HS256)
+                .compact();
+
+        return accessToken;
+    }
+
+    public String generateRefreshToken(Authentication authentication) {
+        long now = (new Date()).getTime();
+
+        // Refresh Token 생성
+        // 7일: 7*24*60*60*1000 = 604800000
+        String refreshToken = Jwts.builder()
+                .setSubject(authentication.getName())
+                .setExpiration(new Date(now + 604800000))
+                .signWith(key, SignatureAlgorithm.HS256)
+                .compact();
+        return refreshToken;
+    }
+
+
 
     // JWT 토큰을 복호화하여 토큰에 들어있는 정보를 꺼내는 메서드
     public Authentication getAuthentication(String accessToken) {
@@ -134,6 +153,15 @@ public class JwtTokenProvider {
         }
         return false;
     }
+
+
+    // 토큰에서 email 가져오는 기능
+    public String getEmailFromToken(String token) {
+        return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody().getSubject();
+    }
+
+
+
 
     private Claims parseClaims(String accessToken) {
         try {
