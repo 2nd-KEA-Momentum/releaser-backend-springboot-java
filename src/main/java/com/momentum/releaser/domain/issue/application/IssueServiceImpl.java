@@ -7,6 +7,7 @@ import com.momentum.releaser.domain.issue.domain.*;
 import com.momentum.releaser.domain.issue.dto.IssueReqDto.IssueInfoReq;
 import com.momentum.releaser.domain.issue.dto.IssueReqDto.RegisterOpinionReq;
 import com.momentum.releaser.domain.issue.dto.IssueReqDto.UpdateLifeCycleReq;
+import com.momentum.releaser.domain.issue.mapper.IssueMapper;
 import com.momentum.releaser.domain.project.dao.ProjectMemberRepository;
 import com.momentum.releaser.domain.project.dao.ProjectRepository;
 import com.momentum.releaser.domain.project.domain.Project;
@@ -282,21 +283,26 @@ public class IssueServiceImpl implements IssueService {
         return getIssue;
     }
 
+//    private GetIssue createGetIssue(Issue issue, List<GetMembersRes> memberRes, List<OpinionInfoRes> opinionRes) {
+//
+//        GetIssue getIssue = mapIssueToGetIssue(issue);
+//        getIssue.setIssueNum(issue.getIssueNum().getIssueNum());
+//        getIssue.setManager(issue.getMember().getMemberId());
+//
+//        if (issue.getRelease() != null) {
+//            String deployStatus = String.valueOf(issue.getRelease().getDeployStatus());
+//            getIssue.setDeployYN(deployStatus.equals("DEPLOYED") ? 'Y' : 'N');
+//        } else {
+//            getIssue.setDeployYN('N');
+//        }
+//
+//        getIssue.setMemberList(memberRes);
+//        getIssue.setOpinionList(opinionRes);
+//        return getIssue;
+//    }
+
     private GetIssue createGetIssue(Issue issue, List<GetMembersRes> memberRes, List<OpinionInfoRes> opinionRes) {
-
-        GetIssue getIssue = mapIssueToGetIssue(issue);
-        getIssue.setIssueNum(issue.getIssueNum().getIssueNum());
-        getIssue.setManager(issue.getMember().getMemberId());
-
-        if (issue.getRelease() != null) {
-            String deployStatus = String.valueOf(issue.getRelease().getDeployStatus());
-            getIssue.setDeployYN(deployStatus.equals("DEPLOYED") ? 'Y' : 'N');
-        } else {
-            getIssue.setDeployYN('N');
-        }
-
-        getIssue.setMemberList(memberRes);
-        getIssue.setOpinionList(opinionRes);
+        GetIssue getIssue = IssueMapper.INSTANCE.mapToGetIssue(issue, memberRes, opinionRes);
         return getIssue;
     }
 
