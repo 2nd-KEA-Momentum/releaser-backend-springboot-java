@@ -7,6 +7,9 @@ import com.momentum.releaser.domain.project.domain.ProjectMember;
 import com.momentum.releaser.domain.project.dto.ProjectResDto.GetMembersRes;
 import com.momentum.releaser.domain.project.mapper.ProjectMemberMapper;
 import com.momentum.releaser.domain.release.dao.approval.ReleaseApprovalRepository;
+import com.momentum.releaser.domain.release.dao.release.ReleaseRepository;
+import com.momentum.releaser.domain.release.domain.ReleaseApproval;
+import com.momentum.releaser.domain.release.domain.ReleaseNote;
 import com.momentum.releaser.domain.user.dao.UserRepository;
 import com.momentum.releaser.domain.user.domain.User;
 import com.momentum.releaser.global.error.CustomException;
@@ -31,7 +34,7 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
     private final ProjectRepository projectRepository;
     private final UserRepository userRepository;
     private final ReleaseApprovalRepository releaseApprovalRepository;
-    private final ModelMapper modelMapper;
+    private final ReleaseRepository releaseRepository;
 
     /**
      * 4.1 프로젝트 멤버 조회
@@ -89,29 +92,44 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
         //link check
         Project project = projectRepository.findByLink(link).orElseThrow(() -> new CustomException(NOT_EXISTS_LINK));
 
-        //member check
-        ProjectMember projectMember = findProjectMember(user, project);
-
-        String result;
-        if (projectMember == null) {
-            //멤버 추가
-            addProjectMember(project, user);
-            result = "프로젝트 참여가 완료되었습니다.";
-        } else {
+        //projectMember 존재여부 확인
+        if (isProjectMember(user, project)) {
             throw new CustomException(ALREADY_EXISTS_PROJECT_MEMBER);
         }
-        return result;
+        // member 추가
+        ProjectMember member = addProjectMember(project, user);
+        // approval 추가
+        addReleaseApprovalsForProjectMember(member, project);
+        return "프로젝트 참여가 완료되었습니다.";
+    }
+
+    private boolean isProjectMember(User user, Project project) {
+        return findProjectMember(user, project) != null;
     }
 
     //프로젝트 멤버 추가
-    private void addProjectMember(Project project, User user) {
+    private ProjectMember addProjectMember(Project project, User user) {
         ProjectMember projectMember = ProjectMember.builder()
                 .position('M')
                 .user(user)
                 .project(project)
                 .build();
 
-        projectMemberRepository.save(projectMember);
+        return projectMemberRepository.save(projectMember);
+    }
+
+    private void addReleaseApprovalsForProjectMember(ProjectMember member, Project project) {
+        List<ReleaseNote> releaseNotes = releaseRepository.findAllByProject(project);
+        if (releaseNotes != null) {
+            for (ReleaseNote releaseNote : releaseNotes) {
+                ReleaseApproval releaseApproval = ReleaseApproval.builder()
+                        .member(member)
+                        .release(releaseNote)
+                        .build();
+
+                releaseApprovalRepository.save(releaseApproval);
+            }
+        }
     }
 
     /**

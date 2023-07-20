@@ -44,7 +44,7 @@ public class AuthServiceImpl implements AuthService{
     @Override
     @Transactional
     public UserInfoRes signUpUser(UserInfoReq userInfoReq) {
-        //Token User
+        //Email check
         validateUniqueEmail(userInfoReq.getEmail());
         //userInfo 저장
         User user = createUser(userInfoReq);
