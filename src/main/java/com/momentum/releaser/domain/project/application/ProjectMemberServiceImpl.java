@@ -186,9 +186,4 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
         return projectMemberRepository.findByUserAndProject(user, project);
     }
 
-    //project member status = 'N'
-    private void deactivateProjectMember(ProjectMember member) {
-        member.statusToInactive();
-    }
-
 }
