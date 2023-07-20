@@ -4,13 +4,11 @@ import com.momentum.releaser.domain.project.dao.ProjectMemberRepository;
 import com.momentum.releaser.domain.project.dao.ProjectRepository;
 import com.momentum.releaser.domain.project.domain.Project;
 import com.momentum.releaser.domain.project.domain.ProjectMember;
-import com.momentum.releaser.domain.project.dto.ProjectResDto;
 import com.momentum.releaser.domain.project.dto.ProjectResDto.GetMembersRes;
 import com.momentum.releaser.domain.project.mapper.ProjectMemberMapper;
 import com.momentum.releaser.domain.release.dao.approval.ReleaseApprovalRepository;
 import com.momentum.releaser.domain.user.dao.UserRepository;
 import com.momentum.releaser.domain.user.domain.User;
-import com.momentum.releaser.global.config.BaseResponseStatus;
 import com.momentum.releaser.global.error.CustomException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,8 +16,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.momentum.releaser.global.config.BaseResponseStatus.*;
@@ -89,13 +87,31 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
         User user = findUserByEmail(email);
 
         //link check
-
+        Project project = projectRepository.findByLink(link).orElseThrow(() -> new CustomException(NOT_EXISTS_LINK));
 
         //member check
+        ProjectMember projectMember = findProjectMember(user, project);
 
-        //add member
+        String result;
+        if (projectMember == null) {
+            //멤버 추가
+            addProjectMember(project, user);
+            result = "프로젝트 참여가 완료되었습니다.";
+        } else {
+            throw new CustomException(ALREADY_EXISTS_PROJECT_MEMBER);
+        }
+        return result;
+    }
 
-        return null;
+    //프로젝트 멤버 추가
+    private void addProjectMember(Project project, User user) {
+        ProjectMember projectMember = ProjectMember.builder()
+                .position('M')
+                .user(user)
+                .project(project)
+                .build();
+
+        projectMemberRepository.save(projectMember);
     }
 
     /**

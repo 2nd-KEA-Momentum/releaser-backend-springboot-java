@@ -18,8 +18,8 @@ public interface ProjectMemberMapper {
     ProjectMembersDataDto toProjectMembersDataDto(ProjectMember projectMember);
 
 
-    @Mapping(target = "link", source = "project.link")
-    @Mapping(source = "projectMember.position", target = "position")
+    @Mapping(target = "link", source = "projectMember.project.link")
+    @Mapping(target = "position", source = "projectMember.position")
     @Mapping(target = "userId", source = "projectMember.user.userId")
     @Mapping(target = "name", source = "projectMember.user.name")
     @Mapping(target = "img", source = "projectMember.user.img")

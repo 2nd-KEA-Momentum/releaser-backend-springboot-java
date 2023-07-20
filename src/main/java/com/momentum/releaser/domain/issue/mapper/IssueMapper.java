@@ -7,13 +7,14 @@ import com.momentum.releaser.domain.issue.dto.IssueResDto.GetIssue;
 import com.momentum.releaser.domain.issue.dto.IssueResDto.OpinionInfoRes;
 import com.momentum.releaser.domain.project.dto.ProjectResDto;
 import com.momentum.releaser.domain.project.dto.ProjectResDto.GetMembersRes;
+import com.momentum.releaser.domain.project.mapper.ProjectMapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 
-@Mapper
+@Mapper(uses = { ProjectMapper.class })
 public interface IssueMapper {
 
     IssueMapper INSTANCE = Mappers.getMapper(IssueMapper.class);
@@ -29,5 +30,6 @@ public interface IssueMapper {
 
     @Mapping(source = "issue.issueNum.issueNum", target = "issueNum")
     @Mapping(source = "issue.member.memberId", target = "manager")
+    @Mapping(target = "memberList", source = "memberRes")
     GetIssue mapToGetIssue(Issue issue, List<GetMembersRes> memberRes, List<OpinionInfoRes> opinionRes);
 }

@@ -73,7 +73,8 @@ public class ProjectResDto {
 
         @QueryProjection
         @Builder
-        public GetMembersRes(Long memberId, Long userId, String name, String img, char position) {
+        public GetMembersRes(String link, Long memberId, Long userId, String name, String img, char position) {
+            this.link = link;
             this.memberId = memberId;
             this.userId = userId;
             this.name = name;
