@@ -82,6 +82,21 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
     /**
      * 4.2 프로젝트 멤버 추가
      */
+    @Override
+    @Transactional
+    public String addMember(String link, String email) {
+        //Token UserInfo
+        User user = findUserByEmail(email);
+
+        //link check
+
+
+        //member check
+
+        //add member
+
+        return null;
+    }
 
     /**
      * 4.3 프로젝트 멤버 제거

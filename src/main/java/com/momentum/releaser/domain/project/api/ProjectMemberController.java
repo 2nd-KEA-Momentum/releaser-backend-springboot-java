@@ -39,6 +39,13 @@ public class ProjectMemberController {
     /**
      * 4.2 프로젝트 멤버 추가
      */
+    @PostMapping("/join/{link}")
+    public BaseResponse<String> inviteMember(@PathVariable String link,
+                                             @AuthenticationPrincipal UserPrincipal userPrincipal) {
+        String email = userPrincipal.getEmail();
+        return new BaseResponse<>(projectMemberService.addMember(link, email));
+    }
+
 
     /**
      * 4.3 프로젝트 멤버 제거

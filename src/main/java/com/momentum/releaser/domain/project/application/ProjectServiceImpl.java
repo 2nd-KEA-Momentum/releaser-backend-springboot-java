@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 import static com.momentum.releaser.global.common.Base64.getImageUrlFromBase64;
 import static com.momentum.releaser.global.common.CommonEnum.DEFAULT_PROJECT_IMG;
@@ -220,13 +221,26 @@ public class ProjectServiceImpl implements ProjectService {
      * 프로젝트 생성
      */
     private Project createNewProject(ProjectInfoReq registerReq, String url) {
+        //초대 링크 생성
+        String inviteLink = generateInviteLink();
+
         return projectRepository.save(Project.builder()
                 .title(registerReq.getTitle())
                 .content(registerReq.getContent())
+                .link(inviteLink)
                 .team(registerReq.getTeam())
                 .img(url)
                 .status('Y')
                 .build());
+    }
+
+    /**
+     * 초대 링크 생성
+     */
+
+    private String generateInviteLink() {
+        // UUID를 이용하여 무작위의 초대 링크를 생성
+        return UUID.randomUUID().toString();
     }
 
     /**
