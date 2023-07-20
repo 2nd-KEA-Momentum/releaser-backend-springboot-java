@@ -17,7 +17,7 @@ public interface ProjectService {
     /**
      * 3.2 프로젝트 수정
      */
-    ProjectInfoRes updateProject(Long projectId, ProjectInfoReq projectInfoReq) throws IOException;
+    ProjectInfoRes updateProject(Long projectId, String email, ProjectInfoReq projectInfoReq) throws IOException;
 
     /**
      * 3.3 프로젝트 삭제

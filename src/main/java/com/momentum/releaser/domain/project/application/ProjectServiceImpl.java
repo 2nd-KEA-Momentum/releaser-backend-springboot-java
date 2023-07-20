@@ -72,21 +72,21 @@ public class ProjectServiceImpl implements ProjectService {
      */
     @Transactional
     @Override
-    public ProjectInfoRes updateProject(Long projectId, ProjectInfoReq projectInfoReq) throws IOException {
-
+    public ProjectInfoRes updateProject(Long projectId, String email, ProjectInfoReq projectInfoReq) throws IOException {
         Project project = getProjectById(projectId);
+        User user = findUserByEmail(email);
+        ProjectMember leader = findLeaderForProject(project);
 
-
-        // S3 URL 생성
-        String url = updateProjectImg(project, projectInfoReq);
-
-        // 프로젝트 정보 가져오기 및 업데이트
-        Project updatedProject = getAndUpdateProject(project, projectInfoReq, url);
-
-        // 프로젝트 응답 객체 생성
-        return ProjectMapper.INSTANCE.toProjectInfoRes(updatedProject);
-
+        // 접근 유저가 프로젝트 생성자인지 확인
+        if (user.equals(leader.getUser())) {
+            String url = updateProjectImg(project, projectInfoReq);
+            Project updatedProject = getAndUpdateProject(project, projectInfoReq, url);
+            return ProjectMapper.INSTANCE.toProjectInfoRes(updatedProject);
+        } else {
+            throw new CustomException(NOT_PROJECT_PM);
+        }
     }
+
 
     /**
      * 3.3 프로젝트 삭제
@@ -189,6 +189,19 @@ public class ProjectServiceImpl implements ProjectService {
     private String updateProjectImg(Project project, ProjectInfoReq projectInfoReq) throws IOException {
         deleteIfExistsProjectImg(project);
         return uploadProjectImg(projectInfoReq);
+    }
+
+    /**
+     * 해당 프로젝트의 관리자 찾기
+     */
+    private ProjectMember findLeaderForProject(Project project) {
+        List<ProjectMember> members = projectMemberRepository.findByProject(project);
+        for (ProjectMember member : members) {
+            if (member.getPosition() == 'L') {
+                return member;
+            }
+        }
+        return null;
     }
 
     /**

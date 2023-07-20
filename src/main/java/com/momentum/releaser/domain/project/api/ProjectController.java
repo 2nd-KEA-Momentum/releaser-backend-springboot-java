@@ -46,8 +46,10 @@ public class ProjectController {
     @PatchMapping(value = "/{projectId}")
     public BaseResponse<ProjectInfoRes> updateProject(
             @PathVariable @Min(value = 1, message = "프로젝트 식별 번호는 1 이상의 숫자여야 합니다.") Long projectId,
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
             @RequestBody @Valid ProjectInfoReq projectInfoReq) throws IOException {
-        return new BaseResponse<>(projectService.updateProject(projectId, projectInfoReq));
+        String email = userPrincipal.getEmail();
+        return new BaseResponse<>(projectService.updateProject(projectId, email, projectInfoReq));
     }
 
     /**
