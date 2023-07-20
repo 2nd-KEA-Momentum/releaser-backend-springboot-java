@@ -1,6 +1,7 @@
 package com.momentum.releaser.domain.project.dao;
 
 import com.momentum.releaser.domain.project.domain.Project;
+import com.momentum.releaser.domain.project.domain.QProject;
 import com.momentum.releaser.domain.project.domain.QProjectMember;
 import com.momentum.releaser.domain.project.dto.ProjectResDto.GetMembersRes;
 import com.momentum.releaser.domain.project.dto.QProjectResDto_GetMembersRes;
@@ -26,6 +27,7 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom{
 
         List<GetMembersRes> getMembersRes = queryFactory
                 .select(new QProjectResDto_GetMembersRes(
+                        member.project.link,
                         member.memberId,
                         user.userId,
                         user.name,

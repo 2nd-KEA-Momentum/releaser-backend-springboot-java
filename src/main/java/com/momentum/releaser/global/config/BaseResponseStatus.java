@@ -51,6 +51,7 @@ public enum BaseResponseStatus {
 
     NOT_EXISTS_PROJECT_MEMBER(false, 4300, "존재하지 않는 멤버입니다."),
     NOT_EXISTS_ADMIN_MEMBER(false, 4301, "관리자가 존재하지 않습니다."),
+    ALREADY_EXISTS_PROJECT_MEMBER(false, 4302, "이미 존재하는 멤버입니다."),
 
     NOT_EXISTS_RELEASE_NOTE(false, 4400, "존재하지 않는 릴리즈 노트입니다."),
     FAILED_TO_CREATE_RELEASE_NOTE(false, 4401, "릴리즈 노트 생성에 실패하였습니다."),

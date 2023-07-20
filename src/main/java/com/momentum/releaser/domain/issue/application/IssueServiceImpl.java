@@ -285,8 +285,16 @@ public class IssueServiceImpl implements IssueService {
 
     private GetIssue createGetIssue(Issue issue, List<GetMembersRes> memberRes, List<OpinionInfoRes> opinionRes) {
         GetIssue getIssue = IssueMapper.INSTANCE.mapToGetIssue(issue, memberRes, opinionRes);
-        String deployStatus = String.valueOf(issue.getRelease().getDeployStatus());
-        getIssue.setDeployYN(deployStatus.equals("DEPLOYED") ? 'Y' : 'N');
+        String deployStatus = null;
+        ReleaseNote release = issue.getRelease();
+        if (release != null) {
+            deployStatus = String.valueOf(release.getDeployStatus());
+        }
+        if (deployStatus == null) {
+            getIssue.setDeployYN('N');
+        } else {
+            getIssue.setDeployYN(deployStatus.equals("DEPLOYED") ? 'Y' : 'N');
+        }
         return getIssue;
     }
 
@@ -299,10 +307,6 @@ public class IssueServiceImpl implements IssueService {
         }
     }
 
-    private GetIssue mapIssueToGetIssue(Issue issue) {
-        return modelMapper.map(issue, GetIssue.class);
-    }
-
     private List<OpinionInfoRes> getIssueOpinion(Issue issue, Long memberId) {
         List<OpinionInfoRes> issueOpinion = issueRepository.getIssueOpinion(issue);
         for (OpinionInfoRes opinion : issueOpinion) {
@@ -312,7 +316,9 @@ public class IssueServiceImpl implements IssueService {
     }
 
     private List<GetMembersRes> getMemberList(Project project) {
+        log.info("member start");
         List<GetMembersRes> issueMember = projectRepository.getMemberList(project);
+
         for (GetMembersRes member : issueMember) {
             member.setDeleteYN('N');
         }

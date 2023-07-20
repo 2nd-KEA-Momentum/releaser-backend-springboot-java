@@ -90,10 +90,28 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
         Project project = projectRepository.findByLink(link).orElseThrow(() -> new CustomException(NOT_EXISTS_LINK));
 
         //member check
-        ProjectMember projectMember = projectMemberRepository.findByUserAndProject(user, project);
+        ProjectMember projectMember = findProjectMember(user, project);
 
+        String result;
+        if (projectMember == null) {
+            //멤버 추가
+            addProjectMember(project, user);
+            result = "프로젝트 참여가 완료되었습니다.";
+        } else {
+            throw new CustomException(ALREADY_EXISTS_PROJECT_MEMBER);
+        }
+        return result;
+    }
 
-        return null;
+    //프로젝트 멤버 추가
+    private void addProjectMember(Project project, User user) {
+        ProjectMember projectMember = ProjectMember.builder()
+                .position('M')
+                .user(user)
+                .project(project)
+                .build();
+
+        projectMemberRepository.save(projectMember);
     }
 
     /**
