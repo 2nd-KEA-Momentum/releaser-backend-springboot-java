@@ -19,6 +19,8 @@ import com.momentum.releaser.domain.release.dto.ReleaseDataDto.CoordinateDataDto
 import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.*;
 import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.*;
 import com.momentum.releaser.domain.release.mapper.ReleaseMapper;
+import com.momentum.releaser.domain.user.dao.UserRepository;
+import com.momentum.releaser.domain.user.domain.User;
 import com.momentum.releaser.global.error.CustomException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,6 +37,7 @@ import static com.momentum.releaser.global.config.BaseResponseStatus.*;
 @RequiredArgsConstructor
 public class ReleaseServiceImpl implements ReleaseService {
 
+    private final UserRepository userRepository;
     private final ProjectRepository projectRepository;
     private final ProjectMemberRepository projectMemberRepository;
     private final ReleaseRepository releaseRepository;
@@ -47,9 +50,14 @@ public class ReleaseServiceImpl implements ReleaseService {
      */
     @Transactional(readOnly = true)
     @Override
-    public ReleasesResponseDto getReleasesByProject(Long projectId) {
+    public ReleasesResponseDto getReleasesByProject(String userEmail, Long projectId) {
+        // 프로젝트 식별 번호로 프로젝트 엔티티를 가져온다.
         Project project = getProjectById(projectId);
-        return ProjectMapper.INSTANCE.toReleasesResponseDto(project);
+
+        // 요청을 한 사용자의 프로젝트 내 역할을 가져올 수 있도록 한다.
+        ProjectMember member = getProjectMemberByEmail(project, userEmail);
+
+        return ProjectMapper.INSTANCE.toReleasesResponseDto(project, member);
     }
 
     /**
@@ -205,10 +213,14 @@ public class ReleaseServiceImpl implements ReleaseService {
     }
 
     /**
-     * 릴리즈 노트 의견 식별 번호를 통해 릴리즈 노트 의견 엔티티를 가져온다.
+     * 프로젝트 조회 시 해당 요청을 한 사용자의 프로젝트 멤버의 역할을 알려주기 위해 프로젝트 멤버 엔티티를 가져온다.
      */
-    private ReleaseOpinion getReleaseOpinionById(Long opinionId) {
-        return releaseOpinionRepository.findById(opinionId).orElseThrow(() -> new CustomException(NOT_EXISTS_RELEASE_OPINION));
+    private ProjectMember getProjectMemberByEmail(Project project, String email) {
+        // 사용자 이메일을 통해 사용자 엔티티를 가져온다.
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(NOT_EXISTS_USER));
+
+        // 사용자 엔티티를 통해 프로젝트 멤버 엔티티를 가져온다.
+        return projectMemberRepository.findOneByUserAndProject(user, project).orElseThrow(() -> new CustomException(NOT_EXISTS_PROJECT_MEMBER));
     }
 
     /**
@@ -243,7 +255,6 @@ public class ReleaseServiceImpl implements ReleaseService {
         } else {  // 데이터베이스에서 가장 최신의 버전을 가져온 경우
             releaseVersions = getLatestVersion(releaseVersions);
             String latestVersion = releaseVersions.get(0);
-            log.info("latestVersion: {}", latestVersion);
 
             String[] eachVersion = latestVersion.split("\\.");
             int latestMajorVersion = Integer.parseInt(eachVersion[0]);
@@ -305,28 +316,24 @@ public class ReleaseServiceImpl implements ReleaseService {
 
     private List<String> sortVersionByAsc(List<String> versions) {
 
-        versions.sort(new Comparator<String>() {
+        versions.sort((v1, v2) -> {
+            String[] v1s = v1.split("\\.");
+            String[] v2s = v2.split("\\.");
 
-            @Override
-            public int compare(String v1, String v2) {
-                String[] v1s = v1.split("\\.");
-                String[] v2s = v2.split("\\.");
+            int majorV1 = Integer.parseInt(v1s[0]);
+            int minorV1 = Integer.parseInt(v1s[1]);
+            int patchV1 = Integer.parseInt(v1s[2]);
 
-                int majorV1 = Integer.parseInt(v1s[0]);
-                int minorV1 = Integer.parseInt(v1s[1]);
-                int patchV1 = Integer.parseInt(v1s[2]);
+            int majorV2 = Integer.parseInt(v2s[0]);
+            int minorV2 = Integer.parseInt(v2s[1]);
+            int patchV2 = Integer.parseInt(v2s[2]);
 
-                int majorV2 = Integer.parseInt(v2s[0]);
-                int minorV2 = Integer.parseInt(v2s[1]);
-                int patchV2 = Integer.parseInt(v2s[2]);
-
-                if (majorV1 != majorV2) {
-                    return Integer.compare(majorV1, majorV2);
-                } else if (minorV1 != minorV2) {
-                    return Integer.compare(minorV1, minorV2);
-                } else {
-                    return Integer.compare(patchV1, patchV2);
-                }
+            if (majorV1 != majorV2) {
+                return Integer.compare(majorV1, majorV2);
+            } else if (minorV1 != minorV2) {
+                return Integer.compare(minorV1, minorV2);
+            } else {
+                return Integer.compare(patchV1, patchV2);
             }
         });
 
