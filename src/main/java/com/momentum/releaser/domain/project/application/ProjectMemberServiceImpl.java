@@ -138,24 +138,28 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
     @Override
     @Transactional
     public String deleteMember(Long memberId, String email) {
-        //Token UserInfo
         User user = findUserByEmail(email);
+        ProjectMember projectMember = findProjectMemberById(memberId);
 
-        //project member 정보
-        ProjectMember projectMember = projectMemberRepository.findById(memberId).orElseThrow(() -> new CustomException(NOT_EXISTS_PROJECT_MEMBER));
-        ProjectMember accessMember = findProjectMember(user, projectMember.getProject());
-
-        //해당 프로젝트의 관리자만 멤버 제거 가능
-        if (accessMember.getPosition() == 'L') {
-            projectMemberRepository.deleteById(projectMember.getMemberId());
-            releaseApprovalRepository.deleteByReleaseApproval();
-            String result = "프로젝트 멤버가 제거되었습니다.";
-            return result;
-        } else {
+        if (!isProjectLeader(user, projectMember.getProject())) {
             throw new CustomException(NOT_PROJECT_PM);
         }
 
+        projectMemberRepository.deleteById(projectMember.getMemberId());
+        releaseApprovalRepository.deleteByReleaseApproval();
+        return "프로젝트 멤버가 제거되었습니다.";
     }
+
+    private ProjectMember findProjectMemberById(Long memberId) {
+        return projectMemberRepository.findById(memberId)
+                .orElseThrow(() -> new CustomException(NOT_EXISTS_PROJECT_MEMBER));
+    }
+
+    private boolean isProjectLeader(User user, Project project) {
+        ProjectMember accessMember = findProjectMember(user, project);
+        return accessMember != null && accessMember.getPosition() == 'L';
+    }
+
 
     /**
      * 4.4 프로젝트 멤버 탈퇴
