@@ -194,16 +194,11 @@ public class IssueServiceImpl implements IssueService {
     @Transactional
     public GetIssuesList getIssues(Long projectId) {
         Project findProject = findProject(projectId);
-        log.info("get issue");
         List<IssueInfoRes> getAllIssue = issueRepository.getIssues(findProject);
 
-        log.info("filter start");
         List<IssueInfoRes> notStartedList = filterAndSetDeployStatus(getAllIssue, "NOT_STARTED");
-        log.info("filter 1");
         List<IssueInfoRes> inProgressList = filterAndSetDeployStatus(getAllIssue, "IN_PROGRESS");
-        log.info("filter 2");
         List<IssueInfoRes> doneList = filterAndSetDeployStatus(getAllIssue, "DONE");
-        log.info("filter 3");
 
         return GetIssuesList.builder()
                 .getNotStartedList(notStartedList)
