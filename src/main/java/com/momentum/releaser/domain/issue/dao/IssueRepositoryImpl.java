@@ -106,7 +106,7 @@ public class IssueRepositoryImpl implements IssueRepositoryCustom{
                         Expressions.stringTemplate("CAST({0} AS string)", issue.tag),
                         issue.endDate,
                         issue.edit,
-                        member.memberId,
+                        Expressions.cases().when(member.status.eq('N')).then(0L).otherwise(member.memberId),
                         user.name.as("memberName"),
                         user.img.as("memberImg"))
                 )
@@ -135,7 +135,7 @@ public class IssueRepositoryImpl implements IssueRepositoryCustom{
                         issue.title,
                         Expressions.stringTemplate("CAST({0} AS string)", issue.tag),
                         issue.edit,
-                        member.memberId,
+                        Expressions.cases().when(member.status.eq('N')).then(0L).otherwise(member.memberId),
                         user.name.as("memberName"),
                         user.img.as("memberImg"),
                         releaseNote.version)

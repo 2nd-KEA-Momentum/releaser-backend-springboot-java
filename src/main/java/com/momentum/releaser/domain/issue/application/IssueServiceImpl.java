@@ -34,6 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.momentum.releaser.domain.issue.dto.IssueResDto.*;
@@ -212,6 +213,10 @@ public class IssueServiceImpl implements IssueService {
                 .filter(issue -> lifeCycle.equals(issue.getLifeCycle()))
                 .peek(issueInfoRes -> {
                     Issue issue = findIssue(issueInfoRes.getIssueId());
+                    Optional<ProjectMember> projectMember = projectMemberRepository.findById(issueInfoRes.getMemberId());
+                    if (projectMember.isEmpty()) {
+                        issueInfoRes.setMemberId(0L);
+                    }
                     if (issue.getRelease() != null) {
                         String deployStatus = String.valueOf(issue.getRelease().getDeployStatus());
                         //배포 여부
@@ -223,6 +228,7 @@ public class IssueServiceImpl implements IssueService {
                 })
                 .map(issue -> modelMapper.map(issue, IssueInfoRes.class))
                 .collect(Collectors.toList());
+
     }
 
 
@@ -234,6 +240,12 @@ public class IssueServiceImpl implements IssueService {
     public List<GetDoneIssues> getDoneIssues(Long projectId, String status) {
         Project findProject = findProject(projectId);
         List<GetDoneIssues> getDoneIssue = issueRepository.getDoneIssues(findProject, status.toUpperCase());
+        for (GetDoneIssues getDoneIssues : getDoneIssue) {
+            Optional<ProjectMember> projectMember = projectMemberRepository.findById(getDoneIssues.getMemberId());
+            if (projectMember.isEmpty()) {
+                getDoneIssues.setMemberId(0L);
+            }
+        }
 
         return getDoneIssue;
     }
@@ -285,6 +297,10 @@ public class IssueServiceImpl implements IssueService {
 
     private GetIssue createGetIssue(Issue issue, List<GetMembersRes> memberRes, List<OpinionInfoRes> opinionRes) {
         GetIssue getIssue = IssueMapper.INSTANCE.mapToGetIssue(issue, memberRes, opinionRes);
+        Optional<ProjectMember> projectMember = projectMemberRepository.findById(getIssue.getManager());
+        if (projectMember.isEmpty()) {
+            getIssue.setManager(0L);
+        }
         String deployStatus = null;
         ReleaseNote release = issue.getRelease();
         if (release != null) {

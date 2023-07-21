@@ -38,7 +38,7 @@ public class IssueController {
      * 7.1 이슈 생성
      */
     @PostMapping("/{projectId}")
-    public BaseResponse<String> registerIssue(@PathVariable @Min(1) Long projectId,
+    public BaseResponse<String> registerIssue(@PathVariable @Min(value = 1, message = "프로젝트 식별 번호는 1 이상의 숫자여야 합니다.") Long projectId,
                                               @Valid @RequestBody IssueInfoReq registerReq) {
         return new BaseResponse<>(issueService.registerIssue(projectId, registerReq));
     }
@@ -47,7 +47,7 @@ public class IssueController {
      * 7.2 이슈 수정
      */
     @PatchMapping("/issue/{issueId}")
-    public BaseResponse<String> updateIssue(@PathVariable @Min(1) Long issueId,
+    public BaseResponse<String> updateIssue(@PathVariable @Min(value = 1, message = "이슈 식별 번호는 1 이상의 숫자여야 합니다.") Long issueId,
                                             @AuthenticationPrincipal UserPrincipal userPrincipal,
                                             @Valid @RequestBody IssueInfoReq updateReq) {
         String email = userPrincipal.getEmail();
@@ -58,7 +58,7 @@ public class IssueController {
      * 7.3 이슈 제거
      */
     @PostMapping("/{issueId}/delete")
-    public BaseResponse<String> deleteIssue(@PathVariable @Min(1) Long issueId) {
+    public BaseResponse<String> deleteIssue(@PathVariable @Min(value = 1, message = "이슈 식별 번호는 1 이상의 숫자여야 합니다.") Long issueId) {
         return new BaseResponse<>(issueService.deleteIssue(issueId));
     }
 
@@ -66,7 +66,7 @@ public class IssueController {
      * 7.4 프로젝트별 모든 이슈 조회
      */
     @GetMapping("/project/{projectId}")
-    public BaseResponse<GetIssuesList> getIssues(@PathVariable @Min(1) Long projectId) {
+    public BaseResponse<GetIssuesList> getIssues(@PathVariable @Min(value = 1, message = "프로젝트 식별 번호는 1 이상의 숫자여야 합니다.") Long projectId) {
         return new BaseResponse<>(issueService.getIssues(projectId));
     }
 
@@ -74,7 +74,7 @@ public class IssueController {
      * 7.5 프로젝트별 해결 & 미연결 이슈 조회
      */
     @GetMapping("/project/{projectId}/release")
-    public BaseResponse<List<GetDoneIssues>> getDoneIssues(@PathVariable @Min(1) Long projectId,
+    public BaseResponse<List<GetDoneIssues>> getDoneIssues(@PathVariable @Min(value = 1, message = "프로젝트 식별 번호는 1 이상의 숫자여야 합니다.") Long projectId,
                                                            @RequestParam
                                                            @Pattern(regexp = "(?i)^(DONE)$", message = "상태는 DONE 이어야 합니다.")
                                                            String status,
@@ -90,9 +90,9 @@ public class IssueController {
      * 7.6 릴리즈 노트별 연결된 이슈 조회
      */
     @GetMapping("/project/{projectId}/release/{releaseId}")
-    public BaseResponse<List<GetConnectionIssues>> getConnectRelease(@PathVariable @Min(1) Long projectId,
-                                                                     @PathVariable @Min(1) Long releaseId,
-                                                                     @RequestParam(required = false, defaultValue = "false") boolean connect) {
+    public BaseResponse<List<GetConnectionIssues>> getConnectRelease(@PathVariable @Min(value = 1, message = "프로젝트 식별 번호는 1 이상의 숫자여야 합니다.") Long projectId,
+                                                                     @PathVariable @Min(value = 1, message = "릴리즈 노트 식별 번호는 1 이상의 숫자여야 합니다.") Long releaseId,
+                                                                     @RequestParam(required = false, defaultValue = "true") boolean connect) {
         return new BaseResponse<>(issueService.getConnectRelease(projectId, releaseId));
     }
 
@@ -100,7 +100,7 @@ public class IssueController {
      * 7.7 이슈별 조회
      */
     @GetMapping("/{issueId}")
-    public BaseResponse<GetIssue> getIssue(@PathVariable @Min(1) Long issueId,
+    public BaseResponse<GetIssue> getIssue(@PathVariable @Min(value = 1, message = "이슈 식별 번호는 1 이상의 숫자여야 합니다.") Long issueId,
                                            @AuthenticationPrincipal UserPrincipal userPrincipal) {
         String email = userPrincipal.getEmail();
         return new BaseResponse<>(issueService.getIssue(issueId, email));
@@ -110,7 +110,7 @@ public class IssueController {
      * 7.8 이슈 상태 변경
      */
     @PatchMapping("/{issueId}")
-    public BaseResponse<String> updateLifeCycle(@PathVariable @Min(1) Long issueId,
+    public BaseResponse<String> updateLifeCycle(@PathVariable @Min(value = 1, message = "이슈 식별 번호는 1 이상의 숫자여야 합니다.") Long issueId,
                                                 @RequestParam(name = "status")
                                                 @Pattern(regexp = "(?i)^(NOT_STARTED|IN_PROGRESS|DONE)$", message = "상태는 NOT_STARTED, IN_PROGRESS, DONE 중 하나여야 합니다.")
                                                 String lifeCycle) {
@@ -121,7 +121,7 @@ public class IssueController {
      * 8.1 이슈 의견 추가
      */
     @PostMapping("/{issueId}/opinion")
-    public BaseResponse<List<OpinionInfoRes>> registerOpinion(@PathVariable @Min(1) Long issueId,
+    public BaseResponse<List<OpinionInfoRes>> registerOpinion(@PathVariable @Min(value = 1, message = "이슈 식별 번호는 1 이상의 숫자여야 합니다.") Long issueId,
                                                               @AuthenticationPrincipal UserPrincipal userPrincipal,
                                                         @Valid @RequestBody RegisterOpinionReq opinionReq) {
         String email = userPrincipal.getEmail();
@@ -133,7 +133,7 @@ public class IssueController {
      * 8.2 이슈 의견 삭제
      */
     @PostMapping("/opinion/{opinionId}")
-    public BaseResponse<String> deleteOpinion(@PathVariable @Min(1) Long opinionId,
+    public BaseResponse<String> deleteOpinion(@PathVariable @Min(value = 1, message = "이슈 의견 식별 번호는 1 이상의 숫자여야 합니다.") Long opinionId,
                                               @AuthenticationPrincipal UserPrincipal userPrincipal) {
         String email = userPrincipal.getEmail();
         return new BaseResponse<>(issueService.deleteOpinion(opinionId, email));

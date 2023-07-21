@@ -72,6 +72,7 @@ public class ProjectMember extends BaseTime {
         for (ReleaseApproval approval : approvals) {
             approval.deleteToMember();
         }
+
     }
 
 
