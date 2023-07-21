@@ -284,6 +284,7 @@ public class IssueServiceImpl implements IssueService {
 
         Long memberId = findProjectMemberByUserAndProject(user, issue.getProject()).getMemberId();
         ProjectMember member = findProjectMember(memberId);
+
         //pm이 조회할 경우 edit 상태 변경
         updateIssueEdit(issue, member);
 
@@ -338,7 +339,6 @@ public class IssueServiceImpl implements IssueService {
     }
 
     private List<GetMembersRes> getMemberList(Project project) {
-        log.info("member start");
         List<GetMembersRes> issueMember = projectRepository.getMemberList(project);
 
         for (GetMembersRes member : issueMember) {

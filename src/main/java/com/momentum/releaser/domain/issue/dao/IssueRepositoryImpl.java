@@ -159,7 +159,7 @@ public class IssueRepositoryImpl implements IssueRepositoryCustom{
 
         List<OpinionInfoRes> opinionInfoRes = queryFactory
                 .select(new QIssueResDto_OpinionInfoRes(
-                        member.memberId,
+                        Expressions.cases().when(issueOpinion.member.status.eq('N')).then(0L).otherwise(issueOpinion.member.memberId),
                         user.name.as("memberName"),
                         user.img.as("memberImg"),
                         issueOpinion.issueOpinionId.as("opinionId"),
@@ -167,9 +167,9 @@ public class IssueRepositoryImpl implements IssueRepositoryCustom{
                 ))
                 .from(issueOpinion)
                 .leftJoin(issueOpinion.member, member)
-                .leftJoin(member.user, user)
+                .leftJoin(issueOpinion.member.user, user)
                 .where(issueOpinion.issue.eq(issue))
-                .fetch();
+                .fetchResults().getResults();
         return opinionInfoRes;
     }
 }

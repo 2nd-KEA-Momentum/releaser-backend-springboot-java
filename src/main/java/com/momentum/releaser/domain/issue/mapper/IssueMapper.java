@@ -31,5 +31,6 @@ public interface IssueMapper {
     @Mapping(source = "issue.issueNum.issueNum", target = "issueNum")
     @Mapping(source = "issue.member.memberId", target = "manager")
     @Mapping(target = "memberList", source = "memberRes")
+    @Mapping(target = "opinionList", source = "opinionRes")
     GetIssue mapToGetIssue(Issue issue, List<GetMembersRes> memberRes, List<OpinionInfoRes> opinionRes);
 }
