@@ -300,9 +300,12 @@ public class IssueServiceImpl implements IssueService {
 
     private GetIssue createGetIssue(Issue issue, List<GetMembersRes> memberRes, List<OpinionInfoRes> opinionRes) {
         GetIssue getIssue = IssueMapper.INSTANCE.mapToGetIssue(issue, memberRes, opinionRes);
-        Optional<ProjectMember> projectMember = projectMemberRepository.findById(getIssue.getManager());
-        if (projectMember.isEmpty()) {
-            getIssue.setManager(0L);
+        Long memberId = getIssue.getManager();
+        if (memberId != null) {
+            Optional<ProjectMember> projectMember = projectMemberRepository.findById(memberId);
+            if (projectMember.isEmpty()) {
+                getIssue.setManager(0L);
+            }
         }
         String deployStatus = null;
         ReleaseNote release = issue.getRelease();
