@@ -194,11 +194,16 @@ public class IssueServiceImpl implements IssueService {
     @Transactional
     public GetIssuesList getIssues(Long projectId) {
         Project findProject = findProject(projectId);
+        log.info("get issue");
         List<IssueInfoRes> getAllIssue = issueRepository.getIssues(findProject);
 
+        log.info("filter start");
         List<IssueInfoRes> notStartedList = filterAndSetDeployStatus(getAllIssue, "NOT_STARTED");
+        log.info("filter 1");
         List<IssueInfoRes> inProgressList = filterAndSetDeployStatus(getAllIssue, "IN_PROGRESS");
+        log.info("filter 2");
         List<IssueInfoRes> doneList = filterAndSetDeployStatus(getAllIssue, "DONE");
+        log.info("filter 3");
 
         return GetIssuesList.builder()
                 .getNotStartedList(notStartedList)
@@ -213,9 +218,12 @@ public class IssueServiceImpl implements IssueService {
                 .filter(issue -> lifeCycle.equals(issue.getLifeCycle()))
                 .peek(issueInfoRes -> {
                     Issue issue = findIssue(issueInfoRes.getIssueId());
-                    Optional<ProjectMember> projectMember = projectMemberRepository.findById(issueInfoRes.getMemberId());
-                    if (projectMember.isEmpty()) {
-                        issueInfoRes.setMemberId(0L);
+                    Long memberId = issueInfoRes.getMemberId();
+                    if (memberId != null) {
+                        Optional<ProjectMember> projectMember = projectMemberRepository.findById(memberId);
+                        if (projectMember.isEmpty()) {
+                            issueInfoRes.setMemberId(0L);
+                        }
                     }
                     if (issue.getRelease() != null) {
                         String deployStatus = String.valueOf(issue.getRelease().getDeployStatus());
