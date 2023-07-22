@@ -5,6 +5,8 @@ import com.momentum.releaser.domain.issue.dto.IssueReqDto.IssueInfoReq;
 import com.momentum.releaser.domain.project.domain.Project;
 import com.momentum.releaser.domain.project.domain.ProjectMember;
 import com.momentum.releaser.domain.release.domain.ReleaseNote;
+import com.momentum.releaser.domain.release.dto.ReleaseRequestDto;
+import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.UpdateReleaseDocsReq;
 import com.momentum.releaser.global.common.BaseTime;
 import com.sun.istack.NotNull;
 import lombok.AccessLevel;
@@ -128,6 +130,13 @@ public class Issue extends BaseTime {
         this.tag = Tag.valueOf(updateReq.getTag().toUpperCase());
         this.endDate = updateReq.getEndDate();
         this.member = member;
+    }
+
+    /**
+     * 이슈 요약
+     */
+    public void updateSummary(UpdateReleaseDocsReq updateReq) {
+        this.summary = updateReq.getSummary();
     }
 
 
