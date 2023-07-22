@@ -129,4 +129,14 @@ public class ReleaseController {
 
         return new BaseResponse<>(releaseService.getReleaseOpinions(releaseId));
     }
+
+    /**
+     * 9.1 프로젝트별 릴리즈 보고서 조회
+     */
+    @GetMapping("/project/{projectId}/docs")
+    public BaseResponse<List<ReleaseDocsRes>> getReleaseDocs(
+            @PathVariable @Min(value = 1, message = "프로젝트 식별 번호는 1 이상의 숫자여야 합니다.") Long projectId) {
+        return new BaseResponse<>(releaseService.getReleaseDocs(projectId));
+
+    }
 }
