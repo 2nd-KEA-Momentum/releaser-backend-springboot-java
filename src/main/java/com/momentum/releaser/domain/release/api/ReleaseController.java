@@ -139,4 +139,16 @@ public class ReleaseController {
         return new BaseResponse<>(releaseService.getReleaseDocs(projectId));
 
     }
+
+    /**
+     * 9.2 프로젝트별 릴리즈 보고서 수정
+     */
+    @PatchMapping("/project/{projectId}/docs")
+    public BaseResponse<String> updateReleaseDocs(
+            @PathVariable @Min(value = 1, message = "프로젝트 식별 번호는 1 이상의 숫자여야 합니다.") Long projectId,
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
+            @RequestBody @Valid List<UpdateReleaseDocsReq> updateReleaseDocsReq ) {
+        String email = userPrincipal.getEmail();
+        return new BaseResponse<>(releaseService.updateReleaseDocs(projectId, email, updateReleaseDocsReq));
+    }
 }

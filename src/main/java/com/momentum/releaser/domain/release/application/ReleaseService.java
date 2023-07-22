@@ -58,4 +58,7 @@ public interface ReleaseService {
     List<ReleaseOpinionsResponseDto> getReleaseOpinions(Long releaseId);
 
     List<ReleaseDocsRes> getReleaseDocs(Long projectId);
+
+    String updateReleaseDocs(Long projectId, String email, List<UpdateReleaseDocsReq> updateReleaseDocsReq);
+
 }

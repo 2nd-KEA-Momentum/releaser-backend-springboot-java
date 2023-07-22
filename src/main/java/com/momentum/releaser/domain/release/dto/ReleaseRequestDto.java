@@ -1,10 +1,7 @@
 package com.momentum.releaser.domain.release.dto;
 
 import com.momentum.releaser.domain.release.dto.ReleaseDataDto.CoordinateDataDto;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.*;
@@ -140,6 +137,25 @@ public class ReleaseRequestDto {
         public ReleaseOpinionCreateRequestDto(Long memberId, String opinion) {
             this.memberId = memberId;
             this.opinion = opinion;
+        }
+    }
+
+    /**
+     * 9.2 프로젝트별 릴리즈 보고서 수정
+     */
+    @Data
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    public static class UpdateReleaseDocsReq {
+        @NotNull(message = "이슈 식별 번호를 입력해주세요.")
+        @Min(value = 1, message = "이슈 식별 번호는 1 이상의 숫자여야 합니다.")
+        private Long issueId;
+
+        private String summary;
+
+        @Builder
+        public UpdateReleaseDocsReq(Long issueId, String summary) {
+            this.issueId = issueId;
+            this.summary = summary;
         }
     }
 }

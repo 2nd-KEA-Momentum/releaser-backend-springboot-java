@@ -221,8 +221,32 @@ public class ReleaseServiceImpl implements ReleaseService {
         return releaseDocsResList;
     }
 
+    /**
+     * 9.2 프로젝트별 릴리즈 보고서 수정
+     */
+    @Override
+    @Transactional
+    public String updateReleaseDocs(Long projectId, String email, List<UpdateReleaseDocsReq> updateReq) {
+        //Token UserInfo
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(NOT_EXISTS_USER));
 
+        //project
+        Project project = getProjectById(projectId);
 
+        ProjectMember member = projectMemberRepository.findByUserAndProject(user, project);
+
+        if (member.getPosition() != 'L') {
+            throw new CustomException(NOT_ADMIN);
+        }
+
+        for (UpdateReleaseDocsReq req : updateReq) {
+            Issue issue = issueRepository.findById(req.getIssueId()).orElseThrow(() -> new CustomException(NOT_EXISTS_ISSUE));
+            issue.updateSummary(req);
+            issueRepository.save(issue);
+        }
+
+        return "릴리즈 보고서가 수정되었습니다.";
+    }
 
 
     // =================================================================================================================
