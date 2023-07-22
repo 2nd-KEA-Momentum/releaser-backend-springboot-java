@@ -224,29 +224,31 @@ public class ReleaseServiceImpl implements ReleaseService {
     /**
      * 9.2 프로젝트별 릴리즈 보고서 수정
      */
-    @Override
     @Transactional
+    @Override
     public String updateReleaseDocs(Long projectId, String email, List<UpdateReleaseDocsReq> updateReq) {
-        //Token UserInfo
+        // Token UserInfo
         User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(NOT_EXISTS_USER));
-
-        //project
+        // 프로젝트 조회
         Project project = getProjectById(projectId);
+        // 프로젝트 구성원 정보 조회
+        ProjectMember member = getProjectMemberByEmailAndProjectId(email, projectId);
 
-        ProjectMember member = projectMemberRepository.findByUserAndProject(user, project);
-
+        // 구성원이 'L'인 경우에만 업데이트 가능
         if (member.getPosition() != 'L') {
             throw new CustomException(NOT_ADMIN);
         }
 
+        // 업데이트 요청에 따라 이슈의 요약 업데이트 수행
         for (UpdateReleaseDocsReq req : updateReq) {
-            Issue issue = issueRepository.findById(req.getIssueId()).orElseThrow(() -> new CustomException(NOT_EXISTS_ISSUE));
-            issue.updateSummary(req);
-            issueRepository.save(issue);
+            updateIssueSummary(req.getIssueId(), req);
         }
 
         return "릴리즈 보고서가 수정되었습니다.";
     }
+
+
+
 
 
     // =================================================================================================================
@@ -847,5 +849,28 @@ public class ReleaseServiceImpl implements ReleaseService {
                 .releaseContent(note.getContent())
                 .tagsList(tagsList)
                 .build();
+    }
+
+    /**
+     * 프로젝트 구성원 정보
+     */
+    private ProjectMember getProjectMemberByEmailAndProjectId(String email, Long projectId) {
+        // 이메일로 사용자 조회
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(NOT_EXISTS_USER));
+        // 프로젝트 조회
+        Project project = getProjectById(projectId);
+        // 사용자와 프로젝트로 구성원 정보 조회
+        return projectMemberRepository.findByUserAndProject(user, project);
+    }
+
+    /**
+     * 이슈의 summary 업데이트
+     */
+    private void updateIssueSummary(Long issueId, UpdateReleaseDocsReq req) {
+        // 이슈 ID로 이슈 조회
+        Issue issue = issueRepository.findById(issueId).orElseThrow(() -> new CustomException(NOT_EXISTS_ISSUE));
+        // 요청에 따라 이슈의 요약 업데이트 후 저장
+        issue.updateSummary(req);
+        issueRepository.save(issue);
     }
 }
