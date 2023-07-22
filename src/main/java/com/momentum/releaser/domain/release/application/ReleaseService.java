@@ -56,4 +56,6 @@ public interface ReleaseService {
      * 6.3 릴리즈 노트 의견 목록 조회
      */
     List<ReleaseOpinionsResponseDto> getReleaseOpinions(Long releaseId);
+
+    List<ReleaseDocsRes> getReleaseDocs(Long projectId);
 }

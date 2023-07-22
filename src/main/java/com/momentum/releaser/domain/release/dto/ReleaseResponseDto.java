@@ -5,14 +5,14 @@ import com.momentum.releaser.domain.project.dto.ProjectMemberResponseDto;
 import com.momentum.releaser.domain.project.dto.ProjectMemberResponseDto.ProjectMemberPositionResponseDto;
 import com.momentum.releaser.domain.release.domain.ReleaseEnum;
 import com.momentum.releaser.domain.release.domain.ReleaseEnum.ReleaseDeployStatus;
+import com.momentum.releaser.domain.release.dto.ReleaseDataDto.GetTags;
 import com.momentum.releaser.domain.release.dto.ReleaseDataDto.ReleaseApprovalsDataDto;
 import com.momentum.releaser.domain.release.dto.ReleaseDataDto.ReleaseOpinionsDataDto;
 import com.momentum.releaser.domain.release.dto.ReleaseDataDto.ReleasesDataDto;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import com.querydsl.core.annotations.QueryProjection;
+import lombok.*;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -160,4 +160,29 @@ public class ReleaseResponseDto {
             this.memberProfileImg = memberProfileImg;
         }
     }
+
+    /**
+     * 9.1 프로젝트별 릴리즈 보고서 조회
+     */
+    @Data
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    public static class ReleaseDocsRes {
+        private Long releaseId;
+        private String releaseVersion;
+        private String releaseTitle;
+        private String releaseContent;
+        private List<GetTags> tagsList = new ArrayList<>(); // 빈 리스트로 초기화
+
+        @Builder
+        public ReleaseDocsRes(Long releaseId, String releaseVersion, String releaseTitle, String releaseContent, List<GetTags> tagsList) {
+            this.releaseId = releaseId;
+            this.releaseVersion = releaseVersion;
+            this.releaseTitle = releaseTitle;
+            this.releaseContent = releaseContent;
+            if (tagsList != null) {
+                this.tagsList = tagsList;
+            }
+        }
+    }
+
 }

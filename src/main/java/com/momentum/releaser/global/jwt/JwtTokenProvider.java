@@ -132,7 +132,6 @@ public class JwtTokenProvider {
                         .collect(Collectors.toList());
 
         // UserDetails 객체를 만들어서 Authentication 리턴
-//        UserDetails principal = new User(claims.getSubject(), "", authorities);
         UserDetails userDetails = customUserDetailsService.loadUserByUsername(subject);
         return new UsernamePasswordAuthenticationToken(userDetails, accessToken, authorities);
     }

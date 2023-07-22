@@ -40,6 +40,9 @@ public class Issue extends BaseTime {
     @Column(name = "content")
     private String content;
 
+    @Column(name = "summary")
+    private String summary;
+
     @NotNull
     @Column(name = "tag")
     @Enumerated(EnumType.STRING)
@@ -83,10 +86,11 @@ public class Issue extends BaseTime {
 
 
     @Builder
-    public Issue(Long issueId, String title, String content, Tag tag, Date endDate, LifeCycle lifeCycle, char edit, char status, Project project, ProjectMember member, ReleaseNote release, IssueNum issueNum) {
+    public Issue(Long issueId, String title, String content, String summary, Tag tag, Date endDate, LifeCycle lifeCycle, char edit, char status, Project project, ProjectMember member, ReleaseNote release, IssueNum issueNum) {
         this.issueId = issueId;
         this.title = title;
         this.content = content;
+        this.summary = summary;
         this.tag = tag;
         this.endDate = endDate;
         this.lifeCycle = lifeCycle;
@@ -127,6 +131,9 @@ public class Issue extends BaseTime {
     }
 
 
+    /**
+     * 이슈가 삭제 되기전 실행된다.
+     */
     @PreRemove
     private void preRemove() {
         deleteToIssueNum();
@@ -161,6 +168,8 @@ public class Issue extends BaseTime {
     public void updateIssueEdit(char status){
         this.edit = status;
     }
+
+    //issue lifeCycle 변경
     public void updateLifeCycle(String lifeCycle) {
         this.lifeCycle = LifeCycle.valueOf(lifeCycle);
     }

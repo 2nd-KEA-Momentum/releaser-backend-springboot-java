@@ -1,11 +1,13 @@
 package com.momentum.releaser.domain.release.dto;
 
 import com.momentum.releaser.domain.release.domain.ReleaseEnum.ReleaseDeployStatus;
+import com.querydsl.core.annotations.QueryProjection;
 import lombok.*;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
+import java.util.List;
 
 public class ReleaseDataDto {
 
@@ -99,6 +101,40 @@ public class ReleaseDataDto {
             this.releaseId = releaseId;
             this.coordX = coordX;
             this.coordY = coordY;
+        }
+    }
+
+    /**
+     * 9.1 프로젝트별 릴리즈 보고서 조회
+     */
+    @Data
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    public static class GetTags {
+        private String tag;
+        private List<GetIssueTitle> titleList;
+
+        @Builder
+        public GetTags(String tag, List<GetIssueTitle> titleList) {
+            this.tag = tag;
+            this.titleList = titleList;
+        }
+    }
+
+    /**
+     * 9.1 프로젝트별 릴리즈 보고서 조회
+     */
+    @Data
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    public static class GetIssueTitle {
+        private Long issueId;
+        private String title;
+        private String summary;
+
+        @Builder
+        public GetIssueTitle(Long issueId, String title, String summary) {
+            this.issueId = issueId;
+            this.title = title;
+            this.summary = summary;
         }
     }
 }

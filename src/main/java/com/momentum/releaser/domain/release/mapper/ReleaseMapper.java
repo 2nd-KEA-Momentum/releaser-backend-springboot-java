@@ -71,4 +71,6 @@ public interface ReleaseMapper {
     @Mapping(target = "memberProfileImg", source = "releaseOpinion.member.user.img")
     ReleaseOpinionsResponseDto toReleaseOpinionsResponseDto(ReleaseOpinion releaseOpinion);
 
+
+
 }

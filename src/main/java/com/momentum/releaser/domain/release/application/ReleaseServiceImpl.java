@@ -15,7 +15,10 @@ import com.momentum.releaser.domain.release.domain.ReleaseApproval;
 import com.momentum.releaser.domain.release.domain.ReleaseEnum.ReleaseDeployStatus;
 import com.momentum.releaser.domain.release.domain.ReleaseNote;
 import com.momentum.releaser.domain.release.domain.ReleaseOpinion;
+import com.momentum.releaser.domain.release.dto.ReleaseDataDto;
 import com.momentum.releaser.domain.release.dto.ReleaseDataDto.CoordinateDataDto;
+import com.momentum.releaser.domain.release.dto.ReleaseDataDto.GetIssueTitle;
+import com.momentum.releaser.domain.release.dto.ReleaseDataDto.GetTags;
 import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.*;
 import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.*;
 import com.momentum.releaser.domain.release.mapper.ReleaseMapper;
@@ -188,6 +191,39 @@ public class ReleaseServiceImpl implements ReleaseService {
         ReleaseNote releaseNote = getReleaseNoteById(releaseId);
         return getReleaseOpinionsResponseDto(releaseNote.getReleaseOpinions());
     }
+
+    /**
+     * 9.1 프로젝트별 릴리즈 보고서 조회
+     */
+    @Override
+    @Transactional
+    public List<ReleaseDocsRes> getReleaseDocs(Long projectId) {
+        // 프로젝트 조회
+        Project project = getProjectById(projectId);
+        // 해당 프로젝트와 연결된 모든 릴리즈 조회
+        List<ReleaseNote> releaseNotes = releaseRepository.findAllByProject(project);
+
+        // 릴리즈별로 저장할 결과 리스트 초기화
+        List<ReleaseDocsRes> releaseDocsResList = new ArrayList<>();
+
+        for (ReleaseNote note : releaseNotes) {
+            // 릴리즈에 연결된 이슈들 조회
+            List<Issue> issues = issueRepository.findByRelease(note);
+
+            // 이슈들을 태그별로 그룹화하여 저장할 맵
+            Map<String, List<GetIssueTitle>> tagToIssueMap = groupIssuesByTag(issues);
+
+            // ReleaseDocsRes 객체 생성
+            ReleaseDocsRes releaseDocsRes = buildReleaseDocsRes(note, tagToIssueMap);
+            releaseDocsResList.add(releaseDocsRes);
+        }
+
+        return releaseDocsResList;
+    }
+
+
+
+
 
     // =================================================================================================================
 
@@ -744,5 +780,48 @@ public class ReleaseServiceImpl implements ReleaseService {
         return releaseOpinions.stream()
                 .map(ReleaseMapper.INSTANCE::toReleaseOpinionsResponseDto)
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * 이슈들을 태그별로 그룹화하는 메서드
+     */
+    private Map<String, List<GetIssueTitle>> groupIssuesByTag(List<Issue> issues) {
+        Map<String, List<GetIssueTitle>> tagToIssueMap = new HashMap<>();
+        for (Issue issue : issues) {
+            // 이슈의 태그 가져오기
+            String tag = String.valueOf(issue.getTag());
+            // GetIssueTitle 객체 생성
+            GetIssueTitle issueTitle = GetIssueTitle.builder()
+                    .issueId(issue.getIssueId())
+                    .title(issue.getTitle())
+                    .summary(issue.getSummary())
+                    .build();
+
+            // 태그별로 이슈들을 그룹화
+            tagToIssueMap.computeIfAbsent(tag, k -> new ArrayList<>()).add(issueTitle);
+        }
+        return tagToIssueMap;
+    }
+
+    /**
+     * ReleaseDocsRes 객체를 생성하는 메서드
+     */
+    private ReleaseDocsRes buildReleaseDocsRes(ReleaseNote note, Map<String, List<GetIssueTitle>> tagToIssueMap) {
+        // 태그별로 그룹화된 이슈들을 GetTags 리스트로 변환하여 저장
+        List<GetTags> tagsList = tagToIssueMap.entrySet().stream()
+                .map(entry -> GetTags.builder()
+                        .tag(entry.getKey())
+                        .titleList(entry.getValue())
+                        .build())
+                .collect(Collectors.toList());
+
+        // ReleaseDocsRes 객체 생성 및 반환
+        return ReleaseDocsRes.builder()
+                .releaseId(note.getReleaseId())
+                .releaseVersion(note.getVersion())
+                .releaseTitle(note.getTitle())
+                .releaseContent(note.getContent())
+                .tagsList(tagsList)
+                .build();
     }
 }
