@@ -21,6 +21,4 @@ public interface ReleaseRepositoryCustom {
     List<ReleaseNote> findByProjectAndNotInVersion(Project project, String version);
 
     List<ReleaseNote> findPreviousReleaseNotes(Project project, String version);
-
-    List<ReleaseNote> findNextReleaseNotes(Project project, String version);
 }

@@ -20,6 +20,7 @@ public enum BaseResponseStatus {
     INVALID_REQUEST_BODY(false, 2000, "요청 데이터가 잘못되었습니다."),
     NOT_PROJECT_PM(false, 2200, "해당 프로젝트의 관리자가 아닙니다."),
     INVALID_RELEASE_VERSION_TYPE(false, 2400, "릴리즈 버전 타입이 올바르지 않습니다. MAJOR, MINOR, PATCH 중 하나여야 합니다."),
+    EXISTS_DEPLOYED_RELEASE_NOTE_AFTER_THIS(false, 2401, "배포된 상위 버전의 릴리즈 노트가 있어 삭제할 수 없습니다."),
     INVALID_ISSUE_TAG(false, 2500, "이슈 태그가 올바르지 않습니다."),
     INVALID_LIFECYCLE(false, 2501, "이슈 상태가 올바르지 않습니다."),
     CONNECTED_ISSUE_EXISTS(false, 2502, "릴리즈와 연결된 이슈이므로 상태 변경이 불가능합니다."),
@@ -53,6 +54,7 @@ public enum BaseResponseStatus {
     NOT_EXISTS_PROJECT_MEMBER(false, 4300, "존재하지 않는 멤버입니다."),
     NOT_EXISTS_ADMIN_MEMBER(false, 4301, "관리자가 존재하지 않습니다."),
     ALREADY_EXISTS_PROJECT_MEMBER(false, 4302, "이미 존재하는 멤버입니다."),
+    NOT_PROJECT_MANAGER(false, 4303, "프로젝트 관리자가 아닙니다."),
 
     NOT_EXISTS_RELEASE_NOTE(false, 4400, "존재하지 않는 릴리즈 노트입니다."),
     FAILED_TO_CREATE_RELEASE_NOTE(false, 4401, "릴리즈 노트 생성에 실패하였습니다."),
