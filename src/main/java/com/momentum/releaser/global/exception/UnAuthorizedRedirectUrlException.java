@@ -1,4 +1,4 @@
-package com.momentum.releaser.global.error;
+package com.momentum.releaser.global.exception;
 
 
 import javax.security.auth.message.AuthException;

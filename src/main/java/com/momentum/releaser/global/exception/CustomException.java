@@ -1,8 +1,7 @@
-package com.momentum.releaser.global.error;
+package com.momentum.releaser.global.exception;
 
 
 import com.momentum.releaser.global.config.BaseResponseStatus;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 //@AllArgsConstructor

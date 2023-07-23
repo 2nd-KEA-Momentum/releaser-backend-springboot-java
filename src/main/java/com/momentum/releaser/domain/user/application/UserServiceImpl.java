@@ -6,7 +6,7 @@ import com.momentum.releaser.domain.user.dto.UserRequestDto.UserUpdateImgRequest
 import com.momentum.releaser.domain.user.dto.UserResponseDto.UserProfileImgResponseDto;
 import com.momentum.releaser.domain.user.mapper.UserMapper;
 import com.momentum.releaser.global.config.aws.S3Upload;
-import com.momentum.releaser.global.error.CustomException;
+import com.momentum.releaser.global.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

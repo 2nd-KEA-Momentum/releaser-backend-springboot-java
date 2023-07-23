@@ -5,6 +5,7 @@ import com.momentum.releaser.domain.user.dao.AuthPasswordRepository;
 import com.momentum.releaser.domain.user.dao.AuthSocialRepository;
 import com.momentum.releaser.domain.user.dao.UserRepository;
 import com.momentum.releaser.global.config.oauth2.*;
+import com.momentum.releaser.global.exception.CustomLogoutSuccessHandler;
 import com.momentum.releaser.global.jwt.JwtAuthenticationFilter;
 import com.momentum.releaser.global.jwt.JwtTokenProvider;
 import com.momentum.releaser.global.security.CustomAccessDeniedHandler;
@@ -51,6 +52,8 @@ public class SecurityConfig {
     private final AuthPasswordRepository authPasswordRepository;
     private final AuthSocialRepository authSocialRepository;
     private final CustomUserDetailsService customUserDetailsService;
+    private final CustomLogoutSuccessHandler customLogoutSuccessHandler;
+
 
     @Bean
     OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler(){
@@ -130,6 +133,15 @@ public class SecurityConfig {
                 .anyRequest().authenticated()
 
                 .and()
+                .logout()
+                .logoutUrl("/api/auth/logout") // 로그아웃 URL을 지정합니다.
+                .logoutSuccessHandler(customLogoutSuccessHandler) // 로그아웃 성공 후의 처리를 위해 CustomLogoutSuccessHandler를 등록합니다.
+                .deleteCookies("JSESSIONID") // 로그아웃 시 삭제할 쿠키를 지정합니다.
+                .clearAuthentication(true) // 인증 정보를 삭제합니다.
+                .invalidateHttpSession(true) // 세션을 무효화합니다.
+                .permitAll() // 로그아웃은 모두에게 허용합니다.
+
+                .and()
                 .oauth2Login()
                 .authorizationEndpoint()
                 .authorizationRequestRepository(httpCookieOAuth2AuthorizationRequestRepository())
@@ -139,6 +151,9 @@ public class SecurityConfig {
                 .and()
                 .successHandler(oAuth2AuthenticationSuccessHandler())
                 .failureHandler(oAuth2AuthenticationFailureHandler());
+
+
+
 
         http
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);

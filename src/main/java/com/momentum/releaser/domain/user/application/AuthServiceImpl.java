@@ -11,8 +11,7 @@ import com.momentum.releaser.domain.user.dto.AuthReqDto.UserLoginReq;
 import com.momentum.releaser.domain.user.dto.AuthResDto.UserInfoRes;
 import com.momentum.releaser.domain.user.dto.TokenDto;
 import com.momentum.releaser.global.jwt.JwtTokenProvider;
-import com.momentum.releaser.global.error.CustomException;
-import io.jsonwebtoken.Claims;
+import com.momentum.releaser.global.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -22,7 +21,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.servlet.http.HttpServletResponse;
 import java.util.Optional;
 
 import static com.momentum.releaser.global.config.BaseResponseStatus.*;
