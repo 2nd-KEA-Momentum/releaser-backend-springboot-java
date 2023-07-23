@@ -5,28 +5,20 @@ import com.momentum.releaser.domain.user.dao.AuthPasswordRepository;
 import com.momentum.releaser.domain.user.dao.UserRepository;
 import com.momentum.releaser.domain.user.domain.AuthPassword;
 import com.momentum.releaser.global.config.BaseResponseStatus;
-import com.momentum.releaser.global.error.CustomException;
+import com.momentum.releaser.global.exception.CustomException;
 import com.momentum.releaser.global.jwt.UserPrincipal;
-import com.momentum.releaser.global.jwt.UserRoleEnum;
-import org.springframework.context.annotation.Bean;
-import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 
-import javax.transaction.Transactional;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-
-import static com.momentum.releaser.global.config.BaseResponseStatus.NOT_EXISTS_USER;
 
 @Service
 @RequiredArgsConstructor

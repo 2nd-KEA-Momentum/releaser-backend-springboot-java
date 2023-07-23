@@ -1,7 +1,7 @@
 package com.momentum.releaser.global.config.oauth2;
 
 import com.momentum.releaser.domain.user.dto.TokenDto;
-import com.momentum.releaser.global.error.UnAuthorizedRedirectUrlException;
+import com.momentum.releaser.global.exception.UnAuthorizedRedirectUrlException;
 import com.momentum.releaser.global.jwt.JwtTokenProvider;
 import com.momentum.releaser.global.util.CookieUtils;
 import lombok.RequiredArgsConstructor;

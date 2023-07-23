@@ -1,4 +1,4 @@
-package com.momentum.releaser.global.error;
+package com.momentum.releaser.global.exception;
 
 import com.momentum.releaser.global.config.BaseException;
 import com.momentum.releaser.global.config.BaseResponse;
@@ -13,9 +13,7 @@ import javax.validation.ConstraintViolationException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static com.momentum.releaser.global.config.BaseResponseStatus.INVALID_REQUEST_BODY;
 

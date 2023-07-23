@@ -4,12 +4,8 @@ package com.momentum.releaser.global.config;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.momentum.releaser.domain.issue.dto.IssueResDto;
-import com.momentum.releaser.global.error.CustomException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-
-import java.util.Map;
 
 @Getter
 @AllArgsConstructor
