@@ -67,15 +67,20 @@ public class ReleaseServiceImpl implements ReleaseService {
      */
     @Transactional
     @Override
-    public ReleaseCreateAndUpdateResponseDto createReleaseNote(Long projectId, ReleaseCreateRequestDto releaseCreateRequestDto) {
+    public ReleaseCreateAndUpdateResponseDto createReleaseNote(String userEmail, Long projectId, ReleaseCreateRequestDto releaseCreateRequestDto) {
+        Project project = getProjectById(projectId);
+
+        // 릴리즈 노트 생성 권한이 있는 프로젝트 멤버인지 확인한다.
+        isProjectManager(userEmail, project);
+
         // 먼저, 클라이언트로부터 받아온 릴리즈 노트를 저장한다.
-        ReleaseNote savedReleaseNote = saveReleaseNote(projectId, releaseCreateRequestDto, createReleaseVersion(projectId, releaseCreateRequestDto.getVersionType()));
+        ReleaseNote savedReleaseNote = saveReleaseNote(project, releaseCreateRequestDto, createReleaseVersion(project, releaseCreateRequestDto.getVersionType()));
 
         // 이슈들을 연결한다.
         connectIssues(releaseCreateRequestDto.getIssues(), savedReleaseNote);
 
         // 생성된 릴리즈 노트에 대한 알림을 보낸다.
-        alertCreatedReleaseNote(projectId, savedReleaseNote.getReleaseId());
+        alertCreatedReleaseNote(project, savedReleaseNote.getReleaseId());
 
         // 생성한 릴리즈 노트에 대한 동의 테이블을 생성한다.
         createReleaseApprovals(savedReleaseNote);
@@ -296,8 +301,7 @@ public class ReleaseServiceImpl implements ReleaseService {
     /**
      * 릴리즈 버전 타입을 통해 올바른 릴리즈 버전을 생성한다.
      */
-    private String createReleaseVersion(Long projectId, String versionType) {
-        Project project = getProjectById(projectId);
+    private String createReleaseVersion(Project project, String versionType) {
         String newVersion = "";
 
         // 데이터베이스로부터 가장 최신의 버전을 가져온다.
@@ -407,8 +411,7 @@ public class ReleaseServiceImpl implements ReleaseService {
     /**
      * 릴리즈 노트 엔티티 객체를 생성한 후, 데이터베이스에 저장한다.
      */
-    private ReleaseNote saveReleaseNote(Long projectId, ReleaseCreateRequestDto releaseCreateRequestDto, String newVersion) {
-        Project project = getProjectById(projectId);
+    private ReleaseNote saveReleaseNote(Project project, ReleaseCreateRequestDto releaseCreateRequestDto, String newVersion) {
 
         // 새로운 릴리즈 노트 생성
         ReleaseNote newReleaseNote = ReleaseNote.builder()
@@ -515,7 +518,7 @@ public class ReleaseServiceImpl implements ReleaseService {
     /**
      * 릴리즈 노트가 생성되었음을 프로젝트 멤버들에게 알리고, 동의를 구하도록 한다.
      */
-    private void alertCreatedReleaseNote(Long projectId, Long releaseId) {
+    private void alertCreatedReleaseNote(Project project, Long releaseId) {
         // TODO: 이후 RabbitMQ를 적용시킬 때 구현한다.
     }
 
@@ -950,10 +953,12 @@ public class ReleaseServiceImpl implements ReleaseService {
         ProjectMember member = projectMemberRepository.findByUserAndProject(user, project);
 
         if (member == null) {
+            // 프로젝트 멤버가 아닐 경우 예외를 발생시킨다.
             throw new CustomException(NOT_EXISTS_PROJECT_MEMBER);
         }
 
         if (member.getPosition() != 'L') {
+            // 프로젝트의 관리자가 아닌 경우 예외를 발생시킨다.
             throw new CustomException(NOT_PROJECT_MANAGER);
         }
     }

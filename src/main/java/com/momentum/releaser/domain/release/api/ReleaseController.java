@@ -41,10 +41,11 @@ public class ReleaseController {
      */
     @PostMapping(value = "/projects/{projectId}")
     public BaseResponse<ReleaseCreateAndUpdateResponseDto> createReleaseNote(
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
             @PathVariable @Min(value = 1, message = "프로젝트 식별 번호는 1 이상의 숫자여야 합니다.") Long projectId,
             @RequestBody @Valid ReleaseCreateRequestDto releaseCreateRequestDto) {
 
-        return new BaseResponse<>(releaseService.createReleaseNote(projectId, releaseCreateRequestDto));
+        return new BaseResponse<>(releaseService.createReleaseNote(userPrincipal.getEmail(), projectId, releaseCreateRequestDto));
     }
 
     /**

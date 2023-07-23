@@ -28,6 +28,11 @@ public class ReleaseApproval extends BaseTime {
     @JoinColumn(name = "release_id")
     private ReleaseNote release;
 
+    /**
+     * P(Pending): 배포 대기 (Default)
+     * Y(Yes): 배포 동의
+     * N(No): 배포 거부
+     */
     @Column(name = "approval")
     private char approval;
 
@@ -52,9 +57,13 @@ public class ReleaseApproval extends BaseTime {
         this.release = null;
         this.member = null;
     }
+
+    /**
+     * 데이터베이스에 초기화/저장되기 전에 자동으로 값을 초기화시킨다.
+     */
     @PrePersist
     public void prePersist() {
-        this.approval = (this.approval == '\0') ? 'N' : this.approval;
+        this.approval = (this.approval == '\0') ? 'P' : this.approval;
     }
 
     /**
