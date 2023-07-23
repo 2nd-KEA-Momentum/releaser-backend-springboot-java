@@ -71,8 +71,9 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     private boolean isAuthorizedRedirectUri(String uri) {
         // TODO: OAuth2 클라이언트가 허용하는 유효한 리다이렉트 URI 목록을 가져와야 합니다.
         List<String> authorizedRedirectUris = Arrays.asList(
-                "https://example.com/oauth2/callback",
-                "http://localhost:8080/oauth2/callback"
+                "http://localhost:8080/login/oauth2/code/google",
+                "https://www.releaser.shop/login/oauth2/code/google",
+                "http://localhost:3000/login/oauth2/code/google"
         );
 
         URI clientRedirectUri = URI.create(uri);
