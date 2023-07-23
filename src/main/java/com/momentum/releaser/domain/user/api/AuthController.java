@@ -55,11 +55,11 @@ public class AuthController {
      * 2.3 Token 재발급
      */
     @PostMapping("/refresh")
-    public BaseResponse<TokenDto> refreshUser(@RequestHeader("Authorization") String authorizationHeader) {
+    public BaseResponse<TokenDto> refreshUser(HttpServletRequest request) {
 
-        String accessToken = extractTokenFromAuthorizationHeader(authorizationHeader);
+        String accessToken = extractTokenFromAuthorizationHeader(request.getHeader("Access_Token"));
 
-        String refreshToken = extractTokenFromAuthorizationHeader(authorizationHeader);
+        String refreshToken = extractTokenFromAuthorizationHeader(request.getHeader("Refresh_Token"));
 
         return new BaseResponse<>(authService.refreshUser(accessToken, refreshToken));
     }
