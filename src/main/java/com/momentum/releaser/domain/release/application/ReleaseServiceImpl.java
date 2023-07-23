@@ -93,9 +93,14 @@ public class ReleaseServiceImpl implements ReleaseService {
      */
     @Transactional
     @Override
-    public ReleaseCreateAndUpdateResponseDto updateReleaseNote(Long releaseId, ReleaseUpdateRequestDto releaseUpdateRequestDto) {
+    public ReleaseCreateAndUpdateResponseDto updateReleaseNote(String userEmail, Long releaseId, ReleaseUpdateRequestDto releaseUpdateRequestDto) {
+        ReleaseNote releaseNote = getReleaseNoteById(releaseId);
+
+        // 릴리즈 노트 수정 권한이 있는 사용자인지 확인한다. 만약 아니라면, 예외를 발생시킨다.
+        isProjectManager(userEmail, releaseNote.getProject());
+
         // 수정된 릴리즈 노트 내용을 반영 및 저장한다.
-        ReleaseNote updatedReleaseNote = updateAndSaveReleaseNote(releaseId, releaseUpdateRequestDto, updateReleaseVersion(releaseId, releaseUpdateRequestDto.getVersion()));
+        ReleaseNote updatedReleaseNote = updateAndSaveReleaseNote(releaseNote, releaseUpdateRequestDto, updateReleaseVersion(releaseNote, releaseUpdateRequestDto.getVersion()));
 
         // 이슈를 연결한다.
         connectIssues(releaseUpdateRequestDto.getIssues(), updatedReleaseNote);
@@ -431,8 +436,7 @@ public class ReleaseServiceImpl implements ReleaseService {
     /**
      * 릴리즈 노트 엔티티를 업데이트(수정)한다.
      */
-    private ReleaseNote updateAndSaveReleaseNote(Long releaseId, ReleaseUpdateRequestDto releaseUpdateRequestDto, String updatedVersion) {
-        ReleaseNote releaseNote = getReleaseNoteById(releaseId);
+    private ReleaseNote updateAndSaveReleaseNote(ReleaseNote releaseNote, ReleaseUpdateRequestDto releaseUpdateRequestDto, String updatedVersion) {
 
         // 수정이 가능한 릴리즈 노트인지 유효성 검사를 진행한다.
         validateReleaseNoteUpdate(releaseNote, releaseUpdateRequestDto);
@@ -564,8 +568,7 @@ public class ReleaseServiceImpl implements ReleaseService {
     /**
      * 클라이언트로부터 전달받은 버전이 올바른지 검사한다.
      */
-    private String updateReleaseVersion(Long releaseId, String version) {
-        ReleaseNote releaseNote = getReleaseNoteById(releaseId);
+    private String updateReleaseVersion(ReleaseNote releaseNote, String version) {
 
         // 1. 만약 수정하려고 하는 릴리즈 노트의 원래 버전이 1.0.0인 경우 수정하지 못하도록 한다. 이 경우 릴리즈 노트 내용만 수정해야 한다.
         if (!Objects.equals(version, "1.0.0") && Objects.equals(releaseNote.getVersion(), "1.0.0")) {
@@ -573,7 +576,7 @@ public class ReleaseServiceImpl implements ReleaseService {
         }
 
         // 2. 중복된 버전이 있는지 확인한다. 중복된 버전이 존재할 경우 예외를 발생시킨다.
-        if (releaseRepository.existsByProjectAndVersion(releaseNote.getProject(), releaseId, version)) {
+        if (releaseRepository.existsByProjectAndVersion(releaseNote.getProject(), releaseNote.getReleaseId(), version)) {
             throw new CustomException(DUPLICATED_RELEASE_VERSION);
         }
 

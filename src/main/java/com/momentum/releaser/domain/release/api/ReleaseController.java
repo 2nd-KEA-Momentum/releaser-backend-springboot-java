@@ -53,10 +53,11 @@ public class ReleaseController {
      */
     @PatchMapping(value = "/{releaseId}")
     public BaseResponse<ReleaseCreateAndUpdateResponseDto> updateReleaseNote(
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
             @PathVariable @Min(value = 1, message = "릴리즈 식별 번호는 1 이상의 숫자여야 합니다.") Long releaseId,
             @RequestBody @Valid ReleaseUpdateRequestDto releaseUpdateRequestDto) {
 
-        return new BaseResponse<>(releaseService.updateReleaseNote(releaseId, releaseUpdateRequestDto));
+        return new BaseResponse<>(releaseService.updateReleaseNote(userPrincipal.getEmail(), releaseId, releaseUpdateRequestDto));
     }
 
     /**
