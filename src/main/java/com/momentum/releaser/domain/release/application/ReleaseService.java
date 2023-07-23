@@ -15,7 +15,7 @@ public interface ReleaseService {
     /**
      * 5.2 릴리즈 노트 생성
      */
-    ReleaseCreateAndUpdateResponseDto createReleaseNote(Long project, ReleaseCreateRequestDto releaseCreateRequestDto);
+    ReleaseCreateAndUpdateResponseDto createReleaseNote(String userEmail, Long project, ReleaseCreateRequestDto releaseCreateRequestDto);
 
     /**
      * 5.3 릴리즈 노트 수정
