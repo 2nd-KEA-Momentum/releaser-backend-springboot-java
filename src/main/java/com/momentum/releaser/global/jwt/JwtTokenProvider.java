@@ -90,7 +90,7 @@ public class JwtTokenProvider {
         // 1일: 24*60*60*1000 = 86400000
         // 2시간 : 2*60*60*1000 = 7200000
         // 1분 : 60*1000 = 60000
-        Date accessTokenExpiresIn = new Date(now + 60000);
+        Date accessTokenExpiresIn = new Date(now + 7200000);
         String accessToken = Jwts.builder()
                 .setSubject(authentication.getName())
                 .claim("auth", authorities)
