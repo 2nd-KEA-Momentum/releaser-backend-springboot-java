@@ -107,9 +107,13 @@ public class ReleaseServiceImpl implements ReleaseService {
      */
     @Transactional
     @Override
-    public String deleteReleaseNote(Long releaseId) {
-        // 해당 릴리즈 노트 삭제가 가능한지 확인한다.
+    public String deleteReleaseNote(String userEmail, Long releaseId) {
         ReleaseNote releaseNote = getReleaseNoteById(releaseId);
+
+        // 프로젝트의 PM인지 확인한다.
+        isProjectManager(userEmail, releaseNote.getProject());
+
+        // 해당 릴리즈 노트 삭제가 가능한지 확인한다.
         validateReleaseNoteDelete(releaseNote);
 
         // 해당 릴리즈 노트에 대한 배포 동의 여부 데이터를 모두 삭제한다.
@@ -247,10 +251,6 @@ public class ReleaseServiceImpl implements ReleaseService {
         return "릴리즈 보고서가 수정되었습니다.";
     }
 
-
-
-
-
     // =================================================================================================================
 
     /**
@@ -376,6 +376,9 @@ public class ReleaseServiceImpl implements ReleaseService {
         return versions;
     }
 
+    /**
+     * 릴리즈 버전을 오름차순으로 정렬한다.
+     */
     private List<String> sortVersionByAsc(List<String> versions) {
 
         versions.sort((v1, v2) -> {
@@ -578,11 +581,11 @@ public class ReleaseServiceImpl implements ReleaseService {
 
         // 4. 변경하려는 버전이 포함된 릴리즈 버전 배열을 오름차순으로 정렬한다.
 //        Collections.sort(versions);
-        versions = sortVersionByAsc(versions);
-        log.info("updateReleaseVersion/versions: {}", versions);
+        List<String> sortedVersions = sortVersionByAsc(versions);
+        log.info("updateReleaseVersion/sortedVersions: {}", sortedVersions);
 
         // 5. 바꾸려는 버전 값이 올바른 버전 값인지를 확인한다.
-        validateCorrectVersion(versions);
+        validateCorrectVersion(sortedVersions);
 
         return version;
     }
@@ -697,17 +700,83 @@ public class ReleaseServiceImpl implements ReleaseService {
      */
     private void validateReleaseNoteDelete(ReleaseNote releaseNote) {
 
-        // 릴리즈 노트가 삭제 가능한 상태(PLANNING, DENIED)인지 검사한다.
+        // 해당 릴리즈 노트가 삭제 가능한 상태(PLANNING, DENIED)인지 검사한다.
         if (releaseNote.getDeployStatus().equals(ReleaseDeployStatus.DEPLOYED)) {
             // 만약 이미 DEPLOYED 된 릴리즈 노트인 경우 예외를 발생시킨다.
             throw new CustomException(FAILED_TO_DELETE_DEPLOYED_RELEASE_NOTE);
         }
 
-        // 만약 해당 릴리즈 노트 앞에 추가로 생성된 릴리즈 노트가 있을 경우 삭제할 수 없다.
-        List<ReleaseNote> releaseNotes = releaseRepository.findNextReleaseNotes(releaseNote.getProject(), releaseNote.getVersion());
-        if (releaseNotes.size() > 0) {
+        // 해당 릴리즈 노트의 이후 버전 중 배포된 것이 있다면 예외를 발생시킨다.
+        // 1. 릴리즈 노트를 릴리즈 버전 기준 오름차순으로 정렬한다.
+        List<ReleaseNote> releaseNotes = releaseRepository.findAllByProject(releaseNote.getProject());
+        List<ReleaseNote> sortedReleaseNotes = sortReleaseNoteByAsc(releaseNotes);
+
+        // 2. 해당 릴리즈 노트가 가장 최신의 버전이라면 유효성 검사를 통과한다.
+        int currentIdx = sortedReleaseNotes.indexOf(releaseNote);
+        if (currentIdx == sortedReleaseNotes.size() - 1) {
+            return;
+        }
+
+        // 3. 현재 릴리즈 노트의 이후 버전 중 배포된 릴리즈 노트가 있는지 확인하고, 있다면 예외를 발생시킨다.
+        for (int i = currentIdx + 1; i < sortedReleaseNotes.size(); i++) {
+            if (sortedReleaseNotes.get(i).getDeployStatus() == ReleaseDeployStatus.DEPLOYED) {
+                throw new CustomException(EXISTS_DEPLOYED_RELEASE_NOTE_AFTER_THIS);
+            }
+        }
+
+        // 이후 릴리즈가 배포되지 않은 상황에서 릴리즈 노트의 각 자릿수 버전(Major, Minor, Patch) 끝 숫자만 삭제할 수 있다.
+        // 1. 현재 릴리즈 노트의 버전의 각 숫자(Major, Minor, Patch)와 다음 버전의 각 숫자를 가져온다.
+        String currentVersion = releaseNote.getVersion();
+        int currentMinor = Integer.parseInt(currentVersion.split("\\.")[1]);
+        int currentPatch = Integer.parseInt(currentVersion.split("\\.")[2]);
+
+        String nextVersion = releaseNotes.get(currentIdx + 1).getVersion();
+        int nextMinor = Integer.parseInt(nextVersion.split("\\.")[1]);
+        int nextPatch = Integer.parseInt(nextVersion.split("\\.")[2]);
+
+        // 3. 현재 버전과 다음 버전의 바뀌는 숫자가 같은 자리인 경우 예외를 발생시킨다.
+        if (currentMinor == 0 && currentPatch == 0) {
             throw new CustomException(FAILED_TO_DELETE_RELEASE_NOTE);
         }
+
+        if (currentPatch == 0 && nextPatch == 0) {
+            if (currentMinor < nextMinor) {
+                throw new CustomException(FAILED_TO_DELETE_RELEASE_NOTE);
+            }
+        } else {
+            if (currentPatch < nextPatch) {
+                throw new CustomException(FAILED_TO_DELETE_RELEASE_NOTE);
+            }
+        }
+    }
+
+    /**
+     * 릴리즈 노트를 버전을 기준으로 오름차순으로 배열한다.
+     */
+    private List<ReleaseNote> sortReleaseNoteByAsc(List<ReleaseNote> releaseNotes) {
+
+        releaseNotes.sort((r1, r2) -> {
+            String[] v1s = r1.getVersion().split("\\.");
+            String[] v2s = r2.getVersion().split("\\.");
+
+            int majorV1 = Integer.parseInt(v1s[0]);
+            int minorV1 = Integer.parseInt(v1s[1]);
+            int patchV1 = Integer.parseInt(v1s[2]);
+
+            int majorV2 = Integer.parseInt(v2s[0]);
+            int minorV2 = Integer.parseInt(v2s[1]);
+            int patchV2 = Integer.parseInt(v2s[2]);
+
+            if (majorV1 != majorV2) {
+                return Integer.compare(majorV1, majorV2);
+            } else if (minorV1 != minorV2) {
+                return Integer.compare(minorV1, minorV2);
+            } else {
+                return Integer.compare(patchV1, patchV2);
+            }
+        });
+
+        return releaseNotes;
     }
 
     /**
@@ -872,5 +941,21 @@ public class ReleaseServiceImpl implements ReleaseService {
         // 요청에 따라 이슈의 요약 업데이트 후 저장
         issue.updateSummary(req);
         issueRepository.save(issue);
+    }
+
+    /**
+     * 사용자가 프로젝트의 PM인지 확인한다.
+     */
+    private void isProjectManager(String email, Project project) {
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(NOT_EXISTS_USER));
+        ProjectMember member = projectMemberRepository.findByUserAndProject(user, project);
+
+        if (member == null) {
+            throw new CustomException(NOT_EXISTS_PROJECT_MEMBER);
+        }
+
+        if (member.getPosition() != 'L') {
+            throw new CustomException(NOT_PROJECT_MANAGER);
+        }
     }
 }

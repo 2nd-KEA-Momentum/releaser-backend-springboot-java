@@ -25,7 +25,7 @@ public interface ReleaseService {
     /**
      * 5.4 릴리즈 노트 삭제
      */
-    String deleteReleaseNote(Long releaseId);
+    String deleteReleaseNote(String userEmail, Long releaseId);
 
     /**
      * 5.5 릴리즈 노트 조회

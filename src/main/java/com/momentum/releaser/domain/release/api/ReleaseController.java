@@ -63,9 +63,10 @@ public class ReleaseController {
      */
     @PostMapping(value = "/{releaseId}")
     public BaseResponse<String> deleteReleaseNote(
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
             @PathVariable @Min(value = 1, message = "릴리즈 식별 번호는 1 이상의 숫자여야 합니다.") Long releaseId) {
 
-        return new BaseResponse<>(releaseService.deleteReleaseNote(releaseId));
+        return new BaseResponse<>(releaseService.deleteReleaseNote(userPrincipal.getEmail(), releaseId));
     }
 
     /**
