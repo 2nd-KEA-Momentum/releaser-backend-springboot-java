@@ -84,12 +84,13 @@ public class ReleaseController {
     /**
      * 5.6 릴리즈 노트 배포 동의 여부 선택 (멤버용)
      */
-    @PostMapping(value = "/{releaseId}/approval")
+    @PostMapping(value = "/{releaseId}/approvals")
     public BaseResponse<List<ReleaseApprovalsResponseDto>> decideOnApprovalByMember(
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
             @PathVariable @Min(value = 1, message = "릴리즈 식별 번호는 1 이상의 숫자여야 합니다.") Long releaseId,
             @RequestBody @Valid ReleaseApprovalRequestDto releaseApprovalRequestDto) {
 
-        return new BaseResponse<>(releaseService.decideOnApprovalByMember(releaseId, releaseApprovalRequestDto));
+        return new BaseResponse<>(releaseService.decideOnApprovalByMember(userPrincipal.getEmail(), releaseId, releaseApprovalRequestDto));
     }
 
     /**

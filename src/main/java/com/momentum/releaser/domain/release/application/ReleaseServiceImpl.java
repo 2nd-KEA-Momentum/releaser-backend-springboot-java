@@ -149,15 +149,17 @@ public class ReleaseServiceImpl implements ReleaseService {
      */
     @Transactional
     @Override
-    public List<ReleaseApprovalsResponseDto> decideOnApprovalByMember(Long releaseId, ReleaseApprovalRequestDto releaseApprovalRequestDto) {
+    public List<ReleaseApprovalsResponseDto> decideOnApprovalByMember(String userEmail, Long releaseId, ReleaseApprovalRequestDto releaseApprovalRequestDto) {
         ReleaseNote releaseNote = getReleaseNoteById(releaseId);
-        ProjectMember projectMember = getProjectMemberById(releaseApprovalRequestDto.getMemberId());
+
+        // 프로젝트 멤버가 맞는지 확인하고, 맞다면 프로젝트 멤버를 반환한다.
+        ProjectMember member = getProjectMember(userEmail, releaseNote.getProject());
 
         // 배포 동의 여부를 선택할 수 있는 릴리즈인지 확인한다.
-        validateReleaseNoteApproval(projectMember, releaseNote);
+        validateReleaseNoteApproval(member, releaseNote);
 
         // 릴리즈 노트에 대한 배포 동의 여부를 업데이트한다.
-        updateReleaseNoteApproval(projectMember, releaseNote, releaseApprovalRequestDto.getApproval().charAt(0));
+        updateReleaseNoteApproval(member, releaseNote, releaseApprovalRequestDto.getApproval().charAt(0));
 
         // 프로젝트 멤버들의 업데이트된 동의 여부 목록을 반환한다.
         return getReleaseApprovals(releaseNote);
@@ -964,5 +966,20 @@ public class ReleaseServiceImpl implements ReleaseService {
             // 프로젝트의 관리자가 아닌 경우 예외를 발생시킨다.
             throw new CustomException(NOT_PROJECT_MANAGER);
         }
+    }
+
+    /**
+     * 사용자가 프로젝트의 멤버인지 확인한다.
+     */
+    private ProjectMember getProjectMember(String email, Project project) {
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(NOT_EXISTS_USER));
+        ProjectMember member = projectMemberRepository.findByUserAndProject(user, project);
+
+        if (member == null) {
+            // 프로젝트 멤버가 아닐 경우 예외를 발생시킨다.
+            throw new CustomException(NOT_EXISTS_PROJECT_MEMBER);
+        }
+
+        return member;
     }
 }
