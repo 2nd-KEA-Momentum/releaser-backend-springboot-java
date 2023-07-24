@@ -66,7 +66,7 @@ public interface IssueService {
     /**
      * 8.2 이슈 의견 삭제
      */
-    String deleteOpinion(Long opinionId, String email);
+    List<OpinionInfoRes> deleteOpinion(Long opinionId, String email);
 
 
 }
