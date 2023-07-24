@@ -15,7 +15,6 @@ import com.momentum.releaser.domain.release.domain.ReleaseApproval;
 import com.momentum.releaser.domain.release.domain.ReleaseEnum.ReleaseDeployStatus;
 import com.momentum.releaser.domain.release.domain.ReleaseNote;
 import com.momentum.releaser.domain.release.domain.ReleaseOpinion;
-import com.momentum.releaser.domain.release.dto.ReleaseDataDto;
 import com.momentum.releaser.domain.release.dto.ReleaseDataDto.CoordinateDataDto;
 import com.momentum.releaser.domain.release.dto.ReleaseDataDto.GetIssueTitle;
 import com.momentum.releaser.domain.release.dto.ReleaseDataDto.GetTags;
@@ -130,8 +129,11 @@ public class ReleaseServiceImpl implements ReleaseService {
         // 해당 릴리즈 노트에 대한 배포 동의 여부 데이터를 모두 삭제한다.
         releaseApprovalRepository.deleteByReleaseNote(releaseNote);
 
+        // 해당 릴리즈 노트를 삭제하기 전 연결된 이슈를 모두 해제한다.
+        disconnectIssues(releaseNote);
+
         // 해당 릴리즈 노트를 삭제한다.
-        releaseRepository.deleteById(releaseId);
+        releaseRepository.deleteById(releaseNote.getReleaseId());
 
         return "릴리즈 노트 삭제에 성공하였습니다.";
     }
