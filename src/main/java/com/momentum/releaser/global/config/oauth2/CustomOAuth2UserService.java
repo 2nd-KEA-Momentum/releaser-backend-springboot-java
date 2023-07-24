@@ -8,6 +8,7 @@ import com.momentum.releaser.domain.user.domain.AuthSocial;
 import com.momentum.releaser.domain.user.domain.User;
 import com.momentum.releaser.global.config.oauth2.user.OAuth2UserInfo;
 import com.momentum.releaser.global.config.oauth2.user.OAuth2UserInfoFactory;
+import com.momentum.releaser.global.jwt.AuthProvider;
 import com.momentum.releaser.global.jwt.UserPrincipal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
@@ -57,7 +58,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         if(userOptional.isPresent()) {
             user = userOptional.get();
             authSocial = authSocialOptional.get();
-            if(!authSocial.getType().equals(oAuth2UserRequest.getClientRegistration().getRegistrationId())) {
+            if(!authSocial.getProvider().equals(AuthProvider.valueOf(oAuth2UserRequest.getClientRegistration().getRegistrationId()))) {
                 throw new OAuth2AuthenticationProcessingException("이미 등록된 멤버입니다.");
             }
         } else {
@@ -75,7 +76,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 'Y');
         AuthSocial authSocial = new AuthSocial(
                 user,
-                oAuth2UserRequest.getClientRegistration().getRegistrationId(),
+                AuthProvider.valueOf(oAuth2UserRequest.getClientRegistration().getRegistrationId()),
                 null,
                 'Y'
         );
