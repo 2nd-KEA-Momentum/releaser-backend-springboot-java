@@ -61,7 +61,6 @@ public class ReleaseResponseDto {
         private Double coordY;
 
         @Builder
-
         public ReleaseCreateAndUpdateResponseDto(Long releaseId, String version, String summary, Date deployDate, ReleaseDeployStatus deployStatus, Double coordX, Double coordY) {
             this.releaseId = releaseId;
             this.version = version;
@@ -184,5 +183,7 @@ public class ReleaseResponseDto {
             }
         }
     }
+
+
 
 }

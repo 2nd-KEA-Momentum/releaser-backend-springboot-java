@@ -57,7 +57,7 @@ public class ProjectController {
      */
     @PostMapping("/{projectId}")
     public BaseResponse<String> deleteProject(
-            @PathVariable @Min(1) Long projectId) {
+            @PathVariable @Min(value = 1, message = "프로젝트 식별 번호는 1 이상의 숫자여야 합니다.") Long projectId) {
         return new BaseResponse<>(projectService.deleteProject(projectId));
     }
 
@@ -68,5 +68,17 @@ public class ProjectController {
     public BaseResponse<GetProjectRes> getProjects(@AuthenticationPrincipal UserPrincipal userPrincipal) {
         String email = userPrincipal.getEmail();
         return new BaseResponse<>(projectService.getProjects(email));
+    }
+
+    /**
+     * 10.1 프로젝트 내 통합검색
+     */
+    @GetMapping("/{projectId}")
+    public BaseResponse<ProjectSearchRes> getSearch(
+            @PathVariable @Min(value = 1, message = "프로젝트 식별 번호는 1 이상의 숫자여야 합니다.") Long projectId,
+            @RequestParam String filterTypeGroup,
+            @RequestParam(required = false) String filterIssueGroup,
+            @RequestParam(required = false) String filterReleaseGroup) {
+        return new BaseResponse<>(projectService.getProjectSearch(projectId, filterTypeGroup, filterIssueGroup, filterReleaseGroup));
     }
 }

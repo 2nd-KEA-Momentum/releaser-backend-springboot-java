@@ -1,5 +1,7 @@
 package com.momentum.releaser.domain.project.dto;
 
+import com.momentum.releaser.domain.project.dto.ProjectDataDto.GetIssueInfo;
+import com.momentum.releaser.domain.project.dto.ProjectDataDto.GetReleaseInfo;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.*;
 
@@ -80,6 +82,22 @@ public class ProjectResDto {
             this.name = name;
             this.img = img;
             this.position = position;
+        }
+    }
+
+    /**
+     * 10.1 프로젝트 내 통합검색
+     */
+    @Data
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    public static class ProjectSearchRes {
+        private List<GetReleaseInfo> getReleaseInfoList;
+        private List<GetIssueInfo> getIssueInfoList;
+
+        @Builder
+        public ProjectSearchRes(List<GetReleaseInfo> getReleaseInfoList, List<GetIssueInfo> getIssueInfoList) {
+            this.getReleaseInfoList = getReleaseInfoList;
+            this.getIssueInfoList = getIssueInfoList;
         }
     }
 

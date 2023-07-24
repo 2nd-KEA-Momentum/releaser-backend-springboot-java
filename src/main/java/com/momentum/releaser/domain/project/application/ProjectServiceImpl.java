@@ -1,20 +1,29 @@
 package com.momentum.releaser.domain.project.application;
 
 import com.momentum.releaser.domain.issue.dao.IssueRepository;
+import com.momentum.releaser.domain.issue.domain.Issue;
+import com.momentum.releaser.domain.issue.domain.QIssue;
 import com.momentum.releaser.domain.project.dao.ProjectMemberRepository;
 import com.momentum.releaser.domain.project.dao.ProjectRepository;
 import com.momentum.releaser.domain.project.domain.Project;
 import com.momentum.releaser.domain.project.domain.ProjectMember;
 import com.momentum.releaser.domain.project.dto.ProjectReqDto.ProjectInfoReq;
+import com.momentum.releaser.domain.project.dto.ProjectResDto;
 import com.momentum.releaser.domain.project.dto.ProjectResDto.GetProject;
 import com.momentum.releaser.domain.project.dto.ProjectResDto.GetProjectRes;
 import com.momentum.releaser.domain.project.dto.ProjectResDto.ProjectInfoRes;
+import com.momentum.releaser.domain.project.dto.ProjectResDto.ProjectSearchRes;
 import com.momentum.releaser.domain.project.mapper.ProjectMapper;
 import com.momentum.releaser.domain.release.dao.approval.ReleaseApprovalRepository;
+import com.momentum.releaser.domain.release.dao.release.ReleaseRepository;
+import com.momentum.releaser.domain.release.domain.QReleaseNote;
+import com.momentum.releaser.domain.release.domain.ReleaseNote;
 import com.momentum.releaser.domain.user.dao.UserRepository;
 import com.momentum.releaser.domain.user.domain.User;
 import com.momentum.releaser.global.config.aws.S3Upload;
 import com.momentum.releaser.global.exception.CustomException;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Predicate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -23,10 +32,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.time.LocalDate;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import static com.momentum.releaser.global.common.Base64.getImageUrlFromBase64;
 import static com.momentum.releaser.global.common.CommonEnum.DEFAULT_PROJECT_IMG;
@@ -41,6 +50,7 @@ public class ProjectServiceImpl implements ProjectService {
     private final ProjectMemberRepository projectMemberRepository;
     private final UserRepository userRepository;
     private final IssueRepository issueRepository;
+    private final ReleaseRepository releaseRepository;
     private final ReleaseApprovalRepository releaseApprovalRepository;
     private final ModelMapper modelMapper;
     private final S3Upload s3Upload;
@@ -136,6 +146,98 @@ public class ProjectServiceImpl implements ProjectService {
                 .getEnterProjectList(getEnterProjectList)
                 .build();
     }
+
+    /**
+     * 10.2 프로젝트 내 통합검색
+     */
+    @Override
+    @Transactional
+    public ProjectSearchRes getProjectSearch(Long projectId,
+                                                           String filterTypeGroup,
+                                                           String filterIssueGroup,
+                                                           String filterReleaseGroup) {
+
+        //filterGroup 파싱하여 검색조건 만들기
+        Predicate predicateRelease = buildPredicateFromFilters(filterTypeGroup, filterReleaseGroup);
+        Predicate predicateIssue = buildPredicateFromFilters(filterTypeGroup, filterIssueGroup);
+
+
+        // Query 실행
+        Iterable<ReleaseNote> resultRelease = releaseRepository.findAll(predicateRelease);
+        Iterable<Issue> resultIssue = issueRepository.findAll(predicateIssue);
+
+        // Iterable을 List로 변환
+        List<ReleaseNote> releaseNotes = StreamSupport.stream(resultRelease.spliterator(), false)
+                .collect(Collectors.toList());
+
+        List<Issue> issues = StreamSupport.stream(resultIssue.spliterator(), false)
+                .collect(Collectors.toList());
+
+        //mapper 사용해서 releaseRes 만들기
+        //mapper 사용해서 issueRes 만들기
+
+
+        //ProjectSearchRes 만들기
+        return null;
+    }
+
+    private Predicate buildPredicateFromFilters(String filterTypeGroup, String filterGroup) {
+        BooleanBuilder builder = new BooleanBuilder();
+
+        if (filterTypeGroup.equals("issue")) {
+            QIssue issue = QIssue.issue;
+
+            Map<String, String> filterMap = parseFilterGroup(filterGroup);
+            String startDateStr = filterMap.get("startDate");
+            String endDateStr = filterMap.get("endDate");
+            String manager = filterMap.get("manager");
+            String version = filterMap.get("version");
+            String tag = filterMap.get("tag");
+            String title = filterMap.get("title");
+
+            if (startDateStr != null && endDateStr != null) {
+                LocalDate startDate = LocalDate.parse(startDateStr);
+                LocalDate endDate = LocalDate.parse(endDateStr);
+
+                Date sqlStartDate = Date.valueOf(startDate);
+                Date sqlEndDate = Date.valueOf(endDate);
+
+                builder.and(issue.endDate.between(sqlStartDate, sqlEndDate));
+            }
+            if (manager != null) {
+                builder.and(issue.manager.eq(manager));
+            }
+            if (version != null) {
+                builder.and(issue.version.eq(version));
+            }
+            if (tag != null) {
+                builder.and(issue.tag.eq(tag));
+            }
+            if (title != null) {
+                builder.and(issue.title.containsIgnoreCase(title));
+            }
+        } else if ("release".equals(filterTypeGroup)) {
+            QReleaseNote releaseNote = QReleaseNote.releaseNote;
+        }
+        return null;
+    }
+
+    private Map<String, String> parseFilterGroup(String filterGroup) {
+        Map<String, String> filterMap = new HashMap<>();
+        String[] filters = filterGroup.split(",");
+        for (String filter : filters) {
+            String[] keyValue = filter.split(":");
+            if (keyValue.length == 2) {
+                filterMap.put(keyValue[0], keyValue[1]);
+            } else if (keyValue.length == 3 && "date".equals(keyValue[0])) {
+                filterMap.put("startDate", keyValue[1]);
+                filterMap.put("endDate", keyValue[2]);
+            }
+        }
+        return filterMap;
+    }
+
+
 
     // =================================================================================================================
 
