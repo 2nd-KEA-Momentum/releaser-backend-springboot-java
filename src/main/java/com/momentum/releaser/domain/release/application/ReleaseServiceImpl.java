@@ -15,9 +15,11 @@ import com.momentum.releaser.domain.release.domain.ReleaseApproval;
 import com.momentum.releaser.domain.release.domain.ReleaseEnum.ReleaseDeployStatus;
 import com.momentum.releaser.domain.release.domain.ReleaseNote;
 import com.momentum.releaser.domain.release.domain.ReleaseOpinion;
+import com.momentum.releaser.domain.release.dto.ReleaseDataDto;
 import com.momentum.releaser.domain.release.dto.ReleaseDataDto.CoordinateDataDto;
 import com.momentum.releaser.domain.release.dto.ReleaseDataDto.GetIssueTitle;
 import com.momentum.releaser.domain.release.dto.ReleaseDataDto.GetTags;
+import com.momentum.releaser.domain.release.dto.ReleaseDataDto.ReleaseOpinionsDataDto;
 import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.*;
 import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.*;
 import com.momentum.releaser.domain.release.mapper.ReleaseMapper;
@@ -141,8 +143,14 @@ public class ReleaseServiceImpl implements ReleaseService {
     @Override
     public ReleaseInfoResponseDto getReleaseNoteInfo(String userEmail, Long releaseId) {
         ReleaseNote releaseNote = getReleaseNoteById(releaseId);
-        isProjectMember(userEmail, releaseNote.getProject());
-        return ReleaseMapper.INSTANCE.toReleaseInfoResponseDto(releaseNote);
+
+        // 해당 프로젝트 멤버인지 식별한다.
+        ProjectMember member = getProjectMember(userEmail, releaseNote.getProject());
+
+        // 만약 릴리즈 노트 의견 목록 중 조회한 사용자가 작성한 댓글이 있다면, 삭제가 가능하도록 해준다.
+        List<ReleaseOpinionsDataDto> opinions = updateToAllowDeleteOpinion(releaseNote, member);
+
+        return ReleaseMapper.INSTANCE.toReleaseInfoResponseDto(releaseNote, opinions);
     }
 
     /**
@@ -995,5 +1003,20 @@ public class ReleaseServiceImpl implements ReleaseService {
         }
 
         return member;
+    }
+
+    /**
+     * 릴리즈 노트 의견을 삭제할 수 있도록 상태 값을 변경한다.
+     */
+    private List<ReleaseOpinionsDataDto> updateToAllowDeleteOpinion(ReleaseNote releaseNote, ProjectMember member) {
+        // DTO를 받아올 때 릴리즈 노트 의견을 작성한 사용자의 탈퇴 여부를 확인하고, 만약 탈퇴한 경우 memberId를 0으로 바꾼다.
+        List<ReleaseOpinionsDataDto> opinionDtos = releaseOpinionRepository.getDtosByReleaseNote(releaseNote);
+
+        for (ReleaseOpinionsDataDto opinionDto : opinionDtos) {
+            // 만약 요청한 사용자가 작성한 의견인 경우 삭제가 가능하도록 상태 값을 변경한다.
+            opinionDto.updateDeleteYN(opinionDto.getMemberId().equals(member.getMemberId()) ? 'Y' : 'N');
+        }
+
+        return opinionDtos;
     }
 }

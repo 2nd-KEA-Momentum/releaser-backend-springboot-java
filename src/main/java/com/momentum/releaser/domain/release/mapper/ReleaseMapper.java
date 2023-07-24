@@ -11,7 +11,10 @@ import com.momentum.releaser.domain.release.dto.ReleaseDataDto.ReleasesDataDto;
 import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.*;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
+
+import java.util.List;
 
 @Mapper(uses = {IssueMapper.class, ProjectMemberMapper.class})
 public interface ReleaseMapper {
@@ -31,8 +34,8 @@ public interface ReleaseMapper {
     /**
      * Entity (ReleaseNote) -> DTO(ReleaseInfoResponseDto)
      */
-    @Mapping(target = "opinions", source = "releaseNote.releaseOpinions")
-    ReleaseInfoResponseDto toReleaseInfoResponseDto(ReleaseNote releaseNote);
+    @Mapping(target = "opinions", source = "releaseOpinionsDataDtos")
+    ReleaseInfoResponseDto toReleaseInfoResponseDto(ReleaseNote releaseNote, List<ReleaseOpinionsDataDto> releaseOpinionsDataDtos);
 
     /**
      * Entity(ReleaseApproval) -> DTO(ReleaseApprovalsDataDto)
@@ -70,7 +73,5 @@ public interface ReleaseMapper {
     @Mapping(target = "memberName", source = "releaseOpinion.member.user.name")
     @Mapping(target = "memberProfileImg", source = "releaseOpinion.member.user.img")
     ReleaseOpinionsResponseDto toReleaseOpinionsResponseDto(ReleaseOpinion releaseOpinion);
-
-
 
 }

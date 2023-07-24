@@ -49,7 +49,9 @@ public class ReleaseDataDto {
         private Long memberId;
         private String memberName;
         private String memberProfileImg;
+        private char deleteYN;
 
+        @QueryProjection
         @Builder
         public ReleaseOpinionsDataDto(Long releaseOpinionId, String opinion, Long memberId, String memberName, String memberProfileImg) {
             this.releaseOpinionId = releaseOpinionId;
@@ -57,6 +59,13 @@ public class ReleaseDataDto {
             this.memberId = memberId;
             this.memberName = memberName;
             this.memberProfileImg = memberProfileImg;
+        }
+
+        /**
+         * 해당 사용자가 릴리즈 노트 의견을 삭제할 수 있는지 아닌지를 알려주는 값을 업데이트한다.
+         */
+        public void updateDeleteYN(char deleteYN) {
+            this.deleteYN = deleteYN;
         }
     }
 
