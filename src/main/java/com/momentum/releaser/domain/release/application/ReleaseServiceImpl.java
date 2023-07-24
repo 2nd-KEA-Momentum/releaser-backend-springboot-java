@@ -139,8 +139,9 @@ public class ReleaseServiceImpl implements ReleaseService {
      */
     @Transactional(readOnly = true)
     @Override
-    public ReleaseInfoResponseDto getReleaseNoteInfo(Long releaseId) {
+    public ReleaseInfoResponseDto getReleaseNoteInfo(String userEmail, Long releaseId) {
         ReleaseNote releaseNote = getReleaseNoteById(releaseId);
+        isProjectMember(userEmail, releaseNote.getProject());
         return ReleaseMapper.INSTANCE.toReleaseInfoResponseDto(releaseNote);
     }
 
@@ -970,6 +971,19 @@ public class ReleaseServiceImpl implements ReleaseService {
 
     /**
      * 사용자가 프로젝트의 멤버인지 확인한다.
+     */
+    private void isProjectMember(String email, Project project) {
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(NOT_EXISTS_USER));
+        ProjectMember member = projectMemberRepository.findByUserAndProject(user, project);
+
+        if (member == null) {
+            // 프로젝트 멤버가 아닐 경우 예외를 발생시킨다.
+            throw new CustomException(NOT_EXISTS_PROJECT_MEMBER);
+        }
+    }
+
+    /**
+     * 사용자가 프로젝트의 멤버인지 확인하고, 맞다면 가져온다.
      */
     private ProjectMember getProjectMember(String email, Project project) {
         User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(NOT_EXISTS_USER));

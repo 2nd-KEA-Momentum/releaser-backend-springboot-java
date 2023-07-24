@@ -76,9 +76,10 @@ public class ReleaseController {
      */
     @GetMapping(value = "/{releaseId}")
     public BaseResponse<ReleaseInfoResponseDto> getReleaseNote(
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
             @PathVariable @Min(value = 1, message = "릴리즈 식별 번호는 1 이상의 숫자여야 합니다.") Long releaseId) {
 
-        return new BaseResponse<>(releaseService.getReleaseNoteInfo(releaseId));
+        return new BaseResponse<>(releaseService.getReleaseNoteInfo(userPrincipal.getEmail(), releaseId));
     }
 
     /**
