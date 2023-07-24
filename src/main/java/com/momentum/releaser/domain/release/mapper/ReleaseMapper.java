@@ -11,9 +11,12 @@ import com.momentum.releaser.domain.release.dto.ReleaseDataDto.ReleasesDataDto;
 import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.*;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
 
-@Mapper(uses = {IssueMapper.class, ProjectMemberMapper.class})
+import java.util.List;
+
+@Mapper(uses = {ReleaseMapper.class, IssueMapper.class, ProjectMemberMapper.class})
 public interface ReleaseMapper {
 
     ReleaseMapper INSTANCE = Mappers.getMapper(ReleaseMapper.class);
@@ -31,8 +34,8 @@ public interface ReleaseMapper {
     /**
      * Entity (ReleaseNote) -> DTO(ReleaseInfoResponseDto)
      */
-    @Mapping(target = "opinions", source = "releaseNote.releaseOpinions")
-    ReleaseInfoResponseDto toReleaseInfoResponseDto(ReleaseNote releaseNote);
+    @Mapping(target = "opinions", source = "releaseOpinionsDataDtos")
+    ReleaseInfoResponseDto toReleaseInfoResponseDto(ReleaseNote releaseNote, List<ReleaseOpinionsDataDto> releaseOpinionsDataDtos);
 
     /**
      * Entity(ReleaseApproval) -> DTO(ReleaseApprovalsDataDto)
@@ -45,10 +48,10 @@ public interface ReleaseMapper {
     /**
      * Entity(ReleaseOpinion) -> DTO(ReleaseOpinionsDataDto)
      */
-    @Mapping(target = "memberId", source = "releaseOpinion.member.memberId")
-    @Mapping(target = "memberName", source = "releaseOpinion.member.user.name")
-    @Mapping(target = "memberProfileImg", source = "releaseOpinion.member.user.img")
-    ReleaseOpinionsDataDto toReleaseOpinionsDataDto(ReleaseOpinion releaseOpinion);
+//    @Mapping(target = "memberId", source = "releaseOpinion.member.memberId")
+//    @Mapping(target = "memberName", source = "releaseOpinion.member.user.name")
+//    @Mapping(target = "memberProfileImg", source = "releaseOpinion.member.user.img")
+//    ReleaseOpinionsDataDto toReleaseOpinionsDataDto(ReleaseOpinion releaseOpinion);
 
     /**
      * Entity(ReleaseApproval) -> DTO(ReleaseApprovalsResponseDto)
@@ -70,7 +73,5 @@ public interface ReleaseMapper {
     @Mapping(target = "memberName", source = "releaseOpinion.member.user.name")
     @Mapping(target = "memberProfileImg", source = "releaseOpinion.member.user.img")
     ReleaseOpinionsResponseDto toReleaseOpinionsResponseDto(ReleaseOpinion releaseOpinion);
-
-
 
 }
