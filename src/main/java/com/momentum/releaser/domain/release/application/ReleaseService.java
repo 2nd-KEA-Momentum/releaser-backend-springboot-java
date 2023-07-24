@@ -35,7 +35,7 @@ public interface ReleaseService {
     /**
      * 5.6 릴리즈 노트 배포 동의 여부 선택 (멤버용)
      */
-    List<ReleaseApprovalsResponseDto> decideOnApprovalByMember(Long releaseId, ReleaseApprovalRequestDto releaseApprovalRequestDto);
+    List<ReleaseApprovalsResponseDto> decideOnApprovalByMember(String userEmail, Long releaseId, ReleaseApprovalRequestDto releaseApprovalRequestDto);
 
     /**
      * 5.7 릴리즈 노트 그래프 좌표 추가

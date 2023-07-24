@@ -90,16 +90,11 @@ public class ReleaseRequestDto {
     @Getter
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     public static class ReleaseApprovalRequestDto {
-        @NotNull(message = "프로젝트 멤버 식별 번호는 1 이상의 숫자여야 합니다.")
-        @Min(value = 1, message = "프로젝트 멤버 식별 번호는 1 이상의 숫자여야 합니다.")
-        private Long memberId;
-
-        @Pattern(regexp = "(?i)^[YN]$", message = "Y 또는 N 값을 입력해 주세요.")
+        @Pattern(regexp = "(?i)^[PYN]$", message = "P, Y, N 값 중 하나를 입력해 주세요.")
         private String approval;
 
         @Builder
-        public ReleaseApprovalRequestDto(Long memberId, String approval) {
-            this.memberId = memberId;
+        public ReleaseApprovalRequestDto(String approval) {
             this.approval = approval;
         }
     }
