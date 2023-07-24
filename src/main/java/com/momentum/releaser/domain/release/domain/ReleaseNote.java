@@ -1,7 +1,6 @@
 package com.momentum.releaser.domain.release.domain;
 
 import com.momentum.releaser.domain.issue.domain.Issue;
-import com.momentum.releaser.domain.issue.domain.IssueNum;
 import com.momentum.releaser.domain.project.domain.Project;
 import com.momentum.releaser.domain.release.domain.ReleaseEnum.ReleaseDeployStatus;
 import com.momentum.releaser.global.common.BaseTime;
@@ -104,11 +103,6 @@ public class ReleaseNote extends BaseTime {
         // 릴리즈 노트 의견 삭제
         for (ReleaseOpinion opinion : releaseOpinions) {
             opinion.statusToInactive();
-        }
-
-        // 릴리즈 노트와 연결된 이슈 삭제
-        for (Issue issue : issues) {
-            issue.statusToInactive();
         }
     }
 
