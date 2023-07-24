@@ -30,7 +30,7 @@ public interface ReleaseService {
     /**
      * 5.5 릴리즈 노트 조회
      */
-    ReleaseInfoResponseDto getReleaseNoteInfo(Long releaseId);
+    ReleaseInfoResponseDto getReleaseNoteInfo(String userEmail, Long releaseId);
 
     /**
      * 5.6 릴리즈 노트 배포 동의 여부 선택 (멤버용)
