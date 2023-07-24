@@ -28,13 +28,6 @@ jwt:
   secret:
     key: ${JWT_SECRET_KEY}
 
-# OAuth2 클라이언트가 허용하는 리다이렉트 URI 목록
-#oauth2:
-#  client:
-#    authorized-redirect-uris:
-#      - http://localhost:8080/login/oauth2/code/google
-#      - https://www.releaser.shop/login/oauth2/code/google
-#      - http://localhost:3000/login/oauth2/code/google
 
 cloud:
   aws:
