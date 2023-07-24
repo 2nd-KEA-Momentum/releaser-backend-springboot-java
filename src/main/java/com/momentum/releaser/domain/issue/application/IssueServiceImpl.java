@@ -407,7 +407,7 @@ public class IssueServiceImpl implements IssueService {
      */
     @Override
     @Transactional
-    public String deleteOpinion(Long opinionId, String email) {
+    public List<OpinionInfoRes> deleteOpinion(Long opinionId, String email) {
         //Token UserInfo
         User user = findUserByEmail(email);
         //opinion
@@ -416,7 +416,9 @@ public class IssueServiceImpl implements IssueService {
         if (equalsMember(user, issueOpinion)) {
             //opinion soft delete
             issueOpinionRepository.deleteById(opinionId);
-            return "해당 이슈 의견이 삭제되었습니다.";
+            Long memberId = findProjectMemberByUserAndProject(user, issueOpinion.getIssue().getProject()).getMemberId();
+            List<OpinionInfoRes> opinionRes = getIssueOpinion(issueOpinion.getIssue(), memberId);
+            return opinionRes;
         }
         else {
             throw new CustomException(NOT_ISSUE_COMMENTER);
