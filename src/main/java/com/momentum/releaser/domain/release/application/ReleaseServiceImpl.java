@@ -150,7 +150,7 @@ public class ReleaseServiceImpl implements ReleaseService {
         // 만약 릴리즈 노트 의견 목록 중 조회한 사용자가 작성한 댓글이 있다면, 삭제가 가능하도록 해준다.
         List<ReleaseOpinionsDataDto> opinions = updateToAllowDeleteOpinion(releaseNote, member);
 
-        return ReleaseMapper.INSTANCE.toReleaseInfoResponseDto(releaseNote, opinions);
+        return createReleaseInfoResponseDto(releaseNote, opinions);
     }
 
     /**
@@ -1018,5 +1018,12 @@ public class ReleaseServiceImpl implements ReleaseService {
         }
 
         return opinionDtos;
+    }
+
+    /**
+     * ReleaseInfoResponseDto로 변환
+     */
+    private ReleaseInfoResponseDto createReleaseInfoResponseDto(ReleaseNote releaseNote, List<ReleaseOpinionsDataDto> opinions) {
+        return ReleaseMapper.INSTANCE.toReleaseInfoResponseDto(releaseNote, opinions);
     }
 }

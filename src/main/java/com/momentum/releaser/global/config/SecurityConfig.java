@@ -11,6 +11,8 @@ import com.momentum.releaser.global.jwt.JwtTokenProvider;
 import com.momentum.releaser.global.security.CustomAccessDeniedHandler;
 import com.momentum.releaser.global.security.CustomAuthenticationEntryPoint;
 import com.momentum.releaser.global.security.CustomUserDetailsService;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -31,6 +33,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import lombok.RequiredArgsConstructor;
 
 import javax.servlet.http.HttpSession;
+import java.util.List;
 
 /**
  * SecurityConfig는 Spring Security 설정을 위한 클래스.
@@ -53,6 +56,7 @@ public class SecurityConfig {
     private final AuthSocialRepository authSocialRepository;
     private final CustomUserDetailsService customUserDetailsService;
     private final CustomLogoutSuccessHandler customLogoutSuccessHandler;
+
 
 
     @Bean

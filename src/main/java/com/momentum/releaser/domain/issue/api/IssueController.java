@@ -133,7 +133,7 @@ public class IssueController {
      * 8.2 이슈 의견 삭제
      */
     @PostMapping("/opinion/{opinionId}")
-    public BaseResponse<String> deleteOpinion(@PathVariable @Min(value = 1, message = "이슈 의견 식별 번호는 1 이상의 숫자여야 합니다.") Long opinionId,
+    public BaseResponse<List<OpinionInfoRes>> deleteOpinion(@PathVariable @Min(value = 1, message = "이슈 의견 식별 번호는 1 이상의 숫자여야 합니다.") Long opinionId,
                                               @AuthenticationPrincipal UserPrincipal userPrincipal) {
         String email = userPrincipal.getEmail();
         return new BaseResponse<>(issueService.deleteOpinion(opinionId, email));

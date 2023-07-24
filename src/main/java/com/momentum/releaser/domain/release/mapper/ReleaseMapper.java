@@ -16,7 +16,7 @@ import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 
-@Mapper(uses = {IssueMapper.class, ProjectMemberMapper.class})
+@Mapper(uses = {ReleaseMapper.class, IssueMapper.class, ProjectMemberMapper.class})
 public interface ReleaseMapper {
 
     ReleaseMapper INSTANCE = Mappers.getMapper(ReleaseMapper.class);
@@ -48,10 +48,10 @@ public interface ReleaseMapper {
     /**
      * Entity(ReleaseOpinion) -> DTO(ReleaseOpinionsDataDto)
      */
-    @Mapping(target = "memberId", source = "releaseOpinion.member.memberId")
-    @Mapping(target = "memberName", source = "releaseOpinion.member.user.name")
-    @Mapping(target = "memberProfileImg", source = "releaseOpinion.member.user.img")
-    ReleaseOpinionsDataDto toReleaseOpinionsDataDto(ReleaseOpinion releaseOpinion);
+//    @Mapping(target = "memberId", source = "releaseOpinion.member.memberId")
+//    @Mapping(target = "memberName", source = "releaseOpinion.member.user.name")
+//    @Mapping(target = "memberProfileImg", source = "releaseOpinion.member.user.img")
+//    ReleaseOpinionsDataDto toReleaseOpinionsDataDto(ReleaseOpinion releaseOpinion);
 
     /**
      * Entity(ReleaseApproval) -> DTO(ReleaseApprovalsResponseDto)
