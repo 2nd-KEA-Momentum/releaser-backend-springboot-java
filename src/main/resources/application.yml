@@ -40,7 +40,9 @@ cloud:
       auto: false
     stack:
       auto: false
-
+app:
+  cors:
+    allowedOrigins: http://localhost:3000,http://localhost:8080, https://www.releaser.shop
 
 logging.level:
   org.hibernate.SQL: debug
