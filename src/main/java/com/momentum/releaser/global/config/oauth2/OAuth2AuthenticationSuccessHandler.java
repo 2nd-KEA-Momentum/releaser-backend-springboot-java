@@ -15,6 +15,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -26,7 +28,7 @@ import static com.momentum.releaser.global.config.oauth2.HttpCookieOAuth2Authori
 @RequiredArgsConstructor
 public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
-    private final JwtTokenProvider tokenProvider;
+    private final JwtTokenProvider jwtTokenProvider;
     private final HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
 
     @Override
@@ -55,12 +57,14 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         }
 
         String targetUrl = redirectUri.orElse(getDefaultTargetUrl());
-        TokenDto token = tokenProvider.generateToken(authentication);
+        TokenDto token = jwtTokenProvider.generateToken(authentication);
 
         return UriComponentsBuilder
                 .fromUriString(targetUrl)
-                .queryParam("token", token)
+                .queryParam("accessToken", token.getAccessToken())
+                .queryParam("refreshToken", token.getRefreshToken())
                 .build().toUriString();
+
     }
 
     protected void clearAuthenticationAttributes(HttpServletRequest request, HttpServletResponse response) {
