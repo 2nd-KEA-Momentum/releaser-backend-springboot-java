@@ -75,6 +75,7 @@ public class IssueRepositoryImpl implements IssueRepositoryCustom{
                                 issue.issueNum.issueNum,
                                 issue.title,
                                 issue.content,
+                                issue.endDate,
                                 member.memberId,
                                 user.name.as("memberName"),
                                 user.img.as("memberImg"),
