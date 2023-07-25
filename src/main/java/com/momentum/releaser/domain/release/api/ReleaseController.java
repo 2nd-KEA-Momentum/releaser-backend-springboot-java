@@ -119,11 +119,12 @@ public class ReleaseController {
     /**
      * 6.2 릴리즈 노트 의견 삭제
      */
-    @DeleteMapping("/opinions/{opinionId}")
+    @PostMapping("/opinions/{opinionId}")
     public BaseResponse<String> deleteReleaseOpinion(
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
             @PathVariable @Min(value = 1, message = "릴리즈 의견 식별 번호는 1 이상의 숫자여야 합니다.") Long opinionId) {
 
-        return new BaseResponse<>(releaseService.deleteReleaseOpinion(opinionId));
+        return new BaseResponse<>(releaseService.deleteReleaseOpinion(userPrincipal.getEmail(), opinionId));
     }
 
     /**
