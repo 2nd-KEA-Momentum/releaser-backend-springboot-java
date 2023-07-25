@@ -16,7 +16,7 @@ public class ProjectResDto {
         private Long projectId;
 
         @Builder
-        public ProjectInfoRes(Long projectId) {
+        public ProjectInfoRes(Long projectId, String projectName) {
             this.projectId = projectId;
         }
     }
