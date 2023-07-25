@@ -14,10 +14,12 @@ public class ProjectResDto {
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     public static class ProjectInfoRes {
         private Long projectId;
+        private String projectName;
 
         @Builder
-        public ProjectInfoRes(Long projectId) {
+        public ProjectInfoRes(Long projectId, String projectName) {
             this.projectId = projectId;
+            this.projectName = projectName;
         }
     }
 
