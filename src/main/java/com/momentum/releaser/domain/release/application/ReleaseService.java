@@ -33,7 +33,7 @@ public interface ReleaseService {
     ReleaseInfoResponseDto getReleaseNoteInfo(String userEmail, Long releaseId);
 
     /**
-     * 5.6 릴리즈 노트 배포 동의 여부 선택 (멤버용)
+     * 5.6 릴리즈 노트 배포 동의 여부 선택
      */
     List<ReleaseApprovalsResponseDto> decideOnApprovalByMember(String userEmail, Long releaseId, ReleaseApprovalRequestDto releaseApprovalRequestDto);
 

@@ -156,7 +156,7 @@ public class ReleaseServiceImpl implements ReleaseService {
     }
 
     /**
-     * 5.6 릴리즈 노트 배포 동의 여부 선택 (멤버용)
+     * 5.6 릴리즈 노트 배포 동의 여부 선택
      */
     @Transactional
     @Override
@@ -490,6 +490,8 @@ public class ReleaseServiceImpl implements ReleaseService {
         // 만약 요청된 릴리즈 노트의 배포 상태가 DEPLOYED인 경우
         if (releaseUpdateRequestDto.getDeployStatus().equals("DEPLOYED")) {
             Project project = releaseNote.getProject();
+
+            // FIXME: 나중에 QA 확인 필요 (Querydsl로 가져오면 2.0.0이 10.0.0보다 더 앞에 있게 된다.)
             List<ReleaseNote> releaseNotes = releaseRepository.findPreviousReleaseNotes(project, releaseUpdateRequestDto.getVersion());
 
             // 이전 릴리즈 노트 중 배포되지 않은 것이 있는지 검증하고, 아닌 경우 예외를 발생시킨다.
@@ -820,6 +822,56 @@ public class ReleaseServiceImpl implements ReleaseService {
         ReleaseApproval releaseApproval = releaseApprovalRepository.findByMemberAndRelease(member, releaseNote).orElseThrow(() -> new CustomException(NOT_EXISTS_RELEASE_APPROVAL));
         releaseApproval.updateApproval(approval);
         releaseApprovalRepository.save(releaseApproval);
+
+        if (member.getPosition() == 'L' && approval == 'Y') {
+            // 저장한 후 배포 동의 상태 값을 전달한 사용자가 관리자이고, 관리자가 동의를 선택한 경우 최종적으로 릴리즈 노트를 배포한다.
+            // 1. 모든 멤버의 동의 여부가 완료되었는지 확인한다.
+            checkIfApproveAllMembers(releaseNote);
+
+            // 2. 만약 이전에 배포되지 않은 버전이 있다면 예외를 발생시킨다.
+            checkIfNotDeployedReleaseNotes(releaseNote);
+
+            // 3. 모든 조건을 만족했다면 릴리즈 노트의 배포 상태 값을 배포 완료로 변경한다.
+            releaseNote.updateDeployStatus(ReleaseDeployStatus.DEPLOYED);
+            releaseRepository.save(releaseNote);
+        }
+    }
+
+    /**
+     * 이전에 배포되지 않은 버전이 있는지 확인한다.
+     */
+    private void checkIfNotDeployedReleaseNotes(ReleaseNote releaseNote) {
+        // 먼저 릴리즈 버전을 기준으로 오름차순 정렬한다.
+        List<ReleaseNote> releaseNotes = releaseRepository.findAllByProject(releaseNote.getProject());
+        List<ReleaseNote> sortedReleaseNotes = sortReleaseNoteByAsc(releaseNotes);
+
+        // 현재 릴리즈 노트의 인덱스를 찾는다.
+        int currentIdx = sortedReleaseNotes.indexOf(releaseNote);
+        if (currentIdx == 0) {
+            // 만약 해당 릴리즈 노트 하나밖에 없다면 유효성 검사를 통과할 수 있다.
+            return;
+        }
+
+        // 현재 릴리즈 노트의 이전 버전 중 배포되지 않은 릴리즈 노트가 있는지 확인하고, 있다면 예외를 발생시킨다.
+        for (int i = 0; i < currentIdx; i++) {
+            if (sortedReleaseNotes.get(i).getDeployStatus() != ReleaseDeployStatus.DEPLOYED) {
+                throw new CustomException(EXISTS_NOT_DEPLOYED_RELEASE_NOTE_BEFORE_THIS);
+            }
+        }
+    }
+
+    /**
+     * 모든 프로젝트 멤버가 배포를 동의했는지 확인한다.
+     */
+    private void checkIfApproveAllMembers(ReleaseNote releaseNote) {
+        // ReleaseApproval 테이블을 가져와서 모든 멤버의 배포 동의 값이 'Y'인지 확인한다.
+        List<ReleaseApproval> approvals = releaseApprovalRepository.findAllByRelease(releaseNote);
+        for (ReleaseApproval approval : approvals) {
+            if (approval.getApproval() != 'Y') {
+                // 만약 한 사람이라도 배포를 동의하지 않았다면 예외를 발생시킨다.
+                throw new CustomException(EXISTS_DISAPPROVED_MEMBER);
+            }
+        }
     }
 
     /**

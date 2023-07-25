@@ -171,4 +171,11 @@ public class ReleaseNote extends BaseTime {
         this.coordX = coordX;
         this.coordY = coordY;
     }
+
+    /**
+     * 릴리즈 노트 배포 상태를 업데이트한다.
+     */
+    public void updateDeployStatus(ReleaseDeployStatus deployStatus) {
+        this.deployStatus = deployStatus;
+    }
 }
