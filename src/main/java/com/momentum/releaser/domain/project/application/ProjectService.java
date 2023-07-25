@@ -7,6 +7,7 @@ import com.momentum.releaser.domain.project.dto.ProjectResDto.ProjectInfoRes;
 import com.momentum.releaser.domain.project.dto.ProjectResDto.ProjectSearchRes;
 
 import java.io.IOException;
+import java.text.ParseException;
 
 public interface ProjectService {
 
@@ -34,5 +35,5 @@ public interface ProjectService {
     /**
      * 10.1 프로젝트 내 통합검색
      */
-    ProjectSearchRes getProjectSearch(Long projectId, String filterTypeGroup, String filterIssueGroup, String filterReleaseGroup);
+    ProjectSearchRes getProjectSearch(Long projectId, String filterTypeGroup, String filterIssueGroup, String filterReleaseGroup) throws ParseException;
 }

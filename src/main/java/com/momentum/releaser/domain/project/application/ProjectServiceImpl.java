@@ -3,12 +3,12 @@ package com.momentum.releaser.domain.project.application;
 import com.momentum.releaser.domain.issue.dao.IssueRepository;
 import com.momentum.releaser.domain.issue.domain.Issue;
 import com.momentum.releaser.domain.issue.domain.QIssue;
+import com.momentum.releaser.domain.issue.domain.Tag;
 import com.momentum.releaser.domain.project.dao.ProjectMemberRepository;
 import com.momentum.releaser.domain.project.dao.ProjectRepository;
 import com.momentum.releaser.domain.project.domain.Project;
 import com.momentum.releaser.domain.project.domain.ProjectMember;
 import com.momentum.releaser.domain.project.dto.ProjectReqDto.ProjectInfoReq;
-import com.momentum.releaser.domain.project.dto.ProjectResDto;
 import com.momentum.releaser.domain.project.dto.ProjectResDto.GetProject;
 import com.momentum.releaser.domain.project.dto.ProjectResDto.GetProjectRes;
 import com.momentum.releaser.domain.project.dto.ProjectResDto.ProjectInfoRes;
@@ -32,6 +32,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -155,11 +157,13 @@ public class ProjectServiceImpl implements ProjectService {
     public ProjectSearchRes getProjectSearch(Long projectId,
                                                            String filterTypeGroup,
                                                            String filterIssueGroup,
-                                                           String filterReleaseGroup) {
+                                                           String filterReleaseGroup) throws ParseException {
 
         //filterGroup 파싱하여 검색조건 만들기
         Predicate predicateRelease = buildPredicateFromFilters(filterTypeGroup, filterReleaseGroup);
         Predicate predicateIssue = buildPredicateFromFilters(filterTypeGroup, filterIssueGroup);
+
+
 
 
         // Query 실행
@@ -181,7 +185,7 @@ public class ProjectServiceImpl implements ProjectService {
         return null;
     }
 
-    private Predicate buildPredicateFromFilters(String filterTypeGroup, String filterGroup) {
+    private Predicate buildPredicateFromFilters(String filterTypeGroup, String filterGroup) throws ParseException {
         BooleanBuilder builder = new BooleanBuilder();
 
         if (filterTypeGroup.equals("issue")) {
@@ -196,22 +200,20 @@ public class ProjectServiceImpl implements ProjectService {
             String title = filterMap.get("title");
 
             if (startDateStr != null && endDateStr != null) {
-                LocalDate startDate = LocalDate.parse(startDateStr);
-                LocalDate endDate = LocalDate.parse(endDateStr);
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                Date startDate = dateFormat.parse(startDateStr);
+                Date endDate = dateFormat.parse(endDateStr);
 
-                Date sqlStartDate = Date.valueOf(startDate);
-                Date sqlEndDate = Date.valueOf(endDate);
-
-                builder.and(issue.endDate.between(sqlStartDate, sqlEndDate));
+                builder.and(issue.endDate.between(startDate, endDate));
             }
             if (manager != null) {
-                builder.and(issue.manager.eq(manager));
+                builder.and(issue.member.memberId.eq(Long.valueOf(manager)));
             }
             if (version != null) {
-                builder.and(issue.version.eq(version));
+                builder.and(issue.release.version.eq(version));
             }
             if (tag != null) {
-                builder.and(issue.tag.eq(tag));
+                builder.and(issue.tag.eq(Tag.valueOf(tag)));
             }
             if (title != null) {
                 builder.and(issue.title.containsIgnoreCase(title));
