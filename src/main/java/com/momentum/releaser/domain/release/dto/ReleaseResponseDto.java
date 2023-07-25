@@ -114,13 +114,15 @@ public class ReleaseResponseDto {
         private Long memberId;
         private String memberName;
         private String memberProfileImg;
+        private char position;
         private char approval;
 
         @Builder
-        public ReleaseApprovalsResponseDto(Long memberId, String memberName, String memberProfileImg, char approval) {
+        public ReleaseApprovalsResponseDto(Long memberId, String memberName, String memberProfileImg, char position, char approval) {
             this.memberId = memberId;
             this.memberName = memberName;
             this.memberProfileImg = memberProfileImg;
+            this.position = position;
             this.approval = approval;
         }
     }

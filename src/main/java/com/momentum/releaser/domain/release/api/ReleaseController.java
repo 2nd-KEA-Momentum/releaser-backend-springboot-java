@@ -83,7 +83,7 @@ public class ReleaseController {
     }
 
     /**
-     * 5.6 릴리즈 노트 배포 동의 여부 선택 (멤버용)
+     * 5.6 릴리즈 노트 배포 동의 여부 선택
      */
     @PostMapping(value = "/{releaseId}/approvals")
     public BaseResponse<List<ReleaseApprovalsResponseDto>> decideOnApprovalByMember(
