@@ -19,7 +19,6 @@ public interface ProjectMapper {
     /**
      * Entity(Project) -> DTO(ProjectInfoRes)
      */
-    @Mapping(target = "projectName", source ="project.title")
     ProjectInfoRes toProjectInfoRes(Project project);
 
     /**
