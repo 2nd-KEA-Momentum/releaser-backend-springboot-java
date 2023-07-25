@@ -50,7 +50,7 @@ public interface ReleaseService {
     /**
      * 6.2 릴리즈 노트 의견 삭제
      */
-    String deleteReleaseOpinion(String userEmail, Long opinionId);
+    List<ReleaseOpinionsResponseDto> deleteReleaseOpinion(String userEmail, Long opinionId);
 
     /**
      * 6.3 릴리즈 노트 의견 목록 조회

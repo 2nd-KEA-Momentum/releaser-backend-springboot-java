@@ -120,7 +120,7 @@ public class ReleaseController {
      * 6.2 릴리즈 노트 의견 삭제
      */
     @PostMapping("/opinions/{opinionId}")
-    public BaseResponse<String> deleteReleaseOpinion(
+    public BaseResponse<List<ReleaseOpinionsResponseDto>> deleteReleaseOpinion(
             @AuthenticationPrincipal UserPrincipal userPrincipal,
             @PathVariable @Min(value = 1, message = "릴리즈 의견 식별 번호는 1 이상의 숫자여야 합니다.") Long opinionId) {
 
