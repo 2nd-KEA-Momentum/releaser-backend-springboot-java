@@ -108,7 +108,7 @@ public class ReleaseController {
      * 6.1 릴리즈 노트 의견 추가
      */
     @PostMapping(value = "/{releaseId}/opinions")
-    public BaseResponse<ReleaseOpinionCreateResponseDto> addReleaseOpinion(
+    public BaseResponse<List<ReleaseOpinionsResponseDto>> addReleaseOpinion(
             @AuthenticationPrincipal UserPrincipal userPrincipal,
             @PathVariable @Min(value = 1, message = "릴리즈 식별 번호는 1 이상의 숫자여야 합니다.") Long releaseId,
             @RequestBody @Valid ReleaseOpinionCreateRequestDto releaseOpinionCreateRequestDto) {
