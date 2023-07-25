@@ -121,16 +121,12 @@ public class ReleaseRequestDto {
     @Getter
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     public static class ReleaseOpinionCreateRequestDto {
-        @NotNull(message = "프로젝트 멤버 식별 번호는 1 이상의 숫자여야 합니다.")
-        @Min(value = 1, message = "프로젝트 멤버 식별 번호는 1 이상의 숫자여야 합니다.")
-        private Long memberId;
 
         @NotNull(message = "릴리즈 노트에 대한 의견을 작성해 주세요.")
         private String opinion;
 
         @Builder
-        public ReleaseOpinionCreateRequestDto(Long memberId, String opinion) {
-            this.memberId = memberId;
+        public ReleaseOpinionCreateRequestDto(String opinion) {
             this.opinion = opinion;
         }
     }

@@ -128,7 +128,7 @@ public class ReleaseResponseDto {
     }
 
     /**
-     * 6.1 릴리즈 노트 의견 추가
+     * 6.1 릴리즈 노트 의견 추가 (이전)
      */
     @Getter
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -142,7 +142,8 @@ public class ReleaseResponseDto {
     }
 
     /**
-     * 6.3 릴리즈 노트 의견 목록 조회
+     * 6.1 릴리즈 노트 의견 추가
+     * 6.2 릴리즈 노트 의견 삭제
      */
     @Getter
     @NoArgsConstructor(access = AccessLevel.PROTECTED)

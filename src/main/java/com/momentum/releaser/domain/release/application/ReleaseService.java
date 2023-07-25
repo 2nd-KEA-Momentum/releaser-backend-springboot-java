@@ -45,7 +45,7 @@ public interface ReleaseService {
     /**
      * 6.1 릴리즈 노트 의견 추가
      */
-    ReleaseOpinionCreateResponseDto addReleaseOpinion(Long releaseId, ReleaseOpinionCreateRequestDto releaseOpinionCreateRequestDto);
+    List<ReleaseOpinionsResponseDto> addReleaseOpinion(String userEmail, Long releaseId, ReleaseOpinionCreateRequestDto releaseOpinionCreateRequestDto);
 
     /**
      * 6.2 릴리즈 노트 의견 삭제

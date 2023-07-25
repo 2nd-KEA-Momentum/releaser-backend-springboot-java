@@ -191,11 +191,15 @@ public class ReleaseServiceImpl implements ReleaseService {
      */
     @Transactional
     @Override
-    public ReleaseOpinionCreateResponseDto addReleaseOpinion(Long releaseId, ReleaseOpinionCreateRequestDto releaseOpinionCreateRequestDto) {
+    public List<ReleaseOpinionsResponseDto> addReleaseOpinion(String userEmail, Long releaseId, ReleaseOpinionCreateRequestDto releaseOpinionCreateRequestDto) {
         ReleaseNote releaseNote = getReleaseNoteById(releaseId);
-        ProjectMember projectMember = getProjectMemberById(releaseOpinionCreateRequestDto.getMemberId());
-        ReleaseOpinion savedReleaseOpinion = saveReleaseOpinion(releaseNote, projectMember, releaseOpinionCreateRequestDto);
-        return ReleaseMapper.INSTANCE.toReleaseOpinionCreateResponseDto(savedReleaseOpinion);
+
+        // JWT 토큰을 이용하여 요청을 한 사용자의 프로젝트 멤버 정보를 가져온다.
+        ProjectMember projectMember = getProjectMemberByEmail(releaseNote.getProject(), userEmail);
+
+        saveReleaseOpinion(releaseNote, projectMember, releaseOpinionCreateRequestDto);
+
+        return createReleaseOpinionsResponseDto(releaseNote);
     }
 
     /**
@@ -928,14 +932,14 @@ public class ReleaseServiceImpl implements ReleaseService {
     /**
      * 릴리즈 노트 의견을 저장한다.
      */
-    private ReleaseOpinion saveReleaseOpinion(ReleaseNote releaseNote, ProjectMember member, ReleaseOpinionCreateRequestDto releaseOpinionCreateRequestDto) {
+    private void saveReleaseOpinion(ReleaseNote releaseNote, ProjectMember member, ReleaseOpinionCreateRequestDto releaseOpinionCreateRequestDto) {
         ReleaseOpinion releaseOpinion = ReleaseOpinion.builder()
                 .opinion(releaseOpinionCreateRequestDto.getOpinion())
                 .release(releaseNote)
                 .member(member)
                 .build();
 
-        return releaseOpinionRepository.save(releaseOpinion);
+        releaseOpinionRepository.save(releaseOpinion);
     }
 
     /**
@@ -1079,5 +1083,16 @@ public class ReleaseServiceImpl implements ReleaseService {
      */
     private ReleaseInfoResponseDto createReleaseInfoResponseDto(ReleaseNote releaseNote, List<ReleaseOpinionsDataDto> opinions) {
         return ReleaseMapper.INSTANCE.toReleaseInfoResponseDto(releaseNote, opinions);
+    }
+
+    /**
+     * ReleaseOpinionsResponseDto 배열 생성 후 변환
+     */
+    private List<ReleaseOpinionsResponseDto> createReleaseOpinionsResponseDto(ReleaseNote releaseNote) {
+        List<ReleaseOpinion> opinions = releaseOpinionRepository.findAllByRelease(releaseNote);
+
+        return opinions.stream()
+                .map(ReleaseMapper.INSTANCE::toReleaseOpinionsResponseDto)
+                .collect(Collectors.toList());
     }
 }
