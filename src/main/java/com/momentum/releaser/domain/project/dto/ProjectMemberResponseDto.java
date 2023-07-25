@@ -18,4 +18,21 @@ public class ProjectMemberResponseDto {
             this.position = position;
         }
     }
+
+    /**
+     * 4.2 프로젝트 멤버 추가
+     */
+    @Getter
+    @NoArgsConstructor
+    public static class InviteProjectMemberRes {
+        private Long projectId;
+        private String projectName;
+
+        @Builder
+        public InviteProjectMemberRes(Long projectId, String projectName) {
+            this.projectId = projectId;
+            this.projectName = projectName;
+        }
+    }
+
 }

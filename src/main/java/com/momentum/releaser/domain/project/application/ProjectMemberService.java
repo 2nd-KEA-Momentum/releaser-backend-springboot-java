@@ -1,5 +1,7 @@
 package com.momentum.releaser.domain.project.application;
 
+import com.momentum.releaser.domain.project.dto.ProjectMemberResponseDto;
+import com.momentum.releaser.domain.project.dto.ProjectMemberResponseDto.InviteProjectMemberRes;
 import com.momentum.releaser.domain.project.dto.ProjectResDto;
 import com.momentum.releaser.domain.project.dto.ProjectResDto.GetMembersRes;
 
@@ -14,7 +16,7 @@ public interface ProjectMemberService {
     /**
      * 4.2 프로젝트 멤버 추가
      */
-    String addMember(String link, String email);
+    InviteProjectMemberRes addMember(String link, String email);
 
 
     /**

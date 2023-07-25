@@ -4,6 +4,8 @@ import com.momentum.releaser.domain.project.dao.ProjectMemberRepository;
 import com.momentum.releaser.domain.project.dao.ProjectRepository;
 import com.momentum.releaser.domain.project.domain.Project;
 import com.momentum.releaser.domain.project.domain.ProjectMember;
+import com.momentum.releaser.domain.project.dto.ProjectMemberResponseDto;
+import com.momentum.releaser.domain.project.dto.ProjectMemberResponseDto.InviteProjectMemberRes;
 import com.momentum.releaser.domain.project.dto.ProjectResDto.GetMembersRes;
 import com.momentum.releaser.domain.project.mapper.ProjectMemberMapper;
 import com.momentum.releaser.domain.release.dao.approval.ReleaseApprovalRepository;
@@ -83,22 +85,27 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
      */
     @Override
     @Transactional
-    public String addMember(String link, String email) {
+    public InviteProjectMemberRes addMember(String link, String email) {
         //Token UserInfo
         User user = findUserByEmail(email);
 
         //link check
         Project project = projectRepository.findByLink(link).orElseThrow(() -> new CustomException(NOT_EXISTS_LINK));
 
+        InviteProjectMemberRes res = InviteProjectMemberRes.builder()
+                .projectId(project.getProjectId())
+                .projectName(project.getTitle())
+                .build();
+
         //projectMember 존재여부 확인
         if (isProjectMember(user, project)) {
-            throw new CustomException(ALREADY_EXISTS_PROJECT_MEMBER);
+            throw new CustomException(ALREADY_EXISTS_PROJECT_MEMBER, res);
         }
         // member 추가
         ProjectMember member = addProjectMember(project, user);
         // approval 추가
         addReleaseApprovalsForProjectMember(member, project);
-        return "프로젝트 참여가 완료되었습니다.";
+        return res;
     }
 
     private boolean isProjectMember(User user, Project project) {
