@@ -43,6 +43,7 @@ public interface ReleaseMapper {
     @Mapping(target = "memberId", source = "releaseApproval.member.memberId")
     @Mapping(target = "memberName", source = "releaseApproval.member.user.name")
     @Mapping(target = "memberProfileImg", source = "releaseApproval.member.user.img")
+    @Mapping(target = "position", source = "releaseApproval.member.position")
     ReleaseApprovalsDataDto toReleaseApprovalsDataDto(ReleaseApproval releaseApproval);
 
     /**
