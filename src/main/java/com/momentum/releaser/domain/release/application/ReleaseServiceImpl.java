@@ -191,9 +191,12 @@ public class ReleaseServiceImpl implements ReleaseService {
      */
     @Transactional
     @Override
-    public ReleaseOpinionCreateResponseDto addReleaseOpinion(Long releaseId, ReleaseOpinionCreateRequestDto releaseOpinionCreateRequestDto) {
+    public ReleaseOpinionCreateResponseDto addReleaseOpinion(String userEmail, Long releaseId, ReleaseOpinionCreateRequestDto releaseOpinionCreateRequestDto) {
         ReleaseNote releaseNote = getReleaseNoteById(releaseId);
-        ProjectMember projectMember = getProjectMemberById(releaseOpinionCreateRequestDto.getMemberId());
+
+        // JWT 토큰을 이용하여 요청을 한 사용자의 프로젝트 멤버 정보를 가져온다.
+        ProjectMember projectMember = getProjectMemberByEmail(releaseNote.getProject(), userEmail);
+
         ReleaseOpinion savedReleaseOpinion = saveReleaseOpinion(releaseNote, projectMember, releaseOpinionCreateRequestDto);
         return ReleaseMapper.INSTANCE.toReleaseOpinionCreateResponseDto(savedReleaseOpinion);
     }

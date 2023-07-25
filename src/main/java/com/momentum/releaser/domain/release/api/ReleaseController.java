@@ -109,10 +109,11 @@ public class ReleaseController {
      */
     @PostMapping(value = "/{releaseId}/opinions")
     public BaseResponse<ReleaseOpinionCreateResponseDto> addReleaseOpinion(
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
             @PathVariable @Min(value = 1, message = "릴리즈 식별 번호는 1 이상의 숫자여야 합니다.") Long releaseId,
             @RequestBody @Valid ReleaseOpinionCreateRequestDto releaseOpinionCreateRequestDto) {
 
-        return new BaseResponse<>(releaseService.addReleaseOpinion(releaseId, releaseOpinionCreateRequestDto));
+        return new BaseResponse<>(releaseService.addReleaseOpinion(userPrincipal.getEmail(), releaseId, releaseOpinionCreateRequestDto));
     }
 
     /**
