@@ -207,9 +207,18 @@ public class ReleaseServiceImpl implements ReleaseService {
      */
     @Transactional
     @Override
-    public String deleteReleaseOpinion(Long opinionId) {
+    public List<ReleaseOpinionsResponseDto> deleteReleaseOpinion(String userEmail, Long opinionId) {
+        ReleaseOpinion releaseOpinion = getReleaseOpinionById(opinionId);
+
+        // JWT 토큰을 이용하여 요청을 한 사용자의 프로젝트 멤버 정보를 가져온다.
+        ProjectMember member = getProjectMemberByEmail(releaseOpinion.getRelease().getProject(), userEmail);
+
+        // 해당 의견을 작성한 사용자가 맞는지 확인한다. 아니라면 예외를 발생시킨다.
+        validateOpinionAndMember(releaseOpinion, member);
+
         releaseOpinionRepository.deleteById(opinionId);
-        return "릴리즈 노트 의견 삭제에 성공하였습니다.";
+
+        return createReleaseOpinionsResponseDto(releaseOpinion.getRelease());
     }
 
     /**
@@ -298,6 +307,13 @@ public class ReleaseServiceImpl implements ReleaseService {
      */
     private ReleaseNote getReleaseNoteById(Long releaseId) {
         return releaseRepository.findById(releaseId).orElseThrow(() -> new CustomException(NOT_EXISTS_RELEASE_NOTE));
+    }
+
+    /**
+     * 릴리즈 노트 의견 식별 번호를 통해 릴리즈 의견 엔티티를 가져온다.
+     */
+    private ReleaseOpinion getReleaseOpinionById(Long opinionId) {
+        return releaseOpinionRepository.findById(opinionId).orElseThrow(() -> new CustomException(NOT_EXISTS_RELEASE_OPINION));
     }
 
     /**
@@ -1094,5 +1110,15 @@ public class ReleaseServiceImpl implements ReleaseService {
         return opinions.stream()
                 .map(ReleaseMapper.INSTANCE::toReleaseOpinionsResponseDto)
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * 릴리즈 노트 의견 작성자와 의견 삭제 요청을 보낸 멤버가 같은 사람인지 확인한다.
+     */
+    private void validateOpinionAndMember(ReleaseOpinion opinion, ProjectMember member) {
+        if (opinion.getMember() != member) {
+            // 만약 작성자가 같은 사람이 아닌 경우 예외를 발생시킨다.
+            throw new CustomException(UNAUTHORIZED_TO_DELETE_RELEASE_OPINION);
+        }
     }
 }
