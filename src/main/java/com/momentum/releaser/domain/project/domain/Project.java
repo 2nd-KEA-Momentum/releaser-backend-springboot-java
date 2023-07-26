@@ -79,6 +79,9 @@ public class Project extends BaseTime {
         this.status = status;
     }
 
+    /**
+     * delete 되기 전 실행된다.
+     */
     @PreRemove
     private void preRemove() {
         for (ProjectMember member : members) {
@@ -99,17 +102,23 @@ public class Project extends BaseTime {
     }
 
     /**
-     * insert 되기전 (persist 되기전) 실행된다.
+     * insert 되기 전 (persist 되기전) 실행된다.
      */
     @PrePersist
     public void prePersist() {
         this.status = (this.status == '\0') ? 'Y' : this.status;
     }
 
+    /**
+     * 이슈 번호 제거
+     */
     public void removeIssueNum(IssueNum issueNum) {
         issueNums.remove(issueNum);
     }
 
+    /**
+     * 프로젝트 정보 업데이트
+     */
     public void updateProject(ProjectInfoRequestDTO updateReq, String url) {
         this.title = updateReq.getTitle();
         this.content = updateReq.getContent();
@@ -117,6 +126,9 @@ public class Project extends BaseTime {
         this.img = url;
     }
 
+    /**
+     * 프로젝트 이미지 업데이트
+     */
     public void updateImg(String img) {
         this.img = img;
     }
