@@ -27,12 +27,12 @@ public class ProjectMemberResponseDto {
 
     @Getter
     @NoArgsConstructor
-    public static class ProjectMemberPositionResponseDto {
+    public static class ProjectMemberPositionResponseDTO {
         private Long memberId;
         private char position;
 
         @Builder
-        public ProjectMemberPositionResponseDto(Long memberId, char position) {
+        public ProjectMemberPositionResponseDTO(Long memberId, char position) {
             this.memberId = memberId;
             this.position = position;
         }
@@ -43,12 +43,12 @@ public class ProjectMemberResponseDto {
      */
     @Getter
     @NoArgsConstructor
-    public static class InviteProjectMemberRes {
+    public static class InviteProjectMemberResponseDTO {
         private Long projectId;
         private String projectName;
 
         @Builder
-        public InviteProjectMemberRes(Long projectId, String projectName) {
+        public InviteProjectMemberResponseDTO(Long projectId, String projectName) {
             this.projectId = projectId;
             this.projectName = projectName;
         }

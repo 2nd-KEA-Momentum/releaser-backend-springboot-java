@@ -2,7 +2,7 @@ package com.momentum.releaser.domain.release.dto;
 
 import com.momentum.releaser.domain.issue.dto.IssueDataDto.ConnectedIssuesDataDto;
 import com.momentum.releaser.domain.project.dto.ProjectMemberResponseDto;
-import com.momentum.releaser.domain.project.dto.ProjectMemberResponseDto.ProjectMemberPositionResponseDto;
+import com.momentum.releaser.domain.project.dto.ProjectMemberResponseDto.ProjectMemberPositionResponseDTO;
 import com.momentum.releaser.domain.release.domain.ReleaseEnum;
 import com.momentum.releaser.domain.release.domain.ReleaseEnum.ReleaseDeployStatus;
 import com.momentum.releaser.domain.release.dto.ReleaseDataDto.GetTags;
@@ -30,13 +30,13 @@ public class ReleaseResponseDto {
         private String team;
         private String img;
 
-        private ProjectMemberPositionResponseDto member;
+        private ProjectMemberPositionResponseDTO member;
 
         // 릴리즈 노트 목록
         private List<ReleasesDataDto> releases;
 
         @Builder
-        public ReleasesResponseDto(Long projectId, String title, String team, String img, ProjectMemberPositionResponseDto member, List<ReleasesDataDto> releases) {
+        public ReleasesResponseDto(Long projectId, String title, String team, String img, ProjectMemberPositionResponseDTO member, List<ReleasesDataDto> releases) {
             this.projectId = projectId;
             this.title = title;
             this.team = team;
