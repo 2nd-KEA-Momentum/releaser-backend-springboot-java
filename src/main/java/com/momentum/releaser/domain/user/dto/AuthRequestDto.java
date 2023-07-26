@@ -1,19 +1,22 @@
 package com.momentum.releaser.domain.user.dto;
 
+import javax.validation.constraints.*;
+
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.*;
 
-public class AuthReqDto {
+public class AuthRequestDto {
     /**
-     * 회원가입
+     * 2.1 회원가입
+     *
+     * 회원가입 요청 DTO
      */
     @Data
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    public static class UserInfoReq {
+    public static class UserInfoReqestDTO {
 
         @NotBlank(message = "이름을 입력해주세요.")
         @Size(min = 1, max = 20)
@@ -29,7 +32,7 @@ public class AuthReqDto {
         private String password;
 
         @Builder
-        public UserInfoReq(String name, String email, String password) {
+        public UserInfoReqestDTO(String name, String email, String password) {
             this.name = name;
             this.email = email;
             this.password = password;
@@ -37,11 +40,13 @@ public class AuthReqDto {
     }
 
     /**
-     * 로그인
+     * 2.2 이메일 로그인
+     *
+     * 로그인 요청 DTO
      */
     @Data
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    public static class UserLoginReq {
+    public static class UserLoginReqestDTO {
 
         @NotBlank(message = "이메일을 입력해주세요.")
         @Email(message = "이메일 형식에 맞지 않습니다.")
@@ -53,7 +58,7 @@ public class AuthReqDto {
         private String password;
 
         @Builder
-        public UserLoginReq(String email, String password) {
+        public UserLoginReqestDTO(String email, String password) {
             this.email = email;
             this.password = password;
         }

@@ -4,7 +4,6 @@ import lombok.*;
 
 /**
  * 클라이언트에 토큰을 보내기 위한 DTO
- * @author rimsong
  */
 
 @Builder
