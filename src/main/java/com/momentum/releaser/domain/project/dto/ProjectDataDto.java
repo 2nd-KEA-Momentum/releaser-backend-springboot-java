@@ -32,7 +32,9 @@ public class ProjectDataDto {
         }
     }
 
-    // 개별 프로젝트 조회
+    /**
+     * 개별 프로젝트 조회
+     */
     @Data
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     public static class GetProjectDateDTO {
