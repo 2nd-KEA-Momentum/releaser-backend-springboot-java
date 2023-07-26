@@ -1,6 +1,6 @@
 package com.momentum.releaser.global.config;
 
-import com.momentum.releaser.domain.project.dto.ProjectMemberResponseDto.InviteProjectMemberRes;
+import com.momentum.releaser.domain.project.dto.ProjectMemberResponseDto.InviteProjectMemberResponseDTO;
 import lombok.Getter;
 
 /**
@@ -99,7 +99,7 @@ public enum BaseResponseStatus {
         return message + " (releaseId: " + releaseId + ")";
     }
 
-    public String getErrorMessageDto(InviteProjectMemberRes inviteProjectMemberRes) {
+    public String getErrorMessageDto(InviteProjectMemberResponseDTO inviteProjectMemberRes) {
 
         return message + inviteProjectMemberRes;
     }
