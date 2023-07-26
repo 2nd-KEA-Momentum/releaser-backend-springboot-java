@@ -1,7 +1,7 @@
 package com.momentum.releaser.domain.project.api;
 
 import com.momentum.releaser.domain.project.application.ProjectService;
-import com.momentum.releaser.domain.project.dto.ProjectReqDto.ProjectInfoReq;
+import com.momentum.releaser.domain.project.dto.ProjectRequestDto.ProjectInfoReq;
 import com.momentum.releaser.global.config.BaseResponse;
 import com.momentum.releaser.global.jwt.UserPrincipal;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +15,7 @@ import javax.validation.constraints.Min;
 
 import java.io.IOException;
 
-import static com.momentum.releaser.domain.project.dto.ProjectResDto.*;
+import static com.momentum.releaser.domain.project.dto.ProjectResponseDto.*;
 
 @Slf4j
 @RestController

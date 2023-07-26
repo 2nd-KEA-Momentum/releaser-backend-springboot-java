@@ -1,8 +1,8 @@
 package com.momentum.releaser.domain.project.application;
 
-import com.momentum.releaser.domain.project.dto.ProjectReqDto.ProjectInfoReq;
-import com.momentum.releaser.domain.project.dto.ProjectResDto.GetProjectRes;
-import com.momentum.releaser.domain.project.dto.ProjectResDto.ProjectInfoRes;
+import com.momentum.releaser.domain.project.dto.ProjectRequestDto.ProjectInfoReq;
+import com.momentum.releaser.domain.project.dto.ProjectResponseDto.GetProjectRes;
+import com.momentum.releaser.domain.project.dto.ProjectResponseDto.ProjectInfoRes;
 
 import java.io.IOException;
 

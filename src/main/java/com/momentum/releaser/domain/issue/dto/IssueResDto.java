@@ -1,17 +1,12 @@
 package com.momentum.releaser.domain.issue.dto;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.momentum.releaser.domain.issue.domain.LifeCycle;
-import com.momentum.releaser.domain.issue.domain.Tag;
-import com.momentum.releaser.domain.project.dto.ProjectResDto;
-import com.momentum.releaser.domain.project.dto.ProjectResDto.GetMembersRes;
+import com.momentum.releaser.domain.project.dto.ProjectResponseDto.GetMembersRes;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 

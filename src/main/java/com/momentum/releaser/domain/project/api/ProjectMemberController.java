@@ -1,13 +1,10 @@
 package com.momentum.releaser.domain.project.api;
 
 import com.momentum.releaser.domain.project.application.ProjectMemberService;
-import com.momentum.releaser.domain.project.dto.ProjectMemberResponseDto;
 import com.momentum.releaser.domain.project.dto.ProjectMemberResponseDto.InviteProjectMemberRes;
-import com.momentum.releaser.domain.project.dto.ProjectResDto;
-import com.momentum.releaser.domain.project.dto.ProjectResDto.GetMembersRes;
+import com.momentum.releaser.domain.project.dto.ProjectResponseDto.GetMembersRes;
 import com.momentum.releaser.global.config.BaseResponse;
 import com.momentum.releaser.global.jwt.UserPrincipal;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -15,7 +12,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Slf4j

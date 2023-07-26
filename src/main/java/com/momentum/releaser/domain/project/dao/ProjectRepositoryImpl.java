@@ -1,9 +1,8 @@
 package com.momentum.releaser.domain.project.dao;
 
 import com.momentum.releaser.domain.project.domain.Project;
-import com.momentum.releaser.domain.project.domain.QProject;
 import com.momentum.releaser.domain.project.domain.QProjectMember;
-import com.momentum.releaser.domain.project.dto.ProjectResDto.GetMembersRes;
+import com.momentum.releaser.domain.project.dto.ProjectResponseDto.GetMembersRes;
 import com.momentum.releaser.domain.project.dto.QProjectResDto_GetMembersRes;
 import com.momentum.releaser.domain.user.domain.QUser;
 import com.querydsl.jpa.impl.JPAQueryFactory;

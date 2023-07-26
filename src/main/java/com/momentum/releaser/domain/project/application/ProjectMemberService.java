@@ -1,9 +1,7 @@
 package com.momentum.releaser.domain.project.application;
 
-import com.momentum.releaser.domain.project.dto.ProjectMemberResponseDto;
 import com.momentum.releaser.domain.project.dto.ProjectMemberResponseDto.InviteProjectMemberRes;
-import com.momentum.releaser.domain.project.dto.ProjectResDto;
-import com.momentum.releaser.domain.project.dto.ProjectResDto.GetMembersRes;
+import com.momentum.releaser.domain.project.dto.ProjectResponseDto.GetMembersRes;
 
 import java.util.List;
 

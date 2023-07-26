@@ -1,9 +1,8 @@
 package com.momentum.releaser.domain.project.mapper;
 
 import com.momentum.releaser.domain.project.domain.ProjectMember;
-import com.momentum.releaser.domain.project.dto.ProjectMemberDatoDto.ProjectMembersDataDto;
-import com.momentum.releaser.domain.project.dto.ProjectResDto;
-import com.momentum.releaser.domain.project.dto.ProjectResDto.GetMembersRes;
+import com.momentum.releaser.domain.project.dto.ProjectMemberDataDto.ProjectMembersDataDto;
+import com.momentum.releaser.domain.project.dto.ProjectResponseDto.GetMembersRes;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;

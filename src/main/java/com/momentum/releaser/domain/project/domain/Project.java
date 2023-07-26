@@ -3,8 +3,7 @@ package com.momentum.releaser.domain.project.domain;
 
 import com.momentum.releaser.domain.issue.domain.Issue;
 import com.momentum.releaser.domain.issue.domain.IssueNum;
-import com.momentum.releaser.domain.project.dto.ProjectReqDto.ProjectInfoReq;
-import com.momentum.releaser.domain.release.domain.ReleaseApproval;
+import com.momentum.releaser.domain.project.dto.ProjectRequestDto.ProjectInfoReq;
 import com.momentum.releaser.domain.release.domain.ReleaseNote;
 import com.momentum.releaser.global.common.BaseTime;
 import com.sun.istack.NotNull;

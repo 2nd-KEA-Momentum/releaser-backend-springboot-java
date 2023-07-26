@@ -5,7 +5,7 @@ import lombok.*;
 
 import java.util.List;
 
-public class ProjectResDto {
+public class ProjectResponseDto {
 
     /**
      * 프로젝트 정보 - 생성, 수정

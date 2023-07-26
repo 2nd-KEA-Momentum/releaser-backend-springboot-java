@@ -5,7 +5,7 @@ import lombok.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
-public class ProjectReqDto {
+public class ProjectRequestDto {
 
     /**
      * 프로젝트 정보 - 생성, 수정

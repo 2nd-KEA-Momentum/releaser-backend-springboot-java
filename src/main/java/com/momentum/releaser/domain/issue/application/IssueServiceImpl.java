@@ -11,7 +11,7 @@ import com.momentum.releaser.domain.project.dao.ProjectMemberRepository;
 import com.momentum.releaser.domain.project.dao.ProjectRepository;
 import com.momentum.releaser.domain.project.domain.Project;
 import com.momentum.releaser.domain.project.domain.ProjectMember;
-import com.momentum.releaser.domain.project.dto.ProjectResDto.GetMembersRes;
+import com.momentum.releaser.domain.project.dto.ProjectResponseDto.GetMembersRes;
 import com.momentum.releaser.domain.release.dao.release.ReleaseRepository;
 import com.momentum.releaser.domain.release.domain.ReleaseNote;
 import com.momentum.releaser.domain.user.dao.UserRepository;
