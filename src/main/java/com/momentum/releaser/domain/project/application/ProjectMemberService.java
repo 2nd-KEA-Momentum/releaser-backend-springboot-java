@@ -9,7 +9,7 @@ public interface ProjectMemberService {
     /**
      * 4.1 프로젝트 멤버 조회
      */
-    List<MembersResponseDTO> findProjectMembers(Long projectId, String email);
+    MembersResponseDTO findProjectMembers(Long projectId, String email);
 
     /**
      * 4.2 프로젝트 멤버 추가
