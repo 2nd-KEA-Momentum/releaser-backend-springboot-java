@@ -122,7 +122,7 @@ public class ReleaseRequestDto {
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     public static class ReleaseOpinionCreateRequestDto {
 
-        @NotNull(message = "릴리즈 노트에 대한 의견을 작성해 주세요.")
+        @NotBlank(message = "릴리즈 노트에 대한 의견을 작성해 주세요.")
         private String opinion;
 
         @Builder
