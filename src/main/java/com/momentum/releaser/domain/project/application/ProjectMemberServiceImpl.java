@@ -71,6 +71,8 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
         char position = accessMember.getPosition();
         char deleteYN = (position == 'L') ? 'Y' : 'N';
 
+
+        MembersResponseDTO.builder().link().memberList().build();
         MembersResponseDTO getMembersRes = ProjectMemberMapper.INSTANCE.toGetMembersRes(projectMember);
         getMembersRes.setDeleteYN(deleteYN);
 
