@@ -27,6 +27,9 @@ public class RefreshToken {
         this.userEmail = email;
     }
 
+    /**
+     * 새로운 Refresh Token으로 업데이트
+     */
     public RefreshToken updateToken(String token) {
         this.refreshToken = token;
         return this;
