@@ -9,7 +9,7 @@ import com.momentum.releaser.domain.project.dto.ProjectDataDto.GetProjectDateDTO
 public class ProjectResponseDto {
 
     /**
-     * 프로젝트 정보 - 생성, 수정
+     * 프로젝트 정보
      */
     @Data
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
