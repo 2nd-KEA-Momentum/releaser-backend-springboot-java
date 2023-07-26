@@ -1,22 +1,25 @@
 package com.momentum.releaser.domain.project.domain;
 
+import java.util.ArrayList;
+import java.util.List;
 
-import com.momentum.releaser.domain.issue.domain.Issue;
-import com.momentum.releaser.domain.issue.domain.IssueNum;
-import com.momentum.releaser.domain.project.dto.ProjectRequestDto.ProjectInfoReq;
-import com.momentum.releaser.domain.release.domain.ReleaseNote;
-import com.momentum.releaser.global.common.BaseTime;
-import com.sun.istack.NotNull;
+import javax.persistence.*;
+
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
+
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
 
-import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
+import com.sun.istack.NotNull;
+
+import com.momentum.releaser.domain.issue.domain.Issue;
+import com.momentum.releaser.domain.issue.domain.IssueNum;
+import com.momentum.releaser.domain.project.dto.ProjectRequestDto.ProjectInfoRequestDTO;
+import com.momentum.releaser.domain.release.domain.ReleaseNote;
+import com.momentum.releaser.global.common.BaseTime;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -76,17 +79,6 @@ public class Project extends BaseTime {
         this.status = status;
     }
 
-    public void updateProject(ProjectInfoReq updateReq, String url) {
-        this.title = updateReq.getTitle();
-        this.content = updateReq.getContent();
-        this.team = updateReq.getTeam();
-        this.img = url;
-    }
-
-    public void updateImg(String img) {
-        this.img = img;
-    }
-
     @PreRemove
     private void preRemove() {
         for (ProjectMember member : members) {
@@ -104,14 +96,7 @@ public class Project extends BaseTime {
             issue.deleteToIssueNum();
             issue.softDelete();
         }
-
     }
-
-
-    public void removeIssueNum(IssueNum issueNum) {
-        issueNums.remove(issueNum);
-    }
-
 
     /**
      * insert 되기전 (persist 되기전) 실행된다.
@@ -120,4 +105,20 @@ public class Project extends BaseTime {
     public void prePersist() {
         this.status = (this.status == '\0') ? 'Y' : this.status;
     }
+
+    public void removeIssueNum(IssueNum issueNum) {
+        issueNums.remove(issueNum);
+    }
+
+    public void updateProject(ProjectInfoRequestDTO updateReq, String url) {
+        this.title = updateReq.getTitle();
+        this.content = updateReq.getContent();
+        this.team = updateReq.getTeam();
+        this.img = url;
+    }
+
+    public void updateImg(String img) {
+        this.img = img;
+    }
+
 }

@@ -1,8 +1,9 @@
 package com.momentum.releaser.domain.project.api;
 
 import com.momentum.releaser.domain.project.application.ProjectMemberService;
+import com.momentum.releaser.domain.project.dto.ProjectMemberResponseDto;
 import com.momentum.releaser.domain.project.dto.ProjectMemberResponseDto.InviteProjectMemberRes;
-import com.momentum.releaser.domain.project.dto.ProjectResponseDto.GetMembersRes;
+import com.momentum.releaser.domain.project.dto.ProjectMemberResponseDto.MembersResponseDTO;
 import com.momentum.releaser.global.config.BaseResponse;
 import com.momentum.releaser.global.jwt.UserPrincipal;
 import lombok.RequiredArgsConstructor;
@@ -28,8 +29,8 @@ public class ProjectMemberController {
      * 4.1 프로젝트 멤버 조회
      */
     @GetMapping("/project/{projectId}")
-    public BaseResponse<List<GetMembersRes>> getMembers(@PathVariable @Min(value = 1, message = "프로젝트 식별 번호는 1 이상의 숫자여야 합니다.") Long projectId,
-                                                        @AuthenticationPrincipal UserPrincipal userPrincipal) {
+    public BaseResponse<List<MembersResponseDTO>> getMembers(@PathVariable @Min(value = 1, message = "프로젝트 식별 번호는 1 이상의 숫자여야 합니다.") Long projectId,
+                                                             @AuthenticationPrincipal UserPrincipal userPrincipal) {
         String email = userPrincipal.getEmail();
         return new BaseResponse<>(projectMemberService.getMembers(projectId, email));
     }

@@ -1,10 +1,35 @@
 package com.momentum.releaser.domain.project.dto;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import com.querydsl.core.annotations.QueryProjection;
+import lombok.*;
 
 public class ProjectMemberResponseDto {
+
+    /**
+     * 프로젝트 멤버 조회
+     */
+    @Data
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    public static class MembersResponseDTO {
+        private String link; //초대 링크
+        private Long memberId;
+        private Long userId;
+        private String name;
+        private String img;
+        private char position;
+        private char deleteYN;
+
+        @QueryProjection
+        @Builder
+        public MembersResponseDTO(String link, Long memberId, Long userId, String name, String img, char position) {
+            this.link = link;
+            this.memberId = memberId;
+            this.userId = userId;
+            this.name = name;
+            this.img = img;
+            this.position = position;
+        }
+    }
 
     @Getter
     @NoArgsConstructor

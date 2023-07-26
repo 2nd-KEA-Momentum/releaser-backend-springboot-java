@@ -11,7 +11,7 @@ import com.momentum.releaser.domain.project.dao.ProjectMemberRepository;
 import com.momentum.releaser.domain.project.dao.ProjectRepository;
 import com.momentum.releaser.domain.project.domain.Project;
 import com.momentum.releaser.domain.project.domain.ProjectMember;
-import com.momentum.releaser.domain.project.dto.ProjectResponseDto.GetMembersRes;
+import com.momentum.releaser.domain.project.dto.ProjectDataDto.GetMembers;
 import com.momentum.releaser.domain.release.dao.release.ReleaseRepository;
 import com.momentum.releaser.domain.release.domain.ReleaseNote;
 import com.momentum.releaser.domain.user.dao.UserRepository;
@@ -284,14 +284,14 @@ public class IssueServiceImpl implements IssueService {
         List<OpinionInfoRes> opinionRes = getIssueOpinion(issue, memberId);
 
         //프로젝트 멤버 리스트
-        List<GetMembersRes> memberRes = getMemberList(member.getProject());
+        List<GetMembers> memberRes = getMemberList(member.getProject());
 
         GetIssue getIssue = createGetIssue(issue, memberRes, opinionRes);
 
         return getIssue;
     }
 
-    private GetIssue createGetIssue(Issue issue, List<GetMembersRes> memberRes, List<OpinionInfoRes> opinionRes) {
+    private GetIssue createGetIssue(Issue issue, List<GetMembers> memberRes, List<OpinionInfoRes> opinionRes) {
         GetIssue getIssue = IssueMapper.INSTANCE.mapToGetIssue(issue, memberRes, opinionRes);
         Long memberId = getIssue.getManager();
         if (memberId != null) {
@@ -330,12 +330,9 @@ public class IssueServiceImpl implements IssueService {
         return issueOpinion;
     }
 
-    private List<GetMembersRes> getMemberList(Project project) {
-        List<GetMembersRes> issueMember = projectRepository.getMemberList(project);
+    private List<GetMembers> getMemberList(Project project) {
+        List<GetMembers> issueMember = projectRepository.getMemberList(project);
 
-        for (GetMembersRes member : issueMember) {
-            member.setDeleteYN('N');
-        }
         return issueMember;
     }
 

@@ -1,9 +1,10 @@
 package com.momentum.releaser.domain.project.dto;
 
-import com.querydsl.core.annotations.QueryProjection;
+import java.util.List;
+
 import lombok.*;
 
-import java.util.List;
+import com.momentum.releaser.domain.project.dto.ProjectDataDto.GetProjectDateDTO;
 
 public class ProjectResponseDto {
 
@@ -12,11 +13,11 @@ public class ProjectResponseDto {
      */
     @Data
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    public static class ProjectInfoRes {
+    public static class ProjectInfoResponseDTO {
         private Long projectId;
 
         @Builder
-        public ProjectInfoRes(Long projectId, String projectName) {
+        public ProjectInfoResponseDTO(Long projectId) {
             this.projectId = projectId;
         }
     }
@@ -26,61 +27,19 @@ public class ProjectResponseDto {
      */
     @Data
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    public static class GetProjectRes {
-        private List<GetProject> getCreateProjectList;
-        private List<GetProject> getEnterProjectList;
+    public static class GetProjectResponseDTO {
+        private List<GetProjectDateDTO> getCreateProjectList;
+        private List<GetProjectDateDTO> getEnterProjectList;
 
         @Builder
-        public GetProjectRes(List<GetProject> getCreateProjectList, List<GetProject> getEnterProjectList) {
+        public GetProjectResponseDTO(List<GetProjectDateDTO> getCreateProjectList, List<GetProjectDateDTO> getEnterProjectList) {
             this.getCreateProjectList = getCreateProjectList;
             this.getEnterProjectList = getEnterProjectList;
         }
     }
 
-    // 개별 프로젝트 조회
-    @Data
-    @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    public static class GetProject {
-        private Long projectId;
-        private String title;
-        private String content;
-        private String team;
-        private String img;
+    
 
-        @Builder
-        public GetProject(Long projectId, String title, String content, String team, String img) {
-            this.projectId = projectId;
-            this.title = title;
-            this.content = content;
-            this.team = team;
-            this.img = img;
-        }
-    }
 
-    /**
-     * 프로젝트 멤버 조회
-     */
-    @Data
-    @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    public static class GetMembersRes {
-        private String link; //초대 링크
-        private Long memberId;
-        private Long userId;
-        private String name;
-        private String img;
-        private char position;
-        private char deleteYN;
-
-        @QueryProjection
-        @Builder
-        public GetMembersRes(String link, Long memberId, Long userId, String name, String img, char position) {
-            this.link = link;
-            this.memberId = memberId;
-            this.userId = userId;
-            this.name = name;
-            this.img = img;
-            this.position = position;
-        }
-    }
 
 }

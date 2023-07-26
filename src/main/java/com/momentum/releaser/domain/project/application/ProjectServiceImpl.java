@@ -1,25 +1,9 @@
 package com.momentum.releaser.domain.project.application;
 
-import com.momentum.releaser.domain.issue.dao.IssueRepository;
-import com.momentum.releaser.domain.project.dao.ProjectMemberRepository;
-import com.momentum.releaser.domain.project.dao.ProjectRepository;
-import com.momentum.releaser.domain.project.domain.Project;
-import com.momentum.releaser.domain.project.domain.ProjectMember;
-import com.momentum.releaser.domain.project.dto.ProjectRequestDto.ProjectInfoReq;
-import com.momentum.releaser.domain.project.dto.ProjectResponseDto.GetProject;
-import com.momentum.releaser.domain.project.dto.ProjectResponseDto.GetProjectRes;
-import com.momentum.releaser.domain.project.dto.ProjectResponseDto.ProjectInfoRes;
-import com.momentum.releaser.domain.project.mapper.ProjectMapper;
-import com.momentum.releaser.domain.release.dao.approval.ReleaseApprovalRepository;
-import com.momentum.releaser.domain.user.dao.UserRepository;
-import com.momentum.releaser.domain.user.domain.User;
-import com.momentum.releaser.global.config.aws.S3Upload;
-import com.momentum.releaser.global.exception.CustomException;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import static com.momentum.releaser.domain.project.dto.ProjectDataDto.*;
+import static com.momentum.releaser.global.common.Base64.getImageUrlFromBase64;
+import static com.momentum.releaser.global.common.CommonEnum.DEFAULT_PROJECT_IMG;
+import static com.momentum.releaser.global.config.BaseResponseStatus.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,10 +12,31 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-import static com.momentum.releaser.global.common.Base64.getImageUrlFromBase64;
-import static com.momentum.releaser.global.common.CommonEnum.DEFAULT_PROJECT_IMG;
-import static com.momentum.releaser.global.config.BaseResponseStatus.*;
+import org.modelmapper.ModelMapper;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+import com.momentum.releaser.domain.issue.dao.IssueRepository;
+import com.momentum.releaser.domain.project.dao.ProjectMemberRepository;
+import com.momentum.releaser.domain.project.dao.ProjectRepository;
+import com.momentum.releaser.domain.project.domain.Project;
+import com.momentum.releaser.domain.project.domain.ProjectMember;
+import com.momentum.releaser.domain.project.dto.ProjectRequestDto.ProjectInfoRequestDTO;
+import com.momentum.releaser.domain.project.dto.ProjectResponseDto.GetProjectResponseDTO;
+import com.momentum.releaser.domain.project.dto.ProjectResponseDto.ProjectInfoResponseDTO;
+import com.momentum.releaser.domain.project.mapper.ProjectMapper;
+import com.momentum.releaser.domain.release.dao.approval.ReleaseApprovalRepository;
+import com.momentum.releaser.domain.user.dao.UserRepository;
+import com.momentum.releaser.domain.user.domain.User;
+import com.momentum.releaser.global.config.aws.S3Upload;
+import com.momentum.releaser.global.exception.CustomException;
+
+/**
+ * 프로젝트와 관련된 기능을 제공하는 서비스 구현 클래스입니다.
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -47,34 +52,41 @@ public class ProjectServiceImpl implements ProjectService {
 
     /**
      * 3.1 프로젝트 생성
+     *
+     * @author chaeanna, seonwoo
+     * @date 2023-07-04
+     * @param email 사용자 이메일
+     * @param projectInfoReq 프로젝트 생성 요청 객체
      */
     @Override
     @Transactional
-    public ProjectInfoRes createProject(String email, ProjectInfoReq projectInfoReq) throws IOException {
+    public ProjectInfoResponseDTO addProject(String email, ProjectInfoRequestDTO projectInfoReq) throws IOException {
         //Token UserInfo
-        User user = findUserByEmail(email);
-
+        User user = getUserByEmail(email);
         // S3 URL 생성한다.
         String url = uploadProjectImg(projectInfoReq);
-
         // 프로젝트 생성
         Project newProject = createNewProject(projectInfoReq, url);
-
         // 프로젝트 멤버 추가
         addProjectMember(newProject, user);
-
         // 프로젝트 응답 객체 생성
         return ProjectMapper.INSTANCE.toProjectInfoRes(newProject);
     }
 
     /**
      * 3.2 프로젝트 수정
+     *
+     * @author chaeanna, seonwoo
+     * @date 2023-07-04
+     * @param projectId 프로젝트 식별 번호
+     * @param email 사용자 이메일
+     * @param projectInfoReq 프로젝트 수정 요청 객체
      */
-    @Transactional
     @Override
-    public ProjectInfoRes updateProject(Long projectId, String email, ProjectInfoReq projectInfoReq) throws IOException {
+    @Transactional
+    public ProjectInfoResponseDTO modifyProject(Long projectId, String email, ProjectInfoRequestDTO projectInfoReq) throws IOException {
         Project project = getProjectById(projectId);
-        User user = findUserByEmail(email);
+        User user = getUserByEmail(email);
         ProjectMember leader = findLeaderForProject(project);
 
         // 접근 유저가 프로젝트 생성자인지 확인
@@ -87,14 +99,16 @@ public class ProjectServiceImpl implements ProjectService {
         }
     }
 
-
     /**
      * 3.3 프로젝트 삭제
+     *
+     * @author chaeanna
+     * @date 2023-07-05
+     * @param projectId 프로젝트 식별 번호
      */
     @Override
     @Transactional
-    public String deleteProject(Long projectId) {
-
+    public String removeProject(Long projectId) {
         //project 정보
         Project project = getProjectById(projectId);
 
@@ -106,32 +120,33 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     /**
-     * 3.4 프로젝트 목록 조회
+     * 3.4 프로젝트 조회
+     *
+     * @author chaeanna
+     * @date 2023-07-04
+     * @param email 사용자 이메일
      */
     @Override
     @Transactional
-    public GetProjectRes getProjects(String email) {
-
+    public GetProjectResponseDTO findProjects(String email) {
         // 사용자 정보
-        User user = findUserByEmail(email);
+        User user = getUserByEmail(email);
 
         // 프로젝트 멤버 정보
         List<ProjectMember> projectMemberList = projectMemberRepository.findByUser(user);
-        List<GetProject> getCreateProjectList = new ArrayList<>();
-        List<GetProject> getEnterProjectList = new ArrayList<>();
+        List<GetProjectDateDTO> getCreateProjectList = new ArrayList<>();
+        List<GetProjectDateDTO> getEnterProjectList = new ArrayList<>();
 
         for (ProjectMember projectMember : projectMemberList) {
             // 생성한 프로젝트 조회
             if (projectMember.getPosition() == 'L') {
                 getCreateProjectList.add(mapToGetProject(projectMember.getProject()));
-            }
-            // 참가한 프로젝트 조회
-            else {
+            } else { // 참가한 프로젝트 조회
                 getEnterProjectList.add(mapToGetProject(projectMember.getProject()));
             }
         }
 
-        return GetProjectRes.builder()
+        return GetProjectResponseDTO.builder()
                 .getCreateProjectList(getCreateProjectList)
                 .getEnterProjectList(getEnterProjectList)
                 .build();
@@ -141,20 +156,25 @@ public class ProjectServiceImpl implements ProjectService {
 
     /**
      * 이메일로 User 가져오기
+     *
+     * @author chaeanna
+     * @date 2023-07-04
+     * @param email 사용자 이메일
+     * @return User 조회된 사용자 엔티티
+     * @throws CustomException 사용자가 존재하지 않을 경우 발생하는 예외
      */
-    private User findUserByEmail(String email) {
+    private User getUserByEmail(String email) {
         return userRepository.findByEmail(email).orElseThrow(() -> new CustomException(NOT_EXISTS_USER));
     }
 
     /**
-     * 사용자 식별 번호를 이용하여 사용자 엔티티 가져오기
-     */
-    private User getUserById(Long userId) {
-        return userRepository.findById(userId).orElseThrow(() -> new CustomException(NOT_EXISTS_USER));
-    }
-
-    /**
      * 프로젝트 식별 번호를 이용하여 프로젝트 엔티티 가져오기
+     *
+     * @author seonwoo
+     * @date 2023-07-04
+     * @param projectId 프로젝트 식별 번호
+     * @return Project 조회된 프로젝트 엔티티
+     * @throws CustomException 프로젝트가 존재하지 않을 경우 발생하는 예외
      */
     private Project getProjectById(Long projectId) {
         return projectRepository.findById(projectId).orElseThrow(() -> new CustomException(NOT_EXISTS_PROJECT));
@@ -162,8 +182,14 @@ public class ProjectServiceImpl implements ProjectService {
 
     /**
      * 클라이언트로부터 받은 프로젝트 이미지를 S3에 업로드한다.
+     *
+     * @author seonwoo
+     * @date 2023-07-04
+     * @param projectInfoReq 프로젝트 생성 또는 수정 요청 객체
+     * @return String 업로드된 이미지의 S3 URL
+     * @throws IOException 이미지 업로드 중 오류가 발생한 경우 발생하는 예외
      */
-    private String uploadProjectImg(ProjectInfoReq projectInfoReq) throws IOException {
+    private String uploadProjectImg(ProjectInfoRequestDTO projectInfoReq) throws IOException {
         String img = projectInfoReq.getImg();
 
         if (img.isEmpty()) {
@@ -185,27 +211,45 @@ public class ProjectServiceImpl implements ProjectService {
 
     /**
      * 클라이언트로부터 받은 프로젝트 이미지로 수정한다.
+     *
+     * @author seonwoo
+     * @date 2023-07-04
+     * @param project 프로젝트 엔티티
+     * @param projectInfoReq 프로젝트 수정 요청 객체
+     * @return String 수정된 프로젝트 이미지의 S3 URL
+     * @throws IOException 이미지 업로드 중 오류가 발생한 경우 발생하는 예외
      */
-    private String updateProjectImg(Project project, ProjectInfoReq projectInfoReq) throws IOException {
+    private String updateProjectImg(Project project, ProjectInfoRequestDTO projectInfoReq) throws IOException {
         deleteIfExistsProjectImg(project);
         return uploadProjectImg(projectInfoReq);
     }
 
     /**
      * 해당 프로젝트의 관리자 찾기
+     *
+     * @author chaeanna
+     * @date 2023-07-04
+     * @param project 프로젝트 엔티티
+     * @return ProjectMember 관리자(L) 포지션을 가진 프로젝트 멤버 엔티티
      */
     private ProjectMember findLeaderForProject(Project project) {
         List<ProjectMember> members = projectMemberRepository.findByProject(project);
         for (ProjectMember member : members) {
+
             if (member.getPosition() == 'L') {
                 return member;
             }
+
         }
         return null;
     }
 
     /**
      * 프로젝트 이미지 값이 null이 아닌 경우 한 번 지운다.
+     *
+     * @author seonwoo
+     * @date 2023-07-04
+     * @param project 프로젝트 엔티티
      */
     private void deleteIfExistsProjectImg(Project project) {
         Project updatedProject = project;
@@ -224,16 +268,29 @@ public class ProjectServiceImpl implements ProjectService {
 
     /**
      * 프로필 이미지를 제외한 프로젝트 데이터를 업데이트한다.
+     *
+     * @author seonwoo
+     * @date 2023-07-04
+     * @param project 프로젝트 엔티티
+     * @param projectInfoReq 프로젝트 수정 요청 객체
+     * @param url 업로드된 프로젝트 이미지의 S3 URL
+     * @return Project 업데이트된 프로젝트 엔티티
      */
-    private Project getAndUpdateProject(Project project, ProjectInfoReq projectInfoReq, String url) {
+    private Project getAndUpdateProject(Project project, ProjectInfoRequestDTO projectInfoReq, String url) {
         project.updateProject(projectInfoReq, url);
         return projectRepository.save(project);
     }
 
     /**
      * 프로젝트 생성
+     *
+     * @author seonwoo, chaeanna
+     * @date 2023-07-04
+     * @param registerReq 프로젝트 생성 요청 객체
+     * @param url 업로드된 프로젝트 이미지의 S3 URL
+     * @return Project 생성된 프로젝트 엔티티
      */
-    private Project createNewProject(ProjectInfoReq registerReq, String url) {
+    private Project createNewProject(ProjectInfoRequestDTO registerReq, String url) {
         //초대 링크 생성
         String inviteLink = generateInviteLink();
 
@@ -249,8 +306,11 @@ public class ProjectServiceImpl implements ProjectService {
 
     /**
      * 초대 링크 생성
+     *
+     * @author chaeanna
+     * @date 2023-07-04
+     * @return String 생성된 초대 링크
      */
-
     private String generateInviteLink() {
         // UUID를 이용하여 무작위의 초대 링크를 생성
         return UUID.randomUUID().toString();
@@ -258,6 +318,11 @@ public class ProjectServiceImpl implements ProjectService {
 
     /**
      * 프로젝트 멤버 추가
+     *
+     * @author seonwoo
+     * @date 2023-07-04
+     * @param project 프로젝트 엔티티
+     * @param user 사용자 엔티티
      */
     private void addProjectMember(Project project, User user) {
         ProjectMember projectMember = ProjectMember.builder()
@@ -271,45 +336,15 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     /**
-     * 관리자(L) 멤버 조회
-     */
-    private ProjectMember findAdminMember(List<ProjectMember> projectMembers) {
-        for (ProjectMember member : projectMembers) {
-            if (member.getPosition() == 'L') {
-                return member;
-            }
-        }
-        throw new CustomException(NOT_EXISTS_ADMIN_MEMBER);
-    }
-
-    /**
      * project mapper 사용
+     *
+     * @author chaeanna
+     * @date 2023-07-04
+     * @param project 프로젝트 엔티티
+     * @return GetProjectDateDTO 변환된 프로젝트 DTO
      */
-    private GetProject mapToGetProject(Project project) {
-        return modelMapper.map(project, GetProject.class);
+    private GetProjectDateDTO mapToGetProject(Project project) {
+        return modelMapper.map(project, GetProjectDateDTO.class);
     }
 
-    /**
-     * 프로젝트를 통해 프로젝트 관리자를 가져온다.
-     */
-    private ProjectMember getAdminMember(Project project) {
-        List<ProjectMember> projectMembers = projectMemberRepository.findByProject(project);
-
-        for (ProjectMember member : projectMembers) {
-            if (member.getPosition() == 'L') {
-                return member;
-            }
-        }
-        throw new CustomException(NOT_EXISTS_ADMIN_MEMBER);
-
-    }
-
-    /**
-     * 프로젝트 식별 번호를 통해 프로젝트 관리자의 사용자 엔티티를 가져온다.
-     */
-    private User getAdminUser(ProjectMember projectMember) {
-
-        // 관리자(L) 멤버의 사용자 정보 조회
-        return userRepository.findById(projectMember.getUser().getUserId()).orElseThrow(() -> new CustomException(NOT_EXISTS_USER));
-    }
 }

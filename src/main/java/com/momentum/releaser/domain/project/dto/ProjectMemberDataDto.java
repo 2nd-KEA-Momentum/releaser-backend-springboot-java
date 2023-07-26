@@ -26,4 +26,6 @@ public class ProjectMemberDataDto {
             this.profileImg = profileImg;
         }
     }
+
+
 }

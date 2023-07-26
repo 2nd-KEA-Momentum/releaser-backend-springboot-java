@@ -1,32 +1,42 @@
 package com.momentum.releaser.domain.project.dao;
 
-import com.momentum.releaser.domain.project.domain.Project;
-import com.momentum.releaser.domain.project.domain.QProjectMember;
-import com.momentum.releaser.domain.project.dto.ProjectResponseDto.GetMembersRes;
-import com.momentum.releaser.domain.project.dto.QProjectResDto_GetMembersRes;
-import com.momentum.releaser.domain.user.domain.QUser;
-import com.querydsl.jpa.impl.JPAQueryFactory;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.util.List;
+
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+import com.querydsl.jpa.impl.JPAQueryFactory;
+
+import com.momentum.releaser.domain.project.domain.Project;
+import com.momentum.releaser.domain.project.domain.QProjectMember;
+import com.momentum.releaser.domain.project.dto.ProjectDataDto.GetMembers;
+import com.momentum.releaser.domain.project.dto.QProjectDataDto_GetMembers;
+import com.momentum.releaser.domain.user.domain.QUser;
 
 @Slf4j
 @Repository
 @RequiredArgsConstructor
-public class ProjectRepositoryImpl implements ProjectRepositoryCustom{
+public class ProjectRepositoryImpl implements ProjectRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
 
+    /**
+     * 프로젝트에 속한 멤버들의 정보를 조회
+     *
+     * @author chaeanna
+     * @date 2023-07-04
+     * @param project 멤버들을 조회할 프로젝트 엔티티
+     * @return List<GetMembers> 프로젝트에 속한 멤버들의 정보 리스트
+     */
     @Override
-    public List<GetMembersRes> getMemberList(Project project) {
+    public List<GetMembers> getMemberList(Project project) {
         QProjectMember member = QProjectMember.projectMember;
         QUser user = QUser.user;
 
-        List<GetMembersRes> getMembersRes = queryFactory
-                .select(new QProjectResDto_GetMembersRes(
-                        member.project.link,
+        List<GetMembers> getMembersRes = queryFactory
+                .select(new QProjectDataDto_GetMembers(
                         member.memberId,
                         user.userId,
                         user.name,

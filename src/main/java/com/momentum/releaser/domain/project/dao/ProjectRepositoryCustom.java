@@ -1,12 +1,13 @@
 package com.momentum.releaser.domain.project.dao;
 
-import com.momentum.releaser.domain.project.domain.Project;
-import com.momentum.releaser.domain.project.dto.ProjectResponseDto.GetMembersRes;
-
 import java.util.List;
+
+import com.momentum.releaser.domain.project.domain.Project;
+import com.momentum.releaser.domain.project.dto.ProjectDataDto.GetMembers;
 
 public interface ProjectRepositoryCustom {
 
-    List<GetMembersRes> getMemberList(Project project);
+    // 프로젝트에 속한 멤버들의 정보를 List 형태로 반환
+    List<GetMembers> getMemberList(Project project);
 
 }

@@ -5,7 +5,7 @@ import com.momentum.releaser.domain.project.dao.ProjectRepository;
 import com.momentum.releaser.domain.project.domain.Project;
 import com.momentum.releaser.domain.project.domain.ProjectMember;
 import com.momentum.releaser.domain.project.dto.ProjectMemberResponseDto.InviteProjectMemberRes;
-import com.momentum.releaser.domain.project.dto.ProjectResponseDto.GetMembersRes;
+import com.momentum.releaser.domain.project.dto.ProjectMemberResponseDto.MembersResponseDTO;
 import com.momentum.releaser.domain.project.mapper.ProjectMemberMapper;
 import com.momentum.releaser.domain.release.dao.approval.ReleaseApprovalRepository;
 import com.momentum.releaser.domain.release.dao.release.ReleaseRepository;
@@ -40,14 +40,14 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
      */
     @Override
     @Transactional
-    public List<GetMembersRes> getMembers(Long projectId, String email) {
+    public List<MembersResponseDTO> getMembers(Long projectId, String email) {
         //Token UserInfo
         User user = findUserByEmail(email);
         Project project = findProject(projectId);
 
         ProjectMember accessMember = findProjectMember(user, project);
 
-        List<GetMembersRes> getMembersRes = projectMemberRepository.findByProject(project)
+        List<MembersResponseDTO> getMembersRes = projectMemberRepository.findByProject(project)
                 .stream()
                 .map(member -> createGetMembersRes(member, accessMember))
                 .collect(Collectors.toList());
@@ -67,11 +67,11 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
     }
 
     //GetMembersRes 객체를 생성
-    private GetMembersRes createGetMembersRes(ProjectMember projectMember, ProjectMember accessMember) {
+    private MembersResponseDTO createGetMembersRes(ProjectMember projectMember, ProjectMember accessMember) {
         char position = accessMember.getPosition();
         char deleteYN = (position == 'L') ? 'Y' : 'N';
 
-        GetMembersRes getMembersRes = ProjectMemberMapper.INSTANCE.toGetMembersRes(projectMember);
+        MembersResponseDTO getMembersRes = ProjectMemberMapper.INSTANCE.toGetMembersRes(projectMember);
         getMembersRes.setDeleteYN(deleteYN);
 
         return getMembersRes;
