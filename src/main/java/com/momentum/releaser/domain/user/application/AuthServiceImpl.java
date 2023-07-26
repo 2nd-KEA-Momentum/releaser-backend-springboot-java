@@ -15,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 
-
 import com.momentum.releaser.domain.user.dao.AuthPasswordRepository;
 import com.momentum.releaser.domain.user.dao.RefreshTokenRepository;
 import com.momentum.releaser.domain.user.dao.UserRepository;
