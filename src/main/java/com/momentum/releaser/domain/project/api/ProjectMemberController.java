@@ -29,7 +29,7 @@ public class ProjectMemberController {
      * 4.1 프로젝트 멤버 조회
      */
     @GetMapping("/project/{projectId}")
-    public BaseResponse<List<MembersResponseDTO>> getMembers(@PathVariable @Min(value = 1, message = "프로젝트 식별 번호는 1 이상의 숫자여야 합니다.") Long projectId,
+    public BaseResponse<List<MembersResponseDTO>> projectMemberList(@PathVariable @Min(value = 1, message = "프로젝트 식별 번호는 1 이상의 숫자여야 합니다.") Long projectId,
                                                              @AuthenticationPrincipal UserPrincipal userPrincipal) {
         String email = userPrincipal.getEmail();
         return new BaseResponse<>(projectMemberService.getMembers(projectId, email));
@@ -39,7 +39,7 @@ public class ProjectMemberController {
      * 4.2 프로젝트 멤버 추가
      */
     @PostMapping("/join/{link}")
-    public BaseResponse<InviteProjectMemberRes> inviteMember(@PathVariable String link,
+    public BaseResponse<InviteProjectMemberRes> memberAdd(@PathVariable String link,
                                                              @AuthenticationPrincipal UserPrincipal userPrincipal) {
         String email = userPrincipal.getEmail();
         String message = "프로젝트 참여가 완료되었습니다.";
@@ -51,7 +51,7 @@ public class ProjectMemberController {
      * 4.3 프로젝트 멤버 제거
      */
     @PostMapping("/{memberId}")
-    public BaseResponse<String> deleteProjectMember(@PathVariable @Min(value = 1, message = "프로젝트 멤버 식별 번호는 1 이상의 숫자여야 합니다.") Long memberId,
+    public BaseResponse<String> ProjectMemberRemove(@PathVariable @Min(value = 1, message = "프로젝트 멤버 식별 번호는 1 이상의 숫자여야 합니다.") Long memberId,
                                                     @AuthenticationPrincipal UserPrincipal userPrincipal) {
         String email = userPrincipal.getEmail();
         return new BaseResponse<>(projectMemberService.deleteMember(memberId, email));
@@ -61,9 +61,9 @@ public class ProjectMemberController {
      * 4.4 프로젝트 멤버 탈퇴
      */
     @PostMapping("/project/{projectId}/withdraw")
-    public BaseResponse<String> withdrawProjectMember(
+    public BaseResponse<String> withdrawProjectMemberRemove(
             @PathVariable @Min(value = 1, message = "프로젝트 식별 번호는 1 이상의 숫자여야 합니다.") Long projectId,
-            @AuthenticationPrincipal UserPrincipal userPrincipal){
+            @AuthenticationPrincipal UserPrincipal userPrincipal) {
         String email = userPrincipal.getEmail();
         return new BaseResponse<>(projectMemberService.withdrawMember(projectId, email));
     }
