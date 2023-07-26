@@ -1,7 +1,10 @@
 package com.momentum.releaser.domain.project.dto;
 
+import com.momentum.releaser.domain.project.dto.ProjectMemberDataDto.ProjectMemberInfoDTO;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.*;
+
+import java.util.List;
 
 public class ProjectMemberResponseDto {
 
@@ -12,22 +15,13 @@ public class ProjectMemberResponseDto {
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     public static class MembersResponseDTO {
         private String link; //초대 링크
-        private Long memberId;
-        private Long userId;
-        private String name;
-        private String img;
-        private char position;
-        private char deleteYN;
+        private List<ProjectMemberInfoDTO> memberList;
 
         @QueryProjection
         @Builder
-        public MembersResponseDTO(String link, Long memberId, Long userId, String name, String img, char position) {
+        public MembersResponseDTO(String link, List<ProjectMemberInfoDTO> memberList) {
             this.link = link;
-            this.memberId = memberId;
-            this.userId = userId;
-            this.name = name;
-            this.img = img;
-            this.position = position;
+            this.memberList = memberList;
         }
     }
 

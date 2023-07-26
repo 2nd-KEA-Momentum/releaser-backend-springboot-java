@@ -28,7 +28,7 @@ public class ProjectMemberController {
      * 4.1 프로젝트 멤버 조회
      */
     @GetMapping("/project/{projectId}")
-    public BaseResponse<List<MembersResponseDTO>> projectMemberList(@PathVariable @Min(value = 1, message = "프로젝트 식별 번호는 1 이상의 숫자여야 합니다.") Long projectId,
+    public BaseResponse<MembersResponseDTO> projectMemberList(@PathVariable @Min(value = 1, message = "프로젝트 식별 번호는 1 이상의 숫자여야 합니다.") Long projectId,
                                                              @AuthenticationPrincipal UserPrincipal userPrincipal) {
         String email = userPrincipal.getEmail();
         return new BaseResponse<>(projectMemberService.findProjectMembers(projectId, email));

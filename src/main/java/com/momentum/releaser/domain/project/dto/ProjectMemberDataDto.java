@@ -1,9 +1,7 @@
 package com.momentum.releaser.domain.project.dto;
 
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import com.querydsl.core.annotations.QueryProjection;
+import lombok.*;
 
 public class ProjectMemberDataDto {
 
@@ -27,6 +25,26 @@ public class ProjectMemberDataDto {
         }
     }
 
+    @Data
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    public static class ProjectMemberInfoDTO {
+        private Long memberId;
+        private Long userId;
+        private String name;
+        private String img;
+        private char position;
+        private char deleteYN;
+
+        @QueryProjection
+        @Builder
+        public ProjectMemberInfoDTO(String link, Long memberId, Long userId, String name, String img, char position) {
+            this.memberId = memberId;
+            this.userId = userId;
+            this.name = name;
+            this.img = img;
+            this.position = position;
+        }
+    }
 
 
 }

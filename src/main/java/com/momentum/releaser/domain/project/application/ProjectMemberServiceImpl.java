@@ -4,6 +4,7 @@ import com.momentum.releaser.domain.project.dao.ProjectMemberRepository;
 import com.momentum.releaser.domain.project.dao.ProjectRepository;
 import com.momentum.releaser.domain.project.domain.Project;
 import com.momentum.releaser.domain.project.domain.ProjectMember;
+import com.momentum.releaser.domain.project.dto.ProjectMemberDataDto.ProjectMemberInfoDTO;
 import com.momentum.releaser.domain.project.dto.ProjectMemberResponseDto.InviteProjectMemberResponseDTO;
 import com.momentum.releaser.domain.project.dto.ProjectMemberResponseDto.MembersResponseDTO;
 import com.momentum.releaser.domain.project.mapper.ProjectMemberMapper;
@@ -19,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -40,20 +42,25 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
      */
     @Override
     @Transactional
-    public List<MembersResponseDTO> findProjectMembers(Long projectId, String email) {
+    public MembersResponseDTO findProjectMembers(Long projectId, String email) {
         //Token UserInfo
         User user = getUserByEmail(email);
         Project project = getProjectById(projectId);
 
         ProjectMember accessMember = findProjectMemberByUserAndProject(user, project);
 
-        List<MembersResponseDTO> getMembersRes = projectMemberRepository.findByProject(project)
-                .stream()
-                .map(member -> buildMembersResponseDTO(member, accessMember))
-                .collect(Collectors.toList());
+        List<ProjectMemberInfoDTO> memberList = getProjectMembersRes(project, accessMember);
+
+        MembersResponseDTO getMembersRes = MembersResponseDTO.builder()
+                .link(project.getLink())
+                .memberList(memberList)
+                .build();
 
         return getMembersRes;
     }
+
+
+
 
 
 
@@ -149,15 +156,18 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
                 .orElseThrow(() -> new CustomException(NOT_EXISTS_PROJECT));
     }
 
-    //GetMembersRes 객체를 생성
-    private MembersResponseDTO buildMembersResponseDTO(ProjectMember projectMember, ProjectMember accessMember) {
+    private List<ProjectMemberInfoDTO> getProjectMembersRes(Project project, ProjectMember accessMember) {
         char position = accessMember.getPosition();
         char deleteYN = (position == 'L') ? 'Y' : 'N';
 
-        MembersResponseDTO getMembersRes = ProjectMemberMapper.INSTANCE.toGetMembersRes(projectMember);
-        getMembersRes.setDeleteYN(deleteYN);
-
-        return getMembersRes;
+        return projectMemberRepository.findByProject(project)
+                .stream()
+                .map(member -> {
+                    ProjectMemberInfoDTO membersRes = ProjectMemberMapper.INSTANCE.toGetMembersRes(member);
+                    membersRes.setDeleteYN(deleteYN);
+                    return membersRes;
+                })
+                .collect(Collectors.toList());
     }
 
     private boolean isProjectMember(User user, Project project) {
