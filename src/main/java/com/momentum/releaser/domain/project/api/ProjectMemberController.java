@@ -1,8 +1,7 @@
 package com.momentum.releaser.domain.project.api;
 
 import com.momentum.releaser.domain.project.application.ProjectMemberService;
-import com.momentum.releaser.domain.project.dto.ProjectMemberResponseDto;
-import com.momentum.releaser.domain.project.dto.ProjectMemberResponseDto.InviteProjectMemberRes;
+import com.momentum.releaser.domain.project.dto.ProjectMemberResponseDto.InviteProjectMemberResponseDTO;
 import com.momentum.releaser.domain.project.dto.ProjectMemberResponseDto.MembersResponseDTO;
 import com.momentum.releaser.global.config.BaseResponse;
 import com.momentum.releaser.global.jwt.UserPrincipal;
@@ -39,8 +38,8 @@ public class ProjectMemberController {
      * 4.2 프로젝트 멤버 추가
      */
     @PostMapping("/join/{link}")
-    public BaseResponse<InviteProjectMemberRes> memberAdd(@PathVariable String link,
-                                                             @AuthenticationPrincipal UserPrincipal userPrincipal) {
+    public BaseResponse<InviteProjectMemberResponseDTO> memberAdd(@PathVariable String link,
+                                                                  @AuthenticationPrincipal UserPrincipal userPrincipal) {
         String email = userPrincipal.getEmail();
         String message = "프로젝트 참여가 완료되었습니다.";
         return new BaseResponse<>(projectMemberService.addProjectMember(link, email), message);

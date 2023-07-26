@@ -4,7 +4,7 @@ import com.momentum.releaser.domain.project.dao.ProjectMemberRepository;
 import com.momentum.releaser.domain.project.dao.ProjectRepository;
 import com.momentum.releaser.domain.project.domain.Project;
 import com.momentum.releaser.domain.project.domain.ProjectMember;
-import com.momentum.releaser.domain.project.dto.ProjectMemberResponseDto.InviteProjectMemberRes;
+import com.momentum.releaser.domain.project.dto.ProjectMemberResponseDto.InviteProjectMemberResponseDTO;
 import com.momentum.releaser.domain.project.dto.ProjectMemberResponseDto.MembersResponseDTO;
 import com.momentum.releaser.domain.project.mapper.ProjectMemberMapper;
 import com.momentum.releaser.domain.release.dao.approval.ReleaseApprovalRepository;
@@ -84,14 +84,14 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
      */
     @Override
     @Transactional
-    public InviteProjectMemberRes addProjectMember(String link, String email) {
+    public InviteProjectMemberResponseDTO addProjectMember(String link, String email) {
         //Token UserInfo
         User user = findUserByEmail(email);
 
         //link check
         Project project = projectRepository.findByLink(link).orElseThrow(() -> new CustomException(NOT_EXISTS_LINK));
 
-        InviteProjectMemberRes res = InviteProjectMemberRes.builder()
+        InviteProjectMemberResponseDTO res = InviteProjectMemberResponseDTO.builder()
                 .projectId(project.getProjectId())
                 .projectName(project.getTitle())
                 .build();

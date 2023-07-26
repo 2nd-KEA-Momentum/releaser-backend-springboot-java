@@ -14,13 +14,13 @@ public class ProjectMemberDataDto {
      */
     @Getter
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    public static class ProjectMembersDataDto {
+    public static class ProjectMembersDataDTO {
         private Long memberId;
         private String name;
         private String profileImg;
 
         @Builder
-        public ProjectMembersDataDto(Long memberId, String name, String profileImg) {
+        public ProjectMembersDataDTO(Long memberId, String name, String profileImg) {
             this.memberId = memberId;
             this.name = name;
             this.profileImg = profileImg;
