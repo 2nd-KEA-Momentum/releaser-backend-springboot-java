@@ -9,22 +9,22 @@ public interface ProjectMemberService {
     /**
      * 4.1 프로젝트 멤버 조회
      */
-    List<MembersResponseDTO> getMembers(Long projectId, String email);
+    List<MembersResponseDTO> findProjectMembers(Long projectId, String email);
 
     /**
      * 4.2 프로젝트 멤버 추가
      */
-    InviteProjectMemberRes addMember(String link, String email);
+    InviteProjectMemberRes addProjectMember(String link, String email);
 
 
     /**
      * 4.3 프로젝트 멤버 제거
      */
-    String deleteMember(Long memberId, String email);
+    String removeProjectMember(Long memberId, String email);
 
     /**
      * 4.4 프로젝트 멤버 탈퇴
      */
-    String withdrawMember(Long projectId, String email);
+    String removeWithdrawProjectMember(Long projectId, String email);
 
 }

@@ -40,7 +40,7 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
      */
     @Override
     @Transactional
-    public List<MembersResponseDTO> getMembers(Long projectId, String email) {
+    public List<MembersResponseDTO> findProjectMembers(Long projectId, String email) {
         //Token UserInfo
         User user = findUserByEmail(email);
         Project project = findProject(projectId);
@@ -84,7 +84,7 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
      */
     @Override
     @Transactional
-    public InviteProjectMemberRes addMember(String link, String email) {
+    public InviteProjectMemberRes addProjectMember(String link, String email) {
         //Token UserInfo
         User user = findUserByEmail(email);
 
@@ -141,7 +141,7 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
      */
     @Override
     @Transactional
-    public String deleteMember(Long memberId, String email) {
+    public String removeProjectMember(Long memberId, String email) {
         User user = findUserByEmail(email);
         ProjectMember projectMember = findProjectMemberById(memberId);
 
@@ -170,7 +170,7 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
      */
     @Override
     @Transactional
-    public String withdrawMember(Long projectId, String email) {
+    public String removeWithdrawProjectMember(Long projectId, String email) {
         User user = findUserByEmail(email);
 
         Project project = findProject(projectId);
