@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-public class ProjectMemberDatoDto {
+public class ProjectMemberDataDto {
 
     /**
      * 릴리즈 노트 모달 하단에 프로젝트 멤버들의 프로필을 보여주는 부분
@@ -26,4 +26,6 @@ public class ProjectMemberDatoDto {
             this.profileImg = profileImg;
         }
     }
+
+
 }

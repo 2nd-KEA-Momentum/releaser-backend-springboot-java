@@ -2,11 +2,9 @@ package com.momentum.releaser.domain.issue.mapper;
 
 import com.momentum.releaser.domain.issue.domain.Issue;
 import com.momentum.releaser.domain.issue.dto.IssueDataDto.ConnectedIssuesDataDto;
-import com.momentum.releaser.domain.issue.dto.IssueResDto;
 import com.momentum.releaser.domain.issue.dto.IssueResDto.GetIssue;
 import com.momentum.releaser.domain.issue.dto.IssueResDto.OpinionInfoRes;
-import com.momentum.releaser.domain.project.dto.ProjectResDto;
-import com.momentum.releaser.domain.project.dto.ProjectResDto.GetMembersRes;
+import com.momentum.releaser.domain.project.dto.ProjectDataDto.GetMembers;
 import com.momentum.releaser.domain.project.mapper.ProjectMapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -32,5 +30,5 @@ public interface IssueMapper {
     @Mapping(source = "issue.member.memberId", target = "manager")
     @Mapping(target = "memberList", source = "memberRes")
     @Mapping(target = "opinionList", source = "opinionRes")
-    GetIssue mapToGetIssue(Issue issue, List<GetMembersRes> memberRes, List<OpinionInfoRes> opinionRes);
+    GetIssue mapToGetIssue(Issue issue, List<GetMembers> memberRes, List<OpinionInfoRes> opinionRes);
 }

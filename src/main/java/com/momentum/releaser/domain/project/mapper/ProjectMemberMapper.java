@@ -1,9 +1,8 @@
 package com.momentum.releaser.domain.project.mapper;
 
 import com.momentum.releaser.domain.project.domain.ProjectMember;
-import com.momentum.releaser.domain.project.dto.ProjectMemberDatoDto.ProjectMembersDataDto;
-import com.momentum.releaser.domain.project.dto.ProjectResDto;
-import com.momentum.releaser.domain.project.dto.ProjectResDto.GetMembersRes;
+import com.momentum.releaser.domain.project.dto.ProjectMemberDataDto.ProjectMembersDataDto;
+import com.momentum.releaser.domain.project.dto.ProjectMemberResponseDto.MembersResponseDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
@@ -23,5 +22,5 @@ public interface ProjectMemberMapper {
     @Mapping(target = "userId", source = "projectMember.user.userId")
     @Mapping(target = "name", source = "projectMember.user.name")
     @Mapping(target = "img", source = "projectMember.user.img")
-    GetMembersRes toGetMembersRes(ProjectMember projectMember);
+    MembersResponseDTO toGetMembersRes(ProjectMember projectMember);
 }
