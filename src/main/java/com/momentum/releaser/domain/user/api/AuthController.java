@@ -35,8 +35,6 @@ public class AuthController {
     /**
      * 2.1 회원가입
      *
-     * 사용자 정보를 받아 회원가입을 처리합니다.
-     *
      * @param userInfoReq 회원가입 요청 객체
      * @return UserInfoResponseDTO 회원가입 성공 시 사용자 정보를 담은 DTO
      */
@@ -48,8 +46,6 @@ public class AuthController {
 
     /**
      * 2.2 이메일 로그인
-     *
-     * 이메일과 비밀번호로 사용자를 로그인합니다.
      *
      * @param userLoginReq 로그인 요청 객체
      * @return TokenDto 로그인 성공 시 토큰 정보를 담은 DTO
@@ -63,8 +59,6 @@ public class AuthController {
     /**
      * 2.3 Token 재발급
      *
-     * 기존의 Access Token과 Refresh Token을 사용하여 새로운 Access Token을 발급받습니다.
-     *
      * @param request HTTP 요청 객체
      * @return TokenDto Token 재발급 성공 시 새로운 Access Token 정보를 담은 DTO
      */
@@ -76,7 +70,9 @@ public class AuthController {
     }
 
     /**
-     * Authorization 헤더에서 토큰을 추출합니다.
+     * 2.3 Token 재발급
+     *
+     * Authorization 헤더에서 토큰을 추출
      *
      * @param authorizationHeader Authorization 헤더 값
      * @return 추출된 토큰
