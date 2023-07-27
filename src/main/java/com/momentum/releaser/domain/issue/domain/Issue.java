@@ -1,11 +1,10 @@
 package com.momentum.releaser.domain.issue.domain;
 
 
-import com.momentum.releaser.domain.issue.dto.IssueReqDto.IssueInfoReq;
+import com.momentum.releaser.domain.issue.dto.IssueRequestDto.IssueInfoReq;
 import com.momentum.releaser.domain.project.domain.Project;
 import com.momentum.releaser.domain.project.domain.ProjectMember;
 import com.momentum.releaser.domain.release.domain.ReleaseNote;
-import com.momentum.releaser.domain.release.dto.ReleaseRequestDto;
 import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.UpdateReleaseDocsReq;
 import com.momentum.releaser.global.common.BaseTime;
 import com.sun.istack.NotNull;

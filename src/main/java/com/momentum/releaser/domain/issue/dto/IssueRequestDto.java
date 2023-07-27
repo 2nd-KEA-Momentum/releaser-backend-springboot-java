@@ -12,7 +12,7 @@ import javax.validation.constraints.Size;
 import java.util.Date;
 
 
-public class IssueReqDto {
+public class IssueRequestDto {
 
     /**
      * 이슈 정보 - 생성, 수정

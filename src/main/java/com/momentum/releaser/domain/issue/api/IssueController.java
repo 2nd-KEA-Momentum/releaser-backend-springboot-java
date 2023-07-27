@@ -1,12 +1,11 @@
 package com.momentum.releaser.domain.issue.api;
 
 import com.momentum.releaser.domain.issue.application.IssueService;
-import com.momentum.releaser.domain.issue.dto.IssueReqDto.IssueInfoReq;
-import com.momentum.releaser.domain.issue.dto.IssueReqDto.UpdateLifeCycleReq;
-import com.momentum.releaser.domain.issue.dto.IssueResDto.GetConnectionIssues;
-import com.momentum.releaser.domain.issue.dto.IssueResDto.GetDoneIssues;
-import com.momentum.releaser.domain.issue.dto.IssueResDto.GetIssuesList;
-import com.momentum.releaser.domain.issue.dto.IssueResDto.OpinionInfoRes;
+import com.momentum.releaser.domain.issue.dto.IssueRequestDto.IssueInfoReq;
+import com.momentum.releaser.domain.issue.dto.IssueResponseDto.GetConnectionIssues;
+import com.momentum.releaser.domain.issue.dto.IssueResponseDto.GetDoneIssues;
+import com.momentum.releaser.domain.issue.dto.IssueResponseDto.GetIssuesList;
+import com.momentum.releaser.domain.issue.dto.IssueResponseDto.OpinionInfoRes;
 import com.momentum.releaser.global.config.BaseResponse;
 import com.momentum.releaser.global.jwt.UserPrincipal;
 import lombok.RequiredArgsConstructor;
@@ -17,12 +16,11 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.util.List;
 
-import static com.momentum.releaser.domain.issue.dto.IssueReqDto.*;
-import static com.momentum.releaser.domain.issue.dto.IssueResDto.*;
+import static com.momentum.releaser.domain.issue.dto.IssueRequestDto.*;
+import static com.momentum.releaser.domain.issue.dto.IssueResponseDto.*;
 
 @Slf4j
 @RestController

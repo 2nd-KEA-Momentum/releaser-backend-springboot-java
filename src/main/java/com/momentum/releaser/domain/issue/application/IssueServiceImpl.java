@@ -4,8 +4,8 @@ import com.momentum.releaser.domain.issue.dao.IssueNumRepository;
 import com.momentum.releaser.domain.issue.dao.IssueOpinionRepository;
 import com.momentum.releaser.domain.issue.dao.IssueRepository;
 import com.momentum.releaser.domain.issue.domain.*;
-import com.momentum.releaser.domain.issue.dto.IssueReqDto.IssueInfoReq;
-import com.momentum.releaser.domain.issue.dto.IssueReqDto.RegisterOpinionReq;
+import com.momentum.releaser.domain.issue.dto.IssueRequestDto.IssueInfoReq;
+import com.momentum.releaser.domain.issue.dto.IssueRequestDto.RegisterOpinionReq;
 import com.momentum.releaser.domain.issue.mapper.IssueMapper;
 import com.momentum.releaser.domain.project.dao.ProjectMemberRepository;
 import com.momentum.releaser.domain.project.dao.ProjectRepository;
@@ -29,7 +29,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.momentum.releaser.domain.issue.dto.IssueResDto.*;
+import static com.momentum.releaser.domain.issue.dto.IssueResponseDto.*;
 import static com.momentum.releaser.global.config.BaseResponseStatus.*;
 
 @Slf4j
