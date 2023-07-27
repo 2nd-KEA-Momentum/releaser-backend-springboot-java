@@ -1,10 +1,12 @@
 package com.momentum.releaser.domain.project.dto;
 
-import com.momentum.releaser.domain.project.dto.ProjectMemberDataDto.ProjectMemberInfoDTO;
-import com.querydsl.core.annotations.QueryProjection;
+import java.util.List;
+
 import lombok.*;
 
-import java.util.List;
+import com.querydsl.core.annotations.QueryProjection;
+
+import com.momentum.releaser.domain.project.dto.ProjectMemberDataDto.ProjectMemberInfoDTO;
 
 public class ProjectMemberResponseDto {
 

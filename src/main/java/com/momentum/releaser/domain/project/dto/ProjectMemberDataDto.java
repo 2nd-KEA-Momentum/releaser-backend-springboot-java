@@ -1,7 +1,8 @@
 package com.momentum.releaser.domain.project.dto;
 
-import com.querydsl.core.annotations.QueryProjection;
 import lombok.*;
+
+import com.querydsl.core.annotations.QueryProjection;
 
 public class ProjectMemberDataDto {
 
