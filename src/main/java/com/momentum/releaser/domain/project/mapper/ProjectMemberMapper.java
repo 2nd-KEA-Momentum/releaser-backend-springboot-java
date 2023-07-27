@@ -23,5 +23,4 @@ public interface ProjectMemberMapper {
     @Mapping(target = "img", source = "projectMember.user.img")
     ProjectMemberInfoDTO toGetMembersRes(ProjectMember projectMember);
 
-
 }

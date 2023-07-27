@@ -127,7 +127,6 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
         return "프로젝트 탈퇴가 완료되었습니다.";
     }
 
-
     // =================================================================================================================
 
     //email로 User 조회

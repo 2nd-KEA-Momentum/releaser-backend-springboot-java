@@ -15,7 +15,6 @@ public interface ProjectMemberService {
      */
     InviteProjectMemberResponseDTO addProjectMember(String link, String email);
 
-
     /**
      * 4.3 프로젝트 멤버 제거
      */
