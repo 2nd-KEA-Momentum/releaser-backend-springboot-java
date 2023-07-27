@@ -51,7 +51,7 @@ public class IssueServiceImpl implements IssueService {
      */
     @Override
     @Transactional
-    public IssueIdResponseDTO registerIssue(Long projectId, IssueInfoReq createReq) {
+    public IssueIdResponseDTO addIssue(Long projectId, IssueInfoReq createReq) {
         ProjectMember projectMember = null;
         // memberId not null
         if (createReq.getMemberId() != null) {
@@ -113,7 +113,7 @@ public class IssueServiceImpl implements IssueService {
      */
     @Override
     @Transactional
-    public String updateIssue(Long issueId, String email, IssueInfoReq updateReq) {
+    public String modifyIssue(Long issueId, String email, IssueInfoReq updateReq) {
         // 이슈 정보 조회
         Issue issue = findIssue(issueId);
 
@@ -164,7 +164,7 @@ public class IssueServiceImpl implements IssueService {
      */
     @Override
     @Transactional
-    public String deleteIssue(Long issueId) {
+    public String removeIssue(Long issueId) {
         //issue
         Issue issue = findIssue(issueId);
 
@@ -186,7 +186,7 @@ public class IssueServiceImpl implements IssueService {
      */
     @Override
     @Transactional
-    public GetIssuesList getIssues(Long projectId) {
+    public GetIssuesList findAllIssues(Long projectId) {
         Project findProject = findProject(projectId);
         List<IssueInfoRes> getAllIssue = issueRepository.getIssues(findProject);
 
@@ -234,7 +234,7 @@ public class IssueServiceImpl implements IssueService {
      */
     @Override
     @Transactional
-    public List<GetDoneIssues> getDoneIssues(Long projectId, String status) {
+    public List<GetDoneIssues> findDoneIssues(Long projectId, String status) {
         Project findProject = findProject(projectId);
         List<GetDoneIssues> getDoneIssue = issueRepository.getDoneIssues(findProject, status.toUpperCase());
         for (GetDoneIssues getDoneIssues : getDoneIssue) {
@@ -251,7 +251,7 @@ public class IssueServiceImpl implements IssueService {
      */
     @Override
     @Transactional
-    public List<GetConnectionIssues> getConnectRelease(Long projectId, Long releaseId) {
+    public List<GetConnectionIssues> findConnectIssues(Long projectId, Long releaseId) {
         Project findProject = findProject(projectId);
         ReleaseNote findReleaseNote = findReleaseNote(releaseId);
 
@@ -271,7 +271,7 @@ public class IssueServiceImpl implements IssueService {
      */
     @Override
     @Transactional
-    public GetIssue getIssue(Long issueId, String email) {
+    public GetIssue findIssue(Long issueId, String email) {
         Issue issue = findIssue(issueId);
         //Token UserInfo
         User user = findUserByEmail(email);
@@ -346,7 +346,7 @@ public class IssueServiceImpl implements IssueService {
      */
     @Override
     @Transactional
-    public String updateLifeCycle(Long issueId, String lifeCycle) {
+    public String modifyIssueLifeCycle(Long issueId, String lifeCycle) {
         //issue 정보
         Issue issue = findIssue(issueId);
 

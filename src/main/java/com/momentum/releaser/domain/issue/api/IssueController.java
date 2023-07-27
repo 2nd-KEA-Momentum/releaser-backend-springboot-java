@@ -38,7 +38,7 @@ public class IssueController {
     @PostMapping("/{projectId}")
     public BaseResponse<IssueIdResponseDTO> issueAdd(@PathVariable @Min(value = 1, message = "프로젝트 식별 번호는 1 이상의 숫자여야 합니다.") Long projectId,
                                               @Valid @RequestBody IssueInfoReq registerReq) {
-        return new BaseResponse<>(issueService.registerIssue(projectId, registerReq));
+        return new BaseResponse<>(issueService.addIssue(projectId, registerReq));
     }
 
     /**
@@ -49,7 +49,7 @@ public class IssueController {
                                             @AuthenticationPrincipal UserPrincipal userPrincipal,
                                             @Valid @RequestBody IssueInfoReq updateReq) {
         String email = userPrincipal.getEmail();
-        return new BaseResponse<>(issueService.updateIssue(issueId, email, updateReq));
+        return new BaseResponse<>(issueService.modifyIssue(issueId, email, updateReq));
     }
 
     /**
@@ -57,7 +57,7 @@ public class IssueController {
      */
     @PostMapping("/{issueId}/delete")
     public BaseResponse<String> issueRemove(@PathVariable @Min(value = 1, message = "이슈 식별 번호는 1 이상의 숫자여야 합니다.") Long issueId) {
-        return new BaseResponse<>(issueService.deleteIssue(issueId));
+        return new BaseResponse<>(issueService.removeIssue(issueId));
     }
 
     /**
@@ -65,7 +65,7 @@ public class IssueController {
      */
     @GetMapping("/project/{projectId}")
     public BaseResponse<GetIssuesList> allIssueList(@PathVariable @Min(value = 1, message = "프로젝트 식별 번호는 1 이상의 숫자여야 합니다.") Long projectId) {
-        return new BaseResponse<>(issueService.getIssues(projectId));
+        return new BaseResponse<>(issueService.findAllIssues(projectId));
     }
 
     /**
@@ -79,7 +79,7 @@ public class IssueController {
                                                            @RequestParam
                                                                @Pattern(regexp = "(?i)^(false)$", message = "연결 상태는 false 이어야 합니다.")
                                                                String connect) {
-        return new BaseResponse<>(issueService.getDoneIssues(projectId, status));
+        return new BaseResponse<>(issueService.findDoneIssues(projectId, status));
 
     }
 
@@ -91,7 +91,7 @@ public class IssueController {
     public BaseResponse<List<GetConnectionIssues>> connectIssueList(@PathVariable @Min(value = 1, message = "프로젝트 식별 번호는 1 이상의 숫자여야 합니다.") Long projectId,
                                                                      @PathVariable @Min(value = 1, message = "릴리즈 노트 식별 번호는 1 이상의 숫자여야 합니다.") Long releaseId,
                                                                      @RequestParam(required = false, defaultValue = "true") boolean connect) {
-        return new BaseResponse<>(issueService.getConnectRelease(projectId, releaseId));
+        return new BaseResponse<>(issueService.findConnectIssues(projectId, releaseId));
     }
 
     /**
@@ -101,7 +101,7 @@ public class IssueController {
     public BaseResponse<GetIssue> issueDetails(@PathVariable @Min(value = 1, message = "이슈 식별 번호는 1 이상의 숫자여야 합니다.") Long issueId,
                                            @AuthenticationPrincipal UserPrincipal userPrincipal) {
         String email = userPrincipal.getEmail();
-        return new BaseResponse<>(issueService.getIssue(issueId, email));
+        return new BaseResponse<>(issueService.findIssue(issueId, email));
     }
 
     /**
@@ -112,7 +112,7 @@ public class IssueController {
                                                 @RequestParam(name = "status")
                                                 @Pattern(regexp = "(?i)^(NOT_STARTED|IN_PROGRESS|DONE)$", message = "상태는 NOT_STARTED, IN_PROGRESS, DONE 중 하나여야 합니다.")
                                                 String lifeCycle) {
-        return new BaseResponse<>(issueService.updateLifeCycle(issueId, lifeCycle));
+        return new BaseResponse<>(issueService.modifyIssueLifeCycle(issueId, lifeCycle));
     }
 
     /**
