@@ -10,7 +10,7 @@ public interface UserService {
     /**
      * 1.1 사용자 프로필 이미지 조회
      */
-    UserProfileImgResponseDto getUserProfileImg(Long userId);
+    UserProfileImgResponseDto getUserProfileImg(String userEmail);
 
     /**
      * 1.2 사용자 프로필 이미지 변경

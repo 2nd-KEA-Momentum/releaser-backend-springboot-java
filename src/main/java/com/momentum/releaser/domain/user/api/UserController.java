@@ -1,5 +1,6 @@
 package com.momentum.releaser.domain.user.api;
 
+import com.momentum.releaser.domain.user.application.UserService;
 import com.momentum.releaser.domain.user.application.UserServiceImpl;
 import com.momentum.releaser.domain.user.dto.UserRequestDto.UserUpdateImgRequestDto;
 import com.momentum.releaser.domain.user.dto.UserResponseDto.UserProfileImgResponseDto;
@@ -25,16 +26,16 @@ import java.io.IOException;
 @Validated
 public class UserController {
 
-    private final UserServiceImpl userService;
+    private final UserService userService;
 
     /**
      * 1.1 사용자 프로필 이미지 조회
      */
-    @GetMapping(value = "/{userId}/images")
+    @GetMapping(value = "/images")
     public BaseResponse<UserProfileImgResponseDto> getUserProfileImg(
-            @PathVariable @Min(value = 1, message = "사용자 식별 번호는 1 이상의 숫자여야 합니다.") Long userId) {
+            @AuthenticationPrincipal UserPrincipal userPrincipal) {
 
-        return new BaseResponse<>(userService.getUserProfileImg(userId));
+        return new BaseResponse<>(userService.getUserProfileImg(userPrincipal.getEmail()));
     }
 
     /**
