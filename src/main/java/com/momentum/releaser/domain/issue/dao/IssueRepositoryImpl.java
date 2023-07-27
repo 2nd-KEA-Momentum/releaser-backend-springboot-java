@@ -1,11 +1,14 @@
 package com.momentum.releaser.domain.issue.dao;
 
 import com.momentum.releaser.domain.issue.domain.*;
-import com.momentum.releaser.domain.issue.dto.*;
 import com.momentum.releaser.domain.issue.dto.IssueResponseDto.GetConnectionIssues;
 import com.momentum.releaser.domain.issue.dto.IssueResponseDto.GetDoneIssues;
 import com.momentum.releaser.domain.issue.dto.IssueResponseDto.IssueInfoRes;
 import com.momentum.releaser.domain.issue.dto.IssueResponseDto.OpinionInfoRes;
+import com.momentum.releaser.domain.issue.dto.QIssueResponseDto_GetConnectionIssues;
+import com.momentum.releaser.domain.issue.dto.QIssueResponseDto_GetDoneIssues;
+import com.momentum.releaser.domain.issue.dto.QIssueResponseDto_IssueInfoRes;
+import com.momentum.releaser.domain.issue.dto.QIssueResponseDto_OpinionInfoRes;
 import com.momentum.releaser.domain.project.domain.Project;
 import com.momentum.releaser.domain.project.domain.QProjectMember;
 import com.momentum.releaser.domain.release.domain.QReleaseNote;
@@ -69,7 +72,7 @@ public class IssueRepositoryImpl implements IssueRepositoryCustom{
 
         List<IssueInfoRes> result = queryFactory
                 .select(
-                        new QIssueResDto_IssueInfoRes(
+                        new QIssueResponseDto_IssueInfoRes(
                                 issue.issueId,
                                 issue.issueNum.issueNum,
                                 issue.title,
@@ -99,7 +102,7 @@ public class IssueRepositoryImpl implements IssueRepositoryCustom{
         QUser user = QUser.user;
 
         List<GetDoneIssues> getDoneIssues = queryFactory
-                .select(new QIssueResDto_GetDoneIssues(
+                .select(new QIssueResponseDto_GetDoneIssues(
                         issue.issueId,
                         issue.issueNum.issueNum,
                         issue.title,
@@ -129,7 +132,7 @@ public class IssueRepositoryImpl implements IssueRepositoryCustom{
         QReleaseNote releaseNote = QReleaseNote.releaseNote;
 
         List<GetConnectionIssues> getConnectionIssues = queryFactory
-                .select(new QIssueResDto_GetConnectionIssues(
+                .select(new QIssueResponseDto_GetConnectionIssues(
                         issue.issueId,
                         issue.issueNum.issueNum,
                         issue.title,
@@ -158,7 +161,7 @@ public class IssueRepositoryImpl implements IssueRepositoryCustom{
         QUser user = QUser.user;
 
         List<OpinionInfoRes> opinionInfoRes = queryFactory
-                .select(new QIssueResDto_OpinionInfoRes(
+                .select(new QIssueResponseDto_OpinionInfoRes(
                         Expressions.cases().when(issueOpinion.member.status.eq('N')).then(0L).otherwise(issueOpinion.member.memberId),
                         user.name.as("memberName"),
                         user.img.as("memberImg"),
