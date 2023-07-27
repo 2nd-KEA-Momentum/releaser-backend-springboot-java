@@ -20,7 +20,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -59,13 +58,6 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
         return getMembersRes;
     }
 
-
-
-
-
-
-
-
     /**
      * 4.2 프로젝트 멤버 추가
      */
@@ -94,8 +86,6 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
         return res;
     }
 
-
-
     /**
      * 4.3 프로젝트 멤버 제거
      */
@@ -111,11 +101,9 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
 
         projectMemberRepository.deleteById(projectMember.getMemberId());
         releaseApprovalRepository.deleteByReleaseApproval();
+
         return "프로젝트 멤버가 제거되었습니다.";
     }
-
-
-
 
     /**
      * 4.4 프로젝트 멤버 탈퇴
@@ -148,7 +136,6 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
     private Project getProjectByLink(String link) {
         return projectRepository.findByLink(link).orElseThrow(() -> new CustomException(NOT_EXISTS_LINK));
     }
-
 
     //projectId로 project 조회
     private Project getProjectById(Long projectId) {
@@ -188,6 +175,7 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
     private void addReleaseApprovalsForProjectMember(ProjectMember member, Project project) {
         List<ReleaseNote> releaseNotes = releaseRepository.findAllByProject(project);
         if (releaseNotes != null) {
+
             for (ReleaseNote releaseNote : releaseNotes) {
                 ReleaseApproval releaseApproval = ReleaseApproval.builder()
                         .member(member)
@@ -196,6 +184,7 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
 
                 releaseApprovalRepository.save(releaseApproval);
             }
+
         }
     }
 

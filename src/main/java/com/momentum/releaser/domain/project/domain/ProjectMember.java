@@ -69,20 +69,11 @@ public class ProjectMember extends BaseTime {
 
     @PreRemove
     private void preRemove() {
+
         for (ReleaseApproval approval : approvals) {
             approval.deleteToMember();
         }
 
-    }
-
-
-
-    public void statusToInactive() {
-        this.status = 'N';
-    }
-
-    public void removeReleaseApproval(ReleaseApproval approval) {
-        approvals.remove(approval);
     }
 
     /**
@@ -92,4 +83,14 @@ public class ProjectMember extends BaseTime {
     public void prePersist() {
         this.status = (this.status == '\0') ? 'Y' : this.status;
     }
+
+    public void statusToInactive() {
+        this.status = 'N';
+    }
+
+    public void removeReleaseApproval(ReleaseApproval approval) {
+        approvals.remove(approval);
+    }
+
+
 }

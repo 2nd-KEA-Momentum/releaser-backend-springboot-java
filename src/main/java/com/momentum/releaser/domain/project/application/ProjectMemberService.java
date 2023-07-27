@@ -3,9 +3,8 @@ package com.momentum.releaser.domain.project.application;
 import com.momentum.releaser.domain.project.dto.ProjectMemberResponseDto.InviteProjectMemberResponseDTO;
 import com.momentum.releaser.domain.project.dto.ProjectMemberResponseDto.MembersResponseDTO;
 
-import java.util.List;
-
 public interface ProjectMemberService {
+
     /**
      * 4.1 프로젝트 멤버 조회
      */
