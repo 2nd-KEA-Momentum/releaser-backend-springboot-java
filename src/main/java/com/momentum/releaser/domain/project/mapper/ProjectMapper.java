@@ -1,15 +1,14 @@
 package com.momentum.releaser.domain.project.mapper;
 
+import org.mapstruct.Mapper;
+import org.mapstruct.factory.Mappers;
+
 import com.momentum.releaser.domain.project.domain.Project;
 import com.momentum.releaser.domain.project.domain.ProjectMember;
-import com.momentum.releaser.domain.project.dto.ProjectResDto;
-import com.momentum.releaser.domain.project.dto.ProjectResDto.GetProjectRes;
-import com.momentum.releaser.domain.project.dto.ProjectResDto.ProjectInfoRes;
+import com.momentum.releaser.domain.project.dto.ProjectResponseDto.ProjectInfoResponseDTO;
 import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.ReleasesResponseDto;
 import com.momentum.releaser.domain.release.mapper.ReleaseMapper;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
+
 
 @Mapper(uses = ReleaseMapper.class)
 public interface ProjectMapper {
@@ -19,7 +18,7 @@ public interface ProjectMapper {
     /**
      * Entity(Project) -> DTO(ProjectInfoRes)
      */
-    ProjectInfoRes toProjectInfoRes(Project project);
+    ProjectInfoResponseDTO toProjectInfoRes(Project project);
 
     /**
      * Entity(Project) -> DTO(ReleasesResponseDto)

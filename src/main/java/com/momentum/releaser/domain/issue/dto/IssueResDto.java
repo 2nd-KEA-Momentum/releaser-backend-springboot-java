@@ -1,17 +1,12 @@
 package com.momentum.releaser.domain.issue.dto;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.momentum.releaser.domain.issue.domain.LifeCycle;
-import com.momentum.releaser.domain.issue.domain.Tag;
-import com.momentum.releaser.domain.project.dto.ProjectResDto;
-import com.momentum.releaser.domain.project.dto.ProjectResDto.GetMembersRes;
+import com.momentum.releaser.domain.project.dto.ProjectDataDto.GetMembers;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
@@ -149,11 +144,11 @@ public class IssueResDto{
         private char edit;
         private Long manager; //담당자
         private char deployYN;
-        private List<GetMembersRes> memberList;
+        private List<GetMembers> memberList;
         private List<OpinionInfoRes> opinionList;
 
         @Builder
-        public GetIssue(Long issueNum, String title, String content, String tag, Date endDate, char edit, Long manager, List<GetMembersRes> memberList, List<OpinionInfoRes> opinionList) {
+        public GetIssue(Long issueNum, String title, String content, String tag, Date endDate, char edit, Long manager, List<GetMembers> memberList, List<OpinionInfoRes> opinionList) {
             this.issueNum = issueNum;
             this.title = title;
             this.content = content;
