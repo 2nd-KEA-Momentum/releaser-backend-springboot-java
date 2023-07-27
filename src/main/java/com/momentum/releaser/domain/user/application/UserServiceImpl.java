@@ -32,8 +32,8 @@ public class UserServiceImpl implements UserService {
      * 1.1 사용자 프로필 이미지 조회
      */
     @Override
-    public UserProfileImgResponseDto getUserProfileImg(Long userId) {
-        User user = getUserById(userId);
+    public UserProfileImgResponseDto getUserProfileImg(String userEmail) {
+        User user = getUserByEmail(userEmail);
         return UserMapper.INSTANCE.toUserProfileImgResponseDto(user);
     }
 
@@ -67,6 +67,13 @@ public class UserServiceImpl implements UserService {
      */
     private User getUserById(Long userId) {
         return userRepository.findById(userId).orElseThrow(() -> new CustomException(NOT_EXISTS_USER));
+    }
+
+    /**
+     * 사용자 이메일을 이용해 사용자 엔티티를 가져온다.
+     */
+    private User getUserByEmail(String email) {
+        return userRepository.findByEmail(email).orElseThrow(() -> new CustomException(NOT_EXISTS_USER));
     }
 
     /**
