@@ -185,6 +185,20 @@ public class IssueResponseDto {
         }
     }
 
+    /**
+     * 생성 및 수정한 이슈 식별 번호 정보
+     */
+    @Data
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    public static class IssueIdResponseDTO {
+        private Long issueId;
+
+        @Builder
+        public IssueIdResponseDTO(Long issueId) {
+            this.issueId = issueId;
+        }
+    }
+
 
 
 

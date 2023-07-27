@@ -51,7 +51,7 @@ public class IssueServiceImpl implements IssueService {
      */
     @Override
     @Transactional
-    public String registerIssue(Long projectId, IssueInfoReq createReq) {
+    public IssueIdResponseDTO registerIssue(Long projectId, IssueInfoReq createReq) {
         ProjectMember projectMember = null;
         // memberId not null
         if (createReq.getMemberId() != null) {
@@ -59,8 +59,10 @@ public class IssueServiceImpl implements IssueService {
         }
         Project project = findProject(projectId);
         Issue newIssue = saveIssue(createReq, project, projectMember);
-        String result = "이슈 생성이 완료되었습니다.";
-        return result;
+
+        return IssueIdResponseDTO.builder()
+                .issueId(newIssue.getIssueId())
+                .build();
     }
 
     private IssueNum saveIssueNum(Project project, Issue newIssue, Long number) {
