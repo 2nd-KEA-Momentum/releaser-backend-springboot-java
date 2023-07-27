@@ -1,7 +1,8 @@
 package com.momentum.releaser.domain.project.dto;
 
-import com.querydsl.core.annotations.QueryProjection;
 import lombok.*;
+
+import com.querydsl.core.annotations.QueryProjection;
 
 public class ProjectMemberDataDto {
 
@@ -25,6 +26,9 @@ public class ProjectMemberDataDto {
         }
     }
 
+    /**
+     * 프로젝트 멤버 정보
+     */
     @Data
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     public static class ProjectMemberInfoDTO {
@@ -45,6 +49,5 @@ public class ProjectMemberDataDto {
             this.position = position;
         }
     }
-
 
 }
