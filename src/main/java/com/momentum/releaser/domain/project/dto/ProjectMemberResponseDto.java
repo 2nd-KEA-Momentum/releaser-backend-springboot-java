@@ -27,6 +27,9 @@ public class ProjectMemberResponseDto {
         }
     }
 
+    /**
+     * 프로젝트 멤버의 직책 정보
+     */
     @Getter
     @NoArgsConstructor
     public static class ProjectMemberPositionResponseDTO {
@@ -41,7 +44,7 @@ public class ProjectMemberResponseDto {
     }
 
     /**
-     * 4.2 프로젝트 멤버 추가
+     * 프로젝트 초대 시 프로젝트에 대한 정보
      */
     @Getter
     @NoArgsConstructor

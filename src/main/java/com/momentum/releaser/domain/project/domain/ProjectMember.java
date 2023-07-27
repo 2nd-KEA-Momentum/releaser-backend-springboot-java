@@ -71,6 +71,9 @@ public class ProjectMember extends BaseTime {
         this.project = project;
     }
 
+    /**
+     * delete 되기 전 실행된다.
+     */
     @PreRemove
     private void preRemove() {
 
@@ -81,20 +84,25 @@ public class ProjectMember extends BaseTime {
     }
 
     /**
-     * insert 되기전 (persist 되기전) 실행된다.
+     * insert 되기 전 (persist 되기 전) 실행된다.
      */
     @PrePersist
     public void prePersist() {
         this.status = (this.status == '\0') ? 'Y' : this.status;
     }
 
+    /**
+     * 상태를 비활성화 (상태 'N'으로 변경)
+     */
     public void statusToInactive() {
         this.status = 'N';
     }
 
+    /**
+     * 지정된 ReleaseApproval 제거
+     */
     public void removeReleaseApproval(ReleaseApproval approval) {
         approvals.remove(approval);
     }
-
 
 }

@@ -26,6 +26,9 @@ public class ProjectMemberDataDto {
         }
     }
 
+    /**
+     * 프로젝트 멤버 정보
+     */
     @Data
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     public static class ProjectMemberInfoDTO {

@@ -13,10 +13,16 @@ public interface ProjectMemberMapper {
 
     ProjectMemberMapper INSTANCE = Mappers.getMapper(ProjectMemberMapper.class);
 
+    /**
+     * Entity(ProjectMember) -> DTO(ProjectMembersDataDTO)
+     */
     @Mapping(target = "name", source = "projectMember.user.name")
     @Mapping(target = "profileImg", source = "projectMember.user.img")
     ProjectMembersDataDTO toProjectMembersDataDto(ProjectMember projectMember);
 
+    /**
+     * Entity(ProjectMember) -> DTO(ProjectMemberInfoDTO)
+     */
     @Mapping(target = "position", source = "projectMember.position")
     @Mapping(target = "userId", source = "projectMember.user.userId")
     @Mapping(target = "name", source = "projectMember.user.name")
