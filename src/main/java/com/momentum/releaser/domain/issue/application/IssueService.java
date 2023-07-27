@@ -10,7 +10,7 @@ public interface IssueService {
     /**
      * 7.1 이슈 생성
      */
-    String registerIssue(Long projectId, IssueInfoReq issueInfoReq);
+    IssueIdResponseDTO registerIssue(Long projectId, IssueInfoReq issueInfoReq);
 
     /**
      * 7.2 이슈 수정

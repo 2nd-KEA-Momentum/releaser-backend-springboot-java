@@ -36,7 +36,7 @@ public class IssueController {
      * 7.1 이슈 생성
      */
     @PostMapping("/{projectId}")
-    public BaseResponse<String> registerIssue(@PathVariable @Min(value = 1, message = "프로젝트 식별 번호는 1 이상의 숫자여야 합니다.") Long projectId,
+    public BaseResponse<IssueIdResponseDTO> registerIssue(@PathVariable @Min(value = 1, message = "프로젝트 식별 번호는 1 이상의 숫자여야 합니다.") Long projectId,
                                               @Valid @RequestBody IssueInfoReq registerReq) {
         return new BaseResponse<>(issueService.registerIssue(projectId, registerReq));
     }
