@@ -1,10 +1,8 @@
 package com.momentum.releaser.domain.issue.application;
 
-import com.momentum.releaser.domain.issue.dto.IssueReqDto;
-import com.momentum.releaser.domain.issue.dto.IssueReqDto.IssueInfoReq;
-import com.momentum.releaser.domain.issue.dto.IssueReqDto.RegisterOpinionReq;
-import com.momentum.releaser.domain.issue.dto.IssueResDto;
-import com.momentum.releaser.domain.issue.dto.IssueResDto.*;
+import com.momentum.releaser.domain.issue.dto.IssueRequestDto.IssueInfoReq;
+import com.momentum.releaser.domain.issue.dto.IssueRequestDto.RegisterOpinionReq;
+import com.momentum.releaser.domain.issue.dto.IssueResponseDto.*;
 
 import java.util.List;
 

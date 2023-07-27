@@ -10,7 +10,8 @@ import lombok.NoArgsConstructor;
 import java.util.Date;
 import java.util.List;
 
-public class IssueResDto{
+public class IssueResponseDto {
+
     /**
      * 이슈 상태 구분
      */

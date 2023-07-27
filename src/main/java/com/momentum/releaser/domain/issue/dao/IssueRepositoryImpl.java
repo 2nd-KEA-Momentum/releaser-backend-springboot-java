@@ -2,12 +2,11 @@ package com.momentum.releaser.domain.issue.dao;
 
 import com.momentum.releaser.domain.issue.domain.*;
 import com.momentum.releaser.domain.issue.dto.*;
-import com.momentum.releaser.domain.issue.dto.IssueResDto.GetConnectionIssues;
-import com.momentum.releaser.domain.issue.dto.IssueResDto.GetDoneIssues;
-import com.momentum.releaser.domain.issue.dto.IssueResDto.IssueInfoRes;
-import com.momentum.releaser.domain.issue.dto.IssueResDto.OpinionInfoRes;
+import com.momentum.releaser.domain.issue.dto.IssueResponseDto.GetConnectionIssues;
+import com.momentum.releaser.domain.issue.dto.IssueResponseDto.GetDoneIssues;
+import com.momentum.releaser.domain.issue.dto.IssueResponseDto.IssueInfoRes;
+import com.momentum.releaser.domain.issue.dto.IssueResponseDto.OpinionInfoRes;
 import com.momentum.releaser.domain.project.domain.Project;
-import com.momentum.releaser.domain.project.domain.ProjectMember;
 import com.momentum.releaser.domain.project.domain.QProjectMember;
 import com.momentum.releaser.domain.release.domain.QReleaseNote;
 import com.momentum.releaser.domain.release.domain.ReleaseNote;
