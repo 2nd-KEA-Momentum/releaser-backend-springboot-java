@@ -1,6 +1,6 @@
 package com.momentum.releaser.domain.release.dto;
 
-import com.momentum.releaser.domain.issue.dto.IssueDataDto.ConnectedIssuesDataDto;
+import com.momentum.releaser.domain.issue.dto.IssueDataDto.ConnectedIssuesDataDTO;
 import com.momentum.releaser.domain.project.dto.ProjectMemberResponseDto;
 import com.momentum.releaser.domain.project.dto.ProjectMemberResponseDto.ProjectMemberPositionResponseDTO;
 import com.momentum.releaser.domain.release.domain.ReleaseEnum;
@@ -86,12 +86,12 @@ public class ReleaseResponseDto {
         private String version;
         private Date deployDate;
         private String deployStatus;
-        private List<ConnectedIssuesDataDto> issues;
+        private List<ConnectedIssuesDataDTO> issues;
         private List<ReleaseOpinionsDataDto> opinions;
         private List<ReleaseApprovalsDataDto> approvals;
 
         @Builder
-        public ReleaseInfoResponseDto(Long releaseId, String title, String content, String summary, String version, Date deployDate, String deployStatus, List<ConnectedIssuesDataDto> issues, List<ReleaseOpinionsDataDto> opinions, List<ReleaseApprovalsDataDto> approvals) {
+        public ReleaseInfoResponseDto(Long releaseId, String title, String content, String summary, String version, Date deployDate, String deployStatus, List<ConnectedIssuesDataDTO> issues, List<ReleaseOpinionsDataDto> opinions, List<ReleaseApprovalsDataDto> approvals) {
             this.releaseId = releaseId;
             this.title = title;
             this.content = content;

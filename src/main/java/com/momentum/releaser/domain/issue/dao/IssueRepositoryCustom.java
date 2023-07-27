@@ -9,18 +9,18 @@ import java.util.List;
 
 public interface IssueRepositoryCustom {
 
-    List<IssueInfoRes> getIssues(Project project);
+    List<IssueInfoResponseDTO> getIssues(Project project);
 
     Long getIssueNum(Project project);
 
     void deleteByIssueNum();
 
-    List<GetDoneIssues> getDoneIssues(Project findProject, String status);
+    List<DoneIssuesResponseDTO> getDoneIssues(Project findProject, String status);
 
-    List<GetConnectionIssues> getConnectionIssues(Project findProject, ReleaseNote findReleaseNote);
+    List<ConnectionIssuesResponseDTO> getConnectionIssues(Project findProject, ReleaseNote findReleaseNote);
 
 
-    List<OpinionInfoRes> getIssueOpinion(Issue issue);
+    List<OpinionInfoResponseDTO> getIssueOpinion(Issue issue);
 
 
 }

@@ -19,7 +19,7 @@ public class IssueRequestDto {
      */
     @Data
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    public static class IssueInfoReq {
+    public static class IssueInfoRequestDTO {
 
         @NotBlank
         @NotNull(message = "이슈명을 입력해주세요.")
@@ -39,7 +39,7 @@ public class IssueRequestDto {
         private Long memberId;
 
         @Builder
-        public IssueInfoReq(String title, String content, String tag, Date endDate) {
+        public IssueInfoRequestDTO(String title, String content, String tag, Date endDate) {
             this.title = title;
             this.content = content;
             this.tag = tag;
@@ -63,24 +63,5 @@ public class IssueRequestDto {
             this.opinion = opinion;
         }
     }
-
-    /**
-     * 이슈 상태 변경
-     */
-    @Data
-    @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    public static class UpdateLifeCycleReq {
-        @NotBlank
-        @NotNull(message = "이슈 상태를 입력해주세요.")
-        @Pattern(regexp = "(?i)^(NOT_STARTED|IN_PROGRESS|DONE)$", message = "이슈 상태는 NOT_STARTED, IN_PROGRESS, DONE 중 하나여야 합니다.")
-        private String lifeCycle;
-
-        @Builder
-        public UpdateLifeCycleReq(String lifeCycle) {
-            this.lifeCycle = lifeCycle;
-        }
-    }
-
-
 
 }

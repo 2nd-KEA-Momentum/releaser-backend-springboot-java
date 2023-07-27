@@ -1,7 +1,7 @@
 package com.momentum.releaser.domain.issue.domain;
 
 
-import com.momentum.releaser.domain.issue.dto.IssueRequestDto.IssueInfoReq;
+import com.momentum.releaser.domain.issue.dto.IssueRequestDto.IssueInfoRequestDTO;
 import com.momentum.releaser.domain.project.domain.Project;
 import com.momentum.releaser.domain.project.domain.ProjectMember;
 import com.momentum.releaser.domain.release.domain.ReleaseNote;
@@ -122,7 +122,7 @@ public class Issue extends BaseTime {
     /**
      * 이슈 수정
      */
-    public void updateIssue(IssueInfoReq updateReq, char edit, ProjectMember member) {
+    public void updateIssue(IssueInfoRequestDTO updateReq, char edit, ProjectMember member) {
         this.title = updateReq.getTitle();
         this.content = updateReq.getContent();
         this.edit = edit;

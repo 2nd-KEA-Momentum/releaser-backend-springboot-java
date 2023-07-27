@@ -4,7 +4,7 @@ import com.momentum.releaser.domain.issue.dao.IssueNumRepository;
 import com.momentum.releaser.domain.issue.dao.IssueOpinionRepository;
 import com.momentum.releaser.domain.issue.dao.IssueRepository;
 import com.momentum.releaser.domain.issue.domain.*;
-import com.momentum.releaser.domain.issue.dto.IssueRequestDto.IssueInfoReq;
+import com.momentum.releaser.domain.issue.dto.IssueRequestDto.IssueInfoRequestDTO;
 import com.momentum.releaser.domain.issue.dto.IssueRequestDto.RegisterOpinionReq;
 import com.momentum.releaser.domain.issue.mapper.IssueMapper;
 import com.momentum.releaser.domain.project.dao.ProjectMemberRepository;
@@ -51,7 +51,7 @@ public class IssueServiceImpl implements IssueService {
      */
     @Override
     @Transactional
-    public IssueIdResponseDTO addIssue(Long projectId, IssueInfoReq createReq) {
+    public IssueIdResponseDTO addIssue(Long projectId, IssueInfoRequestDTO createReq) {
         ProjectMember projectMember = null;
         // memberId not null
         if (createReq.getMemberId() != null) {
@@ -91,7 +91,7 @@ public class IssueServiceImpl implements IssueService {
     }
 
     // 이슈 저장
-    private Issue saveIssue(IssueInfoReq issueInfoReq, Project project, ProjectMember projectMember) {
+    private Issue saveIssue(IssueInfoRequestDTO issueInfoReq, Project project, ProjectMember projectMember) {
         Long number = issueRepository.getIssueNum(project) + 1;
         Issue issue = issueRepository.save(Issue.builder()
                 .title(issueInfoReq.getTitle())
@@ -113,7 +113,7 @@ public class IssueServiceImpl implements IssueService {
      */
     @Override
     @Transactional
-    public String modifyIssue(Long issueId, String email, IssueInfoReq updateReq) {
+    public String modifyIssue(Long issueId, String email, IssueInfoRequestDTO updateReq) {
         // 이슈 정보 조회
         Issue issue = findIssue(issueId);
 
@@ -186,15 +186,15 @@ public class IssueServiceImpl implements IssueService {
      */
     @Override
     @Transactional
-    public GetIssuesList findAllIssues(Long projectId) {
+    public AllIssueListResponseDTO findAllIssues(Long projectId) {
         Project findProject = findProject(projectId);
-        List<IssueInfoRes> getAllIssue = issueRepository.getIssues(findProject);
+        List<IssueInfoResponseDTO> getAllIssue = issueRepository.getIssues(findProject);
 
-        List<IssueInfoRes> notStartedList = filterAndSetDeployStatus(getAllIssue, "NOT_STARTED");
-        List<IssueInfoRes> inProgressList = filterAndSetDeployStatus(getAllIssue, "IN_PROGRESS");
-        List<IssueInfoRes> doneList = filterAndSetDeployStatus(getAllIssue, "DONE");
+        List<IssueInfoResponseDTO> notStartedList = filterAndSetDeployStatus(getAllIssue, "NOT_STARTED");
+        List<IssueInfoResponseDTO> inProgressList = filterAndSetDeployStatus(getAllIssue, "IN_PROGRESS");
+        List<IssueInfoResponseDTO> doneList = filterAndSetDeployStatus(getAllIssue, "DONE");
 
-        return GetIssuesList.builder()
+        return AllIssueListResponseDTO.builder()
                 .getNotStartedList(notStartedList)
                 .getInProgressList(inProgressList)
                 .getDoneList(doneList)
@@ -202,7 +202,7 @@ public class IssueServiceImpl implements IssueService {
     }
 
 
-    private List<IssueInfoRes> filterAndSetDeployStatus(List<IssueInfoRes> issues, String lifeCycle) {
+    private List<IssueInfoResponseDTO> filterAndSetDeployStatus(List<IssueInfoResponseDTO> issues, String lifeCycle) {
         return issues.stream()
                 .filter(issue -> lifeCycle.equals(issue.getLifeCycle()))
                 .peek(issueInfoRes -> {
@@ -223,7 +223,7 @@ public class IssueServiceImpl implements IssueService {
                     }
 
                 })
-                .map(issue -> modelMapper.map(issue, IssueInfoRes.class))
+                .map(issue -> modelMapper.map(issue, IssueInfoResponseDTO.class))
                 .collect(Collectors.toList());
 
     }
@@ -234,10 +234,10 @@ public class IssueServiceImpl implements IssueService {
      */
     @Override
     @Transactional
-    public List<GetDoneIssues> findDoneIssues(Long projectId, String status) {
+    public List<DoneIssuesResponseDTO> findDoneIssues(Long projectId, String status) {
         Project findProject = findProject(projectId);
-        List<GetDoneIssues> getDoneIssue = issueRepository.getDoneIssues(findProject, status.toUpperCase());
-        for (GetDoneIssues getDoneIssues : getDoneIssue) {
+        List<DoneIssuesResponseDTO> getDoneIssue = issueRepository.getDoneIssues(findProject, status.toUpperCase());
+        for (DoneIssuesResponseDTO getDoneIssues : getDoneIssue) {
             Optional<ProjectMember> projectMember = projectMemberRepository.findById(getDoneIssues.getMemberId());
             if (projectMember.isEmpty()) {
                 getDoneIssues.setMemberId(0L);
@@ -251,11 +251,11 @@ public class IssueServiceImpl implements IssueService {
      */
     @Override
     @Transactional
-    public List<GetConnectionIssues> findConnectIssues(Long projectId, Long releaseId) {
+    public List<ConnectionIssuesResponseDTO> findConnectIssues(Long projectId, Long releaseId) {
         Project findProject = findProject(projectId);
         ReleaseNote findReleaseNote = findReleaseNote(releaseId);
 
-        List<GetConnectionIssues> getConnectionIssues = issueRepository.getConnectionIssues(findProject, findReleaseNote);
+        List<ConnectionIssuesResponseDTO> getConnectionIssues = issueRepository.getConnectionIssues(findProject, findReleaseNote);
 
         return getConnectionIssues;
     }
@@ -271,7 +271,7 @@ public class IssueServiceImpl implements IssueService {
      */
     @Override
     @Transactional
-    public GetIssue findIssue(Long issueId, String email) {
+    public IssueDetailsDTO findIssue(Long issueId, String email) {
         Issue issue = findIssue(issueId);
         //Token UserInfo
         User user = findUserByEmail(email);
@@ -283,18 +283,18 @@ public class IssueServiceImpl implements IssueService {
         updateIssueEdit(issue, member);
 
         //의견 리스트
-        List<OpinionInfoRes> opinionRes = getIssueOpinion(issue, memberId);
+        List<OpinionInfoResponseDTO> opinionRes = getIssueOpinion(issue, memberId);
 
         //프로젝트 멤버 리스트
         List<GetMembers> memberRes = getMemberList(member.getProject());
 
-        GetIssue getIssue = createGetIssue(issue, memberRes, opinionRes);
+        IssueDetailsDTO getIssue = createGetIssue(issue, memberRes, opinionRes);
 
         return getIssue;
     }
 
-    private GetIssue createGetIssue(Issue issue, List<GetMembers> memberRes, List<OpinionInfoRes> opinionRes) {
-        GetIssue getIssue = IssueMapper.INSTANCE.mapToGetIssue(issue, memberRes, opinionRes);
+    private IssueDetailsDTO createGetIssue(Issue issue, List<GetMembers> memberRes, List<OpinionInfoResponseDTO> opinionRes) {
+        IssueDetailsDTO getIssue = IssueMapper.INSTANCE.mapToGetIssue(issue, memberRes, opinionRes);
         Long memberId = getIssue.getManager();
         if (memberId != null) {
             Optional<ProjectMember> projectMember = projectMemberRepository.findById(memberId);
@@ -324,9 +324,9 @@ public class IssueServiceImpl implements IssueService {
         }
     }
 
-    private List<OpinionInfoRes> getIssueOpinion(Issue issue, Long memberId) {
-        List<OpinionInfoRes> issueOpinion = issueRepository.getIssueOpinion(issue);
-        for (OpinionInfoRes opinion : issueOpinion) {
+    private List<OpinionInfoResponseDTO> getIssueOpinion(Issue issue, Long memberId) {
+        List<OpinionInfoResponseDTO> issueOpinion = issueRepository.getIssueOpinion(issue);
+        for (OpinionInfoResponseDTO opinion : issueOpinion) {
             opinion.setDeleteYN(opinion.getMemberId() == memberId ? 'Y' : 'N');
         }
         return issueOpinion;
@@ -374,7 +374,7 @@ public class IssueServiceImpl implements IssueService {
      */
     @Override
     @Transactional
-    public List<OpinionInfoRes> registerOpinion(Long issueId, String email, RegisterOpinionReq issueOpinionReq) {
+    public List<OpinionInfoResponseDTO> registerOpinion(Long issueId, String email, RegisterOpinionReq issueOpinionReq) {
         //issue
         Issue issue = findIssue(issueId);
         //Token UserInfo
@@ -387,7 +387,7 @@ public class IssueServiceImpl implements IssueService {
         //save opinion
         IssueOpinion issueOpinion = saveOpinion(issue, member, issueOpinionReq.getOpinion());
 
-        List<OpinionInfoRes> opinionRes = getIssueOpinion(issue, memberId);
+        List<OpinionInfoResponseDTO> opinionRes = getIssueOpinion(issue, memberId);
 
         return opinionRes;
     }
@@ -406,7 +406,7 @@ public class IssueServiceImpl implements IssueService {
      */
     @Override
     @Transactional
-    public List<OpinionInfoRes> deleteOpinion(Long opinionId, String email) {
+    public List<OpinionInfoResponseDTO> deleteOpinion(Long opinionId, String email) {
         //Token UserInfo
         User user = findUserByEmail(email);
         //opinion
@@ -416,7 +416,7 @@ public class IssueServiceImpl implements IssueService {
             //opinion soft delete
             issueOpinionRepository.deleteById(opinionId);
             Long memberId = findProjectMemberByUserAndProject(user, issueOpinion.getIssue().getProject()).getMemberId();
-            List<OpinionInfoRes> opinionRes = getIssueOpinion(issueOpinion.getIssue(), memberId);
+            List<OpinionInfoResponseDTO> opinionRes = getIssueOpinion(issueOpinion.getIssue(), memberId);
             return opinionRes;
         }
         else {
