@@ -10,5 +10,4 @@ import java.util.List;
 @RepositoryRestResource(collectionResourceRel="issue", path="issue")
 public interface IssueRepository extends JpaRepository<Issue, Long>, IssueRepositoryCustom {
     List<Issue> findByRelease(ReleaseNote note);
-
 }

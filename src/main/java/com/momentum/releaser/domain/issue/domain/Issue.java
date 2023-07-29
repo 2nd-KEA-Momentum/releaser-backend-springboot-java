@@ -78,13 +78,12 @@ public class Issue extends BaseTime {
     @JoinColumn(name = "release_id")
     private ReleaseNote release;
 
-    @OneToOne()
+    @OneToOne
     @JoinColumn(name = "issue_num_id")
     private IssueNum issueNum;
 
     @OneToMany(mappedBy = "issue")
     private List<IssueOpinion> issueOpinions = new ArrayList<>();
-
 
     @Builder
     public Issue(Long issueId, String title, String content, String summary, Tag tag, Date endDate, LifeCycle lifeCycle, char edit, char status, Project project, ProjectMember member, ReleaseNote release, IssueNum issueNum) {
@@ -103,7 +102,26 @@ public class Issue extends BaseTime {
         this.issueNum = issueNum;
     }
 
+    /**
+     * delete 되기 전 실행된다.
+     */
+    @PreRemove
+    private void preRemove() {
+        deleteToIssueNum();
+        for (IssueOpinion opinion : issueOpinions) {
+            opinion.statusToInactive();
+        }
+    }
 
+    /**
+     * insert 되기 전 (persist 되기전) 실행된다.
+     */
+    @PrePersist
+    public void prePersist() {
+        this.lifeCycle = lifeCycle == null ? LifeCycle.NOT_STARTED : this.lifeCycle;
+        this.edit = (this.edit == '\0') ? 'N' : this.edit;
+        this.status = (this.status == '\0') ? 'Y' : this.status;
+    }
 
     /**
      * 특정 릴리즈 노트와 이슈를 연결할 때 사용한다.
@@ -138,23 +156,9 @@ public class Issue extends BaseTime {
         this.summary = updateReq.getSummary();
     }
 
-
-    /**
-     * 이슈가 삭제 되기전 실행된다.
-     */
-    @PreRemove
-    private void preRemove() {
-        deleteToIssueNum();
-        for (IssueOpinion opinion : issueOpinions) {
-            opinion.statusToInactive();
-        }
-
-    }
-
     public void deleteToIssueNum() {
         this.issueNum = null;
     }
-
 
     public void statusToInactive() {
         this.status = 'N';
@@ -164,7 +168,6 @@ public class Issue extends BaseTime {
         for (IssueOpinion opinion : issueOpinions) {
             opinion.statusToInactive();
         }
-
     }
 
     //issueNum 저장
@@ -181,16 +184,5 @@ public class Issue extends BaseTime {
     public void updateLifeCycle(String lifeCycle) {
         this.lifeCycle = LifeCycle.valueOf(lifeCycle);
     }
-
-    /**
-     * insert 되기전 (persist 되기전) 실행된다.
-     */
-    @PrePersist
-    public void prePersist() {
-        this.lifeCycle = lifeCycle == null ? LifeCycle.NOT_STARTED : this.lifeCycle;
-        this.edit = (this.edit == '\0') ? 'N' : this.edit;
-        this.status = (this.status == '\0') ? 'Y' : this.status;
-    }
-
 
 }

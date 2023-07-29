@@ -22,13 +22,10 @@ public interface IssueService {
      */
     String removeIssue(Long issueId);
 
-
     /**
      * 7.4 프로젝트별 모든 이슈 조회
      */
     AllIssueListResponseDTO findAllIssues(Long projectId);
-
-
 
     /**
      * 7.5 프로젝트별 해결 & 미연결 이슈 조회
@@ -46,20 +43,16 @@ public interface IssueService {
      */
     IssueDetailsDTO findIssue(Long issueId, String email);
 
-
     /**
      * 7.8 이슈 상태 변경
      */
     String modifyIssueLifeCycle(Long issueId, String lifeCycle);
-
-
 
     /**
      * 8.1 이슈 의견 추가
      */
 
     List<OpinionInfoResponseDTO> registerOpinion(Long issueId, String email, RegisterOpinionReq opinionReq);
-
 
     /**
      * 8.2 이슈 의견 삭제

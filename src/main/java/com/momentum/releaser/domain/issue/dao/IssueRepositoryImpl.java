@@ -33,6 +33,7 @@ public class IssueRepositoryImpl implements IssueRepositoryCustom{
     @Override
     public Long getIssueNum(Project project) {
         QIssueNum issueNum = QIssueNum.issueNum1;
+
         Optional<Long> result = Optional.ofNullable(queryFactory.
                 select(issueNum.issueNum.max())
                 .from(issueNum)
@@ -46,6 +47,7 @@ public class IssueRepositoryImpl implements IssueRepositoryCustom{
         if (result.isPresent()) {
             number = result.get();
         }
+
         return number;
     }
 
@@ -60,8 +62,6 @@ public class IssueRepositoryImpl implements IssueRepositoryCustom{
                 .execute();
     }
 
-
-
     @Override
     public List<IssueInfoResponseDTO> getIssues(Project getProject) {
         QIssue issue = QIssue.issue;
@@ -69,10 +69,8 @@ public class IssueRepositoryImpl implements IssueRepositoryCustom{
         QUser user = QUser.user;
         QReleaseNote releaseNote = QReleaseNote.releaseNote;
 
-
         List<IssueInfoResponseDTO> result = queryFactory
-                .select(
-                        new QIssueResponseDto_IssueInfoResponseDTO(
+                .select(new QIssueResponseDto_IssueInfoResponseDTO(
                                 issue.issueId,
                                 issue.issueNum.issueNum,
                                 issue.title,
@@ -86,12 +84,13 @@ public class IssueRepositoryImpl implements IssueRepositoryCustom{
                                 issue.edit,
                                 Expressions.stringTemplate("CAST({0} AS string)", issue.lifeCycle))
                 )
-                .from(issue)  // Issue 테이블을 지정
+                .from(issue)
                 .leftJoin(issue.member, member)
                 .leftJoin(member.user, user)
                 .leftJoin(issue.release, releaseNote)
                 .where(issue.project.eq(getProject))
                 .fetchResults().getResults();
+
         return result;
     }
 
@@ -173,6 +172,8 @@ public class IssueRepositoryImpl implements IssueRepositoryCustom{
                 .leftJoin(issueOpinion.member.user, user)
                 .where(issueOpinion.issue.eq(issue))
                 .fetchResults().getResults();
+
         return opinionInfoRes;
     }
+
 }

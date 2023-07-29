@@ -17,7 +17,6 @@ public interface IssueMapper {
 
     IssueMapper INSTANCE = Mappers.getMapper(IssueMapper.class);
 
-
     /**
      * Entity (Issue) -> DTO(ConnectedIssuesDataDto)
      */
@@ -26,6 +25,9 @@ public interface IssueMapper {
     @Mapping(target = "memberProfileImg", source = "issue.member.user.img")
     ConnectedIssuesDataDTO toConnectedIssuesDataDto(Issue issue);
 
+    /**
+     * Entity (Issue), DTO(GetMembers, OpinionInfoResponseDTO) -> DTO(ConnectedIssuesDataDto)
+     */
     @Mapping(source = "issue.issueNum.issueNum", target = "issueNum")
     @Mapping(source = "issue.member.memberId", target = "manager")
     @Mapping(target = "memberList", source = "memberRes")

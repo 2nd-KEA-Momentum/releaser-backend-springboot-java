@@ -57,6 +57,7 @@ public class IssueServiceImpl implements IssueService {
         if (createReq.getMemberId() != null) {
             projectMember = getProjectMemberById(createReq.getMemberId());
         }
+
         Project project = getProjectById(projectId);
         Issue newIssue = createIssueNumAndSaveIssue(createReq, project, projectMember);
 
@@ -64,12 +65,6 @@ public class IssueServiceImpl implements IssueService {
                 .issueId(newIssue.getIssueId())
                 .build();
     }
-
-
-
-
-
-
 
     /**
      * 7.2 이슈 수정
@@ -98,12 +93,8 @@ public class IssueServiceImpl implements IssueService {
         issue.updateIssue(updateReq, edit, manager);
         issueRepository.save(issue);
 
-        String result = "이슈 수정이 완료되었습니다.";
-        return result;
+        return "이슈 수정이 완료되었습니다.";
     }
-
-
-
 
     /**
      * 7.3 이슈 제거
@@ -119,7 +110,6 @@ public class IssueServiceImpl implements IssueService {
             Long releaseId = issue.getRelease().getReleaseId();
             throw new CustomException(CONNECTED_RELEASE_EXISTS, releaseId);
         }
-
 
         issueNumRepository.deleteById(issue.getIssueNum().getIssueNumId());
         issueRepository.deleteById(issue.getIssueId());
@@ -147,10 +137,6 @@ public class IssueServiceImpl implements IssueService {
                 .build();
     }
 
-
-
-
-
     /**
      * 7.5 프로젝트별 해결 & 미연결 이슈 조회
      */
@@ -159,11 +145,14 @@ public class IssueServiceImpl implements IssueService {
     public List<DoneIssuesResponseDTO> findDoneIssues(Long projectId, String status) {
         Project findProject = getProjectById(projectId);
         List<DoneIssuesResponseDTO> getDoneIssue = issueRepository.getDoneIssues(findProject, status.toUpperCase());
+
         for (DoneIssuesResponseDTO getDoneIssues : getDoneIssue) {
             Optional<ProjectMember> projectMember = projectMemberRepository.findById(getDoneIssues.getMemberId());
+
             if (projectMember.isEmpty()) {
                 getDoneIssues.setMemberId(0L);
             }
+
         }
 
         return getDoneIssue;
@@ -181,8 +170,6 @@ public class IssueServiceImpl implements IssueService {
 
         return getConnectionIssues;
     }
-
-
 
     /**
      * 7.7 이슈별 조회
@@ -205,18 +192,10 @@ public class IssueServiceImpl implements IssueService {
 
         //프로젝트 멤버 리스트
         List<GetMembers> memberRes = getProjectMembers(member.getProject());
-
         IssueDetailsDTO getIssue = createIssueDetails(issue, memberRes, opinionRes);
 
         return getIssue;
     }
-
-
-
-
-
-
-
 
     /**
      * 7.8 이슈 상태 변경
@@ -236,9 +215,6 @@ public class IssueServiceImpl implements IssueService {
         String result = changeLifeCycle(issue, lifeCycle.toUpperCase());
         return result;
     }
-
-
-
 
     /**
      * 8.1 이슈 의견 추가
@@ -305,7 +281,6 @@ public class IssueServiceImpl implements IssueService {
 
     // =================================================================================================================
 
-
     // memberId로 프로젝트 멤버 찾기
     private ProjectMember getProjectMemberById(Long memberId) {
         return projectMemberRepository.findById(memberId)
@@ -357,7 +332,8 @@ public class IssueServiceImpl implements IssueService {
 
     //email로 user 조회
     private User getUserByEmail(String email) {
-        return userRepository.findOneByEmail(email).orElseThrow(() -> new CustomException(NOT_EXISTS_USER));
+        return userRepository.findOneByEmail(email)
+                .orElseThrow(() -> new CustomException(NOT_EXISTS_USER));
 
     }
 
@@ -369,7 +345,6 @@ public class IssueServiceImpl implements IssueService {
         // 멤버의 포지션이 'M'인 경우 'Y'(편집 가능) 반환, 그 외에는 'N'(편집 불가능) 반환
         return (projectMember.getPosition() == 'M') ? 'Y' : 'N';
     }
-
 
     // 이슈 필터링 및 배포 상태 설정
     private List<IssueInfoResponseDTO> filterAndSetDeployStatus(List<IssueInfoResponseDTO> issues, String lifeCycle) {
@@ -396,7 +371,6 @@ public class IssueServiceImpl implements IssueService {
                 .orElseThrow(() -> new CustomException(NOT_EXISTS_RELEASE_NOTE));
     }
 
-
     private IssueDetailsDTO createIssueDetails(Issue issue, List<GetMembers> memberRes, List<OpinionInfoResponseDTO> opinionRes) {
         IssueDetailsDTO getIssue = IssueMapper.INSTANCE.mapToGetIssue(issue, memberRes, opinionRes);
         Long memberId = getIssue.getManager();
@@ -411,11 +385,12 @@ public class IssueServiceImpl implements IssueService {
         return getIssue;
     }
 
-
     private void updateIssueEdit(Issue issue, ProjectMember member) {
         Project project = issue.getProject();
+
         boolean hasEditor = project.getMembers().stream()
                 .anyMatch(m -> m.getPosition() == 'L' && m.getMemberId() == member.getMemberId());
+
         if (hasEditor) {
             issue.updateIssueEdit('N');
         }
@@ -423,6 +398,7 @@ public class IssueServiceImpl implements IssueService {
 
     private List<OpinionInfoResponseDTO> getIssueOpinionsWithDeleteYN(Issue issue, Long memberId) {
         List<OpinionInfoResponseDTO> issueOpinion = issueRepository.getIssueOpinion(issue);
+
         for (OpinionInfoResponseDTO opinion : issueOpinion) {
             opinion.setDeleteYN(opinion.getMemberId() == memberId ? 'Y' : 'N');
         }
@@ -441,8 +417,6 @@ public class IssueServiceImpl implements IssueService {
         issueRepository.save(issue);
 
         return "이슈 상태 변경이 완료되었습니다.";
-
     }
-
 
 }

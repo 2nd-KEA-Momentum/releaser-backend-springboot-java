@@ -19,7 +19,6 @@ public interface IssueRepositoryCustom {
 
     List<ConnectionIssuesResponseDTO> getConnectionIssues(Project findProject, ReleaseNote findReleaseNote);
 
-
     List<OpinionInfoResponseDTO> getIssueOpinion(Issue issue);
 
 

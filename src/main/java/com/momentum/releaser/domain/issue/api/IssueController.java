@@ -71,12 +71,11 @@ public class IssueController {
      * 7.5 프로젝트별 해결 & 미연결 이슈 조회
      */
     @GetMapping("/project/{projectId}/release")
-    public BaseResponse<List<DoneIssuesResponseDTO>> doneIssueList(
-            @PathVariable @Min(value = 1, message = "프로젝트 식별 번호는 1 이상의 숫자여야 합니다.") Long projectId,
-            @RequestParam
-            @Pattern(regexp = "(?i)^(DONE)$", message = "상태는 DONE 이어야 합니다.") String status,
-            @RequestParam
-            @Pattern(regexp = "(?i)^(false)$", message = "연결 상태는 false 이어야 합니다.") String connect) {
+    public BaseResponse<List<DoneIssuesResponseDTO>> doneIssueList(@PathVariable @Min(value = 1, message = "프로젝트 식별 번호는 1 이상의 숫자여야 합니다.") Long projectId,
+                                                            @RequestParam
+                                                            @Pattern(regexp = "(?i)^(DONE)$", message = "상태는 DONE 이어야 합니다.") String status,
+                                                            @RequestParam
+                                                            @Pattern(regexp = "(?i)^(false)$", message = "연결 상태는 false 이어야 합니다.") String connect) {
 
         return new BaseResponse<>(issueService.findDoneIssues(projectId, status));
     }
@@ -97,7 +96,7 @@ public class IssueController {
      */
     @GetMapping("/{issueId}")
     public BaseResponse<IssueDetailsDTO> issueDetails(@PathVariable @Min(value = 1, message = "이슈 식별 번호는 1 이상의 숫자여야 합니다.") Long issueId,
-                                           @AuthenticationPrincipal UserPrincipal userPrincipal) {
+                                                @AuthenticationPrincipal UserPrincipal userPrincipal) {
         String email = userPrincipal.getEmail();
         return new BaseResponse<>(issueService.findIssue(issueId, email));
     }
@@ -119,7 +118,7 @@ public class IssueController {
     @PostMapping("/{issueId}/opinion")
     public BaseResponse<List<OpinionInfoResponseDTO>> registerOpinion(@PathVariable @Min(value = 1, message = "이슈 식별 번호는 1 이상의 숫자여야 합니다.") Long issueId,
                                                               @AuthenticationPrincipal UserPrincipal userPrincipal,
-                                                        @Valid @RequestBody RegisterOpinionReq opinionReq) {
+                                                              @Valid @RequestBody RegisterOpinionReq opinionReq) {
         String email = userPrincipal.getEmail();
         return new BaseResponse<>(issueService.registerOpinion(issueId, email, opinionReq));
 
@@ -130,10 +129,9 @@ public class IssueController {
      */
     @PostMapping("/opinion/{opinionId}")
     public BaseResponse<List<OpinionInfoResponseDTO>> deleteOpinion(@PathVariable @Min(value = 1, message = "이슈 의견 식별 번호는 1 이상의 숫자여야 합니다.") Long opinionId,
-                                              @AuthenticationPrincipal UserPrincipal userPrincipal) {
+                                                            @AuthenticationPrincipal UserPrincipal userPrincipal) {
         String email = userPrincipal.getEmail();
         return new BaseResponse<>(issueService.deleteOpinion(opinionId, email));
     }
-
 
 }
