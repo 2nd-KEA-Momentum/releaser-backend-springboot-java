@@ -1,11 +1,11 @@
 package com.momentum.releaser.domain.issue.dto;
 
+import java.util.Date;
+
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.Date;
 
 public class IssueDataDto {
 

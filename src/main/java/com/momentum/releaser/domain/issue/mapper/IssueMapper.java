@@ -1,16 +1,17 @@
 package com.momentum.releaser.domain.issue.mapper;
 
+import java.util.List;
+
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.factory.Mappers;
+
 import com.momentum.releaser.domain.issue.domain.Issue;
 import com.momentum.releaser.domain.issue.dto.IssueDataDto.ConnectedIssuesDataDTO;
 import com.momentum.releaser.domain.issue.dto.IssueResponseDto.IssueDetailsDTO;
 import com.momentum.releaser.domain.issue.dto.IssueResponseDto.OpinionInfoResponseDTO;
 import com.momentum.releaser.domain.project.dto.ProjectDataDto.GetMembers;
 import com.momentum.releaser.domain.project.mapper.ProjectMapper;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
-
-import java.util.List;
 
 @Mapper(uses = { ProjectMapper.class })
 public interface IssueMapper {

@@ -1,5 +1,20 @@
 package com.momentum.releaser.domain.issue.domain;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.persistence.*;
+
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
+
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+import com.sun.istack.NotNull;
 
 import com.momentum.releaser.domain.issue.dto.IssueRequestDto.IssueInfoRequestDTO;
 import com.momentum.releaser.domain.project.domain.Project;
@@ -7,18 +22,6 @@ import com.momentum.releaser.domain.project.domain.ProjectMember;
 import com.momentum.releaser.domain.release.domain.ReleaseNote;
 import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.UpdateReleaseDocsReq;
 import com.momentum.releaser.global.common.BaseTime;
-import com.sun.istack.NotNull;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
-
-import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

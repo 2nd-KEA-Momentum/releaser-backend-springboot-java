@@ -1,5 +1,16 @@
 package com.momentum.releaser.domain.issue.dao;
 
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.stereotype.Repository;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+
 import com.momentum.releaser.domain.issue.domain.*;
 import com.momentum.releaser.domain.issue.dto.IssueResponseDto.ConnectionIssuesResponseDTO;
 import com.momentum.releaser.domain.issue.dto.IssueResponseDto.DoneIssuesResponseDTO;
@@ -14,15 +25,6 @@ import com.momentum.releaser.domain.project.domain.QProjectMember;
 import com.momentum.releaser.domain.release.domain.QReleaseNote;
 import com.momentum.releaser.domain.release.domain.ReleaseNote;
 import com.momentum.releaser.domain.user.domain.QUser;
-import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.jpa.impl.JPAQueryFactory;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Repository;
-
-import java.util.List;
-import java.util.Optional;
-
 
 @Slf4j
 @Repository

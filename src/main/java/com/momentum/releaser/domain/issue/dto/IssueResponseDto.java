@@ -1,14 +1,16 @@
 package com.momentum.releaser.domain.issue.dto;
 
-import com.momentum.releaser.domain.project.dto.ProjectDataDto.GetMembers;
-import com.querydsl.core.annotations.QueryProjection;
+import java.util.Date;
+import java.util.List;
+
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
-import java.util.List;
+import com.querydsl.core.annotations.QueryProjection;
+
+import com.momentum.releaser.domain.project.dto.ProjectDataDto.GetMembers;
 
 public class IssueResponseDto {
 

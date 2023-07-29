@@ -1,10 +1,10 @@
 package com.momentum.releaser.domain.issue.application;
 
+import java.util.List;
+
 import com.momentum.releaser.domain.issue.dto.IssueRequestDto.IssueInfoRequestDTO;
 import com.momentum.releaser.domain.issue.dto.IssueRequestDto.RegisterOpinionReq;
 import com.momentum.releaser.domain.issue.dto.IssueResponseDto.*;
-
-import java.util.List;
 
 public interface IssueService {
     /**
