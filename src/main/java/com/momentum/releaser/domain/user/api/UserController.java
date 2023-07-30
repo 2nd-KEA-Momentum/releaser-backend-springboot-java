@@ -32,7 +32,7 @@ public class UserController {
      * 1.1 사용자 프로필 이미지 조회
      */
     @GetMapping(value = "/images")
-    public BaseResponse<UserProfileImgResponseDto> getUserProfileImg(
+    public BaseResponse<UserProfileImgResponseDto> userProfileImgDetails(
             @AuthenticationPrincipal UserPrincipal userPrincipal) {
 
         return new BaseResponse<>(userService.getUserProfileImg(userPrincipal.getEmail()));
@@ -42,7 +42,7 @@ public class UserController {
      * 1.2 사용자 프로필 이미지 변경
      */
     @PatchMapping(value = "/{userId}/images")
-    public BaseResponse<String> updateUserProfileImg(
+    public BaseResponse<String> userProfileImgModify(
             @PathVariable @Min(value = 1, message = "사용자 식별 번호는 1 이상의 숫자여야 합니다.") Long userId,
             @RequestBody UserUpdateImgRequestDto userUpdateImgRequestDto) throws IOException {
 
@@ -53,16 +53,10 @@ public class UserController {
      * 1.3 사용자 프로필 이미지 삭제
      */
     @PostMapping(value = "/{userId}/images")
-    public BaseResponse<String> deleteUserProfileImg(
+    public BaseResponse<String> userProfileImgRemove(
             @PathVariable @Min(value = 1, message = "사용자 식별 번호는 1 이상의 숫자여야 합니다.") Long userId) {
 
         return new BaseResponse<>(userService.deleteUserProfileImg(userId));
     }
 
-//    @Secured(value = UserRoleEnum.Authority.ADMIN)
-    @GetMapping("/test")
-    public String test(@AuthenticationPrincipal UserPrincipal userPrincipal) {
-        String userEmail = userPrincipal.getEmail();
-        return "email : " + userEmail;
-    }
 }
