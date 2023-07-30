@@ -1,16 +1,19 @@
 package com.momentum.releaser.domain.issue.domain;
 
-import com.momentum.releaser.domain.project.domain.ProjectMember;
-import com.momentum.releaser.global.common.BaseTime;
-import com.sun.istack.NotNull;
+import javax.persistence.*;
+
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
+
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
 
-import javax.persistence.*;
+import com.sun.istack.NotNull;
+
+import com.momentum.releaser.domain.project.domain.ProjectMember;
+import com.momentum.releaser.global.common.BaseTime;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -50,11 +53,6 @@ public class IssueOpinion extends BaseTime {
         this.issue = issue;
     }
 
-
-    public void statusToInactive() {
-        this.status = 'N';
-    }
-
     /**
      * insert 되기전 (persist 되기전) 실행된다.
      */
@@ -62,4 +60,12 @@ public class IssueOpinion extends BaseTime {
     public void prePersist() {
         this.status = (this.status == '\0') ? 'Y' : this.status;
     }
+
+    /**
+     * 삭제를 위한 status ='N' 변경
+     */
+    public void statusToInactive() {
+        this.status = 'N';
+    }
+
 }
