@@ -1,7 +1,7 @@
 package com.momentum.releaser.domain.user.mapper;
 
 import com.momentum.releaser.domain.user.domain.User;
-import com.momentum.releaser.domain.user.dto.UserResponseDto.UserProfileImgResponseDto;
+import com.momentum.releaser.domain.user.dto.UserResponseDto.UserProfileImgResponseDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
@@ -13,5 +13,5 @@ public interface UserMapper {
     /**
      * Entity(User) -> DTO(UserProfileImgResponseDto)
      */
-    UserProfileImgResponseDto toUserProfileImgResponseDto(User user);
+    UserProfileImgResponseDTO toUserProfileImgResponseDto(User user);
 }

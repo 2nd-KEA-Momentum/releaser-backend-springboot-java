@@ -2,8 +2,8 @@ package com.momentum.releaser.domain.user.application;
 
 import com.momentum.releaser.domain.user.dao.UserRepository;
 import com.momentum.releaser.domain.user.domain.User;
-import com.momentum.releaser.domain.user.dto.UserRequestDto.UserUpdateImgRequestDto;
-import com.momentum.releaser.domain.user.dto.UserResponseDto.UserProfileImgResponseDto;
+import com.momentum.releaser.domain.user.dto.UserRequestDto.UserUpdateImgRequestDTO;
+import com.momentum.releaser.domain.user.dto.UserResponseDto.UserProfileImgResponseDTO;
 import com.momentum.releaser.domain.user.mapper.UserMapper;
 import com.momentum.releaser.global.config.aws.S3Upload;
 import com.momentum.releaser.global.exception.CustomException;
@@ -32,7 +32,7 @@ public class UserServiceImpl implements UserService {
      * 1.1 사용자 프로필 이미지 조회
      */
     @Override
-    public UserProfileImgResponseDto findUserProfileImg(String userEmail) {
+    public UserProfileImgResponseDTO findUserProfileImg(String userEmail) {
         User user = getUserByEmail(userEmail);
         return UserMapper.INSTANCE.toUserProfileImgResponseDto(user);
     }
@@ -42,7 +42,7 @@ public class UserServiceImpl implements UserService {
      */
     @Transactional
     @Override
-    public String modifyUserProfileImg(Long userId, UserUpdateImgRequestDto userUpdateImgRequestDto) throws IOException {
+    public String modifyUserProfileImg(Long userId, UserUpdateImgRequestDTO userUpdateImgRequestDto) throws IOException {
         User user = getUserById(userId);
         deleteIfExistProfileImg(user);
         user.updateImg(uploadUserProfileImg(userUpdateImgRequestDto));
@@ -79,7 +79,7 @@ public class UserServiceImpl implements UserService {
     /**
      * 사용자로부터 받은 프로필 이미지를 S3에 업로드한다.
      */
-    private String uploadUserProfileImg(UserUpdateImgRequestDto userUpdateImgRequestDto) throws IOException {
+    private String uploadUserProfileImg(UserUpdateImgRequestDTO userUpdateImgRequestDto) throws IOException {
         String img = userUpdateImgRequestDto.getImg();
 
         if (img.isEmpty()) {

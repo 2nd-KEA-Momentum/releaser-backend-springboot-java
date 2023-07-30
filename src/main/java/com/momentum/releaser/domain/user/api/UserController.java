@@ -2,8 +2,8 @@ package com.momentum.releaser.domain.user.api;
 
 import com.momentum.releaser.domain.user.application.UserService;
 import com.momentum.releaser.domain.user.application.UserServiceImpl;
-import com.momentum.releaser.domain.user.dto.UserRequestDto.UserUpdateImgRequestDto;
-import com.momentum.releaser.domain.user.dto.UserResponseDto.UserProfileImgResponseDto;
+import com.momentum.releaser.domain.user.dto.UserRequestDto.UserUpdateImgRequestDTO;
+import com.momentum.releaser.domain.user.dto.UserResponseDto.UserProfileImgResponseDTO;
 import com.momentum.releaser.global.config.BaseResponse;
 import com.momentum.releaser.global.jwt.UserPrincipal;
 import com.momentum.releaser.global.jwt.UserRoleEnum;
@@ -32,7 +32,7 @@ public class UserController {
      * 1.1 사용자 프로필 이미지 조회
      */
     @GetMapping(value = "/images")
-    public BaseResponse<UserProfileImgResponseDto> userProfileImgDetails(
+    public BaseResponse<UserProfileImgResponseDTO> userProfileImgDetails(
             @AuthenticationPrincipal UserPrincipal userPrincipal) {
 
         return new BaseResponse<>(userService.findUserProfileImg(userPrincipal.getEmail()));
@@ -44,7 +44,7 @@ public class UserController {
     @PatchMapping(value = "/{userId}/images")
     public BaseResponse<String> userProfileImgModify(
             @PathVariable @Min(value = 1, message = "사용자 식별 번호는 1 이상의 숫자여야 합니다.") Long userId,
-            @RequestBody UserUpdateImgRequestDto userUpdateImgRequestDto) throws IOException {
+            @RequestBody UserUpdateImgRequestDTO userUpdateImgRequestDto) throws IOException {
 
         return new BaseResponse<>(userService.modifyUserProfileImg(userId, userUpdateImgRequestDto));
     }
