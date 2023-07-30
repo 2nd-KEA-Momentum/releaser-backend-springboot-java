@@ -1,9 +1,9 @@
 package com.momentum.releaser.domain.user.application;
 
+import java.io.IOException;
+
 import com.momentum.releaser.domain.user.dto.UserRequestDto.UserUpdateImgRequestDTO;
 import com.momentum.releaser.domain.user.dto.UserResponseDto.UserProfileImgResponseDTO;
-
-import java.io.IOException;
 
 public interface UserService {
 

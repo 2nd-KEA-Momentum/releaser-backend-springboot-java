@@ -1,5 +1,19 @@
 package com.momentum.releaser.domain.user.application;
 
+import static com.momentum.releaser.global.common.Base64.getImageUrlFromBase64;
+import static com.momentum.releaser.global.common.CommonEnum.DEFAULT_USER_PROFILE_IMG;
+import static com.momentum.releaser.global.config.BaseResponseStatus.*;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Objects;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import com.momentum.releaser.domain.user.dao.UserRepository;
 import com.momentum.releaser.domain.user.domain.User;
 import com.momentum.releaser.domain.user.dto.UserRequestDto.UserUpdateImgRequestDTO;
@@ -7,18 +21,6 @@ import com.momentum.releaser.domain.user.dto.UserResponseDto.UserProfileImgRespo
 import com.momentum.releaser.domain.user.mapper.UserMapper;
 import com.momentum.releaser.global.config.aws.S3Upload;
 import com.momentum.releaser.global.exception.CustomException;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.Objects;
-
-import static com.momentum.releaser.global.common.Base64.getImageUrlFromBase64;
-import static com.momentum.releaser.global.common.CommonEnum.DEFAULT_USER_PROFILE_IMG;
-import static com.momentum.releaser.global.config.BaseResponseStatus.*;
 
 @Slf4j
 @Service
@@ -66,14 +68,16 @@ public class UserServiceImpl implements UserService {
      * 사용자 식별 번호를 이용해 사용자 엔티티를 가져온다.
      */
     private User getUserById(Long userId) {
-        return userRepository.findById(userId).orElseThrow(() -> new CustomException(NOT_EXISTS_USER));
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(NOT_EXISTS_USER));
     }
 
     /**
      * 사용자 이메일을 이용해 사용자 엔티티를 가져온다.
      */
     private User getUserByEmail(String email) {
-        return userRepository.findByEmail(email).orElseThrow(() -> new CustomException(NOT_EXISTS_USER));
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new CustomException(NOT_EXISTS_USER));
     }
 
     /**
@@ -116,4 +120,5 @@ public class UserServiceImpl implements UserService {
         user.updateImg(DEFAULT_USER_PROFILE_IMG.url());
         userRepository.save(user);
     }
+
 }
