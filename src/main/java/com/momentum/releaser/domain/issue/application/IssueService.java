@@ -3,7 +3,7 @@ package com.momentum.releaser.domain.issue.application;
 import java.util.List;
 
 import com.momentum.releaser.domain.issue.dto.IssueRequestDto.IssueInfoRequestDTO;
-import com.momentum.releaser.domain.issue.dto.IssueRequestDto.RegisterOpinionReq;
+import com.momentum.releaser.domain.issue.dto.IssueRequestDto.RegisterOpinionRequestDTO;
 import com.momentum.releaser.domain.issue.dto.IssueResponseDto.*;
 
 /**
@@ -54,8 +54,7 @@ public interface IssueService {
     /**
      * 8.1 이슈 의견 추가
      */
-
-    List<OpinionInfoResponseDTO> registerOpinion(Long issueId, String email, RegisterOpinionReq opinionReq);
+    List<OpinionInfoResponseDTO> registerOpinion(Long issueId, String email, RegisterOpinionRequestDTO opinionReq);
 
     /**
      * 8.2 이슈 의견 삭제

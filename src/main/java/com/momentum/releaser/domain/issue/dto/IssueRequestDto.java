@@ -52,14 +52,14 @@ public class IssueRequestDto {
      */
     @Data
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    public static class RegisterOpinionReq {
+    public static class RegisterOpinionRequestDTO {
         @NotBlank
         @NotNull(message = "의견을 입력해주세요.")
         @Size(min = 1, max = 300)
         private String opinion;
 
         @Builder
-        public RegisterOpinionReq(String opinion) {
+        public RegisterOpinionRequestDTO(String opinion) {
             this.opinion = opinion;
         }
     }
