@@ -32,7 +32,7 @@ public class UserServiceImpl implements UserService {
      * 1.1 사용자 프로필 이미지 조회
      */
     @Override
-    public UserProfileImgResponseDto getUserProfileImg(String userEmail) {
+    public UserProfileImgResponseDto findUserProfileImg(String userEmail) {
         User user = getUserByEmail(userEmail);
         return UserMapper.INSTANCE.toUserProfileImgResponseDto(user);
     }
@@ -42,7 +42,7 @@ public class UserServiceImpl implements UserService {
      */
     @Transactional
     @Override
-    public String updateUserProfileImg(Long userId, UserUpdateImgRequestDto userUpdateImgRequestDto) throws IOException {
+    public String modifyUserProfileImg(Long userId, UserUpdateImgRequestDto userUpdateImgRequestDto) throws IOException {
         User user = getUserById(userId);
         deleteIfExistProfileImg(user);
         user.updateImg(uploadUserProfileImg(userUpdateImgRequestDto));
@@ -53,7 +53,7 @@ public class UserServiceImpl implements UserService {
      * 1.3 사용자 프로필 이미지 삭제
      */
     @Override
-    public String deleteUserProfileImg(Long userId) {
+    public String removeUserProfileImg(Long userId) {
         User user = getUserById(userId);
         deleteIfExistProfileImg(user);
         saveAfterDeleteProfileImg(user);

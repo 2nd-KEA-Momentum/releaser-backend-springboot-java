@@ -10,15 +10,15 @@ public interface UserService {
     /**
      * 1.1 사용자 프로필 이미지 조회
      */
-    UserProfileImgResponseDto getUserProfileImg(String userEmail);
+    UserProfileImgResponseDto findUserProfileImg(String userEmail);
 
     /**
      * 1.2 사용자 프로필 이미지 변경
      */
-    String updateUserProfileImg(Long userId, UserUpdateImgRequestDto userUpdateImgRequestDto) throws IOException;
+    String modifyUserProfileImg(Long userId, UserUpdateImgRequestDto userUpdateImgRequestDto) throws IOException;
 
     /**
      * 1.3 사용자 프로필 이미지 삭제
      */
-    String deleteUserProfileImg(Long userId);
+    String removeUserProfileImg(Long userId);
 }

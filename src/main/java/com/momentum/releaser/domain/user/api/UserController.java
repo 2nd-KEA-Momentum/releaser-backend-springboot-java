@@ -35,7 +35,7 @@ public class UserController {
     public BaseResponse<UserProfileImgResponseDto> userProfileImgDetails(
             @AuthenticationPrincipal UserPrincipal userPrincipal) {
 
-        return new BaseResponse<>(userService.getUserProfileImg(userPrincipal.getEmail()));
+        return new BaseResponse<>(userService.findUserProfileImg(userPrincipal.getEmail()));
     }
 
     /**
@@ -46,7 +46,7 @@ public class UserController {
             @PathVariable @Min(value = 1, message = "사용자 식별 번호는 1 이상의 숫자여야 합니다.") Long userId,
             @RequestBody UserUpdateImgRequestDto userUpdateImgRequestDto) throws IOException {
 
-        return new BaseResponse<>(userService.updateUserProfileImg(userId, userUpdateImgRequestDto));
+        return new BaseResponse<>(userService.modifyUserProfileImg(userId, userUpdateImgRequestDto));
     }
 
     /**
@@ -56,7 +56,7 @@ public class UserController {
     public BaseResponse<String> userProfileImgRemove(
             @PathVariable @Min(value = 1, message = "사용자 식별 번호는 1 이상의 숫자여야 합니다.") Long userId) {
 
-        return new BaseResponse<>(userService.deleteUserProfileImg(userId));
+        return new BaseResponse<>(userService.removeUserProfileImg(userId));
     }
 
 }
