@@ -7,6 +7,7 @@ spring:
     username: ${DEV_DB_USERNAME}
     password: ${DEV_DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
+
   jpa:
     hibernate:
       ddl-auto: update
@@ -24,6 +25,27 @@ spring:
             client-id: ${SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_ID}
             client-secret: ${SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET}
             scope: email,profile
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+
+  redis:
+    host: ${REDIS_HOST}
+    port: ${REDIS_PORT}
+
 jwt:
   secret:
     key: ${JWT_SECRET_KEY}
@@ -41,6 +63,7 @@ cloud:
       auto: false
     stack:
       auto: false
+
 #app:
 #  cors:
 #    allowedOrigins: http://localhost:3000 ,http://localhost:8080, https://www.releaser.shop
