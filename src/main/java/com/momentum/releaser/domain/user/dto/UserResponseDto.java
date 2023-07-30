@@ -12,13 +12,13 @@ public class UserResponseDto {
      */
     @Getter
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    public static class UserProfileImgResponseDto {
+    public static class UserProfileImgResponseDTO {
         private Long userId;
         private String name;
         private String img;
 
         @Builder
-        public UserProfileImgResponseDto(Long userId, String name, String img) {
+        public UserProfileImgResponseDTO(Long userId, String name, String img) {
             this.userId = userId;
             this.name = name;
             this.img = img;
