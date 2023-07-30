@@ -20,7 +20,7 @@ import com.momentum.releaser.domain.issue.dao.IssueOpinionRepository;
 import com.momentum.releaser.domain.issue.dao.IssueRepository;
 import com.momentum.releaser.domain.issue.domain.*;
 import com.momentum.releaser.domain.issue.dto.IssueRequestDto.IssueInfoRequestDTO;
-import com.momentum.releaser.domain.issue.dto.IssueRequestDto.RegisterOpinionReq;
+import com.momentum.releaser.domain.issue.dto.IssueRequestDto.RegisterOpinionRequestDTO;
 import com.momentum.releaser.domain.issue.mapper.IssueMapper;
 import com.momentum.releaser.domain.project.dao.ProjectMemberRepository;
 import com.momentum.releaser.domain.project.dao.ProjectRepository;
@@ -283,66 +283,65 @@ public class IssueServiceImpl implements IssueService {
 
     /**
      * 8.1 이슈 의견 추가
+     *
+     * @author chaeanna
+     * @date 2023-07-08
+     * @param issueId 이슈의 식별 번호
+     * @param email 사용자의 이메일
+     * @param issueOpinionReq 등록할 이슈 의견 정보
      */
     @Override
     @Transactional
-    public List<OpinionInfoResponseDTO> registerOpinion(Long issueId, String email, RegisterOpinionReq issueOpinionReq) {
-        //issue
+    public List<OpinionInfoResponseDTO> registerOpinion(Long issueId, String email, RegisterOpinionRequestDTO issueOpinionReq) {
+        // 이슈 정보 조회
         Issue issue = getIssueById(issueId);
-        //Token UserInfo
+        // 사용자 정보 조회
         User user = getUserByEmail(email);
 
+        // 사용자와 이슈의 프로젝트 멤버 정보 조회
         Long memberId = getProjectMemberByUserAndProject(user, issue.getProject()).getMemberId();
-        //project member
         ProjectMember member = getProjectMemberById(memberId);
 
-        //save opinion
+        // 의견 등록
         IssueOpinion issueOpinion = saveOpinion(issue, member, issueOpinionReq.getOpinion());
 
+        // 등록된 의견 리스트 조회 (삭제 여부 포함)
         List<OpinionInfoResponseDTO> opinionRes = getIssueOpinionsWithDeleteYN(issue, memberId);
 
         return opinionRes;
     }
 
-    private IssueOpinion saveOpinion(Issue issue, ProjectMember member, String opinion) {
-        //Add issue
-        return issueOpinionRepository.save(IssueOpinion.builder()
-                .opinion(opinion)
-                .issue(issue)
-                .member(member)
-                .build());
-    }
-
     /**
      * 8.2 이슈 의견 삭제
+     *
+     * @author chaeanna
+     * @date 2023-07-08
+     * @param opinionId 삭제할 의견의 식별 번호
+     * @param email 사용자의 이메일
+     * @throws CustomException 삭제 권한이 없을 경우 예외 발생
      */
     @Override
     @Transactional
     public List<OpinionInfoResponseDTO> deleteOpinion(Long opinionId, String email) {
-        //Token UserInfo
+        // 사용자 정보 조회
         User user = getUserByEmail(email);
-        //opinion
+
+        // 의견 정보 조회
         IssueOpinion issueOpinion = issueOpinionRepository.findById(opinionId).orElseThrow(() -> new CustomException(NOT_EXISTS_ISSUE_OPINION));
-        //접근 유저가 해당 의견 작성자면 삭제
+
+        // 접근 유저가 해당 의견 작성자인지 확인하여 삭제 권한이 있으면 삭제
         if (equalsMember(user, issueOpinion)) {
-            //opinion soft delete
+            // 의견 soft delete
             issueOpinionRepository.deleteById(opinionId);
+
+            // 삭제 후의 이슈에 대한 모든 의견 정보 조회 (삭제 여부 포함)
             Long memberId = getProjectMemberByUserAndProject(user, issueOpinion.getIssue().getProject()).getMemberId();
             List<OpinionInfoResponseDTO> opinionRes = getIssueOpinionsWithDeleteYN(issueOpinion.getIssue(), memberId);
             return opinionRes;
-        }
-        else {
+        } else {
             throw new CustomException(NOT_ISSUE_COMMENTER);
         }
-
     }
-
-    private boolean equalsMember(User user, IssueOpinion opinion) {
-        Project project = opinion.getIssue().getProject();
-        Long accessMember = getProjectMemberByUserAndProject(user, project).getMemberId();
-        return Objects.equals(accessMember, opinion.getMember().getMemberId());
-    }
-
 
     // =================================================================================================================
 
@@ -350,7 +349,7 @@ public class IssueServiceImpl implements IssueService {
      * memberId로 프로젝트 멤버 가져오기
      *
      * @author chaeanna
-     * @date 2023-07-
+     * @date 2023-07-05
      * @param memberId 조회할 프로젝트 멤버의 식별 번호
      * @return ProjectMember 프로젝트 멤버 정보
      * @throws CustomException 프로젝트 멤버가 존재하지 않을 경우 예외 발생
@@ -364,7 +363,7 @@ public class IssueServiceImpl implements IssueService {
      * 사용자와 프로젝트로 프로젝트 멤버 가져오기
      *
      * @author chaeanna
-     * @date 2023-07-
+     * @date 2023-07-05
      * @param user 사용자 정보
      * @param project 프로젝트 정보
      * @return ProjectMember 프로젝트 멤버 정보
@@ -377,7 +376,7 @@ public class IssueServiceImpl implements IssueService {
      * projectId로 프로젝트 가져오기
      *
      * @author chaeanna
-     * @date 2023-07-
+     * @date 2023-07-05
      * @param projectId 조회할 프로젝트의 식별 번호
      * @return Project 프로젝트 정보
      * @throws CustomException 프로젝트가 존재하지 않을 경우 예외 발생
@@ -391,7 +390,7 @@ public class IssueServiceImpl implements IssueService {
      * 이슈 저장
      *
      * @author chaeanna
-     * @date 2023-07-
+     * @date 2023-07-05
      * @param issueInfoReq 이슈 정보를 담고 있는 요청 DTO
      * @param project 이슈가 속하는 프로젝트 정보
      * @param projectMember 이슈를 등록하는 프로젝트 멤버 정보
@@ -443,7 +442,7 @@ public class IssueServiceImpl implements IssueService {
      * issueId로 issue 가져오기
      *
      * @author chaeanna
-     * @date 2023-07-
+     * @date 2023-07-05
      * @param issueId 조회할 이슈의 식별 번호
      * @return Issue 조회된 이슈 정보
      * @throws CustomException 이슈가 존재하지 않을 경우 예외 발생
@@ -457,7 +456,7 @@ public class IssueServiceImpl implements IssueService {
      * email로 user 가져오기
      *
      * @author chaeanna
-     * @date 2023-07-
+     * @date 2023-07-05
      * @param email 조회할 사용자의 이메일 주소
      * @return User 조회된 사용자 정보
      * @throws CustomException 사용자가 존재하지 않을 경우 예외 발생
@@ -471,7 +470,7 @@ public class IssueServiceImpl implements IssueService {
      * 편집 여부를 멤버의 역할에 따라 결정
      *
      * @author chaeanna
-     * @date 2023-07-
+     * @date 2023-07-05
      * @param memberId 조회할 멤버의 식별 번호
      * @return 편집 가능 여부 ('Y' 또는 'N')
      * @throws CustomException 멤버가 존재하지 않을 경우 예외 발생
@@ -488,7 +487,7 @@ public class IssueServiceImpl implements IssueService {
      * 이슈 필터링 및 배포 상태 설정
      *
      * @author chaeanna
-     * @date 2023-07-
+     * @date 2023-07-08
      * @param issues 이슈 리스트
      * @param lifeCycle 필터링할 배포 상태 (NOT_STARTED, IN_PROGRESS, DONE 중 하나로 대소문자 구분 없이 입력)
      * @return IssueInfoResponseDTO 필터링된 이슈 리스트
@@ -521,7 +520,7 @@ public class IssueServiceImpl implements IssueService {
      * releaseId로 releaseNote 찾기
      *
      * @author chaeanna
-     * @date 2023-07-
+     * @date 2023-07-08
      * @param releaseId 조회할 릴리즈 노트의 식별 번호
      * @return ReleaseNote 조회된 릴리즈 노트 정보
      * @throws CustomException 릴리즈 노트가 존재하지 않을 경우 예외 발생
@@ -535,7 +534,7 @@ public class IssueServiceImpl implements IssueService {
      * 이슈 상세 정보 생성
      *
      * @author chaeanna
-     * @date 2023-07-
+     * @date 2023-07-09
      * @param issue 이슈 정보
      * @param memberRes 멤버 리스트
      * @param opinionRes 의견 리스트
@@ -564,7 +563,7 @@ public class IssueServiceImpl implements IssueService {
      * 이슈 편집 상태 업데이트
      *
      * @author chaeanna
-     * @date 2023-07-
+     * @date 2023-07-09
      * @param issue 이슈 정보
      * @param member 프로젝트 멤버 정보
      */
@@ -584,7 +583,7 @@ public class IssueServiceImpl implements IssueService {
      * 이슈의 의견 목록 조회 및 삭제 가능 여부 설정
      *
      * @author chaeanna
-     * @date 2023-07-
+     * @date 2023-07-09
      * @param issue 이슈 정보
      * @param memberId 멤버 식별 번호
      * @return OpinionInfoResponseDTO 이슈의 의견 목록
@@ -606,7 +605,7 @@ public class IssueServiceImpl implements IssueService {
      * 프로젝트 멤버 리스트 조회
      *
      * @author chaeanna
-     * @date 2023-07-
+     * @date 2023-07-09
      * @param project 프로젝트 정보
      * @return GetMembers 프로젝트의 멤버 리스트
      */
@@ -620,6 +619,8 @@ public class IssueServiceImpl implements IssueService {
     /**
      * 이슈 상태 변경
      *
+     * @author chaeanna
+     * @date 2023-07-08
      * @param issue 이슈 정보
      * @param lifeCycle 변경할 상태 ("NOT_STARTED", "IN_PROGRESS", "DONE" 중 하나로 대소문자 구분 없이 입력)
      * @return String "이슈 상태 변경이 완료되었습니다."
@@ -630,6 +631,45 @@ public class IssueServiceImpl implements IssueService {
         issueRepository.save(issue);
 
         return "이슈 상태 변경이 완료되었습니다.";
+    }
+
+    /**
+     * 특정 이슈에 대한 의견을 저장하는 메서드입니다.
+     *
+     * @author chaeanna
+     * @date 2023-07-08
+     * @param issue 이슈 정보
+     * @param member 프로젝트 멤버 정보
+     * @param opinion 의견 내용
+     * @return IssueOpinion 저장된 의견 정보
+     */
+    private IssueOpinion saveOpinion(Issue issue, ProjectMember member, String opinion) {
+        // 의견 저장
+        return issueOpinionRepository.save(IssueOpinion.builder()
+                .opinion(opinion)
+                .issue(issue)
+                .member(member)
+                .build());
+    }
+
+    /**
+     * 특정 사용자가 해당 이슈 의견 작성자인지 확인하는 메서드입니다.
+     *
+     * @author chaeanna
+     * @date 2023-07-08
+     * @param user 사용자 정보
+     * @param opinion 이슈 의견 정보
+     * @return boolean 해당 사용자가 이슈 의견 작성자인지 여부
+     */
+    private boolean equalsMember(User user, IssueOpinion opinion) {
+        // 이슈가 속한 프로젝트 정보 조회
+        Project project = opinion.getIssue().getProject();
+
+        // 사용자의 프로젝트 멤버 정보 조회
+        Long accessMember = getProjectMemberByUserAndProject(user, project).getMemberId();
+
+        // memberid와 이슈 의견 작성자의 memberId 비교하여 일치 여부 반환
+        return Objects.equals(accessMember, opinion.getMember().getMemberId());
     }
 
 }
