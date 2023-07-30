@@ -6,7 +6,11 @@ import com.momentum.releaser.domain.issue.dto.IssueRequestDto.IssueInfoRequestDT
 import com.momentum.releaser.domain.issue.dto.IssueRequestDto.RegisterOpinionReq;
 import com.momentum.releaser.domain.issue.dto.IssueResponseDto.*;
 
+/**
+ * 이슈와 관련된 기능을 제공하는 인터페이스입니다.
+ */
 public interface IssueService {
+
     /**
      * 7.1 이슈 생성
      */
@@ -31,7 +35,6 @@ public interface IssueService {
      * 7.5 프로젝트별 해결 & 미연결 이슈 조회
      */
     List<DoneIssuesResponseDTO> findDoneIssues(Long projectId, String status);
-
 
     /**
      * 7.6 릴리즈 노트별 연결된 이슈 조회
@@ -58,6 +61,5 @@ public interface IssueService {
      * 8.2 이슈 의견 삭제
      */
     List<OpinionInfoResponseDTO> deleteOpinion(Long opinionId, String email);
-
 
 }

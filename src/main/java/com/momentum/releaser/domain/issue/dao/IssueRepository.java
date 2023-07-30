@@ -10,5 +10,8 @@ import com.momentum.releaser.domain.release.domain.ReleaseNote;
 
 @RepositoryRestResource(collectionResourceRel="issue", path="issue")
 public interface IssueRepository extends JpaRepository<Issue, Long>, IssueRepositoryCustom {
+
+    //릴리즈 기반으로 연결된 이슈 목록 List 형태로 반환
     List<Issue> findByRelease(ReleaseNote note);
+
 }

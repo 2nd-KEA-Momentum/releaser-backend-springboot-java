@@ -153,37 +153,52 @@ public class Issue extends BaseTime {
     }
 
     /**
-     * 이슈 요약
+     * 이슈 요약 업데이트
      */
     public void updateSummary(UpdateReleaseDocsReq updateReq) {
         this.summary = updateReq.getSummary();
     }
 
+    /**
+     * 이슈 번호 삭제
+     */
     public void deleteToIssueNum() {
         this.issueNum = null;
     }
 
+    /**
+     * 삭제를 위한 status = 'N'
+     */
     public void statusToInactive() {
         this.status = 'N';
     }
 
+    /**
+     * 연관된 이슈 의견 리스트 soft delete
+     */
     public void softDelete() {
         for (IssueOpinion opinion : issueOpinions) {
             opinion.statusToInactive();
         }
     }
 
-    //issueNum 저장
+    /**
+     * 이슈 번호 업데이트
+     */
     public void updateIssueNum(IssueNum issueNum) {
         this.issueNum = issueNum;
     }
 
-    //issue edit 변경
+    /**
+     * 이슈 수정이 수정 상태 업데이트
+     */
     public void updateIssueEdit(char status){
         this.edit = status;
     }
 
-    //issue lifeCycle 변경
+    /**
+     * 이슈 상태 변경 업데이트
+     */
     public void updateLifeCycle(String lifeCycle) {
         this.lifeCycle = LifeCycle.valueOf(lifeCycle);
     }

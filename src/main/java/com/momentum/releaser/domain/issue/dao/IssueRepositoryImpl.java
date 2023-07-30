@@ -32,19 +32,30 @@ import com.momentum.releaser.domain.user.domain.QUser;
 public class IssueRepositoryImpl implements IssueRepositoryCustom{
     private final JPAQueryFactory queryFactory;
 
+    /**
+     * 프로젝트의 마지막 이슈 번호 조회
+     *
+     * @author chaeanna
+     * @date 2023-07-08
+     * @param project 프로젝트 정보
+     * @return Long 프로젝트의 마지막 이슈 번호
+     */
     @Override
     public Long getIssueNum(Project project) {
         QIssueNum issueNum = QIssueNum.issueNum1;
 
-        Optional<Long> result = Optional.ofNullable(queryFactory.
-                select(issueNum.issueNum.max())
+        // 이슈 번호 중 가장 큰 값을 조회
+        Optional<Long> result = Optional.ofNullable(queryFactory
+                .select(issueNum.issueNum.max())
                 .from(issueNum)
                 .where(
                         issueNum.project.eq(project)
                 )
                 .limit(1)
-                .fetchOne());
+                .fetchOne()
+        );
 
+        // 해당 값을 반환하고, 없으면 기본값인 0 반환
         Long number = 0L;
         if (result.isPresent()) {
             number = result.get();
@@ -53,10 +64,17 @@ public class IssueRepositoryImpl implements IssueRepositoryCustom{
         return number;
     }
 
+    /**
+     * 이슈 번호가 없는 데이터 삭제
+     *
+     * @author chaeanna
+     * @date 2023-07-08
+     */
     @Override
     public void deleteByIssueNum() {
         QIssueNum issueNum = QIssueNum.issueNum1;
 
+        // 이슈 번호가 없거나 프로젝트 정보가 없는 데이터 삭제
         queryFactory
                 .delete(issueNum)
                 .where(issueNum.project.isNull()
@@ -64,6 +82,14 @@ public class IssueRepositoryImpl implements IssueRepositoryCustom{
                 .execute();
     }
 
+    /**
+     * 프로젝트에 속하는 모든 이슈 조회
+     *
+     * @author chaeanna
+     * @date 2023-07-07
+     * @param getProject 프로젝트 정보
+     * @return IssueInfoResponseDTO 프로젝트에 속하는 모든 이슈 정보
+     */
     @Override
     public List<IssueInfoResponseDTO> getIssues(Project getProject) {
         QIssue issue = QIssue.issue;
@@ -71,20 +97,21 @@ public class IssueRepositoryImpl implements IssueRepositoryCustom{
         QUser user = QUser.user;
         QReleaseNote releaseNote = QReleaseNote.releaseNote;
 
+        // 주어진 프로젝트에 속하는 모든 이슈 정보 조회
         List<IssueInfoResponseDTO> result = queryFactory
                 .select(new QIssueResponseDto_IssueInfoResponseDTO(
-                                issue.issueId,
-                                issue.issueNum.issueNum,
-                                issue.title,
-                                issue.content,
-                                issue.endDate,
-                                member.memberId,
-                                user.name.as("memberName"),
-                                user.img.as("memberImg"),
-                                Expressions.stringTemplate("CAST({0} AS string)", issue.tag),
-                                releaseNote.version.as("releaseVersion"),
-                                issue.edit,
-                                Expressions.stringTemplate("CAST({0} AS string)", issue.lifeCycle))
+                        issue.issueId,
+                        issue.issueNum.issueNum,
+                        issue.title,
+                        issue.content,
+                        issue.endDate,
+                        member.memberId,
+                        user.name.as("memberName"),
+                        user.img.as("memberImg"),
+                        Expressions.stringTemplate("CAST({0} AS string)", issue.tag),
+                        releaseNote.version.as("releaseVersion"),
+                        issue.edit,
+                        Expressions.stringTemplate("CAST({0} AS string)", issue.lifeCycle))
                 )
                 .from(issue)
                 .leftJoin(issue.member, member)
@@ -96,12 +123,22 @@ public class IssueRepositoryImpl implements IssueRepositoryCustom{
         return result;
     }
 
+    /**
+     * 프로젝트에서 완료된 이슈 조회
+     *
+     * @author chaeanna
+     * @date 2023-07-07
+     * @param getProject 프로젝트 정보
+     * @param status 이슈의 상태
+     * @return DoneIssuesResponseDTO 프로젝트에서 완료된 이슈 정보
+     */
     @Override
     public List<DoneIssuesResponseDTO> getDoneIssues(Project getProject, String status) {
         QIssue issue = QIssue.issue;
         QProjectMember member = QProjectMember.projectMember;
         QUser user = QUser.user;
 
+        // 주어진 프로젝트에서 완료된 이슈들의 정보 조회
         List<DoneIssuesResponseDTO> getDoneIssues = queryFactory
                 .select(new QIssueResponseDto_DoneIssuesResponseDTO(
                         issue.issueId,
@@ -118,13 +155,22 @@ public class IssueRepositoryImpl implements IssueRepositoryCustom{
                 .leftJoin(issue.member, member)
                 .leftJoin(member.user, user)
                 .where(issue.project.eq(getProject)
-                        .and(issue.lifeCycle.eq(LifeCycle.valueOf(status)))
+                        .and(issue.lifeCycle.eq(LifeCycle.valueOf(status.toUpperCase())))
                         .and(issue.release.isNull()))
                 .fetchResults().getResults();
 
         return getDoneIssues;
     }
 
+    /**
+     * 릴리즈 노트별 연결된 이슈 조회
+     *
+     * @author chaeanna
+     * @date 2023-07-07
+     * @param getProject 프로젝트 정보
+     * @param getReleaseNote 릴리즈 노트 정보
+     * @return ConnectionIssuesResponseDTO 릴리즈 노트에 연결된 이슈 정보
+     */
     @Override
     public List<ConnectionIssuesResponseDTO> getConnectionIssues(Project getProject, ReleaseNote getReleaseNote) {
         QIssue issue = QIssue.issue;
@@ -132,6 +178,7 @@ public class IssueRepositoryImpl implements IssueRepositoryCustom{
         QUser user = QUser.user;
         QReleaseNote releaseNote = QReleaseNote.releaseNote;
 
+        // 주어진 프로젝트에서 특정 릴리즈 노트에 연결된 이슈들의 정보 조회
         List<ConnectionIssuesResponseDTO> getConnectionIssues = queryFactory
                 .select(new QIssueResponseDto_ConnectionIssuesResponseDTO(
                         issue.issueId,
@@ -144,7 +191,7 @@ public class IssueRepositoryImpl implements IssueRepositoryCustom{
                         user.img.as("memberImg"),
                         releaseNote.version)
                 )
-                .from(issue)  // Issue 테이블을 지정
+                .from(issue)
                 .leftJoin(issue.member, member)
                 .leftJoin(member.user, user)
                 .leftJoin(issue.release, releaseNote)
@@ -155,12 +202,21 @@ public class IssueRepositoryImpl implements IssueRepositoryCustom{
         return getConnectionIssues;
     }
 
+    /**
+     * 이슈별 의견 조회
+     *
+     * @author chaeanna
+     * @date 2023-07-08
+     * @param issue 조회할 이슈 정보
+     * @return OpinionInfoResponseDTO 이슈에 대한 모든 의견 정보
+     */
     @Override
     public List<OpinionInfoResponseDTO> getIssueOpinion(Issue issue) {
         QIssueOpinion issueOpinion = QIssueOpinion.issueOpinion;
         QProjectMember member = QProjectMember.projectMember;
         QUser user = QUser.user;
 
+        // 주어진 이슈에 대한 모든 의견들의 정보 조회
         List<OpinionInfoResponseDTO> opinionInfoRes = queryFactory
                 .select(new QIssueResponseDto_OpinionInfoResponseDTO(
                         Expressions.cases().when(issueOpinion.member.status.eq('N')).then(0L).otherwise(issueOpinion.member.memberId),

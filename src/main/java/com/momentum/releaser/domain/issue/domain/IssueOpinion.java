@@ -53,11 +53,6 @@ public class IssueOpinion extends BaseTime {
         this.issue = issue;
     }
 
-
-    public void statusToInactive() {
-        this.status = 'N';
-    }
-
     /**
      * insert 되기전 (persist 되기전) 실행된다.
      */
@@ -65,4 +60,12 @@ public class IssueOpinion extends BaseTime {
     public void prePersist() {
         this.status = (this.status == '\0') ? 'Y' : this.status;
     }
+
+    /**
+     * 삭제를 위한 status ='N' 변경
+     */
+    public void statusToInactive() {
+        this.status = 'N';
+    }
+
 }

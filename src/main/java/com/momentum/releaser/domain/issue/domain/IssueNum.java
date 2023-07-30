@@ -39,6 +39,9 @@ public class IssueNum extends BaseTime {
         this.issueNum = issueNum;
     }
 
+    /**
+     * delete 되기 전 실행된다.
+     */
     @PreRemove
     private void preRemove() {
         if (issue != null) {
@@ -47,8 +50,9 @@ public class IssueNum extends BaseTime {
         project.removeIssueNum(this);
     }
 
-
-
+    /**
+     * 삭제를 위한 연관매핑 끊기
+     */
     public void deleteToProject() {
         this.project = null;
         this.issue = null;
