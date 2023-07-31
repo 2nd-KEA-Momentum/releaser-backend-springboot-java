@@ -47,7 +47,7 @@ public class UserController {
      *
      * @param userPrincipal JWT
      * @param userUpdateImgRequestDto 사용자 프로필 이미지 변경 요청 정보
-     * @return String "사용자 프로필 이미지 변경에 성공하였습니다."
+     * @return UserProfileImgResponseDTO 사용자 프로필 이미지 정보
      * @throws IOException 파일 입출력 관련 예외
      */
     @PatchMapping(value = "/images")
@@ -59,12 +59,12 @@ public class UserController {
     /**
      * 1.3 사용자 프로필 이미지 삭제
      *
-     * @param userId 사용자 식별 번호
-     * @return String "사용자 프로필 이미지 삭제에 성공하였습니다."
+     * @param userPrincipal JWT
+     * @return UserProfileImgResponseDTO 사용자 프로필 이미지 정보
      */
-    @PostMapping(value = "/{userId}/images")
-    public BaseResponse<String> userProfileImgRemove(@PathVariable @Min(value = 1, message = "사용자 식별 번호는 1 이상의 숫자여야 합니다.") Long userId) {
-        return new BaseResponse<>(userService.removeUserProfileImg(userId));
+    @PostMapping(value = "/images")
+    public BaseResponse<UserProfileImgResponseDTO> userProfileImgRemove(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+        return new BaseResponse<>(userService.removeUserProfileImg(userPrincipal.getEmail()));
     }
 
     //    @Secured(value = UserRoleEnum.Authority.ADMIN)
