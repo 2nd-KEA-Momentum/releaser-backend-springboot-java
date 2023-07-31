@@ -55,7 +55,7 @@ jobs:
           spring.redis.host: ${{secrets.REDIS_HOST}}
           spring.redis.port: ${{secrets.REDIS_PORT}}
           url.image.banner-project: ${{secrets.URL_BANNER_PROJECT}}
-          url.image.logo-team: ${{URL_LOGO_TEAM}}
+          url.image.logo-team: ${{secrets.URL_LOGO_TEAM}}
           
           
           
