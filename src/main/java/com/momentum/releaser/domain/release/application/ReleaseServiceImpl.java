@@ -53,7 +53,7 @@ public class ReleaseServiceImpl implements ReleaseService {
      */
     @Transactional(readOnly = true)
     @Override
-    public ReleasesResponseDto getReleasesByProject(String userEmail, Long projectId) {
+    public ReleasesResponseDto findReleaseNotes(String userEmail, Long projectId) {
         // 프로젝트 식별 번호로 프로젝트 엔티티를 가져온다.
         Project project = getProjectById(projectId);
 
@@ -68,7 +68,7 @@ public class ReleaseServiceImpl implements ReleaseService {
      */
     @Transactional
     @Override
-    public ReleaseCreateAndUpdateResponseDto createReleaseNote(String userEmail, Long projectId, ReleaseCreateRequestDto releaseCreateRequestDto) {
+    public ReleaseCreateAndUpdateResponseDto addReleaseNote(String userEmail, Long projectId, ReleaseCreateRequestDto releaseCreateRequestDto) {
         Project project = getProjectById(projectId);
 
         // 릴리즈 노트 생성 권한이 있는 프로젝트 멤버인지 확인한다.
@@ -94,7 +94,7 @@ public class ReleaseServiceImpl implements ReleaseService {
      */
     @Transactional
     @Override
-    public ReleaseCreateAndUpdateResponseDto updateReleaseNote(String userEmail, Long releaseId, ReleaseUpdateRequestDto releaseUpdateRequestDto) {
+    public ReleaseCreateAndUpdateResponseDto saveReleaseNote(String userEmail, Long releaseId, ReleaseUpdateRequestDto releaseUpdateRequestDto) {
         ReleaseNote releaseNote = getReleaseNoteById(releaseId);
 
         // 릴리즈 노트 수정 권한이 있는 사용자인지 확인한다. 만약 아니라면, 예외를 발생시킨다.
@@ -117,7 +117,7 @@ public class ReleaseServiceImpl implements ReleaseService {
      */
     @Transactional
     @Override
-    public String deleteReleaseNote(String userEmail, Long releaseId) {
+    public String removeReleaseNote(String userEmail, Long releaseId) {
         ReleaseNote releaseNote = getReleaseNoteById(releaseId);
 
         // 프로젝트의 PM인지 확인한다.
@@ -143,7 +143,7 @@ public class ReleaseServiceImpl implements ReleaseService {
      */
     @Transactional(readOnly = true)
     @Override
-    public ReleaseInfoResponseDto getReleaseNoteInfo(String userEmail, Long releaseId) {
+    public ReleaseInfoResponseDto findReleaseNote(String userEmail, Long releaseId) {
         ReleaseNote releaseNote = getReleaseNoteById(releaseId);
 
         // 해당 프로젝트 멤버인지 식별한다.
@@ -160,7 +160,7 @@ public class ReleaseServiceImpl implements ReleaseService {
      */
     @Transactional
     @Override
-    public List<ReleaseApprovalsResponseDto> decideOnApprovalByMember(String userEmail, Long releaseId, ReleaseApprovalRequestDto releaseApprovalRequestDto) {
+    public List<ReleaseApprovalsResponseDto> modifyReleaseApproval(String userEmail, Long releaseId, ReleaseApprovalRequestDto releaseApprovalRequestDto) {
         ReleaseNote releaseNote = getReleaseNoteById(releaseId);
 
         // 프로젝트 멤버가 맞는지 확인하고, 맞다면 프로젝트 멤버를 반환한다.
@@ -181,7 +181,7 @@ public class ReleaseServiceImpl implements ReleaseService {
      */
     @Transactional
     @Override
-    public String updateReleaseNoteCoordinate(ReleaseNoteCoordinateRequestDto releaseNoteCoordinateRequestDto) {
+    public String modifyReleaseCoordinate(ReleaseNoteCoordinateRequestDto releaseNoteCoordinateRequestDto) {
         updateCoordinates(releaseNoteCoordinateRequestDto.getCoordinates());
         return "릴리즈 노트 좌표 업데이트에 성공하였습니다.";
     }

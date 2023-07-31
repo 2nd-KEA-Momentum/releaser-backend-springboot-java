@@ -33,7 +33,7 @@ public class ReleaseController {
             @AuthenticationPrincipal UserPrincipal userPrincipal,
             @RequestParam @Min(value = 1, message = "프로젝트 식별 번호는 1 이상의 숫자여야 합니다.") Long projectId) {
 
-        return new BaseResponse<>(releaseService.getReleasesByProject(userPrincipal.getEmail(), projectId));
+        return new BaseResponse<>(releaseService.findReleaseNotes(userPrincipal.getEmail(), projectId));
     }
 
     /**
@@ -45,7 +45,7 @@ public class ReleaseController {
             @PathVariable @Min(value = 1, message = "프로젝트 식별 번호는 1 이상의 숫자여야 합니다.") Long projectId,
             @RequestBody @Valid ReleaseCreateRequestDto releaseCreateRequestDto) {
 
-        return new BaseResponse<>(releaseService.createReleaseNote(userPrincipal.getEmail(), projectId, releaseCreateRequestDto));
+        return new BaseResponse<>(releaseService.addReleaseNote(userPrincipal.getEmail(), projectId, releaseCreateRequestDto));
     }
 
     /**
@@ -57,7 +57,7 @@ public class ReleaseController {
             @PathVariable @Min(value = 1, message = "릴리즈 식별 번호는 1 이상의 숫자여야 합니다.") Long releaseId,
             @RequestBody @Valid ReleaseUpdateRequestDto releaseUpdateRequestDto) {
 
-        return new BaseResponse<>(releaseService.updateReleaseNote(userPrincipal.getEmail(), releaseId, releaseUpdateRequestDto));
+        return new BaseResponse<>(releaseService.saveReleaseNote(userPrincipal.getEmail(), releaseId, releaseUpdateRequestDto));
     }
 
     /**
@@ -68,7 +68,7 @@ public class ReleaseController {
             @AuthenticationPrincipal UserPrincipal userPrincipal,
             @PathVariable @Min(value = 1, message = "릴리즈 식별 번호는 1 이상의 숫자여야 합니다.") Long releaseId) {
 
-        return new BaseResponse<>(releaseService.deleteReleaseNote(userPrincipal.getEmail(), releaseId));
+        return new BaseResponse<>(releaseService.removeReleaseNote(userPrincipal.getEmail(), releaseId));
     }
 
     /**
@@ -79,7 +79,7 @@ public class ReleaseController {
             @AuthenticationPrincipal UserPrincipal userPrincipal,
             @PathVariable @Min(value = 1, message = "릴리즈 식별 번호는 1 이상의 숫자여야 합니다.") Long releaseId) {
 
-        return new BaseResponse<>(releaseService.getReleaseNoteInfo(userPrincipal.getEmail(), releaseId));
+        return new BaseResponse<>(releaseService.findReleaseNote(userPrincipal.getEmail(), releaseId));
     }
 
     /**
@@ -91,7 +91,7 @@ public class ReleaseController {
             @PathVariable @Min(value = 1, message = "릴리즈 식별 번호는 1 이상의 숫자여야 합니다.") Long releaseId,
             @RequestBody @Valid ReleaseApprovalRequestDto releaseApprovalRequestDto) {
 
-        return new BaseResponse<>(releaseService.decideOnApprovalByMember(userPrincipal.getEmail(), releaseId, releaseApprovalRequestDto));
+        return new BaseResponse<>(releaseService.modifyReleaseApproval(userPrincipal.getEmail(), releaseId, releaseApprovalRequestDto));
     }
 
     /**
@@ -101,7 +101,7 @@ public class ReleaseController {
     public BaseResponse<String> releaseCoordinateModify(
             @RequestBody @Valid ReleaseNoteCoordinateRequestDto releaseNoteCoordinateRequestDto) {
 
-        return new BaseResponse<>(releaseService.updateReleaseNoteCoordinate(releaseNoteCoordinateRequestDto));
+        return new BaseResponse<>(releaseService.modifyReleaseCoordinate(releaseNoteCoordinateRequestDto));
     }
 
     /**
