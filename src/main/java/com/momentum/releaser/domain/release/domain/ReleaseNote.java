@@ -1,21 +1,25 @@
 package com.momentum.releaser.domain.release.domain;
 
-import com.momentum.releaser.domain.issue.domain.Issue;
-import com.momentum.releaser.domain.project.domain.Project;
-import com.momentum.releaser.domain.release.domain.ReleaseEnum.ReleaseDeployStatus;
-import com.momentum.releaser.global.common.BaseTime;
-import com.sun.istack.NotNull;
-import lombok.*;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
+
+import lombok.*;
+
+import com.sun.istack.NotNull;
+
+import com.momentum.releaser.domain.issue.domain.Issue;
+import com.momentum.releaser.domain.project.domain.Project;
+import com.momentum.releaser.domain.release.domain.ReleaseEnum.ReleaseDeployStatus;
+import com.momentum.releaser.global.common.BaseTime;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -107,6 +111,15 @@ public class ReleaseNote extends BaseTime {
     }
 
     /**
+     * insert 되기전 (persist 되기전) 실행된다.
+     */
+    @PrePersist
+    public void prePersist() {
+        this.deployStatus = (this.deployStatus == null) ? ReleaseDeployStatus.PLANNING : this.deployStatus;
+        this.status = (this.status == '\0') ? 'Y' : this.status;
+    }
+
+    /**
      * 연관 관계로 매핑되어 있는 릴리즈 노트의 의견들을 삭제할 때 사용한다.
      */
     public void softDelete() {
@@ -127,15 +140,6 @@ public class ReleaseNote extends BaseTime {
      */
     public void statusToInactive() {
         this.status = 'N';
-    }
-
-    /**
-     * insert 되기전 (persist 되기전) 실행된다.
-     */
-    @PrePersist
-    public void prePersist() {
-        this.deployStatus = (this.deployStatus == null) ? ReleaseDeployStatus.PLANNING : this.deployStatus;
-        this.status = (this.status == '\0') ? 'Y' : this.status;
     }
 
     /**

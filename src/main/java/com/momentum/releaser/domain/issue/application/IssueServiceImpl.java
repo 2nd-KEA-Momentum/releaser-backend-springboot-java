@@ -56,8 +56,6 @@ public class IssueServiceImpl implements IssueService {
      *
      * @author chaeanna
      * @date 2023-07-27
-     * @param projectId 프로젝트 식별 번호
-     * @param createReq 이슈 등록 요청 정보
      */
     @Override
     @Transactional
@@ -84,9 +82,7 @@ public class IssueServiceImpl implements IssueService {
      *
      * @author chaeanna
      * @date 2023-07-05
-     * @param issueId 이슈 식별 번호
      * @param email 사용자 이메일
-     * @param updateReq 이슈 수정 요청 정보
      */
     @Override
     @Transactional
@@ -119,7 +115,6 @@ public class IssueServiceImpl implements IssueService {
      *
      * @author chaeanna
      * @date 2023-07-09
-     * @param issueId 삭제할 이슈의 식별 번호
      */
     @Override
     @Transactional
@@ -145,7 +140,6 @@ public class IssueServiceImpl implements IssueService {
      *
      * @author chaeanna
      * @date 2023-07-08
-     * @param projectId 프로젝트 식별 번호
      */
     @Override
     @Transactional
@@ -174,8 +168,6 @@ public class IssueServiceImpl implements IssueService {
      *
      * @author chaeanna
      * @date 2023-07-08
-     * @param projectId 프로젝트 식별 번호
-     * @param status 이슈 상태 ("DONE"으로 대소문자 구분 없이 입력)
      */
     @Override
     @Transactional
@@ -203,8 +195,6 @@ public class IssueServiceImpl implements IssueService {
      *
      * @author chaeanna
      * @date 2023-07-08
-     * @param projectId 프로젝트 식별 번호
-     * @param releaseId 릴리즈 노트 식별 번호
      */
     @Override
     @Transactional
@@ -226,7 +216,6 @@ public class IssueServiceImpl implements IssueService {
      *
      * @author chaeanna
      * @date 2023-07-09
-     * @param issueId 조회할 이슈의 식별 번호
      * @param email 사용자 이메일
      */
     @Override
@@ -261,7 +250,6 @@ public class IssueServiceImpl implements IssueService {
      *
      * @author chaeanna
      * @date 2023-07-08
-     * @param issueId 상태를 변경할 이슈의 식별 번호
      * @param lifeCycle 변경할 이슈의 상태 ("NOT_STARTED", "IN_PROGRESS", "DONE" 중 하나로 대소문자 구분 없이 입력)
      */
     @Override
@@ -286,9 +274,7 @@ public class IssueServiceImpl implements IssueService {
      *
      * @author chaeanna
      * @date 2023-07-08
-     * @param issueId 이슈의 식별 번호
      * @param email 사용자의 이메일
-     * @param issueOpinionReq 등록할 이슈 의견 정보
      */
     @Override
     @Transactional
@@ -316,7 +302,6 @@ public class IssueServiceImpl implements IssueService {
      *
      * @author chaeanna
      * @date 2023-07-08
-     * @param opinionId 삭제할 의견의 식별 번호
      * @param email 사용자의 이메일
      * @throws CustomException 삭제 권한이 없을 경우 예외 발생
      */
