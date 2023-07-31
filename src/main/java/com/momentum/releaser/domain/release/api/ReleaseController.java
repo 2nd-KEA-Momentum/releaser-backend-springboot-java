@@ -138,7 +138,7 @@ public class ReleaseController {
      * 6.1 릴리즈 노트 의견 추가
      */
     @PostMapping(value = "/{releaseId}/opinions")
-    public BaseResponse<List<ReleaseOpinionsResponseDTO>> addReleaseOpinion(@AuthenticationPrincipal UserPrincipal userPrincipal,
+    public BaseResponse<List<ReleaseOpinionsResponseDTO>> releaseOpinionAdd(@AuthenticationPrincipal UserPrincipal userPrincipal,
             @PathVariable @Min(value = 1, message = "릴리즈 식별 번호는 1 이상의 숫자여야 합니다.") Long releaseId,
             @RequestBody @Valid ReleaseOpinionCreateRequestDTO releaseOpinionCreateRequestDto) {
 
@@ -149,7 +149,7 @@ public class ReleaseController {
      * 6.2 릴리즈 노트 의견 삭제
      */
     @PostMapping("/opinions/{opinionId}")
-    public BaseResponse<List<ReleaseOpinionsResponseDTO>> deleteReleaseOpinion(@AuthenticationPrincipal UserPrincipal userPrincipal,
+    public BaseResponse<List<ReleaseOpinionsResponseDTO>> releaseOpinionRemove(@AuthenticationPrincipal UserPrincipal userPrincipal,
             @PathVariable @Min(value = 1, message = "릴리즈 의견 식별 번호는 1 이상의 숫자여야 합니다.") Long opinionId) {
 
         return new BaseResponse<>(releaseService.deleteReleaseOpinion(userPrincipal.getEmail(), opinionId));
@@ -159,7 +159,7 @@ public class ReleaseController {
      * 6.3 릴리즈 노트 의견 목록 조회
      */
     @GetMapping("/{releaseId}/opinions")
-    public BaseResponse<List<ReleaseOpinionsResponseDTO>> getReleaseOpinions(@PathVariable @Min(value = 1, message = "릴리즈 식별 번호는 1 이상의 숫자여야 합니다.") Long releaseId) {
+    public BaseResponse<List<ReleaseOpinionsResponseDTO>> releaseOpinionList(@PathVariable @Min(value = 1, message = "릴리즈 식별 번호는 1 이상의 숫자여야 합니다.") Long releaseId) {
 
         return new BaseResponse<>(releaseService.getReleaseOpinions(releaseId));
     }
