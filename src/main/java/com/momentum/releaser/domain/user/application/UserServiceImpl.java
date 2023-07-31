@@ -72,17 +72,17 @@ public class UserServiceImpl implements UserService {
      *
      * @author seonwoo
      * @date 2023-07-12
-     * @param userId 사용자 식별 번호
+     * @param userEmail 사용자 이메일
      */
     @Override
-    public String removeUserProfileImg(Long userId) {
+    public UserProfileImgResponseDTO removeUserProfileImg(String userEmail) {
         // 사용자 식별 번호로 사용자 정보 조회
-        User user = getUserById(userId);
+        User user = getUserByEmail(userEmail);
         // 프로필 이미지가 있을 경우 삭제
         deleteIfExistProfileImg(user);
         // 프로필 이미지를 삭제한 후 기본 이미지로 저장
         saveAfterDeleteProfileImg(user);
-        return "사용자 프로필 이미지 삭제에 성공하였습니다.";
+        return UserMapper.INSTANCE.toUserProfileImgResponseDto(user);
     }
 
     // =================================================================================================================
