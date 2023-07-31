@@ -42,10 +42,21 @@ public class ReleaseApproval extends BaseTime {
         this.release = release;
     }
 
+    /**
+     * delete 되기 전 실행된다.
+     */
     @PreRemove
     private void preRemove() {
         release.removeReleaseApproval(this);
         member.removeReleaseApproval(this);
+    }
+
+    /**
+     * 데이터베이스에 초기화/저장되기 전에 자동으로 값을 초기화시킨다.
+     */
+    @PrePersist
+    public void prePersist() {
+        this.approval = (this.approval == '\0') ? 'P' : this.approval;
     }
 
     public void deleteToProject() {
@@ -56,14 +67,6 @@ public class ReleaseApproval extends BaseTime {
     public void deleteToMember() {
         this.release = null;
         this.member = null;
-    }
-
-    /**
-     * 데이터베이스에 초기화/저장되기 전에 자동으로 값을 초기화시킨다.
-     */
-    @PrePersist
-    public void prePersist() {
-        this.approval = (this.approval == '\0') ? 'P' : this.approval;
     }
 
     /**

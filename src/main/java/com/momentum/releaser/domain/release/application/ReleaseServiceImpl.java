@@ -532,7 +532,6 @@ public class ReleaseServiceImpl implements ReleaseService {
         issues.forEach(i -> {
 
             // 각각의 이슈들에 이미 연결된 릴리즈 노트가 없는지, 각 이슈들은 완료된 상태인지를 한 번 더 확인한다.
-
             if (i.getRelease() != null) {
                 throw new CustomException(INVALID_ISSUE_WITH_COMPLETED);
             }
@@ -612,7 +611,6 @@ public class ReleaseServiceImpl implements ReleaseService {
         versions.add(version);
 
         // 4. 변경하려는 버전이 포함된 릴리즈 버전 배열을 오름차순으로 정렬한다.
-//        Collections.sort(versions);
         List<String> sortedVersions = sortVersionByAsc(versions);
         log.info("updateReleaseVersion/sortedVersions: {}", sortedVersions);
 
@@ -866,9 +864,11 @@ public class ReleaseServiceImpl implements ReleaseService {
 
         // 현재 릴리즈 노트의 이전 버전 중 배포되지 않은 릴리즈 노트가 있는지 확인하고, 있다면 예외를 발생시킨다.
         for (int i = 0; i < currentIdx; i++) {
+
             if (sortedReleaseNotes.get(i).getDeployStatus() != ReleaseDeployStatus.DEPLOYED) {
                 throw new CustomException(EXISTS_NOT_DEPLOYED_RELEASE_NOTE_BEFORE_THIS);
             }
+
         }
     }
 
@@ -879,10 +879,12 @@ public class ReleaseServiceImpl implements ReleaseService {
         // ReleaseApproval 테이블을 가져와서 모든 멤버의 배포 동의 값이 'Y'인지 확인한다.
         List<ReleaseApproval> approvals = releaseApprovalRepository.findAllByRelease(releaseNote);
         for (ReleaseApproval approval : approvals) {
+
             if (approval.getApproval() != 'Y') {
                 // 만약 한 사람이라도 배포를 동의하지 않았다면 예외를 발생시킨다.
                 throw new CustomException(EXISTS_DISAPPROVED_MEMBER);
             }
+
         }
     }
 

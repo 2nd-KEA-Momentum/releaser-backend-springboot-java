@@ -49,10 +49,6 @@ public class ReleaseOpinion extends BaseTime {
         this.member = member;
     }
 
-    public void statusToInactive() {
-        this.status = 'N';
-    }
-
     /**
      * insert 되기전 (persist 되기전) 실행된다.
      */
@@ -60,4 +56,9 @@ public class ReleaseOpinion extends BaseTime {
     public void prePersist() {
         this.status = (this.status == '\0') ? 'Y' : this.status;
     }
+
+    public void statusToInactive() {
+        this.status = 'N';
+    }
+
 }

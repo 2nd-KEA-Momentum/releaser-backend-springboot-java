@@ -107,6 +107,15 @@ public class ReleaseNote extends BaseTime {
     }
 
     /**
+     * insert 되기전 (persist 되기전) 실행된다.
+     */
+    @PrePersist
+    public void prePersist() {
+        this.deployStatus = (this.deployStatus == null) ? ReleaseDeployStatus.PLANNING : this.deployStatus;
+        this.status = (this.status == '\0') ? 'Y' : this.status;
+    }
+
+    /**
      * 연관 관계로 매핑되어 있는 릴리즈 노트의 의견들을 삭제할 때 사용한다.
      */
     public void softDelete() {
@@ -127,15 +136,6 @@ public class ReleaseNote extends BaseTime {
      */
     public void statusToInactive() {
         this.status = 'N';
-    }
-
-    /**
-     * insert 되기전 (persist 되기전) 실행된다.
-     */
-    @PrePersist
-    public void prePersist() {
-        this.deployStatus = (this.deployStatus == null) ? ReleaseDeployStatus.PLANNING : this.deployStatus;
-        this.status = (this.status == '\0') ? 'Y' : this.status;
     }
 
     /**

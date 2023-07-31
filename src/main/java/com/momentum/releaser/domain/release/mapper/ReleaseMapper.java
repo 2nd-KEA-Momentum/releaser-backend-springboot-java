@@ -47,14 +47,6 @@ public interface ReleaseMapper {
     ReleaseApprovalsDataDTO toReleaseApprovalsDataDto(ReleaseApproval releaseApproval);
 
     /**
-     * Entity(ReleaseOpinion) -> DTO(ReleaseOpinionsDataDto)
-     */
-//    @Mapping(target = "memberId", source = "releaseOpinion.member.memberId")
-//    @Mapping(target = "memberName", source = "releaseOpinion.member.user.name")
-//    @Mapping(target = "memberProfileImg", source = "releaseOpinion.member.user.img")
-//    ReleaseOpinionsDataDto toReleaseOpinionsDataDto(ReleaseOpinion releaseOpinion);
-
-    /**
      * Entity(ReleaseApproval) -> DTO(ReleaseApprovalsResponseDto)
      */
     @Mapping(target = "memberId", source = "releaseApproval.member.memberId")
