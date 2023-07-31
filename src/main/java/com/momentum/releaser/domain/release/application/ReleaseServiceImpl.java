@@ -1007,7 +1007,6 @@ public class ReleaseServiceImpl implements ReleaseService {
      * @param releaseNote 배포 동의를 선택하려는 릴리즈 노트
      * @throws CustomException 배포 동의를 선택할 수 없는 경우 예외 발생
      */
-
     private void validateReleaseNoteApproval(ProjectMember member, ReleaseNote releaseNote) {
 
         // 만약 릴리즈 노트가 배포된 상태(DEPLOYED)라면 배포 동의를 체크할 수 없다.
