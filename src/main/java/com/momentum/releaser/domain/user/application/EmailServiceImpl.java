@@ -40,8 +40,6 @@ public class EmailServiceImpl implements EmailService {
     /**
      * 2.6 이메일 인증
      *
-     * @param confirmEmailRequestDTO 사용자 이메일 정보가 담긴 요청 클래스
-     * @return 이메일 인증 코드 메일 전송 성공 메시지
      * @author seonwoo
      * @date 2023-07-31 (월)
      */

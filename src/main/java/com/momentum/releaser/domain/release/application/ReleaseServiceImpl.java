@@ -276,6 +276,9 @@ public class ReleaseServiceImpl implements ReleaseService {
 
     /**
      * 9.1 프로젝트별 릴리즈 보고서 조회
+     *
+     * @author chaeanna
+     * @date 2023-07-22
      */
     @Override
     @Transactional
@@ -305,6 +308,10 @@ public class ReleaseServiceImpl implements ReleaseService {
 
     /**
      * 9.2 프로젝트별 릴리즈 보고서 수정
+     *
+     * @author chaeanna
+     * @date 2023-07-22
+     * @param email 사용자 이메일
      */
     @Transactional
     @Override
@@ -1000,7 +1007,6 @@ public class ReleaseServiceImpl implements ReleaseService {
      * @param releaseNote 배포 동의를 선택하려는 릴리즈 노트
      * @throws CustomException 배포 동의를 선택할 수 없는 경우 예외 발생
      */
-
     private void validateReleaseNoteApproval(ProjectMember member, ReleaseNote releaseNote) {
 
         // 만약 릴리즈 노트가 배포된 상태(DEPLOYED)라면 배포 동의를 체크할 수 없다.

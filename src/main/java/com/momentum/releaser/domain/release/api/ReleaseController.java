@@ -176,6 +176,9 @@ public class ReleaseController {
 
     /**
      * 9.1 프로젝트별 릴리즈 보고서 조회
+     *
+     * @param projectId 프로젝트 식별 번호
+     * @return ReleaseDocsResponseDTO 릴리즈 문서 정보를 담은 응답 DTO
      */
     @GetMapping("/project/{projectId}/docs")
     public BaseResponse<List<ReleaseDocsResponseDTO>> getReleaseDocs(@PathVariable @Min(value = 1, message = "프로젝트 식별 번호는 1 이상의 숫자여야 합니다.") Long projectId) {
@@ -185,6 +188,11 @@ public class ReleaseController {
 
     /**
      * 9.2 프로젝트별 릴리즈 보고서 수정
+     *
+     * @param projectId 프로젝트 식별 번호
+     * @param userPrincipal 인증된 사용자 정보를 담고 있는 객체
+     * @param updateReleaseDocsReq 릴리즈 문서의 수정 요청 DTO
+     * @return String "릴리즈 보고서가 수정되었습니다."
      */
     @PatchMapping("/project/{projectId}/docs")
     public BaseResponse<String> updateReleaseDocs(@PathVariable @Min(value = 1, message = "프로젝트 식별 번호는 1 이상의 숫자여야 합니다.") Long projectId,
