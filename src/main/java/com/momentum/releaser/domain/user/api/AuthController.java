@@ -5,14 +5,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
 import com.momentum.releaser.domain.user.application.EmailService;
 import com.momentum.releaser.domain.user.dto.AuthRequestDto.UserInfoReqestDTO;
 import com.momentum.releaser.domain.user.dto.AuthRequestDto.UserLoginReqestDTO;
 import com.momentum.releaser.domain.user.dto.AuthResponseDto.UserInfoResponseDTO;
 import com.momentum.releaser.domain.user.dto.UserRequestDto;
-import com.momentum.releaser.domain.user.dto.UserResponseDto;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
 
 import com.momentum.releaser.domain.user.application.AuthService;
 import com.momentum.releaser.domain.user.dto.TokenDto;
@@ -86,30 +86,16 @@ public class AuthController {
     }
 
     /**
-     * 1.5 이메일 인증
+     * 2.6 이메일 인증
+     *
      * @param confirmEmailRequestDTO 인증이 필요한 이메일이 담긴 클래스
-     * @return 이메일 인증 코드
+     * @return 이메일 인증 코드 메일 전송 성공 메시지
      * @throws MessagingException 이메일 전송 및 작성에 문제가 생긴 경우
      */
     @PostMapping("/emails")
-    public BaseResponse<UserResponseDto.ConfirmEmailResponseDTO> userEmailConfirm(
+    public BaseResponse<String> userEmailConfirm(
             @Valid @RequestBody UserRequestDto.ConfirmEmailRequestDTO confirmEmailRequestDTO) throws MessagingException {
 
         return new BaseResponse<>(emailService.confirmEmail(confirmEmailRequestDTO));
     }
-
-    /**
-     * 2.4 카카오 로그인
-     */
-
-    /**
-     * 2.5 구글 로그인
-     */
-
-    /**
-     * 2.6 로그아웃
-     */
-
-
-
 }

@@ -5,15 +5,14 @@ import java.util.Random;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
-import com.momentum.releaser.domain.user.dto.UserResponseDto.ConfirmEmailResponseDTO;
-import com.momentum.releaser.global.common.property.UrlProperty;
-import com.momentum.releaser.global.util.RedisUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 
+import com.momentum.releaser.global.common.property.UrlProperty;
+import com.momentum.releaser.global.util.RedisUtil;
 import com.momentum.releaser.domain.user.dto.UserRequestDto;
 
 import lombok.RequiredArgsConstructor;
@@ -39,15 +38,15 @@ public class EmailServiceImpl implements EmailService {
     private final SpringTemplateEngine springTemplateEngine;
 
     /**
-     * 1.5 이메일 인증
+     * 2.6 이메일 인증
      *
      * @param confirmEmailRequestDTO 사용자 이메일 정보가 담긴 요청 클래스
-     * @return 이메일 인증 코드
+     * @return 이메일 인증 코드 메일 전송 성공 메시지
      * @author seonwoo
-     * @date 2023-07-30 (일)
+     * @date 2023-07-31 (월)
      */
     @Override
-    public ConfirmEmailResponseDTO confirmEmail(UserRequestDto.ConfirmEmailRequestDTO confirmEmailRequestDTO) throws MessagingException {
+    public String confirmEmail(UserRequestDto.ConfirmEmailRequestDTO confirmEmailRequestDTO) throws MessagingException {
         // 메일 전송 시 필요한 정보 설정
         MimeMessage emailForm = createEmailForm(confirmEmailRequestDTO.getEmail());
 
@@ -58,7 +57,7 @@ public class EmailServiceImpl implements EmailService {
         redisUtil.setDataExpire(authenticationCode, confirmEmailRequestDTO.getEmail(), 60 * 3L);
 
         // 인증 코드 반환
-        return ConfirmEmailResponseDTO.builder().code(authenticationCode).build();
+        return "이메일 인증 메일이 전송되었습니다.";
     }
 
     // =================================================================================================================
@@ -89,6 +88,14 @@ public class EmailServiceImpl implements EmailService {
         authenticationCode = key.toString();
     }
 
+    /**
+     * Thymeleaf 템플릿 엔진에 필요한 값을 주입
+     *
+     * @param code 이메일 인증 코드
+     * @param urlBannerProject 프로젝트 배너 이미지 URL
+     * @param urlLogoTeam 팀 로고 이미지 URL
+     * @return Thymeleaf 템플릿 엔진을 사용하여 mail.html을 렌더링한 결과
+     */
     private String setContext(String code, String urlBannerProject, String urlLogoTeam) {
         Context context = new Context();
         context.setVariable("code", code);

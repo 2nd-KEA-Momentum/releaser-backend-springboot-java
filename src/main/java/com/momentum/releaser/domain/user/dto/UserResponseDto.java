@@ -26,7 +26,7 @@ public class UserResponseDto {
     }
 
     /**
-     * 1.5 이메일 인증
+     * 2.6 이메일 인증 (테스트용)
      */
     @Getter
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
