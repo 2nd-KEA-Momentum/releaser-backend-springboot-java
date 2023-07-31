@@ -136,9 +136,12 @@ public class ReleaseController {
 
     /**
      * 6.1 릴리즈 노트 의견 추가
+     *
+     * @param userPrincipal 인증된 사용자 정보를 담고 있는 객체
+     * @return ReleaseOpinionsResponseDTO 릴리즈 의견 정보를 담은 응답 DTO
      */
     @PostMapping(value = "/{releaseId}/opinions")
-    public BaseResponse<List<ReleaseOpinionsResponseDTO>> addReleaseOpinion(@AuthenticationPrincipal UserPrincipal userPrincipal,
+    public BaseResponse<List<ReleaseOpinionsResponseDTO>> releaseOpinionAdd(@AuthenticationPrincipal UserPrincipal userPrincipal,
             @PathVariable @Min(value = 1, message = "릴리즈 식별 번호는 1 이상의 숫자여야 합니다.") Long releaseId,
             @RequestBody @Valid ReleaseOpinionCreateRequestDTO releaseOpinionCreateRequestDto) {
 
@@ -147,21 +150,28 @@ public class ReleaseController {
 
     /**
      * 6.2 릴리즈 노트 의견 삭제
+     *
+     * @param userPrincipal 인증된 사용자 정보를 담고 있는 객체
+     * @param opinionId 릴리즈 의견 식별 번호
+     * @return ReleaseOpinionsResponseDTO 릴리즈 의견 정보를 담은 응답 DTO
      */
     @PostMapping("/opinions/{opinionId}")
-    public BaseResponse<List<ReleaseOpinionsResponseDTO>> deleteReleaseOpinion(@AuthenticationPrincipal UserPrincipal userPrincipal,
+    public BaseResponse<List<ReleaseOpinionsResponseDTO>> releaseOpinionRemove(@AuthenticationPrincipal UserPrincipal userPrincipal,
             @PathVariable @Min(value = 1, message = "릴리즈 의견 식별 번호는 1 이상의 숫자여야 합니다.") Long opinionId) {
 
-        return new BaseResponse<>(releaseService.deleteReleaseOpinion(userPrincipal.getEmail(), opinionId));
+        return new BaseResponse<>(releaseService.removeReleaseOpinion(userPrincipal.getEmail(), opinionId));
     }
 
     /**
      * 6.3 릴리즈 노트 의견 목록 조회
+     *
+     * @param releaseId 릴리즈 식별 번호
+     * @return ReleaseOpinionsResponseDTO 릴리즈 의견 정보를 담은 응답 DTO
      */
     @GetMapping("/{releaseId}/opinions")
-    public BaseResponse<List<ReleaseOpinionsResponseDTO>> getReleaseOpinions(@PathVariable @Min(value = 1, message = "릴리즈 식별 번호는 1 이상의 숫자여야 합니다.") Long releaseId) {
+    public BaseResponse<List<ReleaseOpinionsResponseDTO>> releaseOpinionList(@PathVariable @Min(value = 1, message = "릴리즈 식별 번호는 1 이상의 숫자여야 합니다.") Long releaseId) {
 
-        return new BaseResponse<>(releaseService.getReleaseOpinions(releaseId));
+        return new BaseResponse<>(releaseService.findReleaseOpinions(releaseId));
     }
 
     /**

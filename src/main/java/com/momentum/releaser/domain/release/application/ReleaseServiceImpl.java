@@ -247,7 +247,7 @@ public class ReleaseServiceImpl implements ReleaseService {
      */
     @Transactional
     @Override
-    public List<ReleaseOpinionsResponseDTO> deleteReleaseOpinion(String userEmail, Long opinionId) {
+    public List<ReleaseOpinionsResponseDTO> removeReleaseOpinion(String userEmail, Long opinionId) {
         ReleaseOpinion releaseOpinion = getReleaseOpinionById(opinionId);
 
         // JWT 토큰을 이용하여 요청을 한 사용자의 프로젝트 멤버 정보를 가져온다.
@@ -269,7 +269,7 @@ public class ReleaseServiceImpl implements ReleaseService {
      */
     @Transactional(readOnly = true)
     @Override
-    public List<ReleaseOpinionsResponseDTO> getReleaseOpinions(Long releaseId) {
+    public List<ReleaseOpinionsResponseDTO> findReleaseOpinions(Long releaseId) {
         ReleaseNote releaseNote = getReleaseNoteById(releaseId);
         return getReleaseOpinionsResponseDto(releaseNote.getReleaseOpinions());
     }
