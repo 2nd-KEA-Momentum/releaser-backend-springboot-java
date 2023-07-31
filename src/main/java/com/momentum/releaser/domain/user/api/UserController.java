@@ -45,15 +45,15 @@ public class UserController {
     /**
      * 1.2 사용자 프로필 이미지 변경
      *
-     * @param userId 사용자 식별 번호
+     * @param userPrincipal JWT
      * @param userUpdateImgRequestDto 사용자 프로필 이미지 변경 요청 정보
      * @return String "사용자 프로필 이미지 변경에 성공하였습니다."
      * @throws IOException 파일 입출력 관련 예외
      */
-    @PatchMapping(value = "/{userId}/images")
-    public BaseResponse<String> userProfileImgModify(@PathVariable @Min(value = 1, message = "사용자 식별 번호는 1 이상의 숫자여야 합니다.") Long userId,
+    @PatchMapping(value = "/images")
+    public BaseResponse<UserProfileImgResponseDTO> userProfileImgModify(@AuthenticationPrincipal UserPrincipal userPrincipal,
                                                      @RequestBody UserUpdateImgRequestDTO userUpdateImgRequestDto) throws IOException {
-        return new BaseResponse<>(userService.modifyUserProfileImg(userId, userUpdateImgRequestDto));
+        return new BaseResponse<>(userService.modifyUserProfileImg(userPrincipal.getEmail(), userUpdateImgRequestDto));
     }
 
     /**
