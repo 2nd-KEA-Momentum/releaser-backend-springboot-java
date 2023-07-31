@@ -29,7 +29,7 @@ public class ReleaseController {
      * 5.1 프로젝트별 릴리즈 노트 목록 조회
      */
     @GetMapping(value = "/projects")
-    public BaseResponse<ReleasesResponseDto> getReleases(
+    public BaseResponse<ReleasesResponseDto> releaseNoteList(
             @AuthenticationPrincipal UserPrincipal userPrincipal,
             @RequestParam @Min(value = 1, message = "프로젝트 식별 번호는 1 이상의 숫자여야 합니다.") Long projectId) {
 
@@ -40,7 +40,7 @@ public class ReleaseController {
      * 5.2 릴리즈 노트 생성
      */
     @PostMapping(value = "/projects/{projectId}")
-    public BaseResponse<ReleaseCreateAndUpdateResponseDto> createReleaseNote(
+    public BaseResponse<ReleaseCreateAndUpdateResponseDto> releaseNoteAdd(
             @AuthenticationPrincipal UserPrincipal userPrincipal,
             @PathVariable @Min(value = 1, message = "프로젝트 식별 번호는 1 이상의 숫자여야 합니다.") Long projectId,
             @RequestBody @Valid ReleaseCreateRequestDto releaseCreateRequestDto) {
@@ -52,7 +52,7 @@ public class ReleaseController {
      * 5.3 릴리즈 노트 수정
      */
     @PatchMapping(value = "/{releaseId}")
-    public BaseResponse<ReleaseCreateAndUpdateResponseDto> updateReleaseNote(
+    public BaseResponse<ReleaseCreateAndUpdateResponseDto> releaseNoteSave(
             @AuthenticationPrincipal UserPrincipal userPrincipal,
             @PathVariable @Min(value = 1, message = "릴리즈 식별 번호는 1 이상의 숫자여야 합니다.") Long releaseId,
             @RequestBody @Valid ReleaseUpdateRequestDto releaseUpdateRequestDto) {
@@ -64,7 +64,7 @@ public class ReleaseController {
      * 5.4 릴리즈 노트 삭제
      */
     @PostMapping(value = "/{releaseId}")
-    public BaseResponse<String> deleteReleaseNote(
+    public BaseResponse<String> releaseNoteRemove(
             @AuthenticationPrincipal UserPrincipal userPrincipal,
             @PathVariable @Min(value = 1, message = "릴리즈 식별 번호는 1 이상의 숫자여야 합니다.") Long releaseId) {
 
@@ -75,7 +75,7 @@ public class ReleaseController {
      * 5.5 릴리즈 노트 조회
      */
     @GetMapping(value = "/{releaseId}")
-    public BaseResponse<ReleaseInfoResponseDto> getReleaseNote(
+    public BaseResponse<ReleaseInfoResponseDto> releaseNoteDetails(
             @AuthenticationPrincipal UserPrincipal userPrincipal,
             @PathVariable @Min(value = 1, message = "릴리즈 식별 번호는 1 이상의 숫자여야 합니다.") Long releaseId) {
 
@@ -86,7 +86,7 @@ public class ReleaseController {
      * 5.6 릴리즈 노트 배포 동의 여부 선택
      */
     @PostMapping(value = "/{releaseId}/approvals")
-    public BaseResponse<List<ReleaseApprovalsResponseDto>> decideOnApprovalByMember(
+    public BaseResponse<List<ReleaseApprovalsResponseDto>> releaseApprovalModify(
             @AuthenticationPrincipal UserPrincipal userPrincipal,
             @PathVariable @Min(value = 1, message = "릴리즈 식별 번호는 1 이상의 숫자여야 합니다.") Long releaseId,
             @RequestBody @Valid ReleaseApprovalRequestDto releaseApprovalRequestDto) {
@@ -98,7 +98,7 @@ public class ReleaseController {
      * 5.7 릴리즈 노트 그래프 좌표 추가
      */
     @PostMapping(value = "/coordinates")
-    public BaseResponse<String> updateReleaseNoteCoordinate(
+    public BaseResponse<String> releaseCoordinateModify(
             @RequestBody @Valid ReleaseNoteCoordinateRequestDto releaseNoteCoordinateRequestDto) {
 
         return new BaseResponse<>(releaseService.updateReleaseNoteCoordinate(releaseNoteCoordinateRequestDto));
