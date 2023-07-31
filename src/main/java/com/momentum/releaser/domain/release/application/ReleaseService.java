@@ -53,12 +53,12 @@ public interface ReleaseService {
     /**
      * 6.2 릴리즈 노트 의견 삭제
      */
-    List<ReleaseOpinionsResponseDTO> deleteReleaseOpinion(String userEmail, Long opinionId);
+    List<ReleaseOpinionsResponseDTO> removeReleaseOpinion(String userEmail, Long opinionId);
 
     /**
      * 6.3 릴리즈 노트 의견 목록 조회
      */
-    List<ReleaseOpinionsResponseDTO> getReleaseOpinions(Long releaseId);
+    List<ReleaseOpinionsResponseDTO> findReleaseOpinions(Long releaseId);
 
     /**
      * 9.1 프로젝트별 릴리즈 보고서 조회

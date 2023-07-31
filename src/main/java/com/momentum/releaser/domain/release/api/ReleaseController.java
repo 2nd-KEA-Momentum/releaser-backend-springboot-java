@@ -152,7 +152,7 @@ public class ReleaseController {
     public BaseResponse<List<ReleaseOpinionsResponseDTO>> releaseOpinionRemove(@AuthenticationPrincipal UserPrincipal userPrincipal,
             @PathVariable @Min(value = 1, message = "릴리즈 의견 식별 번호는 1 이상의 숫자여야 합니다.") Long opinionId) {
 
-        return new BaseResponse<>(releaseService.deleteReleaseOpinion(userPrincipal.getEmail(), opinionId));
+        return new BaseResponse<>(releaseService.removeReleaseOpinion(userPrincipal.getEmail(), opinionId));
     }
 
     /**
@@ -161,7 +161,7 @@ public class ReleaseController {
     @GetMapping("/{releaseId}/opinions")
     public BaseResponse<List<ReleaseOpinionsResponseDTO>> releaseOpinionList(@PathVariable @Min(value = 1, message = "릴리즈 식별 번호는 1 이상의 숫자여야 합니다.") Long releaseId) {
 
-        return new BaseResponse<>(releaseService.getReleaseOpinions(releaseId));
+        return new BaseResponse<>(releaseService.findReleaseOpinions(releaseId));
     }
 
     /**
