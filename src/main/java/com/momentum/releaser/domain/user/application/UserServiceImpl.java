@@ -51,20 +51,20 @@ public class UserServiceImpl implements UserService {
      * 1.2 사용자 프로필 이미지 변경
      *
      * @author seonwoo
-     * @date 2023-07-11
-     * @param userId 사용자 식별 번호
+     * @date 2023-07-31 (월)
+     * @param userEmail 사용자 이메일
      * @param userUpdateImgRequestDto 사용자 프로필 이미지 변경 요청 정보
      * @throws IOException 파일 입출력 관련 예외
      */
     @Transactional
     @Override
-    public String modifyUserProfileImg(Long userId, UserUpdateImgRequestDTO userUpdateImgRequestDto) throws IOException {
+    public UserProfileImgResponseDTO modifyUserProfileImg(String userEmail, UserUpdateImgRequestDTO userUpdateImgRequestDto) throws IOException {
         // 사용자 식별 번호로 사용자 정보 조회
-        User user = getUserById(userId);
+        User user = getUserByEmail(userEmail);
         // 기존 프로필 이미지가 있을 경우 삭제
         deleteIfExistProfileImg(user);
         user.updateImg(uploadUserProfileImg(userUpdateImgRequestDto));
-        return "사용자 프로필 이미지 변경에 성공하였습니다.";
+        return UserMapper.INSTANCE.toUserProfileImgResponseDto(user);
     }
 
     /**
@@ -126,7 +126,7 @@ public class UserServiceImpl implements UserService {
      * @throws CustomException 프로필 이미지 업로드에 실패한 경우 예외 발생
      */
     private String uploadUserProfileImg(UserUpdateImgRequestDTO userUpdateImgRequestDto) throws IOException {
-        String img = userUpdateImgRequestDto.getImg();
+        String img = userUpdateImgRequestDto.getImage();
 
         if (img.isEmpty()) {
             // 만약 사용자로부터 받은 이미지 데이터가 없는 경우 기본 프로필로 대체한다.

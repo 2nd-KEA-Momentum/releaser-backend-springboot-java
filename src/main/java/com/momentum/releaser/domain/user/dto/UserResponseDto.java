@@ -15,13 +15,13 @@ public class UserResponseDto {
     public static class UserProfileImgResponseDTO {
         private Long userId;
         private String name;
-        private String img;
+        private String image;
 
         @Builder
-        public UserProfileImgResponseDTO(Long userId, String name, String img) {
+        public UserProfileImgResponseDTO(Long userId, String name, String image) {
             this.userId = userId;
             this.name = name;
-            this.img = img;
+            this.image = image;
         }
     }
 
