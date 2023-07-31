@@ -8,14 +8,14 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import lombok.extern.slf4j.Slf4j;
-import lombok.RequiredArgsConstructor;
-
 import com.momentum.releaser.domain.user.application.UserService;
-import com.momentum.releaser.domain.user.dto.UserRequestDto.UserUpdateImgRequestDTO;
-import com.momentum.releaser.domain.user.dto.UserResponseDto.UserProfileImgResponseDTO;
 import com.momentum.releaser.global.config.BaseResponse;
 import com.momentum.releaser.global.jwt.UserPrincipal;
+import com.momentum.releaser.domain.user.dto.UserRequestDto.UserUpdateImgRequestDTO;
+import com.momentum.releaser.domain.user.dto.UserResponseDto.UserProfileImgResponseDTO;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * UserController는 사용자 인증과 관련된 API 엔드포인트를 처리하는 컨트롤러입니다.
@@ -67,4 +67,10 @@ public class UserController {
         return new BaseResponse<>(userService.removeUserProfileImg(userId));
     }
 
+    //    @Secured(value = UserRoleEnum.Authority.ADMIN)
+    @GetMapping("/test")
+    public String test(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+        String userEmail = userPrincipal.getEmail();
+        return "email : " + userEmail;
+    }
 }

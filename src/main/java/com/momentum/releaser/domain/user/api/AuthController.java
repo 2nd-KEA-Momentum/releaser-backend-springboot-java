@@ -1,13 +1,18 @@
 package com.momentum.releaser.domain.user.api;
 
+import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
+import com.momentum.releaser.domain.user.application.EmailService;
 import com.momentum.releaser.domain.user.dto.AuthRequestDto.UserInfoReqestDTO;
 import com.momentum.releaser.domain.user.dto.AuthRequestDto.UserLoginReqestDTO;
 import com.momentum.releaser.domain.user.dto.AuthResponseDto.UserInfoResponseDTO;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import com.momentum.releaser.domain.user.dto.UserRequestDto;
 
 import com.momentum.releaser.domain.user.application.AuthService;
 import com.momentum.releaser.domain.user.dto.TokenDto;
@@ -15,8 +20,6 @@ import com.momentum.releaser.global.config.BaseResponse;
 
 import lombok.extern.slf4j.Slf4j;
 import lombok.RequiredArgsConstructor;
-
-
 
 /**
  * AuthController는 사용자 인증과 관련된 API 엔드포인트를 처리하는 컨트롤러입니다.
@@ -31,6 +34,7 @@ import lombok.RequiredArgsConstructor;
 public class AuthController {
 
     private final AuthService authService;
+    private final EmailService emailService;
 
     /**
      * 2.1 회원가입
@@ -82,17 +86,16 @@ public class AuthController {
     }
 
     /**
-     * 2.4 카카오 로그인
+     * 2.6 이메일 인증
+     *
+     * @param confirmEmailRequestDTO 인증이 필요한 이메일이 담긴 클래스
+     * @return 이메일 인증 코드 메일 전송 성공 메시지
+     * @throws MessagingException 이메일 전송 및 작성에 문제가 생긴 경우
      */
+    @PostMapping("/emails")
+    public BaseResponse<String> userEmailConfirm(
+            @Valid @RequestBody UserRequestDto.ConfirmEmailRequestDTO confirmEmailRequestDTO) throws MessagingException {
 
-    /**
-     * 2.5 구글 로그인
-     */
-
-    /**
-     * 2.6 로그아웃
-     */
-
-
-
+        return new BaseResponse<>(emailService.confirmEmail(confirmEmailRequestDTO));
+    }
 }

@@ -25,5 +25,17 @@ public class UserResponseDto {
         }
     }
 
+    /**
+     * 2.6 이메일 인증 (테스트용)
+     */
+    @Getter
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    public static class ConfirmEmailResponseDTO {
+        private String code;
 
+        @Builder
+        public ConfirmEmailResponseDTO(String code) {
+            this.code = code;
+        }
+    }
 }
