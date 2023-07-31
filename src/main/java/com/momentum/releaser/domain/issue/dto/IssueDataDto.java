@@ -1,11 +1,11 @@
 package com.momentum.releaser.domain.issue.dto;
 
+import java.util.Date;
+
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.Date;
 
 public class IssueDataDto {
 
@@ -15,7 +15,7 @@ public class IssueDataDto {
      */
     @Getter
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    public static class ConnectedIssuesDataDto {
+    public static class ConnectedIssuesDataDTO {
         private Long issueId;
         private String title;
         private String lifeCycle;
@@ -27,7 +27,7 @@ public class IssueDataDto {
         private String memberProfileImg;
 
         @Builder
-        public ConnectedIssuesDataDto(Long issueId, String title, String lifeCycle, String tag, Date endDate, char edit, Long memberId, String memberName, String memberProfileImg) {
+        public ConnectedIssuesDataDTO(Long issueId, String title, String lifeCycle, String tag, Date endDate, char edit, Long memberId, String memberName, String memberProfileImg) {
             this.issueId = issueId;
             this.title = title;
             this.lifeCycle = lifeCycle;

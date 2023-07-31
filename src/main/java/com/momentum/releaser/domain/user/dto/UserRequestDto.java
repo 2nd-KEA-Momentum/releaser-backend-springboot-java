@@ -15,11 +15,11 @@ public class UserRequestDto {
      */
     @Getter
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    public static class UserUpdateImgRequestDto {
+    public static class UserUpdateImgRequestDTO {
         private String img;
 
         @Builder
-        public UserUpdateImgRequestDto(String img) {
+        public UserUpdateImgRequestDTO(String img) {
             this.img = img;
         }
     }
