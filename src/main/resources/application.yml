@@ -2,6 +2,16 @@ server:
   port: 8080
 
 spring:
+  #  mvc:
+  #    static-path-pattern: /static/**
+
+  thymeleaf:
+    prefix: classpath:templates/
+    check-template-location: true
+    suffix: .html
+    mode: HTML5
+    cache: false
+
   datasource:
     url: ${DEV_DB_URL}
     username: ${DEV_DB_USERNAME}
@@ -78,3 +88,9 @@ cloud:
 
 logging.level:
   org.hibernate.SQL: debug
+
+# Custom
+url:
+  image:
+    banner-project: ${URL_BANNER_PROJECT}
+    logo-team: ${URL_LOGO_TEAM}

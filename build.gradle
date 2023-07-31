@@ -81,7 +81,15 @@ dependencies {
 
     // 사용자 이메일 인증
     implementation 'org.springframework.boot:spring-boot-starter-mail'
+
+    // Properties에서 오토컴플릿을 지원하하도록 하기 위한 의존성 추가
+    compileOnly 'org.springframework.boot:spring-boot-configuration-processor'
+    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
 }
+
+//tasks.named('compileJava') {
+//    inputs.file(tasks.named('processResources'))
+//}
 
 tasks.named('test') {
     useJUnitPlatform()

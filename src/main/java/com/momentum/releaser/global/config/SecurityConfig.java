@@ -21,7 +21,9 @@ import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
@@ -37,8 +39,8 @@ import java.util.List;
 
 /**
  * SecurityConfig는 Spring Security 설정을 위한 클래스.
- * @author rimsong
  *
+ * @author rimsong
  */
 
 @Configuration
@@ -57,11 +59,18 @@ public class SecurityConfig {
     private final CustomUserDetailsService customUserDetailsService;
     private final CustomLogoutSuccessHandler customLogoutSuccessHandler;
 
-
+    /**
+     * 정적 리소스(/resources)가 Spring Security 필터에 걸리지 않도록 설정한다.
+     * @return WebSecurityCustomizer
+     */
+    @Bean
+    public WebSecurityCustomizer configure() {
+        return (web) -> web.ignoring().antMatchers("/images/**");
+    }
 
     @Bean
-    OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler(){
-        return new OAuth2AuthenticationSuccessHandler(jwtTokenProvider,httpCookieOAuth2AuthorizationRequestRepository());
+    OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler() {
+        return new OAuth2AuthenticationSuccessHandler(jwtTokenProvider, httpCookieOAuth2AuthorizationRequestRepository());
     }
 
 //    @Bean
@@ -70,28 +79,27 @@ public class SecurityConfig {
 //    }
 
     @Bean
-    CustomOAuth2UserService customOAuth2UserService(){
+    CustomOAuth2UserService customOAuth2UserService() {
         return new CustomOAuth2UserService(userRepository, authSocialRepository, authPasswordRepository);
     }
 
     @Bean
-    OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler(){
+    OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler() {
         return new OAuth2AuthenticationFailureHandler(httpCookieOAuth2AuthorizationRequestRepository());
     }
 
     @Bean
-    HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository(){
+    HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository() {
         return new HttpCookieOAuth2AuthorizationRequestRepository();
     }
 
-
     @Bean
-    AuthenticationManager authenticationManager(){
+    AuthenticationManager authenticationManager() {
         return new ProviderManager(authenticationProvider());
     }
 
     @Bean
-    AuthenticationProvider authenticationProvider(){
+    AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
         authenticationProvider.setPasswordEncoder(passwordEncoder());
         authenticationProvider.setUserDetailsService(customUserDetailsService);
@@ -105,16 +113,15 @@ public class SecurityConfig {
 
     /**
      * httpBasic().disable().csrf().disable(): rest api이므로 basic auth 및 csrf 보안을 사용하지 않는다는 설정
-     *  sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS): JWT를 사용하기 때문에 세션을 사용하지 않는다는 설정
-     *  antMatchers().permitAll(): 해당 API에 대해서는 모든 요청을 허가한다는 설정
-     *  antMatchers().hasRole("USER"): USER 권한이 있어야 요청할 수 있다는 설정
-     *  anyRequest().authenticated(): 이 밖에 모든 요청에 대해서 인증을 필요로 한다는 설정
-     *  addFilterBefore(new JwtAUthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class): JWT 인증을 위하여 직접 구현한 필터를 UsernamePasswordAuthenticationFilter 전에 실행하겠다는 설정
-     *  passwordEncoder: JWT를 사용하기 위해서는 기본적으로 password encoder가 필요한데, 여기서는 Bycrypt encoder를 사용
+     * sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS): JWT를 사용하기 때문에 세션을 사용하지 않는다는 설정
+     * antMatchers().permitAll(): 해당 API에 대해서는 모든 요청을 허가한다는 설정
+     * antMatchers().hasRole("USER"): USER 권한이 있어야 요청할 수 있다는 설정
+     * anyRequest().authenticated(): 이 밖에 모든 요청에 대해서 인증을 필요로 한다는 설정
+     * addFilterBefore(new JwtAUthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class): JWT 인증을 위하여 직접 구현한 필터를 UsernamePasswordAuthenticationFilter 전에 실행하겠다는 설정
+     * passwordEncoder: JWT를 사용하기 위해서는 기본적으로 password encoder가 필요한데, 여기서는 Bycrypt encoder를 사용
      */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-
 
 
         http
@@ -156,14 +163,8 @@ public class SecurityConfig {
                 .successHandler(oAuth2AuthenticationSuccessHandler())
                 .failureHandler(oAuth2AuthenticationFailureHandler());
 
-
-
-
         http
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
-
-
-
 
         // 401 Error 처리, Authorization 즉, 인증과정에서 실패할 시 처리
         http.exceptionHandling().authenticationEntryPoint(customAuthenticationEntryPoint);
