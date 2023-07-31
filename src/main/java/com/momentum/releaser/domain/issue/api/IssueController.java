@@ -55,7 +55,7 @@ public class IssueController {
      * 7.2 이슈 수정
      *
      * @param issueId 이슈 식별 번호
-     * @param userPrincipal 사용자 주체 정보
+     * @param userPrincipal 인증된 사용자 정보를 담고 있는 객체
      * @param updateReq 이슈 수정 요청 DTO
      * @return String "이슈 수정이 완료되었습니다."
      */
@@ -126,7 +126,7 @@ public class IssueController {
      * 7.7 이슈별 조회
      *
      * @param issueId 이슈 식별 번호
-     * @param userPrincipal 사용자 주체 정보
+     * @param userPrincipal 인증된 사용자 정보를 담고 있는 객체
      * @return IssueDetailsDTO 이슈별 조회 결과를 담은 응답 DTO
      */
     @GetMapping("/{issueId}")
@@ -155,7 +155,7 @@ public class IssueController {
      * 8.1 이슈 의견 추가
      *
      * @param issueId 이슈의 식별 번호
-     * @param userPrincipal 인증된 사용자 정보
+     * @param userPrincipal 인증된 사용자 정보를 담고 있는 객체
      * @param opinionReq 등록할 의견 정보
      * @return OpinionInfoResponseDTO 의견 등록 후의 이슈에 대한 모든 의견 정보 DTO
      */
@@ -171,7 +171,7 @@ public class IssueController {
      * 8.2 이슈 의견 삭제
      *
      * @param opinionId 이슈 의견의 식별 번호
-     * @param userPrincipal 인증된 사용자 정보
+     * @param userPrincipal 인증된 사용자 정보를 담고 있는 객체
      * @return OpinionInfoResponseDTO 의견 삭제 후의 이슈에 대한 모든 의견 정보 DTO
      */
     @PostMapping("/opinion/{opinionId}")

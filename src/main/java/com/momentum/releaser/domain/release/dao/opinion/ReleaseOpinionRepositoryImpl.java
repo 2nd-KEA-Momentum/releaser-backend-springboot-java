@@ -27,6 +27,10 @@ public class ReleaseOpinionRepositoryImpl implements ReleaseOpinionRepositoryCus
 
     /**
      * 릴리즈 노트의 의견 목록을 가져올 때 DTO로 변환해서 반환한다.
+     *
+     * @author seonwoo
+     * @date 2023-07-24
+     * @param releaseNote 릴리즈 노트 엔티티
      */
     @Override
     public List<ReleaseOpinionsDataDTO> getDtosByReleaseNote(ReleaseNote releaseNote) {

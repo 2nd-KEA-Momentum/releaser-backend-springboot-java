@@ -18,6 +18,13 @@ public class ReleaseApprovalRepositoryImpl implements ReleaseApprovalCustom {
 
     private final JPAQueryFactory queryFactory;
 
+    /**
+     * 주어진 릴리즈 노트에 대한 모든 릴리즈 동의 정보를 삭제
+     *
+     * @author seonwoo
+     * @date 2023-07-09
+     * @param releaseNote 삭제하려는 릴리즈 노트 정보
+     */
     @Override
     public void deleteByReleaseNote(ReleaseNote releaseNote) {
         queryFactory
@@ -26,6 +33,12 @@ public class ReleaseApprovalRepositoryImpl implements ReleaseApprovalCustom {
                 .execute();
     }
 
+    /**
+     * 릴리즈 노트가 없거나 혹은 멤버가 없는 모든 릴리즈 동의 정보 삭제
+     *
+     * @author chaeanna
+     * @date 2023-07-10
+     */
     @Override
     public void deleteByReleaseApproval() {
         queryFactory
@@ -34,4 +47,5 @@ public class ReleaseApprovalRepositoryImpl implements ReleaseApprovalCustom {
                         .or(releaseApproval.member.isNull()))
                 .execute();
     }
+
 }

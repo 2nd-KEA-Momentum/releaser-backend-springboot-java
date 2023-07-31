@@ -5,6 +5,9 @@ import java.util.List;
 import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.*;
 import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.*;
 
+/**
+ * 릴리즈 노트와 관련된 기능을 제공하는 인터페이스입니다.
+ */
 public interface ReleaseService {
 
     /**
@@ -57,8 +60,14 @@ public interface ReleaseService {
      */
     List<ReleaseOpinionsResponseDTO> getReleaseOpinions(Long releaseId);
 
+    /**
+     * 9.1 프로젝트별 릴리즈 보고서 조회
+     */
     List<ReleaseDocsResponseDTO> getReleaseDocs(Long projectId);
 
+    /**
+     * 9.2 프로젝트별 릴리즈 보고서 수정
+     */
     String updateReleaseDocs(Long projectId, String email, List<UpdateReleaseDocsRequestDTO> updateReleaseDocsReq);
 
 }
