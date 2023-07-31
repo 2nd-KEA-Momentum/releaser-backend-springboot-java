@@ -303,6 +303,10 @@ public class ReleaseServiceImpl implements ReleaseService {
             releaseDocsResList.add(releaseDocsRes);
         }
 
+
+        // 버전을 기준으로 내림차순으로 정렬합니다.
+        Collections.sort(releaseDocsResList, (note1, note2) -> note2.getReleaseVersion().compareTo(note1.getReleaseVersion()));
+
         return releaseDocsResList;
     }
 
