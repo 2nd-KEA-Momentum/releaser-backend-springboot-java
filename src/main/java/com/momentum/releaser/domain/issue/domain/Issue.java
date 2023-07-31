@@ -20,7 +20,7 @@ import com.momentum.releaser.domain.issue.dto.IssueRequestDto.IssueInfoRequestDT
 import com.momentum.releaser.domain.project.domain.Project;
 import com.momentum.releaser.domain.project.domain.ProjectMember;
 import com.momentum.releaser.domain.release.domain.ReleaseNote;
-import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.UpdateReleaseDocsReq;
+import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.UpdateReleaseDocsRequestDTO;
 import com.momentum.releaser.global.common.BaseTime;
 
 @Getter
@@ -155,7 +155,7 @@ public class Issue extends BaseTime {
     /**
      * 이슈 요약 업데이트
      */
-    public void updateSummary(UpdateReleaseDocsReq updateReq) {
+    public void updateSummary(UpdateReleaseDocsRequestDTO updateReq) {
         this.summary = updateReq.getSummary();
     }
 

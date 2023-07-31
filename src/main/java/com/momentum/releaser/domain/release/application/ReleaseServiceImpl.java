@@ -15,10 +15,10 @@ import com.momentum.releaser.domain.release.domain.ReleaseApproval;
 import com.momentum.releaser.domain.release.domain.ReleaseEnum.ReleaseDeployStatus;
 import com.momentum.releaser.domain.release.domain.ReleaseNote;
 import com.momentum.releaser.domain.release.domain.ReleaseOpinion;
-import com.momentum.releaser.domain.release.dto.ReleaseDataDto.CoordinateDataDto;
-import com.momentum.releaser.domain.release.dto.ReleaseDataDto.GetIssueTitle;
-import com.momentum.releaser.domain.release.dto.ReleaseDataDto.GetTags;
-import com.momentum.releaser.domain.release.dto.ReleaseDataDto.ReleaseOpinionsDataDto;
+import com.momentum.releaser.domain.release.dto.ReleaseDataDto.CoordinateDataDTO;
+import com.momentum.releaser.domain.release.dto.ReleaseDataDto.GetIssueTitleDataDTO;
+import com.momentum.releaser.domain.release.dto.ReleaseDataDto.GetTagsDataDTO;
+import com.momentum.releaser.domain.release.dto.ReleaseDataDto.ReleaseOpinionsDataDTO;
 import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.*;
 import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.*;
 import com.momentum.releaser.domain.release.mapper.ReleaseMapper;
@@ -53,7 +53,7 @@ public class ReleaseServiceImpl implements ReleaseService {
      */
     @Transactional(readOnly = true)
     @Override
-    public ReleasesResponseDto findReleaseNotes(String userEmail, Long projectId) {
+    public ReleasesResponseDTO findReleaseNotes(String userEmail, Long projectId) {
         // 프로젝트 식별 번호로 프로젝트 엔티티를 가져온다.
         Project project = getProjectById(projectId);
 
@@ -68,7 +68,7 @@ public class ReleaseServiceImpl implements ReleaseService {
      */
     @Transactional
     @Override
-    public ReleaseCreateAndUpdateResponseDto addReleaseNote(String userEmail, Long projectId, ReleaseCreateRequestDto releaseCreateRequestDto) {
+    public ReleaseCreateAndUpdateResponseDTO addReleaseNote(String userEmail, Long projectId, ReleaseCreateRequestDTO releaseCreateRequestDto) {
         Project project = getProjectById(projectId);
 
         // 릴리즈 노트 생성 권한이 있는 프로젝트 멤버인지 확인한다.
@@ -94,7 +94,7 @@ public class ReleaseServiceImpl implements ReleaseService {
      */
     @Transactional
     @Override
-    public ReleaseCreateAndUpdateResponseDto saveReleaseNote(String userEmail, Long releaseId, ReleaseUpdateRequestDto releaseUpdateRequestDto) {
+    public ReleaseCreateAndUpdateResponseDTO saveReleaseNote(String userEmail, Long releaseId, ReleaseUpdateRequestDTO releaseUpdateRequestDto) {
         ReleaseNote releaseNote = getReleaseNoteById(releaseId);
 
         // 릴리즈 노트 수정 권한이 있는 사용자인지 확인한다. 만약 아니라면, 예외를 발생시킨다.
@@ -143,14 +143,14 @@ public class ReleaseServiceImpl implements ReleaseService {
      */
     @Transactional(readOnly = true)
     @Override
-    public ReleaseInfoResponseDto findReleaseNote(String userEmail, Long releaseId) {
+    public ReleaseInfoResponseDTO findReleaseNote(String userEmail, Long releaseId) {
         ReleaseNote releaseNote = getReleaseNoteById(releaseId);
 
         // 해당 프로젝트 멤버인지 식별한다.
         ProjectMember member = getProjectMember(userEmail, releaseNote.getProject());
 
         // 만약 릴리즈 노트 의견 목록 중 조회한 사용자가 작성한 댓글이 있다면, 삭제가 가능하도록 해준다.
-        List<ReleaseOpinionsDataDto> opinions = updateToAllowDeleteOpinion(releaseNote, member);
+        List<ReleaseOpinionsDataDTO> opinions = updateToAllowDeleteOpinion(releaseNote, member);
 
         return createReleaseInfoResponseDto(releaseNote, opinions);
     }
@@ -160,7 +160,7 @@ public class ReleaseServiceImpl implements ReleaseService {
      */
     @Transactional
     @Override
-    public List<ReleaseApprovalsResponseDto> modifyReleaseApproval(String userEmail, Long releaseId, ReleaseApprovalRequestDto releaseApprovalRequestDto) {
+    public List<ReleaseApprovalsResponseDTO> modifyReleaseApproval(String userEmail, Long releaseId, ReleaseApprovalRequestDTO releaseApprovalRequestDto) {
         ReleaseNote releaseNote = getReleaseNoteById(releaseId);
 
         // 프로젝트 멤버가 맞는지 확인하고, 맞다면 프로젝트 멤버를 반환한다.
@@ -181,7 +181,7 @@ public class ReleaseServiceImpl implements ReleaseService {
      */
     @Transactional
     @Override
-    public String modifyReleaseCoordinate(ReleaseNoteCoordinateRequestDto releaseNoteCoordinateRequestDto) {
+    public String modifyReleaseCoordinate(ReleaseNoteCoordinateRequestDTO releaseNoteCoordinateRequestDto) {
         updateCoordinates(releaseNoteCoordinateRequestDto.getCoordinates());
         return "릴리즈 노트 좌표 업데이트에 성공하였습니다.";
     }
@@ -191,7 +191,7 @@ public class ReleaseServiceImpl implements ReleaseService {
      */
     @Transactional
     @Override
-    public List<ReleaseOpinionsResponseDto> addReleaseOpinion(String userEmail, Long releaseId, ReleaseOpinionCreateRequestDto releaseOpinionCreateRequestDto) {
+    public List<ReleaseOpinionsResponseDTO> addReleaseOpinion(String userEmail, Long releaseId, ReleaseOpinionCreateRequestDTO releaseOpinionCreateRequestDto) {
         ReleaseNote releaseNote = getReleaseNoteById(releaseId);
 
         // JWT 토큰을 이용하여 요청을 한 사용자의 프로젝트 멤버 정보를 가져온다.
@@ -207,7 +207,7 @@ public class ReleaseServiceImpl implements ReleaseService {
      */
     @Transactional
     @Override
-    public List<ReleaseOpinionsResponseDto> deleteReleaseOpinion(String userEmail, Long opinionId) {
+    public List<ReleaseOpinionsResponseDTO> deleteReleaseOpinion(String userEmail, Long opinionId) {
         ReleaseOpinion releaseOpinion = getReleaseOpinionById(opinionId);
 
         // JWT 토큰을 이용하여 요청을 한 사용자의 프로젝트 멤버 정보를 가져온다.
@@ -226,7 +226,7 @@ public class ReleaseServiceImpl implements ReleaseService {
      */
     @Transactional(readOnly = true)
     @Override
-    public List<ReleaseOpinionsResponseDto> getReleaseOpinions(Long releaseId) {
+    public List<ReleaseOpinionsResponseDTO> getReleaseOpinions(Long releaseId) {
         ReleaseNote releaseNote = getReleaseNoteById(releaseId);
         return getReleaseOpinionsResponseDto(releaseNote.getReleaseOpinions());
     }
@@ -236,24 +236,24 @@ public class ReleaseServiceImpl implements ReleaseService {
      */
     @Override
     @Transactional
-    public List<ReleaseDocsRes> getReleaseDocs(Long projectId) {
+    public List<ReleaseDocsResponseDTO> getReleaseDocs(Long projectId) {
         // 프로젝트 조회
         Project project = getProjectById(projectId);
         // 해당 프로젝트와 연결된 모든 릴리즈 조회
         List<ReleaseNote> releaseNotes = releaseRepository.findAllByProject(project);
 
         // 릴리즈별로 저장할 결과 리스트 초기화
-        List<ReleaseDocsRes> releaseDocsResList = new ArrayList<>();
+        List<ReleaseDocsResponseDTO> releaseDocsResList = new ArrayList<>();
 
         for (ReleaseNote note : releaseNotes) {
             // 릴리즈에 연결된 이슈들 조회
             List<Issue> issues = issueRepository.findByRelease(note);
 
             // 이슈들을 태그별로 그룹화하여 저장할 맵
-            Map<String, List<GetIssueTitle>> tagToIssueMap = groupIssuesByTag(issues);
+            Map<String, List<GetIssueTitleDataDTO>> tagToIssueMap = groupIssuesByTag(issues);
 
             // ReleaseDocsRes 객체 생성
-            ReleaseDocsRes releaseDocsRes = buildReleaseDocsRes(note, tagToIssueMap);
+            ReleaseDocsResponseDTO releaseDocsRes = buildReleaseDocsRes(note, tagToIssueMap);
             releaseDocsResList.add(releaseDocsRes);
         }
 
@@ -265,7 +265,7 @@ public class ReleaseServiceImpl implements ReleaseService {
      */
     @Transactional
     @Override
-    public String updateReleaseDocs(Long projectId, String email, List<UpdateReleaseDocsReq> updateReq) {
+    public String updateReleaseDocs(Long projectId, String email, List<UpdateReleaseDocsRequestDTO> updateReq) {
         // Token UserInfo
         User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(NOT_EXISTS_USER));
         // 프로젝트 조회
@@ -279,7 +279,7 @@ public class ReleaseServiceImpl implements ReleaseService {
         }
 
         // 업데이트 요청에 따라 이슈의 요약 업데이트 수행
-        for (UpdateReleaseDocsReq req : updateReq) {
+        for (UpdateReleaseDocsRequestDTO req : updateReq) {
             updateIssueSummary(req.getIssueId(), req);
         }
 
@@ -293,13 +293,6 @@ public class ReleaseServiceImpl implements ReleaseService {
      */
     private Project getProjectById(Long projectId) {
         return projectRepository.findById(projectId).orElseThrow(() -> new CustomException(NOT_EXISTS_PROJECT));
-    }
-
-    /**
-     * 프로젝트 멤버 식별 번호를 통해 프로젝트 멤버 엔티티를 가져온다.
-     */
-    private ProjectMember getProjectMemberById(Long memberId) {
-        return projectMemberRepository.findById(memberId).orElseThrow(() -> new CustomException(NOT_EXISTS_PROJECT_MEMBER));
     }
 
     /**
@@ -343,7 +336,6 @@ public class ReleaseServiceImpl implements ReleaseService {
         String newVersion = "";
 
         // 데이터베이스로부터 가장 최신의 버전을 가져온다.
-//        Optional<ReleaseNote> optionalReleaseNote = releaseRepository.findLatestVersionByProject(project);
         List<String> releaseVersions = releaseRepository.findAllVersionsByProject(project);
 
         if (releaseVersions.isEmpty()) {  // 데이터베이스에서 가장 최신의 버전을 가져오지 못한 경우
@@ -449,7 +441,7 @@ public class ReleaseServiceImpl implements ReleaseService {
     /**
      * 릴리즈 노트 엔티티 객체를 생성한 후, 데이터베이스에 저장한다.
      */
-    private ReleaseNote saveReleaseNote(Project project, ReleaseCreateRequestDto releaseCreateRequestDto, String newVersion) {
+    private ReleaseNote saveReleaseNote(Project project, ReleaseCreateRequestDTO releaseCreateRequestDto, String newVersion) {
 
         // 새로운 릴리즈 노트 생성
         ReleaseNote newReleaseNote = ReleaseNote.builder()
@@ -469,7 +461,7 @@ public class ReleaseServiceImpl implements ReleaseService {
     /**
      * 릴리즈 노트 엔티티를 업데이트(수정)한다.
      */
-    private ReleaseNote updateAndSaveReleaseNote(ReleaseNote releaseNote, ReleaseUpdateRequestDto releaseUpdateRequestDto, String updatedVersion) {
+    private ReleaseNote updateAndSaveReleaseNote(ReleaseNote releaseNote, ReleaseUpdateRequestDTO releaseUpdateRequestDto, String updatedVersion) {
 
         // 수정이 가능한 릴리즈 노트인지 유효성 검사를 진행한다.
         validateReleaseNoteUpdate(releaseNote, releaseUpdateRequestDto);
@@ -500,7 +492,7 @@ public class ReleaseServiceImpl implements ReleaseService {
     /**
      * 릴리즈 노트 수정 및 배포가 가능한지 검사한다.
      */
-    private void validateReleaseNoteUpdate(ReleaseNote releaseNote, ReleaseUpdateRequestDto releaseUpdateRequestDto) {
+    private void validateReleaseNoteUpdate(ReleaseNote releaseNote, ReleaseUpdateRequestDTO releaseUpdateRequestDto) {
         // 릴리즈 노트가 수정 가능한 상태(PLANNING, DENIED)인지 검사한다.
         if (releaseNote.getDeployStatus().equals(ReleaseDeployStatus.DEPLOYED)) {
             // 만약 이미 DEPLOYED 된 릴리즈 노트인 경우 예외를 발생시킨다.
@@ -897,7 +889,7 @@ public class ReleaseServiceImpl implements ReleaseService {
     /**
      * 해당 릴리즈 노트에 대한 프로젝트 멤버들의 업데이트된 배포 동의 여부 목록을 반환한다.
      */
-    private List<ReleaseApprovalsResponseDto> getReleaseApprovals(ReleaseNote releaseNote) {
+    private List<ReleaseApprovalsResponseDTO> getReleaseApprovals(ReleaseNote releaseNote) {
         List<ReleaseApproval> releaseApprovals = releaseApprovalRepository.findAllByRelease(releaseNote);
 
         if (releaseApprovals == null || releaseApprovals.size() == 0) {
@@ -912,8 +904,8 @@ public class ReleaseServiceImpl implements ReleaseService {
     /**
      * 릴리즈 노트 좌표를 클라이언트에서 새로 받은 값으로 업데이트한다.
      */
-    private void updateCoordinates(List<CoordinateDataDto> datas) {
-        for (CoordinateDataDto data : datas) {
+    private void updateCoordinates(List<CoordinateDataDTO> datas) {
+        for (CoordinateDataDTO data : datas) {
 
             // 해당 릴리즈 식별 번호에 대항하는 릴리즈 노트 엔티티를 가져온다.
             ReleaseNote releaseNote = getReleaseNoteById(data.getReleaseId());
@@ -948,7 +940,7 @@ public class ReleaseServiceImpl implements ReleaseService {
     /**
      * 릴리즈 노트 의견을 저장한다.
      */
-    private void saveReleaseOpinion(ReleaseNote releaseNote, ProjectMember member, ReleaseOpinionCreateRequestDto releaseOpinionCreateRequestDto) {
+    private void saveReleaseOpinion(ReleaseNote releaseNote, ProjectMember member, ReleaseOpinionCreateRequestDTO releaseOpinionCreateRequestDto) {
         ReleaseOpinion releaseOpinion = ReleaseOpinion.builder()
                 .opinion(releaseOpinionCreateRequestDto.getOpinion())
                 .release(releaseNote)
@@ -961,7 +953,7 @@ public class ReleaseServiceImpl implements ReleaseService {
     /**
      * 릴리즈 노트 의견 조회 결과를 DTO 리스트로 변환한다.
      */
-    private List<ReleaseOpinionsResponseDto> getReleaseOpinionsResponseDto(List<ReleaseOpinion> releaseOpinions) {
+    private List<ReleaseOpinionsResponseDTO> getReleaseOpinionsResponseDto(List<ReleaseOpinion> releaseOpinions) {
         return releaseOpinions.stream()
                 .map(ReleaseMapper.INSTANCE::toReleaseOpinionsResponseDto)
                 .collect(Collectors.toList());
@@ -970,13 +962,13 @@ public class ReleaseServiceImpl implements ReleaseService {
     /**
      * 이슈들을 태그별로 그룹화하는 메서드
      */
-    private Map<String, List<GetIssueTitle>> groupIssuesByTag(List<Issue> issues) {
-        Map<String, List<GetIssueTitle>> tagToIssueMap = new HashMap<>();
+    private Map<String, List<GetIssueTitleDataDTO>> groupIssuesByTag(List<Issue> issues) {
+        Map<String, List<GetIssueTitleDataDTO>> tagToIssueMap = new HashMap<>();
         for (Issue issue : issues) {
             // 이슈의 태그 가져오기
             String tag = String.valueOf(issue.getTag());
             // GetIssueTitle 객체 생성
-            GetIssueTitle issueTitle = GetIssueTitle.builder()
+            GetIssueTitleDataDTO issueTitle = GetIssueTitleDataDTO.builder()
                     .issueId(issue.getIssueId())
                     .title(issue.getTitle())
                     .summary(issue.getSummary())
@@ -991,17 +983,17 @@ public class ReleaseServiceImpl implements ReleaseService {
     /**
      * ReleaseDocsRes 객체를 생성하는 메서드
      */
-    private ReleaseDocsRes buildReleaseDocsRes(ReleaseNote note, Map<String, List<GetIssueTitle>> tagToIssueMap) {
+    private ReleaseDocsResponseDTO buildReleaseDocsRes(ReleaseNote note, Map<String, List<GetIssueTitleDataDTO>> tagToIssueMap) {
         // 태그별로 그룹화된 이슈들을 GetTags 리스트로 변환하여 저장
-        List<GetTags> tagsList = tagToIssueMap.entrySet().stream()
-                .map(entry -> GetTags.builder()
+        List<GetTagsDataDTO> tagsList = tagToIssueMap.entrySet().stream()
+                .map(entry -> GetTagsDataDTO.builder()
                         .tag(entry.getKey())
                         .titleList(entry.getValue())
                         .build())
                 .collect(Collectors.toList());
 
         // ReleaseDocsRes 객체 생성 및 반환
-        return ReleaseDocsRes.builder()
+        return ReleaseDocsResponseDTO.builder()
                 .releaseId(note.getReleaseId())
                 .releaseVersion(note.getVersion())
                 .releaseTitle(note.getTitle())
@@ -1025,7 +1017,7 @@ public class ReleaseServiceImpl implements ReleaseService {
     /**
      * 이슈의 summary 업데이트
      */
-    private void updateIssueSummary(Long issueId, UpdateReleaseDocsReq req) {
+    private void updateIssueSummary(Long issueId, UpdateReleaseDocsRequestDTO req) {
         // 이슈 ID로 이슈 조회
         Issue issue = issueRepository.findById(issueId).orElseThrow(() -> new CustomException(NOT_EXISTS_ISSUE));
         // 요청에 따라 이슈의 요약 업데이트 후 저장
@@ -1051,18 +1043,6 @@ public class ReleaseServiceImpl implements ReleaseService {
         }
     }
 
-    /**
-     * 사용자가 프로젝트의 멤버인지 확인한다.
-     */
-    private void isProjectMember(String email, Project project) {
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(NOT_EXISTS_USER));
-        ProjectMember member = projectMemberRepository.findByUserAndProject(user, project);
-
-        if (member == null) {
-            // 프로젝트 멤버가 아닐 경우 예외를 발생시킨다.
-            throw new CustomException(NOT_EXISTS_PROJECT_MEMBER);
-        }
-    }
 
     /**
      * 사용자가 프로젝트의 멤버인지 확인하고, 맞다면 가져온다.
@@ -1082,11 +1062,11 @@ public class ReleaseServiceImpl implements ReleaseService {
     /**
      * 릴리즈 노트 의견을 삭제할 수 있도록 상태 값을 변경한다.
      */
-    private List<ReleaseOpinionsDataDto> updateToAllowDeleteOpinion(ReleaseNote releaseNote, ProjectMember member) {
+    private List<ReleaseOpinionsDataDTO> updateToAllowDeleteOpinion(ReleaseNote releaseNote, ProjectMember member) {
         // DTO를 받아올 때 릴리즈 노트 의견을 작성한 사용자의 탈퇴 여부를 확인하고, 만약 탈퇴한 경우 memberId를 0으로 바꾼다.
-        List<ReleaseOpinionsDataDto> opinionDtos = releaseOpinionRepository.getDtosByReleaseNote(releaseNote);
+        List<ReleaseOpinionsDataDTO> opinionDtos = releaseOpinionRepository.getDtosByReleaseNote(releaseNote);
 
-        for (ReleaseOpinionsDataDto opinionDto : opinionDtos) {
+        for (ReleaseOpinionsDataDTO opinionDto : opinionDtos) {
             // 만약 요청한 사용자가 작성한 의견인 경우 삭제가 가능하도록 상태 값을 변경한다.
             opinionDto.updateDeleteYN(opinionDto.getMemberId().equals(member.getMemberId()) ? 'Y' : 'N');
         }
@@ -1097,14 +1077,14 @@ public class ReleaseServiceImpl implements ReleaseService {
     /**
      * ReleaseInfoResponseDto로 변환
      */
-    private ReleaseInfoResponseDto createReleaseInfoResponseDto(ReleaseNote releaseNote, List<ReleaseOpinionsDataDto> opinions) {
+    private ReleaseInfoResponseDTO createReleaseInfoResponseDto(ReleaseNote releaseNote, List<ReleaseOpinionsDataDTO> opinions) {
         return ReleaseMapper.INSTANCE.toReleaseInfoResponseDto(releaseNote, opinions);
     }
 
     /**
      * ReleaseOpinionsResponseDto 배열 생성 후 변환
      */
-    private List<ReleaseOpinionsResponseDto> createReleaseOpinionsResponseDto(ReleaseNote releaseNote) {
+    private List<ReleaseOpinionsResponseDTO> createReleaseOpinionsResponseDto(ReleaseNote releaseNote) {
         List<ReleaseOpinion> opinions = releaseOpinionRepository.findAllByRelease(releaseNote);
 
         return opinions.stream()

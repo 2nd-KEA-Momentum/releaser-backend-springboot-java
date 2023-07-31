@@ -10,17 +10,17 @@ public interface ReleaseService {
     /**
      * 5.1 프로젝트별 릴리즈 노트 목록 조회
      */
-    ReleasesResponseDto findReleaseNotes(String userEmail, Long projectId);
+    ReleasesResponseDTO findReleaseNotes(String userEmail, Long projectId);
 
     /**
      * 5.2 릴리즈 노트 생성
      */
-    ReleaseCreateAndUpdateResponseDto addReleaseNote(String userEmail, Long project, ReleaseCreateRequestDto releaseCreateRequestDto);
+    ReleaseCreateAndUpdateResponseDTO addReleaseNote(String userEmail, Long project, ReleaseCreateRequestDTO releaseCreateRequestDto);
 
     /**
      * 5.3 릴리즈 노트 수정
      */
-    ReleaseCreateAndUpdateResponseDto saveReleaseNote(String userEmail, Long releaseId, ReleaseUpdateRequestDto releaseUpdateRequestDto);
+    ReleaseCreateAndUpdateResponseDTO saveReleaseNote(String userEmail, Long releaseId, ReleaseUpdateRequestDTO releaseUpdateRequestDto);
 
     /**
      * 5.4 릴리즈 노트 삭제
@@ -30,35 +30,35 @@ public interface ReleaseService {
     /**
      * 5.5 릴리즈 노트 조회
      */
-    ReleaseInfoResponseDto findReleaseNote(String userEmail, Long releaseId);
+    ReleaseInfoResponseDTO findReleaseNote(String userEmail, Long releaseId);
 
     /**
      * 5.6 릴리즈 노트 배포 동의 여부 선택
      */
-    List<ReleaseApprovalsResponseDto> modifyReleaseApproval(String userEmail, Long releaseId, ReleaseApprovalRequestDto releaseApprovalRequestDto);
+    List<ReleaseApprovalsResponseDTO> modifyReleaseApproval(String userEmail, Long releaseId, ReleaseApprovalRequestDTO releaseApprovalRequestDto);
 
     /**
      * 5.7 릴리즈 노트 그래프 좌표 추가
      */
-    String modifyReleaseCoordinate(ReleaseNoteCoordinateRequestDto releaseNoteCoordinateRequestDto);
+    String modifyReleaseCoordinate(ReleaseNoteCoordinateRequestDTO releaseNoteCoordinateRequestDto);
 
     /**
      * 6.1 릴리즈 노트 의견 추가
      */
-    List<ReleaseOpinionsResponseDto> addReleaseOpinion(String userEmail, Long releaseId, ReleaseOpinionCreateRequestDto releaseOpinionCreateRequestDto);
+    List<ReleaseOpinionsResponseDTO> addReleaseOpinion(String userEmail, Long releaseId, ReleaseOpinionCreateRequestDTO releaseOpinionCreateRequestDto);
 
     /**
      * 6.2 릴리즈 노트 의견 삭제
      */
-    List<ReleaseOpinionsResponseDto> deleteReleaseOpinion(String userEmail, Long opinionId);
+    List<ReleaseOpinionsResponseDTO> deleteReleaseOpinion(String userEmail, Long opinionId);
 
     /**
      * 6.3 릴리즈 노트 의견 목록 조회
      */
-    List<ReleaseOpinionsResponseDto> getReleaseOpinions(Long releaseId);
+    List<ReleaseOpinionsResponseDTO> getReleaseOpinions(Long releaseId);
 
-    List<ReleaseDocsRes> getReleaseDocs(Long projectId);
+    List<ReleaseDocsResponseDTO> getReleaseDocs(Long projectId);
 
-    String updateReleaseDocs(Long projectId, String email, List<UpdateReleaseDocsReq> updateReleaseDocsReq);
+    String updateReleaseDocs(Long projectId, String email, List<UpdateReleaseDocsRequestDTO> updateReleaseDocsReq);
 
 }

@@ -1,7 +1,7 @@
 package com.momentum.releaser.domain.release.dao.opinion;
 
 import com.momentum.releaser.domain.release.domain.ReleaseNote;
-import com.momentum.releaser.domain.release.dto.ReleaseDataDto.ReleaseOpinionsDataDto;
+import com.momentum.releaser.domain.release.dto.ReleaseDataDto.ReleaseOpinionsDataDTO;
 
 import java.util.List;
 
@@ -10,5 +10,5 @@ import java.util.List;
  */
 public interface ReleaseOpinionRepositoryCustom {
 
-    List<ReleaseOpinionsDataDto> getDtosByReleaseNote(ReleaseNote releaseNote);
+    List<ReleaseOpinionsDataDTO> getDtosByReleaseNote(ReleaseNote releaseNote);
 }

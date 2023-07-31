@@ -1,8 +1,8 @@
 package com.momentum.releaser.domain.release.dao.opinion;
 
 import com.momentum.releaser.domain.release.domain.ReleaseNote;
-import com.momentum.releaser.domain.release.dto.QReleaseDataDto_ReleaseOpinionsDataDto;
-import com.momentum.releaser.domain.release.dto.ReleaseDataDto.ReleaseOpinionsDataDto;
+import com.momentum.releaser.domain.release.dto.QReleaseDataDto_ReleaseOpinionsDataDTO;
+import com.momentum.releaser.domain.release.dto.ReleaseDataDto.ReleaseOpinionsDataDTO;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -26,10 +26,10 @@ public class ReleaseOpinionRepositoryImpl implements ReleaseOpinionRepositoryCus
      * 릴리즈 노트의 의견 목록을 가져올 때 DTO로 변환해서 반환한다.
      */
     @Override
-    public List<ReleaseOpinionsDataDto> getDtosByReleaseNote(ReleaseNote releaseNote) {
+    public List<ReleaseOpinionsDataDTO> getDtosByReleaseNote(ReleaseNote releaseNote) {
 
         return queryFactory
-                .select(new QReleaseDataDto_ReleaseOpinionsDataDto(
+                .select(new QReleaseDataDto_ReleaseOpinionsDataDTO(
                         releaseOpinion.releaseOpinionId,
                         releaseOpinion.opinion,
                         Expressions.cases().when(releaseOpinion.member.status.eq('N'))
