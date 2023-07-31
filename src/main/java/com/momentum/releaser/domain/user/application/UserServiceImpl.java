@@ -53,7 +53,6 @@ public class UserServiceImpl implements UserService {
      * @author seonwoo
      * @date 2023-07-31 (월)
      * @param userEmail 사용자 이메일
-     * @param userUpdateImgRequestDto 사용자 프로필 이미지 변경 요청 정보
      * @throws IOException 파일 입출력 관련 예외
      */
     @Transactional

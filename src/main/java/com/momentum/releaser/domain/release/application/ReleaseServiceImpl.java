@@ -276,6 +276,9 @@ public class ReleaseServiceImpl implements ReleaseService {
 
     /**
      * 9.1 프로젝트별 릴리즈 보고서 조회
+     *
+     * @author chaeanna
+     * @date 2023-07-22
      */
     @Override
     @Transactional
@@ -305,6 +308,10 @@ public class ReleaseServiceImpl implements ReleaseService {
 
     /**
      * 9.2 프로젝트별 릴리즈 보고서 수정
+     *
+     * @author chaeanna
+     * @date 2023-07-22
+     * @param email 사용자 이메일
      */
     @Transactional
     @Override
