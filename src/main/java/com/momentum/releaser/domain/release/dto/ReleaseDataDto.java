@@ -1,13 +1,16 @@
 package com.momentum.releaser.domain.release.dto;
 
-import com.momentum.releaser.domain.release.domain.ReleaseEnum.ReleaseDeployStatus;
-import com.querydsl.core.annotations.QueryProjection;
-import lombok.*;
+import java.util.Date;
+import java.util.List;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
-import java.util.Date;
-import java.util.List;
+
+import lombok.*;
+
+import com.querydsl.core.annotations.QueryProjection;
+
+import com.momentum.releaser.domain.release.domain.ReleaseEnum.ReleaseDeployStatus;
 
 public class ReleaseDataDto {
 

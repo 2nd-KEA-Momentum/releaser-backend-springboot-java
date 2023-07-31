@@ -1,11 +1,13 @@
 package com.momentum.releaser.domain.release.dto;
 
-import com.momentum.releaser.domain.release.dto.ReleaseDataDto.CoordinateDataDTO;
-import lombok.*;
+import java.util.List;
 
 import javax.validation.Valid;
 import javax.validation.constraints.*;
-import java.util.List;
+
+import lombok.*;
+
+import com.momentum.releaser.domain.release.dto.ReleaseDataDto.CoordinateDataDTO;
 
 public class ReleaseRequestDto {
 

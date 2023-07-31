@@ -1,12 +1,15 @@
 package com.momentum.releaser.domain.release.dao.approval;
 
-import com.momentum.releaser.domain.release.domain.ReleaseNote;
-import com.querydsl.jpa.impl.JPAQueryFactory;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import static com.momentum.releaser.domain.release.domain.QReleaseApproval.releaseApproval;
+
 import org.springframework.stereotype.Repository;
 
-import static com.momentum.releaser.domain.release.domain.QReleaseApproval.releaseApproval;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+import com.querydsl.jpa.impl.JPAQueryFactory;
+
+import com.momentum.releaser.domain.release.domain.ReleaseNote;
 
 @Slf4j
 @Repository

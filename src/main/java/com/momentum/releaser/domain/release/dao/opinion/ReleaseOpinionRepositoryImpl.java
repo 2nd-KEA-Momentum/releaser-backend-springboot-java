@@ -1,19 +1,22 @@
 package com.momentum.releaser.domain.release.dao.opinion;
 
-import com.momentum.releaser.domain.release.domain.ReleaseNote;
-import com.momentum.releaser.domain.release.dto.QReleaseDataDto_ReleaseOpinionsDataDTO;
-import com.momentum.releaser.domain.release.dto.ReleaseDataDto.ReleaseOpinionsDataDTO;
-import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.jpa.impl.JPAQueryFactory;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Repository;
-
-import java.util.List;
-
 import static com.momentum.releaser.domain.project.domain.QProjectMember.projectMember;
 import static com.momentum.releaser.domain.release.domain.QReleaseOpinion.releaseOpinion;
 import static com.momentum.releaser.domain.user.domain.QUser.user;
+
+import java.util.List;
+
+import org.springframework.stereotype.Repository;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+
+import com.momentum.releaser.domain.release.domain.ReleaseNote;
+import com.momentum.releaser.domain.release.dto.QReleaseDataDto_ReleaseOpinionsDataDTO;
+import com.momentum.releaser.domain.release.dto.ReleaseDataDto.ReleaseOpinionsDataDTO;
 
 @Slf4j
 @Repository

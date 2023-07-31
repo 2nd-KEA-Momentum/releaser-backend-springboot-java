@@ -1,17 +1,18 @@
 package com.momentum.releaser.domain.release.dao.release;
 
-import com.momentum.releaser.domain.project.domain.Project;
-import com.momentum.releaser.domain.release.domain.ReleaseNote;
-import com.querydsl.jpa.impl.JPAQueryFactory;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Repository;
-
-import java.util.List;
-import java.util.Optional;
-
 import static com.momentum.releaser.domain.release.domain.QReleaseNote.releaseNote;
 
+import java.util.List;
+
+import org.springframework.stereotype.Repository;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+import com.querydsl.jpa.impl.JPAQueryFactory;
+
+import com.momentum.releaser.domain.project.domain.Project;
+import com.momentum.releaser.domain.release.domain.ReleaseNote;
 
 @Slf4j
 @Repository
@@ -31,21 +32,6 @@ public class ReleaseRepositoryImpl implements ReleaseRepositoryCustom {
                 .where(releaseNote.releaseId.ne(releaseId))
                 .where(releaseNote.version.eq(version))
                 .fetchFirst() != null;
-    }
-
-    /**
-     * 가장 최신의 버전을 가져온다.
-     */
-    @Override
-    public Optional<ReleaseNote> findLatestVersionByProject(Project project) {
-        ReleaseNote foundReleaseNote = queryFactory
-                .selectFrom(releaseNote)
-                .where(releaseNote.project.eq(project))
-                .orderBy(releaseNote.version.desc())
-                .limit(1)
-                .fetchOne();
-
-        return Optional.ofNullable(foundReleaseNote);
     }
 
     /**

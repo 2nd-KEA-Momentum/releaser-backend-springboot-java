@@ -1,13 +1,14 @@
 package com.momentum.releaser.domain.release.domain;
 
-import com.momentum.releaser.domain.project.domain.ProjectMember;
-import com.momentum.releaser.global.common.BaseTime;
+import javax.persistence.*;
+
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
+import com.momentum.releaser.domain.project.domain.ProjectMember;
+import com.momentum.releaser.global.common.BaseTime;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

@@ -1,20 +1,18 @@
 package com.momentum.releaser.domain.release.dto;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import lombok.*;
+
 import com.momentum.releaser.domain.issue.dto.IssueDataDto.ConnectedIssuesDataDTO;
-import com.momentum.releaser.domain.project.dto.ProjectMemberResponseDto;
 import com.momentum.releaser.domain.project.dto.ProjectMemberResponseDto.ProjectMemberPositionResponseDTO;
-import com.momentum.releaser.domain.release.domain.ReleaseEnum;
 import com.momentum.releaser.domain.release.domain.ReleaseEnum.ReleaseDeployStatus;
 import com.momentum.releaser.domain.release.dto.ReleaseDataDto.GetTagsDataDTO;
 import com.momentum.releaser.domain.release.dto.ReleaseDataDto.ReleaseApprovalsDataDTO;
 import com.momentum.releaser.domain.release.dto.ReleaseDataDto.ReleaseOpinionsDataDTO;
 import com.momentum.releaser.domain.release.dto.ReleaseDataDto.ReleasesDataDTO;
-import com.querydsl.core.annotations.QueryProjection;
-import lombok.*;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 public class ReleaseResponseDto {
 

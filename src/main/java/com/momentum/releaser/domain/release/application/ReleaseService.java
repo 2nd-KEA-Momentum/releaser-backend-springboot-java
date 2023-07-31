@@ -1,9 +1,9 @@
 package com.momentum.releaser.domain.release.application;
 
+import java.util.List;
+
 import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.*;
 import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.*;
-
-import java.util.List;
 
 public interface ReleaseService {
 

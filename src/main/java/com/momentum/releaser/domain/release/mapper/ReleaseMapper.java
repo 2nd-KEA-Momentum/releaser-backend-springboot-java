@@ -1,5 +1,11 @@
 package com.momentum.releaser.domain.release.mapper;
 
+import java.util.List;
+
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.factory.Mappers;
+
 import com.momentum.releaser.domain.issue.mapper.IssueMapper;
 import com.momentum.releaser.domain.project.mapper.ProjectMemberMapper;
 import com.momentum.releaser.domain.release.domain.ReleaseApproval;
@@ -9,12 +15,6 @@ import com.momentum.releaser.domain.release.dto.ReleaseDataDto.ReleaseApprovalsD
 import com.momentum.releaser.domain.release.dto.ReleaseDataDto.ReleaseOpinionsDataDTO;
 import com.momentum.releaser.domain.release.dto.ReleaseDataDto.ReleasesDataDTO;
 import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.*;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.Named;
-import org.mapstruct.factory.Mappers;
-
-import java.util.List;
 
 @Mapper(uses = {ReleaseMapper.class, IssueMapper.class, ProjectMemberMapper.class})
 public interface ReleaseMapper {
