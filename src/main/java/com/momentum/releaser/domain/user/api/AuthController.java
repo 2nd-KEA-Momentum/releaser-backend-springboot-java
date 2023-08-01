@@ -5,6 +5,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import com.momentum.releaser.domain.user.dto.AuthRequestDto;
@@ -100,7 +101,7 @@ public class AuthController {
      */
     @RequestMapping(value = "/emails", method = RequestMethod.POST, params = "!email")
     public BaseResponse<String> userEmailSend(
-            @Valid @RequestBody SendEmailRequestDTO confirmEmailRequestDTO) throws MessagingException {
+            @RequestBody @Valid SendEmailRequestDTO confirmEmailRequestDTO) throws MessagingException {
 
         return new BaseResponse<>(emailService.sendEmail(confirmEmailRequestDTO));
     }
@@ -116,7 +117,7 @@ public class AuthController {
      */
     @RequestMapping(value = "/emails", method = RequestMethod.POST, params = "email")
     public BaseResponse<ConfirmEmailResponseDTO> userEmailConfirm(
-            @RequestParam(value = "email") @Email(message = "올바르지 않은 이메일 형식입니다.") String email,
+            @RequestParam(value = "email") @NotBlank(message = "이메일을 입력해 주세요.") @Email(message = "올바르지 않은 이메일 형식입니다.") String email,
             @Valid @RequestBody ConfirmEmailRequestDTO confirmEmailRequestDTO) {
 
         return new BaseResponse<>(emailService.confirmEmail(email, confirmEmailRequestDTO));
