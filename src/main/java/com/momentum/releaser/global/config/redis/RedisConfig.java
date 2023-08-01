@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
 
 @Configuration
@@ -17,8 +18,22 @@ public class RedisConfig {
     @Value("${spring.redis.port}")
     private int port;
 
+    /**
+     * application.yml에 있는 port와 host를 불러와서 Redis와 연결한다.
+     * @return RedisConnectionFactory
+     */
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
         return new LettuceConnectionFactory(host, port);
+    }
+
+    /**
+     * RedisConnection을 통해 넘어온 byte 값을 객체 직렬화(Serialization) 한다.
+     * @return RedisTemplate
+     */
+    public RedisTemplate<?, ?> redisTemplate() {
+        RedisTemplate<byte[], byte[]> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory((redisConnectionFactory()));
+        return redisTemplate;
     }
 }

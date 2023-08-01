@@ -3,16 +3,23 @@ package com.momentum.releaser.domain.user.api;
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+import com.momentum.releaser.domain.user.dto.AuthRequestDto;
+import com.momentum.releaser.domain.user.dto.AuthRequestDto.ConfirmEmailRequestDTO;
+import com.momentum.releaser.domain.user.dto.AuthResponseDto;
+import com.momentum.releaser.domain.user.dto.AuthResponseDto.ConfirmEmailResponseDTO;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import com.momentum.releaser.domain.user.dto.AuthRequestDto.SendEmailRequestDTO;
 import com.momentum.releaser.domain.user.application.EmailService;
 import com.momentum.releaser.domain.user.dto.AuthRequestDto.UserInfoReqestDTO;
 import com.momentum.releaser.domain.user.dto.AuthRequestDto.UserLoginReqestDTO;
 import com.momentum.releaser.domain.user.dto.AuthResponseDto.UserInfoResponseDTO;
-import com.momentum.releaser.domain.user.dto.UserRequestDto;
 
 import com.momentum.releaser.domain.user.application.AuthService;
 import com.momentum.releaser.domain.user.dto.TokenDto;
@@ -92,10 +99,27 @@ public class AuthController {
      * @return 이메일 인증 코드 메일 전송 성공 메시지
      * @throws MessagingException 이메일 전송 및 작성에 문제가 생긴 경우
      */
-    @PostMapping("/emails")
-    public BaseResponse<String> userEmailConfirm(
-            @Valid @RequestBody UserRequestDto.ConfirmEmailRequestDTO confirmEmailRequestDTO) throws MessagingException {
+    @RequestMapping(value = "/emails", method = RequestMethod.POST, params = "!email")
+    public BaseResponse<String> userEmailSend(
+            @RequestBody @Valid SendEmailRequestDTO confirmEmailRequestDTO) throws MessagingException {
 
-        return new BaseResponse<>(emailService.confirmEmail(confirmEmailRequestDTO));
+        return new BaseResponse<>(emailService.sendEmail(confirmEmailRequestDTO));
+    }
+
+    /**
+     * 2.7 이메일 인증 확인
+     *
+     * @author seonwoo
+     * @date 2023-08-01 (화)
+     * @param email 사용자 이메일
+     * @param confirmEmailRequestDTO 사용자 이메일 인증 확인 코드
+     * @return ConfirmEmailRequestDTO 사용자 이메일
+     */
+    @RequestMapping(value = "/emails", method = RequestMethod.POST, params = "email")
+    public BaseResponse<ConfirmEmailResponseDTO> userEmailConfirm(
+            @RequestParam(value = "email") @NotBlank(message = "이메일을 입력해 주세요.") @Email(message = "올바르지 않은 이메일 형식입니다.") String email,
+            @Valid @RequestBody ConfirmEmailRequestDTO confirmEmailRequestDTO) {
+
+        return new BaseResponse<>(emailService.confirmEmail(email, confirmEmailRequestDTO));
     }
 }

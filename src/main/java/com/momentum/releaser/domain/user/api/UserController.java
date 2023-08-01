@@ -2,8 +2,6 @@ package com.momentum.releaser.domain.user.api;
 
 import java.io.IOException;
 
-import javax.validation.constraints.Min;
-
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;

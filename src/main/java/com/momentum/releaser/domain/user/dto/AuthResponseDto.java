@@ -1,9 +1,9 @@
 package com.momentum.releaser.domain.user.dto;
 
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotEmpty;
 
 public class AuthResponseDto {
 
@@ -27,5 +27,17 @@ public class AuthResponseDto {
         }
     }
 
+    /**
+     * 2.7 이메일 인증 확인
+     */
+    @Getter
+    @NoArgsConstructor
+    public static class ConfirmEmailResponseDTO {
+        private String email;
 
+        @Builder
+        public ConfirmEmailResponseDTO(String email) {
+            this.email = email;
+        }
+    }
 }
