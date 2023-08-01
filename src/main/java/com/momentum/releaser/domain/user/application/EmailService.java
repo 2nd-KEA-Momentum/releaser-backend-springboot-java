@@ -3,6 +3,7 @@ package com.momentum.releaser.domain.user.application;
 import javax.mail.MessagingException;
 
 import com.momentum.releaser.domain.user.dto.AuthRequestDto.ConfirmEmailRequestDTO;
+import com.momentum.releaser.domain.user.dto.AuthRequestDto.SendEmailForPasswordRequestDTO;
 import com.momentum.releaser.domain.user.dto.AuthRequestDto.SendEmailRequestDTO;
 import com.momentum.releaser.domain.user.dto.AuthResponseDto.ConfirmEmailResponseDTO;
 
@@ -27,4 +28,15 @@ public interface EmailService {
      * @return ConfirmEmailResponseDTO 사용자 이메일
      */
     ConfirmEmailResponseDTO confirmEmail(String userEmail, ConfirmEmailRequestDTO confirmEmailRequestDTO);
+
+    /**
+     * 2.8 비밀번호 변경 인증 메일 전송
+     *
+     * @author seonwoo
+     * @date 2023-08-01 (화)
+     * @param sendEmailForPasswordRequestDTO 사용자 정보 (이름, 이메일)
+     * @return 비밀번호 변경 인증 메일 전송 성공 메시지
+     * @throws MessagingException 이메일 전송 및 작성에 문제가 생긴 경우
+     */
+    String sendEmailForPassword(SendEmailForPasswordRequestDTO sendEmailForPasswordRequestDTO) throws MessagingException;
 }

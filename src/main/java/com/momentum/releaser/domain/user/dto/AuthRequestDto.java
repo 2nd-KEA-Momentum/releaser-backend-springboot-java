@@ -92,4 +92,24 @@ public class AuthRequestDto {
         }
     }
 
+    /**
+     * 2.8 비밀번호 인증 메일 전송
+     */
+    @Getter
+    @NoArgsConstructor
+    public static class SendEmailForPasswordRequestDTO {
+
+        @NotEmpty(message = "이름을 입력해 주세요.")
+        private String name;
+
+        @NotEmpty(message = "이메일을 입력해 주세요.")
+        @Email(message = "올바르지 않은 이메일 형식입니다.")
+        private String email;
+
+        @Builder
+        public SendEmailForPasswordRequestDTO(String name, String email) {
+            this.name = name;
+            this.email = email;
+        }
+    }
 }

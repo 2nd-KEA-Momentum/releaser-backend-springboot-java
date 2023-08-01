@@ -9,16 +9,13 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import com.momentum.releaser.domain.user.dto.AuthRequestDto;
-import com.momentum.releaser.domain.user.dto.AuthRequestDto.ConfirmEmailRequestDTO;
+import com.momentum.releaser.domain.user.dto.AuthRequestDto.*;
 import com.momentum.releaser.domain.user.dto.AuthResponseDto;
 import com.momentum.releaser.domain.user.dto.AuthResponseDto.ConfirmEmailResponseDTO;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import com.momentum.releaser.domain.user.dto.AuthRequestDto.SendEmailRequestDTO;
 import com.momentum.releaser.domain.user.application.EmailService;
-import com.momentum.releaser.domain.user.dto.AuthRequestDto.UserInfoReqestDTO;
-import com.momentum.releaser.domain.user.dto.AuthRequestDto.UserLoginReqestDTO;
 import com.momentum.releaser.domain.user.dto.AuthResponseDto.UserInfoResponseDTO;
 
 import com.momentum.releaser.domain.user.application.AuthService;
@@ -121,5 +118,21 @@ public class AuthController {
             @Valid @RequestBody ConfirmEmailRequestDTO confirmEmailRequestDTO) {
 
         return new BaseResponse<>(emailService.confirmEmail(email, confirmEmailRequestDTO));
+    }
+
+    /**
+     * 2.8 비밀번호 변경 인증 메일 전송
+     *
+     * @author seonwoo
+     * @date 2023-08-01 (화)
+     * @param sendPasswordRequestDTO 사용자 이름, 이메일이 담긴 객체
+     * @return 비밀번호 변경 인증 메일 전송 성공 메시지
+     * @throws MessagingException 이메일 전송 및 작성에 문제가 생긴 경우
+     */
+    @RequestMapping(value = "/password", method = RequestMethod.POST, params = {"!name", "!email"})
+    public BaseResponse<String> userPasswordSend(
+            @RequestBody @Valid SendEmailForPasswordRequestDTO sendPasswordRequestDTO) throws MessagingException {
+
+        return new BaseResponse<>(emailService.sendEmailForPassword(sendPasswordRequestDTO));
     }
 }
