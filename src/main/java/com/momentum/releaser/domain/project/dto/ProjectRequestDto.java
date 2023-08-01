@@ -5,6 +5,9 @@ import javax.validation.constraints.Size;
 
 import lombok.*;
 
+import java.util.Date;
+import java.util.List;
+
 public class ProjectRequestDto {
 
     /**
@@ -35,4 +38,31 @@ public class ProjectRequestDto {
             this.img = img;
         }
     }
+
+    /**
+     * requestParam - 이슈 그룹
+     */
+    @Data
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    public static class FilterIssueRequestDTO {
+        private Date startDate;
+        private Date endDate;
+        private Long managerId;
+        private String startVersion;
+        private String endVersion;
+        private List<String> tag;
+        private String issueTitle;
+    }
+
+    /**
+     * requestParam - 릴리즈 그룹
+     */
+    @Data
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    public static class FilterReleaseRequestDTO {
+        private String startVersion;
+        private String endVersion;
+        private String releaseTitle;
+    }
+
 }

@@ -26,7 +26,7 @@ import com.momentum.releaser.domain.project.dao.ProjectMemberRepository;
 import com.momentum.releaser.domain.project.dao.ProjectRepository;
 import com.momentum.releaser.domain.project.domain.Project;
 import com.momentum.releaser.domain.project.domain.ProjectMember;
-import com.momentum.releaser.domain.project.dto.ProjectDataDto.GetMembers;
+import com.momentum.releaser.domain.project.dto.ProjectDataDto.GetMembersDataDTO;
 import com.momentum.releaser.domain.release.dao.release.ReleaseRepository;
 import com.momentum.releaser.domain.release.domain.ReleaseNote;
 import com.momentum.releaser.domain.user.dao.UserRepository;
@@ -238,7 +238,7 @@ public class IssueServiceImpl implements IssueService {
         List<OpinionInfoResponseDTO> opinionRes = getIssueOpinionsWithDeleteYN(issue, memberId);
 
         // 프로젝트의 모든 멤버 리스트
-        List<GetMembers> memberRes = getProjectMembers(member.getProject());
+        List<GetMembersDataDTO> memberRes = getProjectMembers(member.getProject());
 
         IssueDetailsDTO getIssue = createIssueDetails(issue, memberRes, opinionRes);
 
@@ -525,7 +525,7 @@ public class IssueServiceImpl implements IssueService {
      * @param opinionRes 의견 리스트
      * @return IssueDetailsDTO 생성된 이슈 상세 정보
      */
-    private IssueDetailsDTO createIssueDetails(Issue issue, List<GetMembers> memberRes, List<OpinionInfoResponseDTO> opinionRes) {
+    private IssueDetailsDTO createIssueDetails(Issue issue, List<GetMembersDataDTO> memberRes, List<OpinionInfoResponseDTO> opinionRes) {
         // 이슈 상세 정보 생성
         IssueDetailsDTO getIssue = IssueMapper.INSTANCE.mapToGetIssue(issue, memberRes, opinionRes);
 
@@ -594,9 +594,9 @@ public class IssueServiceImpl implements IssueService {
      * @param project 프로젝트 정보
      * @return GetMembers 프로젝트의 멤버 리스트
      */
-    private List<GetMembers> getProjectMembers(Project project) {
+    private List<GetMembersDataDTO> getProjectMembers(Project project) {
         // 프로젝트에 속한 멤버 리스트를 조회
-        List<GetMembers> issueMember = projectRepository.getMemberList(project);
+        List<GetMembersDataDTO> issueMember = projectRepository.getMemberList(project);
 
         return issueMember;
     }

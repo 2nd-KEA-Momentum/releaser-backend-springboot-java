@@ -7,11 +7,25 @@ import static com.momentum.releaser.global.config.BaseResponseStatus.*;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
+import com.momentum.releaser.domain.issue.domain.Issue;
+import com.momentum.releaser.domain.issue.domain.QIssue;
+import com.momentum.releaser.domain.issue.domain.Tag;
+import com.momentum.releaser.domain.project.dto.ProjectRequestDto;
+import com.momentum.releaser.domain.project.dto.ProjectRequestDto.FilterIssueRequestDTO;
+import com.momentum.releaser.domain.project.dto.ProjectRequestDto.FilterReleaseRequestDTO;
+import com.momentum.releaser.domain.project.dto.ProjectResponseDto;
+import com.momentum.releaser.domain.project.dto.ProjectResponseDto.ProjectSearchResponseDTO;
+import com.momentum.releaser.domain.release.dao.release.ReleaseRepository;
+import com.momentum.releaser.domain.release.domain.QReleaseNote;
+import com.momentum.releaser.domain.release.domain.ReleaseNote;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Predicate;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,6 +60,7 @@ public class ProjectServiceImpl implements ProjectService {
     private final ProjectMemberRepository projectMemberRepository;
     private final UserRepository userRepository;
     private final IssueRepository issueRepository;
+    private final ReleaseRepository releaseRepository;
     private final ReleaseApprovalRepository releaseApprovalRepository;
     private final ModelMapper modelMapper;
     private final S3Upload s3Upload;
@@ -130,8 +145,8 @@ public class ProjectServiceImpl implements ProjectService {
 
         // 프로젝트 멤버 정보
         List<ProjectMember> projectMemberList = projectMemberRepository.findByUser(user);
-        List<GetProjectDateDTO> getCreateProjectList = new ArrayList<>();
-        List<GetProjectDateDTO> getEnterProjectList = new ArrayList<>();
+        List<GetProjectDataDTO> getCreateProjectList = new ArrayList<>();
+        List<GetProjectDataDTO> getEnterProjectList = new ArrayList<>();
 
         for (ProjectMember projectMember : projectMemberList) {
             // 생성한 프로젝트 조회
@@ -153,14 +168,11 @@ public class ProjectServiceImpl implements ProjectService {
      */
     @Override
     @Transactional
-    public ProjectSearchRes getProjectSearch(Long projectId,
-                                                           String filterTypeGroup,
-                                                           String filterIssueGroup,
-                                                           String filterReleaseGroup) throws ParseException {
+    public ProjectSearchResponseDTO findProjectSearch(Long projectId, String filterType, FilterIssueRequestDTO filterIssueGroup, FilterReleaseRequestDTO filterReleaseGroup) throws ParseException {
 
         //filterGroup 파싱하여 검색조건 만들기
-        Predicate predicateRelease = buildPredicateFromFilters(filterTypeGroup, filterReleaseGroup);
-        Predicate predicateIssue = buildPredicateFromFilters(filterTypeGroup, filterIssueGroup);
+        Predicate predicateRelease = buildPredicateFromReleaseFilters(filterReleaseGroup);
+        Predicate predicateIssue = buildPredicateFromIssueFilters(filterIssueGroup);
 
         // Query 실행
         Iterable<ReleaseNote> resultRelease = releaseRepository.findAll(predicateRelease);
@@ -176,66 +188,40 @@ public class ProjectServiceImpl implements ProjectService {
         //mapper 사용해서 releaseRes 만들기
         //mapper 사용해서 issueRes 만들기
 
-
         //ProjectSearchRes 만들기
         return null;
     }
 
-    private Predicate buildPredicateFromFilters(String filterTypeGroup, String filterGroup) throws ParseException {
+    private Predicate buildPredicateFromIssueFilters(FilterIssueRequestDTO filterIssueGroup) throws ParseException {
         BooleanBuilder builder = new BooleanBuilder();
 
-        if (filterTypeGroup.equals("issue")) {
-            QIssue issue = QIssue.issue;
+        QIssue issue = QIssue.issue;
+        Date startDate = filterIssueGroup.getStartDate();
+        Date endDate = filterIssueGroup.getEndDate();
+        Long manager = filterIssueGroup.getManagerId();
+        String startVersion = filterIssueGroup.getStartVersion();
+        String endVersion = filterIssueGroup.getEndVersion();
+        List<String> tag = filterIssueGroup.getTag();
+        String title = filterIssueGroup.getIssueTitle();
 
-            Map<String, String> filterMap = parseFilterGroup(filterGroup);
-            String startDateStr = filterMap.get("startDate");
-            String endDateStr = filterMap.get("endDate");
-            String manager = filterMap.get("manager");
-            String version = filterMap.get("version");
-            String tag = filterMap.get("tag");
-            String title = filterMap.get("title");
-
-            if (startDateStr != null && endDateStr != null) {
-                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                Date startDate = dateFormat.parse(startDateStr);
-                Date endDate = dateFormat.parse(endDateStr);
-
-                builder.and(issue.endDate.between(startDate, endDate));
-            }
-            if (manager != null) {
-                builder.and(issue.member.memberId.eq(Long.valueOf(manager)));
-            }
-            if (version != null) {
-                builder.and(issue.release.version.eq(version));
-            }
-            if (tag != null) {
-                builder.and(issue.tag.eq(Tag.valueOf(tag)));
-            }
-            if (title != null) {
-                builder.and(issue.title.containsIgnoreCase(title));
-            }
-        } else if ("release".equals(filterTypeGroup)) {
-            QReleaseNote releaseNote = QReleaseNote.releaseNote;
+        if (startDate != null && endDate != null) {
+            builder.and(issue.endDate.between(startDate, endDate));
         }
+        if (manager != null) {
+            builder.and(issue.member.memberId.eq(manager));
+        }
+        if (!startVersion.isEmpty() && !endVersion.isEmpty()) {
+            builder.and(issue.release.version.between(startVersion, endVersion));
+        }
+        if (tag != null) {
+            builder.and(issue.tag.eq(Tag.valueOf(tag)));
+        }
+        if (title != null) {
+            builder.and(issue.title.containsIgnoreCase(title));
+        }
+
         return null;
     }
-
-    private Map<String, String> parseFilterGroup(String filterGroup) {
-        Map<String, String> filterMap = new HashMap<>();
-        String[] filters = filterGroup.split(",");
-        for (String filter : filters) {
-            String[] keyValue = filter.split(":");
-            if (keyValue.length == 2) {
-                filterMap.put(keyValue[0], keyValue[1]);
-            } else if (keyValue.length == 3 && "date".equals(keyValue[0])) {
-                filterMap.put("startDate", keyValue[1]);
-                filterMap.put("endDate", keyValue[2]);
-            }
-        }
-        return filterMap;
-    }
-
-
 
     // =================================================================================================================
 
@@ -428,8 +414,8 @@ public class ProjectServiceImpl implements ProjectService {
      * @param project 프로젝트 엔티티
      * @return GetProjectDateDTO 변환된 프로젝트 DTO
      */
-    private GetProjectDateDTO mapToGetProject(Project project) {
-        return modelMapper.map(project, GetProjectDateDTO.class);
+    private GetProjectDataDTO mapToGetProject(Project project) {
+        return modelMapper.map(project, GetProjectDataDTO.class);
     }
 
 }

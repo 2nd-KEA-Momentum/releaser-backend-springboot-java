@@ -2,9 +2,11 @@ package com.momentum.releaser.domain.project.dto;
 
 import java.util.List;
 
+import com.momentum.releaser.domain.project.dto.ProjectDataDto.GetIssueInfoDataDTO;
+import com.momentum.releaser.domain.project.dto.ProjectDataDto.GetReleaseInfoDataDTO;
 import lombok.*;
 
-import com.momentum.releaser.domain.project.dto.ProjectDataDto.GetProjectDateDTO;
+import com.momentum.releaser.domain.project.dto.ProjectDataDto.GetProjectDataDTO;
 
 public class ProjectResponseDto {
 
@@ -28,11 +30,11 @@ public class ProjectResponseDto {
     @Data
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     public static class GetProjectResponseDTO {
-        private List<GetProjectDateDTO> getCreateProjectList;
-        private List<GetProjectDateDTO> getEnterProjectList;
+        private List<GetProjectDataDTO> getCreateProjectList;
+        private List<GetProjectDataDTO> getEnterProjectList;
 
         @Builder
-        public GetProjectResponseDTO(List<GetProjectDateDTO> getCreateProjectList, List<GetProjectDateDTO> getEnterProjectList) {
+        public GetProjectResponseDTO(List<GetProjectDataDTO> getCreateProjectList, List<GetProjectDataDTO> getEnterProjectList) {
             this.getCreateProjectList = getCreateProjectList;
             this.getEnterProjectList = getEnterProjectList;
         }
@@ -44,10 +46,14 @@ public class ProjectResponseDto {
     @Data
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     public static class ProjectSearchResponseDTO {
-        privste List<>
+        private List<GetReleaseInfoDataDTO> getReleaseInfoList;
+        private List<GetIssueInfoDataDTO> getIssueInfoList;
+
+        @Builder
+        public ProjectSearchResponseDTO(List<GetReleaseInfoDataDTO> getReleaseInfoList, List<GetIssueInfoDataDTO> getIssueInfoList) {
+            this.getReleaseInfoList = getReleaseInfoList;
+            this.getIssueInfoList = getIssueInfoList;
+        }
     }
-
-
-
 
 }

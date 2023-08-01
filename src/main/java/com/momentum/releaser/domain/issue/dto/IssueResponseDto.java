@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 
 import com.querydsl.core.annotations.QueryProjection;
 
-import com.momentum.releaser.domain.project.dto.ProjectDataDto.GetMembers;
+import com.momentum.releaser.domain.project.dto.ProjectDataDto.GetMembersDataDTO;
 
 public class IssueResponseDto {
 
@@ -163,11 +163,11 @@ public class IssueResponseDto {
         private char edit;
         private Long manager; //담당자
         private char deployYN;
-        private List<GetMembers> memberList;
+        private List<GetMembersDataDTO> memberList;
         private List<OpinionInfoResponseDTO> opinionList;
 
         @Builder
-        public IssueDetailsDTO(Long issueNum, String title, String content, String tag, Date endDate, char edit, Long manager, List<GetMembers> memberList, List<OpinionInfoResponseDTO> opinionList) {
+        public IssueDetailsDTO(Long issueNum, String title, String content, String tag, Date endDate, char edit, Long manager, List<GetMembersDataDTO> memberList, List<OpinionInfoResponseDTO> opinionList) {
             this.issueNum = issueNum;
             this.title = title;
             this.content = content;
