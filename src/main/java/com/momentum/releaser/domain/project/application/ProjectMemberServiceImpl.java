@@ -46,7 +46,6 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
      *
      * @author chaeanna
      * @date 2023-07-05
-     * @param projectId 프로젝트 식별 번호
      * @param email 사용자의 이메일
      */
     @Override
@@ -73,7 +72,6 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
      *
      * @author chaenna
      * @date 2023-07-20
-     * @param link 프로젝트 가입 링크
      * @param email 사용자의 이메일
      */
     @Override
@@ -106,7 +104,6 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
      *
      * @author chaeanna
      * @date 2023-07-05
-     * @param memberId 프로젝트 멤버 식별 번호
      * @param email 사용자의 이메일
      */
     @Override
@@ -130,7 +127,6 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
      *
      * @author chaeanna
      * @date 2023-07-08
-     * @param projectId 프로젝트 식별 번호
      * @param email 사용자의 이메일
      */
     @Override

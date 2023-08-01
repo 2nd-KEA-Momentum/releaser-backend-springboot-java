@@ -1,8 +1,8 @@
 package com.momentum.releaser.domain.release.domain;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-
 import java.util.stream.Stream;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
 
 public class ReleaseEnum {
 

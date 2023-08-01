@@ -56,7 +56,6 @@ public class ProjectServiceImpl implements ProjectService {
      * @author chaeanna, seonwoo
      * @date 2023-07-04
      * @param email 사용자 이메일
-     * @param projectInfoReq 프로젝트 생성 요청 객체
      */
     @Override
     @Transactional
@@ -78,9 +77,7 @@ public class ProjectServiceImpl implements ProjectService {
      *
      * @author chaeanna, seonwoo
      * @date 2023-07-04
-     * @param projectId 프로젝트 식별 번호
      * @param email 사용자 이메일
-     * @param projectInfoReq 프로젝트 수정 요청 객체
      */
     @Override
     @Transactional
@@ -104,7 +101,6 @@ public class ProjectServiceImpl implements ProjectService {
      *
      * @author chaeanna
      * @date 2023-07-05
-     * @param projectId 프로젝트 식별 번호
      */
     @Override
     @Transactional

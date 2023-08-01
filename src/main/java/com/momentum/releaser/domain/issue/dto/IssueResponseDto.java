@@ -33,6 +33,22 @@ public class IssueResponseDto {
     }
 
     /**
+     * 이슈 수정한 멤버 보내주기
+     */
+    @Data
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    public static class IssueModifyResponseDTO {
+        private Long memberId;
+        private char position;
+
+        @Builder
+        public IssueModifyResponseDTO(Long memberId, char position) {
+            this.memberId = memberId;
+            this.position = position;
+        }
+    }
+
+    /**
      * 이슈 정보
      */
     @Data

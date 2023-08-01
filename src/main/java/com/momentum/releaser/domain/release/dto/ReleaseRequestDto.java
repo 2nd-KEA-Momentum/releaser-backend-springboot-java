@@ -1,11 +1,13 @@
 package com.momentum.releaser.domain.release.dto;
 
-import com.momentum.releaser.domain.release.dto.ReleaseDataDto.CoordinateDataDto;
-import lombok.*;
+import java.util.List;
 
 import javax.validation.Valid;
 import javax.validation.constraints.*;
-import java.util.List;
+
+import lombok.*;
+
+import com.momentum.releaser.domain.release.dto.ReleaseDataDto.CoordinateDataDTO;
 
 public class ReleaseRequestDto {
 
@@ -14,7 +16,7 @@ public class ReleaseRequestDto {
      */
     @Getter
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    public static class ReleaseCreateRequestDto {
+    public static class ReleaseCreateRequestDTO {
         @Size(min = 1, max = 45, message = "릴리즈 제목은 1자 이상 45자 이하여야 합니다.")
         private String title;
 
@@ -37,7 +39,7 @@ public class ReleaseRequestDto {
         List<Long> issues;
 
         @Builder
-        public ReleaseCreateRequestDto(String title, String versionType, String content, String summary, Double coordX, Double coordY, List<Long> issues) {
+        public ReleaseCreateRequestDTO(String title, String versionType, String content, String summary, Double coordX, Double coordY, List<Long> issues) {
             this.title = title;
             this.versionType = versionType;
             this.content = content;
@@ -53,7 +55,7 @@ public class ReleaseRequestDto {
      */
     @Getter
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    public static class ReleaseUpdateRequestDto {
+    public static class ReleaseUpdateRequestDTO {
         @Size(min = 1, max = 45, message = "릴리즈 제목은 1자 이상 45자 이하여야 합니다.")
         private String title;
 
@@ -74,7 +76,7 @@ public class ReleaseRequestDto {
         List<Long> issues;
 
         @Builder
-        public ReleaseUpdateRequestDto(String title, String version, String content, String summary, String deployStatus, List<Long> issues) {
+        public ReleaseUpdateRequestDTO(String title, String version, String content, String summary, String deployStatus, List<Long> issues) {
             this.title = title;
             this.version = version;
             this.content = content;
@@ -89,12 +91,12 @@ public class ReleaseRequestDto {
      */
     @Getter
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    public static class ReleaseApprovalRequestDto {
+    public static class ReleaseApprovalRequestDTO {
         @Pattern(regexp = "(?i)^[PYN]$", message = "P, Y, N 값 중 하나를 입력해 주세요.")
         private String approval;
 
         @Builder
-        public ReleaseApprovalRequestDto(String approval) {
+        public ReleaseApprovalRequestDTO(String approval) {
             this.approval = approval;
         }
     }
@@ -104,13 +106,13 @@ public class ReleaseRequestDto {
      */
     @Getter
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    public static class ReleaseNoteCoordinateRequestDto {
+    public static class ReleaseNoteCoordinateRequestDTO {
 
         @Valid
-        List<CoordinateDataDto> coordinates;
+        List<CoordinateDataDTO> coordinates;
 
         @Builder
-        public ReleaseNoteCoordinateRequestDto(List<CoordinateDataDto> coordinates) {
+        public ReleaseNoteCoordinateRequestDTO(List<CoordinateDataDTO> coordinates) {
             this.coordinates = coordinates;
         }
     }
@@ -120,13 +122,13 @@ public class ReleaseRequestDto {
      */
     @Getter
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    public static class ReleaseOpinionCreateRequestDto {
+    public static class ReleaseOpinionCreateRequestDTO {
 
         @NotBlank(message = "릴리즈 노트에 대한 의견을 작성해 주세요.")
         private String opinion;
 
         @Builder
-        public ReleaseOpinionCreateRequestDto(String opinion) {
+        public ReleaseOpinionCreateRequestDTO(String opinion) {
             this.opinion = opinion;
         }
     }
@@ -136,7 +138,7 @@ public class ReleaseRequestDto {
      */
     @Data
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    public static class UpdateReleaseDocsReq {
+    public static class UpdateReleaseDocsRequestDTO {
         @NotNull(message = "이슈 식별 번호를 입력해주세요.")
         @Min(value = 1, message = "이슈 식별 번호는 1 이상의 숫자여야 합니다.")
         private Long issueId;
@@ -144,7 +146,7 @@ public class ReleaseRequestDto {
         private String summary;
 
         @Builder
-        public UpdateReleaseDocsReq(Long issueId, String summary) {
+        public UpdateReleaseDocsRequestDTO(Long issueId, String summary) {
             this.issueId = issueId;
             this.summary = summary;
         }

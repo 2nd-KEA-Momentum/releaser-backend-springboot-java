@@ -49,8 +49,6 @@ public class AuthServiceImpl implements AuthService{
      *
      * @author chaeanna
      * @date 2023-07-18
-     * @param userInfoReq 회원가입 요청 객체
-     * @return UserInfoResponseDTO 회원가입 성공 시 사용자 정보를 담은 DTO
      */
     @Override
     @Transactional
@@ -69,8 +67,6 @@ public class AuthServiceImpl implements AuthService{
      *
      * @author chaeanna
      * @date 2023-07-18
-     * @param userLoginReq 이메일 로그인 요청 객체
-     * @return TokenDto 로그인 성공 시 발급된 토큰 정보를 담은 DTO
      */
     @Override
     @Transactional
@@ -92,8 +88,7 @@ public class AuthServiceImpl implements AuthService{
      * @date 2023-07-19
      * @param accessToken  기존의 Access Token
      * @param refreshToken 새로 발급받은 Refresh Token
-     * @return TokenDto 재발급된 Access Token과 기존의 Refresh Token을 담은 DTO
-     * @throws CustomException Refresh Token이 유효하지 않거나 해당 사용자의 Refresh Token이 존재하지 않을 경우 발생하는 예외
+     * @throws CustomException Refresh Token이 유효하지 않거나 해당 사용자의 Refresh Token이 존재하지 않을 경우 발생하는 예외 발생
      */
     @Override
     @Transactional
