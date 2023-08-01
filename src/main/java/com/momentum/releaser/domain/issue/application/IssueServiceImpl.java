@@ -86,7 +86,7 @@ public class IssueServiceImpl implements IssueService {
      */
     @Override
     @Transactional
-    public String modifyIssue(Long issueId, String email, IssueInfoRequestDTO updateReq) {
+    public IssueModifyResponseDTO modifyIssue(Long issueId, String email, IssueInfoRequestDTO updateReq) {
         // 이슈 정보 조회
         Issue issue = getIssueById(issueId);
 
@@ -107,7 +107,7 @@ public class IssueServiceImpl implements IssueService {
         issue.updateIssue(updateReq, edit, manager);
         issueRepository.save(issue);
 
-        return "이슈 수정이 완료되었습니다.";
+        return IssueMapper.INSTANCE.toIssueModifyResponseDTO(projectMember);
     }
 
     /**
