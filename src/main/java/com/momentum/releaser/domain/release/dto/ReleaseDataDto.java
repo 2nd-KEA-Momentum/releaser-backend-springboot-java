@@ -1,13 +1,16 @@
 package com.momentum.releaser.domain.release.dto;
 
-import com.momentum.releaser.domain.release.domain.ReleaseEnum.ReleaseDeployStatus;
-import com.querydsl.core.annotations.QueryProjection;
-import lombok.*;
+import java.util.Date;
+import java.util.List;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
-import java.util.Date;
-import java.util.List;
+
+import lombok.*;
+
+import com.querydsl.core.annotations.QueryProjection;
+
+import com.momentum.releaser.domain.release.domain.ReleaseEnum.ReleaseDeployStatus;
 
 public class ReleaseDataDto {
 
@@ -16,7 +19,7 @@ public class ReleaseDataDto {
      */
     @Getter
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    public static class ReleasesDataDto {
+    public static class ReleasesDataDTO {
         private Long releaseId;
         private String version;
         private String summary;
@@ -26,7 +29,7 @@ public class ReleaseDataDto {
         private Double coordY;
 
         @Builder
-        public ReleasesDataDto(Long releaseId, String version, String summary, Date deployDate, ReleaseDeployStatus deployStatus, Double coordX, Double coordY) {
+        public ReleasesDataDTO(Long releaseId, String version, String summary, Date deployDate, ReleaseDeployStatus deployStatus, Double coordX, Double coordY) {
             this.releaseId = releaseId;
             this.version = version;
             this.summary = summary;
@@ -43,20 +46,29 @@ public class ReleaseDataDto {
      */
     @Getter
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    public static class ReleaseOpinionsDataDto {
+    public static class ReleaseOpinionsDataDTO {
         private Long releaseOpinionId;
         private String opinion;
         private Long memberId;
         private String memberName;
         private String memberProfileImg;
+        private char deleteYN;
 
+        @QueryProjection
         @Builder
-        public ReleaseOpinionsDataDto(Long releaseOpinionId, String opinion, Long memberId, String memberName, String memberProfileImg) {
+        public ReleaseOpinionsDataDTO(Long releaseOpinionId, String opinion, Long memberId, String memberName, String memberProfileImg) {
             this.releaseOpinionId = releaseOpinionId;
             this.opinion = opinion;
             this.memberId = memberId;
             this.memberName = memberName;
             this.memberProfileImg = memberProfileImg;
+        }
+
+        /**
+         * 해당 사용자가 릴리즈 노트 의견을 삭제할 수 있는지 아닌지를 알려주는 값을 업데이트한다.
+         */
+        public void updateDeleteYN(char deleteYN) {
+            this.deleteYN = deleteYN;
         }
     }
 
@@ -65,17 +77,19 @@ public class ReleaseDataDto {
      */
     @Getter
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    public static class ReleaseApprovalsDataDto {
+    public static class ReleaseApprovalsDataDTO {
         private Long memberId;
         private String memberName;
         private String memberProfileImg;
+        private char position;
         private char approval;
 
         @Builder
-        public ReleaseApprovalsDataDto(Long memberId, String memberName, String memberProfileImg, char approval) {
+        public ReleaseApprovalsDataDTO(Long memberId, String memberName, String memberProfileImg, char position, char approval) {
             this.memberId = memberId;
             this.memberName = memberName;
             this.memberProfileImg = memberProfileImg;
+            this.position = position;
             this.approval = approval;
         }
     }
@@ -85,7 +99,7 @@ public class ReleaseDataDto {
      */
     @Getter
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    public static class CoordinateDataDto {
+    public static class CoordinateDataDTO {
         @NotNull(message = "릴리즈 식별 번호는 1 이상의 숫자여야 합니다.")
         @Min(value = 1, message = "릴리즈 식별 번호는 1 이상의 숫자여야 합니다.")
         private Long releaseId;
@@ -97,7 +111,7 @@ public class ReleaseDataDto {
         private Double coordY;
 
         @Builder
-        public CoordinateDataDto(Long releaseId, Double coordX, Double coordY) {
+        public CoordinateDataDTO(Long releaseId, Double coordX, Double coordY) {
             this.releaseId = releaseId;
             this.coordX = coordX;
             this.coordY = coordY;
@@ -109,12 +123,12 @@ public class ReleaseDataDto {
      */
     @Data
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    public static class GetTags {
+    public static class GetTagsDataDTO {
         private String tag;
-        private List<GetIssueTitle> titleList;
+        private List<GetIssueTitleDataDTO> titleList;
 
         @Builder
-        public GetTags(String tag, List<GetIssueTitle> titleList) {
+        public GetTagsDataDTO(String tag, List<GetIssueTitleDataDTO> titleList) {
             this.tag = tag;
             this.titleList = titleList;
         }
@@ -125,13 +139,13 @@ public class ReleaseDataDto {
      */
     @Data
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    public static class GetIssueTitle {
+    public static class GetIssueTitleDataDTO {
         private Long issueId;
         private String title;
         private String summary;
 
         @Builder
-        public GetIssueTitle(Long issueId, String title, String summary) {
+        public GetIssueTitleDataDTO(Long issueId, String title, String summary) {
             this.issueId = issueId;
             this.title = title;
             this.summary = summary;

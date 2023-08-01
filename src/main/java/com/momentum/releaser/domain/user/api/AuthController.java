@@ -1,26 +1,30 @@
 package com.momentum.releaser.domain.user.api;
 
-import com.momentum.releaser.domain.user.application.AuthService;
-import com.momentum.releaser.domain.user.application.UserServiceImpl;
-import com.momentum.releaser.domain.user.dto.AuthReqDto;
-import com.momentum.releaser.domain.user.dto.AuthReqDto.UserInfoReq;
-import com.momentum.releaser.domain.user.dto.AuthReqDto.UserLoginReq;
-import com.momentum.releaser.domain.user.dto.AuthResDto;
-import com.momentum.releaser.domain.user.dto.AuthResDto.UserInfoRes;
-import com.momentum.releaser.domain.user.dto.TokenDto;
-import com.momentum.releaser.global.config.BaseResponse;
-import com.momentum.releaser.global.jwt.UserPrincipal;
-import com.nimbusds.oauth2.sdk.http.HTTPRequest;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import javax.mail.MessagingException;
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.constraints.NotNull;
+import com.momentum.releaser.domain.user.application.EmailService;
+import com.momentum.releaser.domain.user.dto.AuthRequestDto.UserInfoReqestDTO;
+import com.momentum.releaser.domain.user.dto.AuthRequestDto.UserLoginReqestDTO;
+import com.momentum.releaser.domain.user.dto.AuthResponseDto.UserInfoResponseDTO;
+import com.momentum.releaser.domain.user.dto.UserRequestDto;
 
+import com.momentum.releaser.domain.user.application.AuthService;
+import com.momentum.releaser.domain.user.dto.TokenDto;
+import com.momentum.releaser.global.config.BaseResponse;
+
+import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
+
+/**
+ * AuthController는 사용자 인증과 관련된 API 엔드포인트를 처리하는 컨트롤러입니다.
+ * 회원가입, 로그인, Token 재발급 등의 기능을 제공합니다.
+ */
 @Slf4j
 @RestController
 @RequestMapping("/api/auth")
@@ -30,58 +34,68 @@ import javax.validation.constraints.NotNull;
 public class AuthController {
 
     private final AuthService authService;
+    private final EmailService emailService;
 
     /**
-     * 2.1 이메일 회원가입
+     * 2.1 회원가입
+     *
+     * @param userInfoReq 회원가입 요청 객체
+     * @return UserInfoResponseDTO 회원가입 성공 시 사용자 정보를 담은 DTO
      */
     @PostMapping("/signup")
-    public BaseResponse<UserInfoRes> signUpUser(
-            @RequestBody @NotNull(message = "정보를 입력해주세요.") UserInfoReq userInfoReq) {
-        return new BaseResponse<>(authService.signUpUser(userInfoReq));
-
+    public BaseResponse<UserInfoResponseDTO> signUpUserAdd(
+            @RequestBody @NotNull(message = "정보를 입력해주세요.") UserInfoReqestDTO userInfoReq) {
+        return new BaseResponse<>(authService.addSignUpUser(userInfoReq));
     }
 
     /**
      * 2.2 이메일 로그인
+     *
+     * @param userLoginReq 로그인 요청 객체
+     * @return TokenDto 로그인 성공 시 토큰 정보를 담은 DTO
      */
     @PostMapping("/login")
-    public BaseResponse<TokenDto> loginUser(
-            @RequestBody @NotNull(message = "정보를 입력해주세요.") UserLoginReq userLoginReq) {
-        return new BaseResponse<>(authService.loginUser(userLoginReq));
-
+    public BaseResponse<TokenDto> loginUserSave(
+            @RequestBody @NotNull(message = "정보를 입력해주세요.") UserLoginReqestDTO userLoginReq) {
+        return new BaseResponse<>(authService.saveLoginUser(userLoginReq));
     }
 
     /**
      * 2.3 Token 재발급
+     *
+     * @param request HTTP 요청 객체
+     * @return TokenDto Token 재발급 성공 시 새로운 Access Token 정보를 담은 DTO
      */
     @PostMapping("/refresh")
-    public BaseResponse<TokenDto> refreshUser(HttpServletRequest request) {
-
+    public BaseResponse<TokenDto> refreshUserSave(HttpServletRequest request) {
         String accessToken = extractTokenFromAuthorizationHeader(request.getHeader("Access_Token"));
-
         String refreshToken = extractTokenFromAuthorizationHeader(request.getHeader("Refresh_Token"));
-
-        return new BaseResponse<>(authService.refreshUser(accessToken, refreshToken));
+        return new BaseResponse<>(authService.saveRefreshUser(accessToken, refreshToken));
     }
 
+    /**
+     * 2.3 Token 재발급
+     *
+     * Authorization 헤더에서 토큰을 추출
+     *
+     * @param authorizationHeader Authorization 헤더 값
+     * @return 추출된 토큰
+     */
     private String extractTokenFromAuthorizationHeader(String authorizationHeader) {
         return authorizationHeader.replace("Bearer ", "");
     }
 
-
-
     /**
-     * 2.4 카카오 로그인
+     * 2.6 이메일 인증
+     *
+     * @param confirmEmailRequestDTO 인증이 필요한 이메일이 담긴 클래스
+     * @return 이메일 인증 코드 메일 전송 성공 메시지
+     * @throws MessagingException 이메일 전송 및 작성에 문제가 생긴 경우
      */
+    @PostMapping("/emails")
+    public BaseResponse<String> userEmailConfirm(
+            @Valid @RequestBody UserRequestDto.ConfirmEmailRequestDTO confirmEmailRequestDTO) throws MessagingException {
 
-    /**
-     * 2.5 구글 로그인
-     */
-
-    /**
-     * 2.6 로그아웃
-     */
-
-
-
+        return new BaseResponse<>(emailService.confirmEmail(confirmEmailRequestDTO));
+    }
 }

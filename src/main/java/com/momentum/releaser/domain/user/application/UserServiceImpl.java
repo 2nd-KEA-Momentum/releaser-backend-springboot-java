@@ -1,25 +1,30 @@
 package com.momentum.releaser.domain.user.application;
 
-import com.momentum.releaser.domain.user.dao.UserRepository;
-import com.momentum.releaser.domain.user.domain.User;
-import com.momentum.releaser.domain.user.dto.UserRequestDto.UserUpdateImgRequestDto;
-import com.momentum.releaser.domain.user.dto.UserResponseDto.UserProfileImgResponseDto;
-import com.momentum.releaser.domain.user.mapper.UserMapper;
-import com.momentum.releaser.global.config.aws.S3Upload;
-import com.momentum.releaser.global.exception.CustomException;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import static com.momentum.releaser.global.common.Base64.getImageUrlFromBase64;
+import static com.momentum.releaser.global.common.CommonEnum.DEFAULT_USER_PROFILE_IMG;
+import static com.momentum.releaser.global.config.BaseResponseStatus.*;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Objects;
 
-import static com.momentum.releaser.global.common.Base64.getImageUrlFromBase64;
-import static com.momentum.releaser.global.common.CommonEnum.DEFAULT_USER_PROFILE_IMG;
-import static com.momentum.releaser.global.config.BaseResponseStatus.*;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+import com.momentum.releaser.domain.user.dao.UserRepository;
+import com.momentum.releaser.domain.user.domain.User;
+import com.momentum.releaser.domain.user.dto.UserRequestDto.UserUpdateImgRequestDTO;
+import com.momentum.releaser.domain.user.dto.UserResponseDto.UserProfileImgResponseDTO;
+import com.momentum.releaser.domain.user.mapper.UserMapper;
+import com.momentum.releaser.global.config.aws.S3Upload;
+import com.momentum.releaser.global.exception.CustomException;
+
+/**
+ * 사용자 관리와 관련된 기능을 제공하는 서비스 구현 클래스입니다.
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -30,50 +35,97 @@ public class UserServiceImpl implements UserService {
 
     /**
      * 1.1 사용자 프로필 이미지 조회
+     *
+     * @author seonwoo
+     * @date 2023-07-12
+     * @param userEmail 조회할 사용자의 이메일 주소
      */
     @Override
-    public UserProfileImgResponseDto getUserProfileImg(Long userId) {
-        User user = getUserById(userId);
+    public UserProfileImgResponseDTO findUserProfileImg(String userEmail) {
+        // 이메일로 사용자 정보를 조회, 사용자 프로필 이미지 정보로 변환하여 반환
+        User user = getUserByEmail(userEmail);
         return UserMapper.INSTANCE.toUserProfileImgResponseDto(user);
     }
 
     /**
      * 1.2 사용자 프로필 이미지 변경
+     *
+     * @author seonwoo
+     * @date 2023-07-31 (월)
+     * @param userEmail 사용자 이메일
+     * @throws IOException 파일 입출력 관련 예외
      */
     @Transactional
     @Override
-    public String updateUserProfileImg(Long userId, UserUpdateImgRequestDto userUpdateImgRequestDto) throws IOException {
-        User user = getUserById(userId);
+    public UserProfileImgResponseDTO modifyUserProfileImg(String userEmail, UserUpdateImgRequestDTO userUpdateImgRequestDto) throws IOException {
+        // 사용자 식별 번호로 사용자 정보 조회
+        User user = getUserByEmail(userEmail);
+        // 기존 프로필 이미지가 있을 경우 삭제
         deleteIfExistProfileImg(user);
         user.updateImg(uploadUserProfileImg(userUpdateImgRequestDto));
-        return "사용자 프로필 이미지 변경에 성공하였습니다.";
+        return UserMapper.INSTANCE.toUserProfileImgResponseDto(user);
     }
 
     /**
      * 1.3 사용자 프로필 이미지 삭제
+     *
+     * @author seonwoo
+     * @date 2023-07-12
+     * @param userEmail 사용자 이메일
      */
     @Override
-    public String deleteUserProfileImg(Long userId) {
-        User user = getUserById(userId);
+    public UserProfileImgResponseDTO removeUserProfileImg(String userEmail) {
+        // 사용자 식별 번호로 사용자 정보 조회
+        User user = getUserByEmail(userEmail);
+        // 프로필 이미지가 있을 경우 삭제
         deleteIfExistProfileImg(user);
+        // 프로필 이미지를 삭제한 후 기본 이미지로 저장
         saveAfterDeleteProfileImg(user);
-        return "사용자 프로필 이미지 삭제에 성공하였습니다.";
+        return UserMapper.INSTANCE.toUserProfileImgResponseDto(user);
     }
 
     // =================================================================================================================
 
     /**
      * 사용자 식별 번호를 이용해 사용자 엔티티를 가져온다.
+     *
+     * @author seonwoo
+     * @date 2023-07-11
+     * @param userId 사용자 식별 번호
+     * @return User 사용자 엔티티
+     * @throws CustomException 사용자 정보가 존재하지 않을 경우 예외 발생
      */
     private User getUserById(Long userId) {
-        return userRepository.findById(userId).orElseThrow(() -> new CustomException(NOT_EXISTS_USER));
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(NOT_EXISTS_USER));
+    }
+
+    /**
+     * 사용자 이메일을 이용해 사용자 엔티티를 가져온다.
+     *
+     * @author seonwoo
+     * @date 2023-07-12
+     * @param email 사용자 이메일 주소
+     * @return User 사용자 엔티티
+     * @throws CustomException 사용자 정보가 존재하지 않을 경우 예외 발생
+     */
+    private User getUserByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new CustomException(NOT_EXISTS_USER));
     }
 
     /**
      * 사용자로부터 받은 프로필 이미지를 S3에 업로드한다.
+     *
+     * @author seonwoo
+     * @date 2023-07-11
+     * @param userUpdateImgRequestDto 사용자로부터 받은 프로필 이미지 정보
+     * @return String 업로드된 이미지의 S3 URL
+     * @throws IOException 이미지 파일 처리 중 예외 발생
+     * @throws CustomException 프로필 이미지 업로드에 실패한 경우 예외 발생
      */
-    private String uploadUserProfileImg(UserUpdateImgRequestDto userUpdateImgRequestDto) throws IOException {
-        String img = userUpdateImgRequestDto.getImg();
+    private String uploadUserProfileImg(UserUpdateImgRequestDTO userUpdateImgRequestDto) throws IOException {
+        String img = userUpdateImgRequestDto.getImage();
 
         if (img.isEmpty()) {
             // 만약 사용자로부터 받은 이미지 데이터가 없는 경우 기본 프로필로 대체한다.
@@ -94,6 +146,10 @@ public class UserServiceImpl implements UserService {
 
     /**
      * 사용자의 이미지 값이 null이 아닌 경우 한 번 지운다.
+     *
+     * @author seonwoo
+     * @date 2023-07-11
+     * @param user 사용자 엔티티
      */
     private void deleteIfExistProfileImg(User user) {
         // 사용자의 프로필 이미지가 기본 이미지도, null도 아닌 경우 기존에 저장된 파일을 S3에서 삭제한다.
@@ -103,10 +159,15 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-     * 사용자의 프로필 이미지 파일을 S3에서 삭제한 후 데이터베이스에서 값을 지운다.
+     * 사용자의 프로필 이미지 파일을 S3에서 삭제한 후 데이터베이스에서 값을 지우는 메서드입니다.
+     *
+     * @author seonwoo
+     * @date 2023-07-12
+     * @param user 프로필 이미지를 삭제할 사용자 엔티티
      */
     private void saveAfterDeleteProfileImg(User user) {
         user.updateImg(DEFAULT_USER_PROFILE_IMG.url());
         userRepository.save(user);
     }
+
 }

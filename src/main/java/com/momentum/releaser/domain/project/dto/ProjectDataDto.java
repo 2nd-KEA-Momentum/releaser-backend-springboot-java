@@ -5,65 +5,52 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import com.querydsl.core.annotations.QueryProjection;
 
 public class ProjectDataDto {
 
     /**
-     * 10.1 프로젝트 내 통합검색 - 릴리즈 정보
+     * 프로젝트 멤버 조회
      */
     @Data
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    public static class GetReleaseInfo {
+    public static class GetMembers {
+        private Long memberId;
+        private Long userId;
+        private String name;
+        private String img;
+        private char position;
 
-        private Long releaseId;
-        private String version;
-        private String title;
-        private Date deployDate;
-        private Long pmId;
-        private String pmName;
-        private String pmImg;
-
+        @QueryProjection
         @Builder
-        public GetReleaseInfo(Long releaseId, String version, String title, Date deployDate, Long pmId, String pmName, String pmImg) {
-            this.releaseId = releaseId;
-            this.version = version;
-            this.title = title;
-            this.deployDate = deployDate;
-            this.pmId = pmId;
-            this.pmName = pmName;
-            this.pmImg = pmImg;
+        public GetMembers(Long memberId, Long userId, String name, String img, char position) {
+            this.memberId = memberId;
+            this.userId = userId;
+            this.name = name;
+            this.img = img;
+            this.position = position;
         }
     }
 
     /**
-     * 10.1 프로젝트 내 통합검색 - 이슈 정보
+     * 개별 프로젝트 조회
      */
     @Data
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    public static class GetIssueInfo {
-
-        private Long issueId;
+    public static class GetProjectDateDTO {
+        private Long projectId;
         private String title;
-        private String tag;
-        private String releaserVersion;
-        private Date endDate;
-        private Long manager;
-        private String managerName;
-        private String managerImg;
+        private String content;
+        private String team;
+        private String img;
 
         @Builder
-        public GetIssueInfo(Long issueId, String title, String tag, String releaserVersion, Date endDate, Long manager, String managerName, String managerImg) {
-            this.issueId = issueId;
+        public GetProjectDateDTO(Long projectId, String title, String content, String team, String img) {
+            this.projectId = projectId;
             this.title = title;
-            this.tag = tag;
-            this.releaserVersion = releaserVersion;
-            this.endDate = endDate;
-            this.manager = manager;
-            this.managerName = managerName;
-            this.managerImg = managerImg;
+            this.content = content;
+            this.team = team;
+            this.img = img;
         }
     }
-
-
 }

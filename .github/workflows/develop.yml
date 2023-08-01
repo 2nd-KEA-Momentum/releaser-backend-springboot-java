@@ -50,6 +50,12 @@ jobs:
           cloud.aws.credentials.access-key: ${{ secrets.AWS_ACCESS_KEY }}
           cloud.aws.credentials.secret-key: ${{ secrets.AWS_SECRET_KEY }}
           jwt.secret.key: ${{secrets.JWT_SECRET_KEY}}
+          spring.mail.username: ${{secrets.MAIL_USERNAME}}
+          spring.mail.password: ${{secrets.MAIL_PASSWORD}}
+          spring.redis.host: ${{secrets.REDIS_HOST}}
+          spring.redis.port: ${{secrets.REDIS_PORT}}
+          url.image.banner-project: ${{secrets.URL_BANNER_PROJECT}}
+          url.image.logo-team: ${{secrets.URL_LOGO_TEAM}}
           
           
           

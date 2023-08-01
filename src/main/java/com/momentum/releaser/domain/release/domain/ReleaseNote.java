@@ -1,22 +1,25 @@
 package com.momentum.releaser.domain.release.domain;
 
-import com.momentum.releaser.domain.issue.domain.Issue;
-import com.momentum.releaser.domain.issue.domain.IssueNum;
-import com.momentum.releaser.domain.project.domain.Project;
-import com.momentum.releaser.domain.release.domain.ReleaseEnum.ReleaseDeployStatus;
-import com.momentum.releaser.global.common.BaseTime;
-import com.sun.istack.NotNull;
-import lombok.*;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
+
+import lombok.*;
+
+import com.sun.istack.NotNull;
+
+import com.momentum.releaser.domain.issue.domain.Issue;
+import com.momentum.releaser.domain.project.domain.Project;
+import com.momentum.releaser.domain.release.domain.ReleaseEnum.ReleaseDeployStatus;
+import com.momentum.releaser.global.common.BaseTime;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -105,11 +108,15 @@ public class ReleaseNote extends BaseTime {
         for (ReleaseOpinion opinion : releaseOpinions) {
             opinion.statusToInactive();
         }
+    }
 
-        // 릴리즈 노트와 연결된 이슈 삭제
-        for (Issue issue : issues) {
-            issue.statusToInactive();
-        }
+    /**
+     * insert 되기전 (persist 되기전) 실행된다.
+     */
+    @PrePersist
+    public void prePersist() {
+        this.deployStatus = (this.deployStatus == null) ? ReleaseDeployStatus.PLANNING : this.deployStatus;
+        this.status = (this.status == '\0') ? 'Y' : this.status;
     }
 
     /**
@@ -133,15 +140,6 @@ public class ReleaseNote extends BaseTime {
      */
     public void statusToInactive() {
         this.status = 'N';
-    }
-
-    /**
-     * insert 되기전 (persist 되기전) 실행된다.
-     */
-    @PrePersist
-    public void prePersist() {
-        this.deployStatus = (this.deployStatus == null) ? ReleaseDeployStatus.PLANNING : this.deployStatus;
-        this.status = (this.status == '\0') ? 'Y' : this.status;
     }
 
     /**
@@ -176,5 +174,12 @@ public class ReleaseNote extends BaseTime {
     public void updateCoordinates(Double coordX, Double coordY) {
         this.coordX = coordX;
         this.coordY = coordY;
+    }
+
+    /**
+     * 릴리즈 노트 배포 상태를 업데이트한다.
+     */
+    public void updateDeployStatus(ReleaseDeployStatus deployStatus) {
+        this.deployStatus = deployStatus;
     }
 }

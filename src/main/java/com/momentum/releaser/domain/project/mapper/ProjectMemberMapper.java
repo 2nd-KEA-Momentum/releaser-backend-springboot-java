@@ -1,27 +1,32 @@
 package com.momentum.releaser.domain.project.mapper;
 
-import com.momentum.releaser.domain.project.domain.ProjectMember;
-import com.momentum.releaser.domain.project.dto.ProjectMemberDatoDto.ProjectMembersDataDto;
-import com.momentum.releaser.domain.project.dto.ProjectResDto;
-import com.momentum.releaser.domain.project.dto.ProjectResDto.GetMembersRes;
+import org.mapstruct.factory.Mappers;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
+
+import com.momentum.releaser.domain.project.domain.ProjectMember;
+import com.momentum.releaser.domain.project.dto.ProjectMemberDataDto.ProjectMemberInfoDTO;
+import com.momentum.releaser.domain.project.dto.ProjectMemberDataDto.ProjectMembersDataDTO;
 
 @Mapper
 public interface ProjectMemberMapper {
+
     ProjectMemberMapper INSTANCE = Mappers.getMapper(ProjectMemberMapper.class);
 
-
+    /**
+     * Entity(ProjectMember) -> DTO(ProjectMembersDataDTO)
+     */
     @Mapping(target = "name", source = "projectMember.user.name")
     @Mapping(target = "profileImg", source = "projectMember.user.img")
-    ProjectMembersDataDto toProjectMembersDataDto(ProjectMember projectMember);
+    ProjectMembersDataDTO toProjectMembersDataDto(ProjectMember projectMember);
 
-
-    @Mapping(target = "link", source = "projectMember.project.link")
+    /**
+     * Entity(ProjectMember) -> DTO(ProjectMemberInfoDTO)
+     */
     @Mapping(target = "position", source = "projectMember.position")
     @Mapping(target = "userId", source = "projectMember.user.userId")
     @Mapping(target = "name", source = "projectMember.user.name")
     @Mapping(target = "img", source = "projectMember.user.img")
-    GetMembersRes toGetMembersRes(ProjectMember projectMember);
+    ProjectMemberInfoDTO toGetMembersRes(ProjectMember projectMember);
+
 }

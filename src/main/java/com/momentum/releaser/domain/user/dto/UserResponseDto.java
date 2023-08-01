@@ -12,18 +12,30 @@ public class UserResponseDto {
      */
     @Getter
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    public static class UserProfileImgResponseDto {
+    public static class UserProfileImgResponseDTO {
         private Long userId;
         private String name;
-        private String img;
+        private String image;
 
         @Builder
-        public UserProfileImgResponseDto(Long userId, String name, String img) {
+        public UserProfileImgResponseDTO(Long userId, String name, String image) {
             this.userId = userId;
             this.name = name;
-            this.img = img;
+            this.image = image;
         }
     }
 
+    /**
+     * 2.6 이메일 인증 (테스트용)
+     */
+    @Getter
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    public static class ConfirmEmailResponseDTO {
+        private String code;
 
+        @Builder
+        public ConfirmEmailResponseDTO(String code) {
+            this.code = code;
+        }
+    }
 }

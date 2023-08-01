@@ -1,14 +1,14 @@
 package com.momentum.releaser.domain.issue.domain;
 
+import javax.persistence.*;
 
-import com.momentum.releaser.domain.project.domain.Project;
-import com.momentum.releaser.global.common.BaseTime;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
+import com.momentum.releaser.domain.project.domain.Project;
+import com.momentum.releaser.global.common.BaseTime;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -39,6 +39,9 @@ public class IssueNum extends BaseTime {
         this.issueNum = issueNum;
     }
 
+    /**
+     * delete 되기 전 실행된다.
+     */
     @PreRemove
     private void preRemove() {
         if (issue != null) {
@@ -47,8 +50,9 @@ public class IssueNum extends BaseTime {
         project.removeIssueNum(this);
     }
 
-
-
+    /**
+     * 삭제를 위한 연관매핑 끊기
+     */
     public void deleteToProject() {
         this.project = null;
         this.issue = null;

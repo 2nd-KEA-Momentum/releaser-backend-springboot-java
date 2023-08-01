@@ -1,36 +1,50 @@
 package com.momentum.releaser.domain.issue.dto;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.momentum.releaser.domain.issue.domain.LifeCycle;
-import com.momentum.releaser.domain.issue.domain.Tag;
-import com.momentum.releaser.domain.project.dto.ProjectResDto;
-import com.momentum.releaser.domain.project.dto.ProjectResDto.GetMembersRes;
-import com.querydsl.core.annotations.QueryProjection;
+import java.util.Date;
+import java.util.List;
+
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
-import java.util.Date;
-import java.util.List;
+import com.querydsl.core.annotations.QueryProjection;
 
-public class IssueResDto{
+import com.momentum.releaser.domain.project.dto.ProjectDataDto.GetMembers;
+
+public class IssueResponseDto {
+
     /**
-     * 이슈 상태 구분
+     * 이슈 상태 구분하여 이슈 조회
      */
     @Data
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    public static class GetIssuesList {
-        private List<IssueInfoRes> getNotStartedList;
-        private List<IssueInfoRes> getInProgressList;
-        private List<IssueInfoRes> getDoneList;
+    public static class AllIssueListResponseDTO {
+        private List<IssueInfoResponseDTO> getNotStartedList;
+        private List<IssueInfoResponseDTO> getInProgressList;
+        private List<IssueInfoResponseDTO> getDoneList;
 
         @Builder
-        public GetIssuesList(List<IssueInfoRes> getNotStartedList, List<IssueInfoRes> getInProgressList, List<IssueInfoRes> getDoneList) {
+        public AllIssueListResponseDTO(List<IssueInfoResponseDTO> getNotStartedList, List<IssueInfoResponseDTO> getInProgressList, List<IssueInfoResponseDTO> getDoneList) {
             this.getNotStartedList = getNotStartedList;
             this.getInProgressList = getInProgressList;
             this.getDoneList = getDoneList;
+        }
+    }
+
+    /**
+     * 이슈 수정한 멤버 보내주기
+     */
+    @Data
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    public static class IssueModifyResponseDTO {
+        private Long memberId;
+        private char position;
+
+        @Builder
+        public IssueModifyResponseDTO(Long memberId, char position) {
+            this.memberId = memberId;
+            this.position = position;
         }
     }
 
@@ -39,7 +53,7 @@ public class IssueResDto{
      */
     @Data
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    public static class IssueInfoRes {
+    public static class IssueInfoResponseDTO {
 
         private Long issueId;
         private Long issueNum;
@@ -57,7 +71,7 @@ public class IssueResDto{
 
         @Builder
         @QueryProjection
-        public IssueInfoRes(Long issueId, Long issueNum, String title, String content, Date endDate, Long memberId, String memberName, String memberImg, String tag, String releaseVersion, char edit, String lifeCycle) {
+        public IssueInfoResponseDTO(Long issueId, Long issueNum, String title, String content, Date endDate, Long memberId, String memberName, String memberImg, String tag, String releaseVersion, char edit, String lifeCycle) {
             this.issueId = issueId;
             this.issueNum = issueNum;
             this.title = title;
@@ -78,7 +92,7 @@ public class IssueResDto{
      */
     @Data
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    public static class GetDoneIssues {
+    public static class DoneIssuesResponseDTO {
         private Long issueId;
         private Long issueNum;
         private String title;
@@ -91,7 +105,7 @@ public class IssueResDto{
 
         @Builder
         @QueryProjection
-        public GetDoneIssues(Long issueId, Long issueNum, String title, String tag, Date endDate, char edit, Long memberId, String memberName, String memberImg) {
+        public DoneIssuesResponseDTO(Long issueId, Long issueNum, String title, String tag, Date endDate, char edit, Long memberId, String memberName, String memberImg) {
             this.issueId = issueId;
             this.issueNum = issueNum;
             this.title = title;
@@ -109,7 +123,7 @@ public class IssueResDto{
      */
     @Data
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    public static class GetConnectionIssues {
+    public static class ConnectionIssuesResponseDTO {
         private Long issueId;
         private Long issueNum;
         private String title;
@@ -122,7 +136,7 @@ public class IssueResDto{
 
         @Builder
         @QueryProjection
-        public GetConnectionIssues(Long issueId, Long issueNum, String title, String tag, char edit, Long memberId, String memberName, String memberImg, String releaseVersion) {
+        public ConnectionIssuesResponseDTO(Long issueId, Long issueNum, String title, String tag, char edit, Long memberId, String memberName, String memberImg, String releaseVersion) {
             this.issueId = issueId;
             this.issueNum = issueNum;
             this.title = title;
@@ -140,7 +154,7 @@ public class IssueResDto{
      */
     @Data
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    public static class GetIssue {
+    public static class IssueDetailsDTO {
         private Long issueNum;
         private String title;
         private String content;
@@ -149,11 +163,11 @@ public class IssueResDto{
         private char edit;
         private Long manager; //담당자
         private char deployYN;
-        private List<GetMembersRes> memberList;
-        private List<OpinionInfoRes> opinionList;
+        private List<GetMembers> memberList;
+        private List<OpinionInfoResponseDTO> opinionList;
 
         @Builder
-        public GetIssue(Long issueNum, String title, String content, String tag, Date endDate, char edit, Long manager, List<GetMembersRes> memberList, List<OpinionInfoRes> opinionList) {
+        public IssueDetailsDTO(Long issueNum, String title, String content, String tag, Date endDate, char edit, Long manager, List<GetMembers> memberList, List<OpinionInfoResponseDTO> opinionList) {
             this.issueNum = issueNum;
             this.title = title;
             this.content = content;
@@ -171,16 +185,17 @@ public class IssueResDto{
      */
     @Data
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    public static class OpinionInfoRes {
+    public static class OpinionInfoResponseDTO {
         private Long memberId;
         private String memberName;
         private String memberImg;
         private Long opinionId;
         private String opinion;
         private char deleteYN;
+
         @Builder
         @QueryProjection
-        public OpinionInfoRes(Long memberId, String memberName, String memberImg, Long opinionId, String opinion) {
+        public OpinionInfoResponseDTO(Long memberId, String memberName, String memberImg, Long opinionId, String opinion) {
             this.memberId = memberId;
             this.memberName = memberName;
             this.memberImg = memberImg;
@@ -189,7 +204,18 @@ public class IssueResDto{
         }
     }
 
+    /**
+     * 생성 및 수정한 이슈 식별 번호 정보
+     */
+    @Data
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    public static class IssueIdResponseDTO {
+        private Long issueId;
 
-
+        @Builder
+        public IssueIdResponseDTO(Long issueId) {
+            this.issueId = issueId;
+        }
+    }
 
 }

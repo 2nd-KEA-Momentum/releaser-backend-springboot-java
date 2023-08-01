@@ -2,11 +2,22 @@ server:
   port: 8080
 
 spring:
+  #  mvc:
+  #    static-path-pattern: /static/**
+
+  thymeleaf:
+    prefix: classpath:templates/
+    check-template-location: true
+    suffix: .html
+    mode: HTML5
+    cache: false
+
   datasource:
     url: ${DEV_DB_URL}
     username: ${DEV_DB_USERNAME}
     password: ${DEV_DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
+
   jpa:
     hibernate:
       ddl-auto: update
@@ -23,19 +34,32 @@ spring:
           google:
             client-id: ${SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_ID}
             client-secret: ${SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET}
-#            redirectUri: "{baseUrl}/oauth2/callback/{registrationId}"
             scope: email,profile
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+
+  redis:
+    host: ${REDIS_HOST}
+    port: ${REDIS_PORT}
+
 jwt:
   secret:
     key: ${JWT_SECRET_KEY}
 
-# OAuth2 클라이언트가 허용하는 리다이렉트 URI 목록
-#oauth2:
-#  client:
-#    authorized-redirect-uris:
-#      - http://localhost:8080/login/oauth2/code/google
-#      - https://www.releaser.shop/login/oauth2/code/google
-#      - http://localhost:3000/login/oauth2/code/google
 
 cloud:
   aws:
@@ -49,6 +73,7 @@ cloud:
       auto: false
     stack:
       auto: false
+
 #app:
 #  cors:
 #    allowedOrigins: http://localhost:3000 ,http://localhost:8080, https://www.releaser.shop
@@ -63,3 +88,9 @@ cloud:
 
 logging.level:
   org.hibernate.SQL: debug
+
+# Custom
+url:
+  image:
+    banner-project: ${URL_BANNER_PROJECT}
+    logo-team: ${URL_LOGO_TEAM}

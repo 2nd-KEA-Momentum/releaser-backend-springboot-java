@@ -1,31 +1,30 @@
 package com.momentum.releaser.domain.issue.dao;
 
-import com.momentum.releaser.domain.issue.domain.Issue;
-import com.momentum.releaser.domain.issue.domain.IssueNum;
-import com.momentum.releaser.domain.issue.dto.IssueResDto;
-import com.momentum.releaser.domain.issue.dto.IssueResDto.*;
-import com.momentum.releaser.domain.project.domain.Project;
-import com.momentum.releaser.domain.project.domain.ProjectMember;
-import com.momentum.releaser.domain.release.domain.ReleaseNote;
-
-import javax.swing.text.html.Option;
 import java.util.List;
-import java.util.Optional;
+
+import com.momentum.releaser.domain.issue.domain.Issue;
+import com.momentum.releaser.domain.issue.dto.IssueResponseDto.*;
+import com.momentum.releaser.domain.project.domain.Project;
+import com.momentum.releaser.domain.release.domain.ReleaseNote;
 
 public interface IssueRepositoryCustom {
 
-    List<IssueInfoRes> getIssues(Project project);
+    // 프로젝트에 속한 이슈의 정보를 List 형태로 반환
+    List<IssueInfoResponseDTO> getIssues(Project project);
 
+    // 프로젝트에 관련한 이슈 번호 조회
     Long getIssueNum(Project project);
 
+    // 이슈 번호 삭제
     void deleteByIssueNum();
 
-    List<GetDoneIssues> getDoneIssues(Project findProject, String status);
+    // 프로젝트와 상태에 맞는 이슈 List 형태로 반환
+    List<DoneIssuesResponseDTO> getDoneIssues(Project findProject, String status);
 
-    List<GetConnectionIssues> getConnectionIssues(Project findProject, ReleaseNote findReleaseNote);
+    // 프로젝트와 연결된 릴리즈에 맞는 이슈 List 형태로 반환
+    List<ConnectionIssuesResponseDTO> getConnectionIssues(Project findProject, ReleaseNote findReleaseNote);
 
-
-    List<OpinionInfoRes> getIssueOpinion(Issue issue);
-
+    // 이슈에 속한 의견 목록 List 형태로 반환
+    List<OpinionInfoResponseDTO> getIssueOpinion(Issue issue);
 
 }

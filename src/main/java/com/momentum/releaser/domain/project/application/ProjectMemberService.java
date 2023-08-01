@@ -1,30 +1,31 @@
 package com.momentum.releaser.domain.project.application;
 
-import com.momentum.releaser.domain.project.dto.ProjectResDto;
-import com.momentum.releaser.domain.project.dto.ProjectResDto.GetMembersRes;
+import com.momentum.releaser.domain.project.dto.ProjectMemberResponseDto.InviteProjectMemberResponseDTO;
+import com.momentum.releaser.domain.project.dto.ProjectMemberResponseDto.MembersResponseDTO;
 
-import java.util.List;
-
+/**
+ * 프로젝트 멤버와 관련된 기능을 제공하는 인터페이스입니다.
+ */
 public interface ProjectMemberService {
+
     /**
      * 4.1 프로젝트 멤버 조회
      */
-    List<GetMembersRes> getMembers(Long projectId, String email);
+    MembersResponseDTO findProjectMembers(Long projectId, String email);
 
     /**
      * 4.2 프로젝트 멤버 추가
      */
-    String addMember(String link, String email);
-
+    InviteProjectMemberResponseDTO addProjectMember(String link, String email);
 
     /**
      * 4.3 프로젝트 멤버 제거
      */
-    String deleteMember(Long memberId, String email);
+    String removeProjectMember(Long memberId, String email);
 
     /**
      * 4.4 프로젝트 멤버 탈퇴
      */
-    String withdrawMember(Long projectId, String email);
+    String removeWithdrawProjectMember(Long projectId, String email);
 
 }

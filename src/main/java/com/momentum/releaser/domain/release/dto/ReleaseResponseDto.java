@@ -1,20 +1,18 @@
 package com.momentum.releaser.domain.release.dto;
 
-import com.momentum.releaser.domain.issue.dto.IssueDataDto.ConnectedIssuesDataDto;
-import com.momentum.releaser.domain.project.dto.ProjectMemberResponseDto;
-import com.momentum.releaser.domain.project.dto.ProjectMemberResponseDto.ProjectMemberPositionResponseDto;
-import com.momentum.releaser.domain.release.domain.ReleaseEnum;
-import com.momentum.releaser.domain.release.domain.ReleaseEnum.ReleaseDeployStatus;
-import com.momentum.releaser.domain.release.dto.ReleaseDataDto.GetTags;
-import com.momentum.releaser.domain.release.dto.ReleaseDataDto.ReleaseApprovalsDataDto;
-import com.momentum.releaser.domain.release.dto.ReleaseDataDto.ReleaseOpinionsDataDto;
-import com.momentum.releaser.domain.release.dto.ReleaseDataDto.ReleasesDataDto;
-import com.querydsl.core.annotations.QueryProjection;
-import lombok.*;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import lombok.*;
+
+import com.momentum.releaser.domain.issue.dto.IssueDataDto.ConnectedIssuesDataDTO;
+import com.momentum.releaser.domain.project.dto.ProjectMemberResponseDto.ProjectMemberPositionResponseDTO;
+import com.momentum.releaser.domain.release.domain.ReleaseEnum.ReleaseDeployStatus;
+import com.momentum.releaser.domain.release.dto.ReleaseDataDto.GetTagsDataDTO;
+import com.momentum.releaser.domain.release.dto.ReleaseDataDto.ReleaseApprovalsDataDTO;
+import com.momentum.releaser.domain.release.dto.ReleaseDataDto.ReleaseOpinionsDataDTO;
+import com.momentum.releaser.domain.release.dto.ReleaseDataDto.ReleasesDataDTO;
 
 public class ReleaseResponseDto {
 
@@ -23,20 +21,20 @@ public class ReleaseResponseDto {
      */
     @Getter
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    public static class ReleasesResponseDto {
+    public static class ReleasesResponseDTO {
         // 프로젝트 정보
         private Long projectId;
         private String title;
         private String team;
         private String img;
 
-        private ProjectMemberPositionResponseDto member;
+        private ProjectMemberPositionResponseDTO member;
 
         // 릴리즈 노트 목록
-        private List<ReleasesDataDto> releases;
+        private List<ReleasesDataDTO> releases;
 
         @Builder
-        public ReleasesResponseDto(Long projectId, String title, String team, String img, ProjectMemberPositionResponseDto member, List<ReleasesDataDto> releases) {
+        public ReleasesResponseDTO(Long projectId, String title, String team, String img, ProjectMemberPositionResponseDTO member, List<ReleasesDataDTO> releases) {
             this.projectId = projectId;
             this.title = title;
             this.team = team;
@@ -51,7 +49,7 @@ public class ReleaseResponseDto {
      */
     @Getter
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    public static class ReleaseCreateAndUpdateResponseDto {
+    public static class ReleaseCreateAndUpdateResponseDTO {
         private Long releaseId;
         private String version;
         private String summary;
@@ -61,7 +59,8 @@ public class ReleaseResponseDto {
         private Double coordY;
 
         @Builder
-        public ReleaseCreateAndUpdateResponseDto(Long releaseId, String version, String summary, Date deployDate, ReleaseDeployStatus deployStatus, Double coordX, Double coordY) {
+
+        public ReleaseCreateAndUpdateResponseDTO(Long releaseId, String version, String summary, Date deployDate, ReleaseDeployStatus deployStatus, Double coordX, Double coordY) {
             this.releaseId = releaseId;
             this.version = version;
             this.summary = summary;
@@ -77,7 +76,7 @@ public class ReleaseResponseDto {
      */
     @Getter
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    public static class ReleaseInfoResponseDto {
+    public static class ReleaseInfoResponseDTO {
         private Long releaseId;
         private String title;
         private String content;
@@ -85,12 +84,12 @@ public class ReleaseResponseDto {
         private String version;
         private Date deployDate;
         private String deployStatus;
-        private List<ConnectedIssuesDataDto> issues;
-        private List<ReleaseOpinionsDataDto> opinions;
-        private List<ReleaseApprovalsDataDto> approvals;
+        private List<ConnectedIssuesDataDTO> issues;
+        private List<ReleaseOpinionsDataDTO> opinions;
+        private List<ReleaseApprovalsDataDTO> approvals;
 
         @Builder
-        public ReleaseInfoResponseDto(Long releaseId, String title, String content, String summary, String version, Date deployDate, String deployStatus, List<ConnectedIssuesDataDto> issues, List<ReleaseOpinionsDataDto> opinions, List<ReleaseApprovalsDataDto> approvals) {
+        public ReleaseInfoResponseDTO(Long releaseId, String title, String content, String summary, String version, Date deployDate, String deployStatus, List<ConnectedIssuesDataDTO> issues, List<ReleaseOpinionsDataDTO> opinions, List<ReleaseApprovalsDataDTO> approvals) {
             this.releaseId = releaseId;
             this.title = title;
             this.content = content;
@@ -109,41 +108,44 @@ public class ReleaseResponseDto {
      */
     @Getter
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    public static class ReleaseApprovalsResponseDto {
+    public static class ReleaseApprovalsResponseDTO {
         private Long memberId;
         private String memberName;
         private String memberProfileImg;
+        private char position;
         private char approval;
 
         @Builder
-        public ReleaseApprovalsResponseDto(Long memberId, String memberName, String memberProfileImg, char approval) {
+        public ReleaseApprovalsResponseDTO(Long memberId, String memberName, String memberProfileImg, char position, char approval) {
             this.memberId = memberId;
             this.memberName = memberName;
             this.memberProfileImg = memberProfileImg;
+            this.position = position;
             this.approval = approval;
         }
     }
 
     /**
-     * 6.1 릴리즈 노트 의견 추가
+     * 6.1 릴리즈 노트 의견 추가 (이전)
      */
     @Getter
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    public static class ReleaseOpinionCreateResponseDto {
+    public static class ReleaseOpinionCreateResponseDTO {
         private Long releaseOpinionId;
 
         @Builder
-        public ReleaseOpinionCreateResponseDto(Long releaseOpinionId) {
+        public ReleaseOpinionCreateResponseDTO(Long releaseOpinionId) {
             this.releaseOpinionId = releaseOpinionId;
         }
     }
 
     /**
-     * 6.3 릴리즈 노트 의견 목록 조회
+     * 6.1 릴리즈 노트 의견 추가
+     * 6.2 릴리즈 노트 의견 삭제
      */
     @Getter
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    public static class ReleaseOpinionsResponseDto {
+    public static class ReleaseOpinionsResponseDTO {
         private Long releaseOpinionId;
         private String opinion;
         private Long memberId;
@@ -151,7 +153,7 @@ public class ReleaseResponseDto {
         private String memberProfileImg;
 
         @Builder
-        public ReleaseOpinionsResponseDto(Long releaseOpinionId, String opinion, Long memberId, String memberName, String memberProfileImg) {
+        public ReleaseOpinionsResponseDTO(Long releaseOpinionId, String opinion, Long memberId, String memberName, String memberProfileImg) {
             this.releaseOpinionId = releaseOpinionId;
             this.opinion = opinion;
             this.memberId = memberId;
@@ -165,15 +167,15 @@ public class ReleaseResponseDto {
      */
     @Data
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    public static class ReleaseDocsRes {
+    public static class ReleaseDocsResponseDTO {
         private Long releaseId;
         private String releaseVersion;
         private String releaseTitle;
         private String releaseContent;
-        private List<GetTags> tagsList = new ArrayList<>(); // 빈 리스트로 초기화
+        private List<GetTagsDataDTO> tagsList = new ArrayList<>(); // 빈 리스트로 초기화
 
         @Builder
-        public ReleaseDocsRes(Long releaseId, String releaseVersion, String releaseTitle, String releaseContent, List<GetTags> tagsList) {
+        public ReleaseDocsResponseDTO(Long releaseId, String releaseVersion, String releaseTitle, String releaseContent, List<GetTagsDataDTO> tagsList) {
             this.releaseId = releaseId;
             this.releaseVersion = releaseVersion;
             this.releaseTitle = releaseTitle;
@@ -183,7 +185,5 @@ public class ReleaseResponseDto {
             }
         }
     }
-
-
 
 }

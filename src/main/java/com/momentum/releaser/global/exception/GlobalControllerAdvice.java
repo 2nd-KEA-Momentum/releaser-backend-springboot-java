@@ -51,6 +51,11 @@ public class GlobalControllerAdvice {
             Map<String, Long> error = new HashMap<>();
             error.put("releaseId", e.getReleaseId());
             return new BaseResponse<>(e.getExceptionStatus(), error);
+        } else if (e.getInviteProjectMemberRes() != null) {
+            Map<String, String> error = new HashMap<>();
+            error.put("projectId", Long.toString(e.getInviteProjectMemberRes().getProjectId()));
+            error.put("projectName", e.getInviteProjectMemberRes().getProjectName());
+            return new BaseResponse<>(e.getExceptionStatus(), error);
         } else {
             return new BaseResponse<>(e.getExceptionStatus());
         }

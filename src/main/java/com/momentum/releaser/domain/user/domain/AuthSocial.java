@@ -31,8 +31,8 @@ public class AuthSocial extends BaseTime {
     private User user;
 
     @NotNull
-    @Column(name = "type")
-    private String type;
+    @Enumerated(EnumType.STRING)
+    private AuthProvider provider;
 
     @NotNull
     @Column(name = "token")
@@ -42,12 +42,20 @@ public class AuthSocial extends BaseTime {
     @Column(name = "status")
     private char status;
 
+
+
     @Builder
-    public AuthSocial(User user, String type, String token, char status) {
+    public AuthSocial(Long authId, User user, AuthProvider provider, String token, char status) {
+        this.authId = authId;
         this.user = user;
-        this.type = type;
+        this.provider = provider;
         this.token = token;
         this.status = status;
+    }
+
+
+    public AuthSocial(User user, AuthProvider authProvider, Object token, char y) {
+        super();
     }
 
 

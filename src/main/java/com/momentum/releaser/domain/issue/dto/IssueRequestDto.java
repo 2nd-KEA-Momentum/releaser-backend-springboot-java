@@ -1,25 +1,25 @@
 package com.momentum.releaser.domain.issue.dto;
 
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import java.util.Date;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
-import java.util.Date;
 
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-public class IssueReqDto {
+public class IssueRequestDto {
 
     /**
      * 이슈 정보 - 생성, 수정
      */
     @Data
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    public static class IssueInfoReq {
+    public static class IssueInfoRequestDTO {
 
         @NotBlank
         @NotNull(message = "이슈명을 입력해주세요.")
@@ -39,7 +39,7 @@ public class IssueReqDto {
         private Long memberId;
 
         @Builder
-        public IssueInfoReq(String title, String content, String tag, Date endDate) {
+        public IssueInfoRequestDTO(String title, String content, String tag, Date endDate) {
             this.title = title;
             this.content = content;
             this.tag = tag;
@@ -52,35 +52,16 @@ public class IssueReqDto {
      */
     @Data
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    public static class RegisterOpinionReq {
+    public static class RegisterOpinionRequestDTO {
         @NotBlank
         @NotNull(message = "의견을 입력해주세요.")
         @Size(min = 1, max = 300)
         private String opinion;
 
         @Builder
-        public RegisterOpinionReq(String opinion) {
+        public RegisterOpinionRequestDTO(String opinion) {
             this.opinion = opinion;
         }
     }
-
-    /**
-     * 이슈 상태 변경
-     */
-    @Data
-    @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    public static class UpdateLifeCycleReq {
-        @NotBlank
-        @NotNull(message = "이슈 상태를 입력해주세요.")
-        @Pattern(regexp = "(?i)^(NOT_STARTED|IN_PROGRESS|DONE)$", message = "이슈 상태는 NOT_STARTED, IN_PROGRESS, DONE 중 하나여야 합니다.")
-        private String lifeCycle;
-
-        @Builder
-        public UpdateLifeCycleReq(String lifeCycle) {
-            this.lifeCycle = lifeCycle;
-        }
-    }
-
-
 
 }
