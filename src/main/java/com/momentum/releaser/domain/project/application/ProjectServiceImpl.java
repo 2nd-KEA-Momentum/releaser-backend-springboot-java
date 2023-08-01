@@ -163,9 +163,6 @@ public class ProjectServiceImpl implements ProjectService {
         Predicate predicateRelease = buildPredicateFromFilters(filterTypeGroup, filterReleaseGroup);
         Predicate predicateIssue = buildPredicateFromFilters(filterTypeGroup, filterIssueGroup);
 
-
-
-
         // Query 실행
         Iterable<ReleaseNote> resultRelease = releaseRepository.findAll(predicateRelease);
         Iterable<Issue> resultIssue = issueRepository.findAll(predicateIssue);

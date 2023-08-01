@@ -73,10 +73,10 @@ public class ProjectController {
     /**
      * 10.1 프로젝트 내 통합검색
      */
-    @GetMapping("/{projectId}")
+    @GetMapping("/{projectId}/search")
     public BaseResponse<ProjectSearchRes> getSearch(
             @PathVariable @Min(value = 1, message = "프로젝트 식별 번호는 1 이상의 숫자여야 합니다.") Long projectId,
-            @RequestParam String filterTypeGroup,
+            @RequestParam String filterType,
             @RequestParam(required = false) String filterIssueGroup,
             @RequestParam(required = false) String filterReleaseGroup) {
         return new BaseResponse<>(projectService.getProjectSearch(projectId, filterTypeGroup, filterIssueGroup, filterReleaseGroup));
