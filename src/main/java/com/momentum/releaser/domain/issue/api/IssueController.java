@@ -60,11 +60,12 @@ public class IssueController {
      * @return String "이슈 수정이 완료되었습니다."
      */
     @PatchMapping("/issue/{issueId}")
-    public BaseResponse<String> issueModify(@PathVariable @Min(value = 1, message = "이슈 식별 번호는 1 이상의 숫자여야 합니다.") Long issueId,
+    public BaseResponse<IssueModifyResponseDTO> issueModify(@PathVariable @Min(value = 1, message = "이슈 식별 번호는 1 이상의 숫자여야 합니다.") Long issueId,
                                             @AuthenticationPrincipal UserPrincipal userPrincipal,
                                             @Valid @RequestBody IssueInfoRequestDTO updateReq) {
         String email = userPrincipal.getEmail();
-        return new BaseResponse<>(issueService.modifyIssue(issueId, email, updateReq));
+        String message = "이슈 수정이 완료되었습니다.";
+        return new BaseResponse<>(issueService.modifyIssue(issueId, email, updateReq), message);
     }
 
     /**

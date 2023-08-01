@@ -19,7 +19,7 @@ public interface IssueService {
     /**
      * 7.2 이슈 수정
      */
-    String modifyIssue(Long issueId, String email, IssueInfoRequestDTO updateReq);
+    IssueModifyResponseDTO modifyIssue(Long issueId, String email, IssueInfoRequestDTO updateReq);
 
     /**
      * 7.3 이슈 제거

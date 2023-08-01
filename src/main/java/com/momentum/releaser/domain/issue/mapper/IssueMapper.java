@@ -2,6 +2,9 @@ package com.momentum.releaser.domain.issue.mapper;
 
 import java.util.List;
 
+import com.momentum.releaser.domain.issue.dto.IssueResponseDto;
+import com.momentum.releaser.domain.issue.dto.IssueResponseDto.IssueModifyResponseDTO;
+import com.momentum.releaser.domain.project.domain.ProjectMember;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
@@ -34,4 +37,9 @@ public interface IssueMapper {
     @Mapping(target = "memberList", source = "memberRes")
     @Mapping(target = "opinionList", source = "opinionRes")
     IssueDetailsDTO mapToGetIssue(Issue issue, List<GetMembers> memberRes, List<OpinionInfoResponseDTO> opinionRes);
+
+    /**
+     * Entity (ProjectMember) -> DTO(IssueModifyResponseDTO)
+     */
+    IssueModifyResponseDTO toIssueModifyResponseDTO(ProjectMember projectMember);
 }
