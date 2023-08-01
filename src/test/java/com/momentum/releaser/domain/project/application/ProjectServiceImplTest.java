@@ -3,31 +3,28 @@ package com.momentum.releaser.domain.project.application;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
-import com.momentum.releaser.domain.issue.dao.IssueRepository;
-import com.momentum.releaser.domain.project.dao.ProjectMemberRepository;
-import com.momentum.releaser.domain.project.dao.ProjectRepository;
-import com.momentum.releaser.domain.project.domain.Project;
-import com.momentum.releaser.domain.project.domain.ProjectMember;
-import com.momentum.releaser.domain.project.dto.ProjectDataDto;
-import com.momentum.releaser.domain.project.dto.ProjectDataDto.GetProjectDateDTO;
-import com.momentum.releaser.domain.project.dto.ProjectResponseDto;
-import com.momentum.releaser.domain.project.dto.ProjectResponseDto.GetProjectResponseDTO;
-import com.momentum.releaser.domain.release.dao.approval.ReleaseApprovalRepository;
-import com.momentum.releaser.domain.user.dao.UserRepository;
-import com.momentum.releaser.domain.user.domain.User;
-import com.momentum.releaser.global.config.aws.S3Upload;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import com.momentum.releaser.domain.issue.dao.IssueRepository;
+import com.momentum.releaser.domain.project.dao.ProjectMemberRepository;
+import com.momentum.releaser.domain.project.dao.ProjectRepository;
+import com.momentum.releaser.domain.project.domain.Project;
+import com.momentum.releaser.domain.project.domain.ProjectMember;
+import com.momentum.releaser.domain.project.dto.ProjectDataDto.GetProjectDateDTO;
+import com.momentum.releaser.domain.project.dto.ProjectResponseDto.GetProjectResponseDTO;
+import com.momentum.releaser.domain.release.dao.approval.ReleaseApprovalRepository;
+import com.momentum.releaser.domain.user.dao.UserRepository;
+import com.momentum.releaser.domain.user.domain.User;
+import com.momentum.releaser.global.config.aws.S3Upload;
 
-import static org.mockito.Mockito.*;
-
-class ProjectServiceTest {
+class ProjectServiceImplTest {
 
     private ProjectService projectService;
     private ProjectRepository projectRepository;
@@ -122,8 +119,10 @@ class ProjectServiceTest {
         // 예상되는 GetProjectResponseDTO 객체 생성
         List<GetProjectDateDTO> expectedGetCreateProjectList = new ArrayList<>();
         List<GetProjectDateDTO> expectedGetEnterProjectList = new ArrayList<>();
+
         expectedGetCreateProjectList.add(modelMapper.map(project1, GetProjectDateDTO.class));
         expectedGetEnterProjectList.add(modelMapper.map(project2, GetProjectDateDTO.class));
+
         GetProjectResponseDTO expectedResponse = GetProjectResponseDTO.builder()
                 .getCreateProjectList(expectedGetCreateProjectList)
                 .getEnterProjectList(expectedGetEnterProjectList)
