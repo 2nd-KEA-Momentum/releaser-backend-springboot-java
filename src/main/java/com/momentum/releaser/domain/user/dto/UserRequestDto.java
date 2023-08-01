@@ -23,20 +23,4 @@ public class UserRequestDto {
             this.image = image;
         }
     }
-
-    /**
-     * 1.5 이메일 인증
-     */
-    @Getter
-    @NoArgsConstructor
-    public static class ConfirmEmailRequestDTO {
-        @NotEmpty(message = "이메일을 입력해 주세요.")
-        @Email(message = "올바르지 않은 이메일 형식입니다.")
-        private String email;
-
-        @Builder
-        public ConfirmEmailRequestDTO(String email) {
-            this.email = email;
-        }
-    }
 }
