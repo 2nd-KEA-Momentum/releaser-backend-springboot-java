@@ -185,13 +185,17 @@ public class ProjectServiceImpl implements ProjectService {
      * @return String 업로드된 이미지의 S3 URL
      * @throws IOException 이미지 업로드 중 오류가 발생한 경우 발생하는 예외
      */
-    private String uploadProjectImg(ProjectInfoRequestDTO projectInfoReq) throws IOException {
-        String img = projectInfoReq.getImg();
+    String uploadProjectImg(ProjectInfoRequestDTO projectInfoReq) throws IOException {
+        if (projectInfoReq == null) {
+            throw new IllegalArgumentException("projectInfoReq cannot be null");
+        }
 
-        if (img.isEmpty()) {
+        if (projectInfoReq.getImg().isEmpty()) {
             // 만약 사용자로부터 받은 이미지 데이터가 없는 경우 기본 프로필로 대체한다.
             return DEFAULT_PROJECT_IMG.url();
         }
+
+        String img = projectInfoReq.getImg();
 
         // Base64로 인코딩된 이미지 파일을 파일 형태로 가져온다.
         File file = getImageUrlFromBase64(img);
@@ -286,7 +290,7 @@ public class ProjectServiceImpl implements ProjectService {
      * @param url 업로드된 프로젝트 이미지의 S3 URL
      * @return Project 생성된 프로젝트 엔티티
      */
-    private Project createNewProject(ProjectInfoRequestDTO registerReq, String url) {
+    Project createNewProject(ProjectInfoRequestDTO registerReq, String url) {
         //초대 링크 생성
         String inviteLink = generateInviteLink();
 
@@ -320,7 +324,7 @@ public class ProjectServiceImpl implements ProjectService {
      * @param project 프로젝트 엔티티
      * @param user 사용자 엔티티
      */
-    private void addProjectMember(Project project, User user) {
+    void addProjectMember(Project project, User user) {
         ProjectMember projectMember = ProjectMember.builder()
                 .position('L')
                 .user(user)
