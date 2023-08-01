@@ -38,7 +38,15 @@ public class ProjectResponseDto {
         }
     }
 
-    
+    /**
+     * 검색 후 응답
+     */
+    @Data
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    public static class ProjectSearchResponseDTO {
+        privste List<>
+    }
+
 
 
 
