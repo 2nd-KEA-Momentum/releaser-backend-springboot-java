@@ -47,6 +47,15 @@ public class RedisUtil {
     }
 
     /**
+     * 해당 key에 해당하는 value가 존재하는지 확인
+     * @param key 찾고자 하는 key 값
+     * @return Redis key 값 존재 여부
+     */
+    public boolean existsData(String key) {
+        return Boolean.TRUE.equals(redisTemplate.hasKey(key));
+    }
+
+    /**
      * Redis에 저장된 데이터를 삭제
      * @param key Redis의 key 값
      */

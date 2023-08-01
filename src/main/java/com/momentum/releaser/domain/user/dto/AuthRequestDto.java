@@ -2,10 +2,7 @@ package com.momentum.releaser.domain.user.dto;
 
 import javax.validation.constraints.*;
 
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 
 public class AuthRequestDto {
@@ -61,6 +58,37 @@ public class AuthRequestDto {
         public UserLoginReqestDTO(String email, String password) {
             this.email = email;
             this.password = password;
+        }
+    }
+
+    /**
+     * 2.6 이메일 인증
+     */
+    @Getter
+    @NoArgsConstructor
+    public static class SendEmailRequestDTO {
+        @NotEmpty(message = "이메일을 입력해 주세요.")
+        @Email(message = "올바르지 않은 이메일 형식입니다.")
+        private String email;
+
+        @Builder
+        public SendEmailRequestDTO(String email) {
+            this.email = email;
+        }
+    }
+
+    /**
+     * 2.7 이메일 인증 확인
+     */
+    @Getter
+    @NoArgsConstructor
+    public static class ConfirmEmailRequestDTO {
+        @NotEmpty(message = "인증 코드를 입력해 주세요.")
+        private String authCode;
+
+        @Builder
+        public ConfirmEmailRequestDTO(String authCode) {
+            this.authCode = authCode;
         }
     }
 
