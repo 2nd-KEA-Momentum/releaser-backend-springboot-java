@@ -429,7 +429,7 @@ public class ReleaseServiceImpl implements ReleaseService {
      * @throws CustomException INVALID_RELEASE_VERSION_TYPE 클라이언트로부터 받은 버전 타입이 올바르지 않은 경우 발생하는 예외
      * @throws CustomException FAILED_TO_GET_LATEST_RELEASE_VERSION 데이터베이스에서 최신 버전 정보를 가져오지 못한 경우 발생하는 예외
      */
-    private String createReleaseVersion(Project project, String versionType) {
+    String createReleaseVersion(Project project, String versionType) {
         String newVersion = "";
 
         // 데이터베이스로부터 가장 최신의 버전을 가져온다.
