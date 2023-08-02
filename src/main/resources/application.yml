@@ -3,9 +3,10 @@ spring:
     group:
       "prod": "prod, common"
       "dev": "dev, common"
+      "local": "local, common"
 
     # 활성 프로필 설정
-    active: dev
+    active: local
 
 ---
 # prod
@@ -21,9 +22,12 @@ spring:
     activate:
       on-profile: "dev"
 
-logging:
-  level:
-    root: info
+---
+# local
+spring:
+  config:
+    activate:
+      on-profile: "local"
 
 ---
 # common
