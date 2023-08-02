@@ -2,6 +2,8 @@ package com.momentum.releaser.domain.issue.mapper;
 
 import java.util.List;
 
+import com.momentum.releaser.domain.issue.dto.IssueDataDto;
+import com.momentum.releaser.domain.issue.dto.IssueDataDto.IssueDetailsDataDTO;
 import com.momentum.releaser.domain.issue.dto.IssueResponseDto;
 import com.momentum.releaser.domain.issue.dto.IssueResponseDto.IssueModifyResponseDTO;
 import com.momentum.releaser.domain.project.domain.ProjectMember;
@@ -36,7 +38,7 @@ public interface IssueMapper {
     @Mapping(source = "issue.member.memberId", target = "manager")
     @Mapping(target = "memberList", source = "memberRes")
     @Mapping(target = "opinionList", source = "opinionRes")
-    IssueDetailsDTO mapToGetIssue(Issue issue, List<GetMembers> memberRes, List<OpinionInfoResponseDTO> opinionRes);
+    IssueDetailsDataDTO mapToGetIssue(Issue issue, List<GetMembers> memberRes, List<OpinionInfoResponseDTO> opinionRes);
 
     /**
      * Entity (ProjectMember) -> DTO(IssueModifyResponseDTO)
