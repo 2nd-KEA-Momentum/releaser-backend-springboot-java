@@ -5,7 +5,6 @@ import com.momentum.releaser.domain.project.dao.ProjectMemberRepository;
 import com.momentum.releaser.domain.project.dao.ProjectRepository;
 import com.momentum.releaser.domain.project.domain.Project;
 import com.momentum.releaser.domain.project.domain.ProjectMember;
-import com.momentum.releaser.domain.project.dto.ProjectMemberResponseDto;
 import com.momentum.releaser.domain.project.dto.ProjectMemberResponseDto.InviteProjectMemberResponseDTO;
 import com.momentum.releaser.domain.project.dto.ProjectMemberResponseDto.MembersResponseDTO;
 import com.momentum.releaser.domain.release.dao.approval.ReleaseApprovalRepository;
