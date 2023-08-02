@@ -4,16 +4,6 @@ import static com.momentum.releaser.global.config.BaseResponseStatus.*;
 
 import java.util.Optional;
 
-import com.momentum.releaser.domain.user.dto.AuthRequestDto.ConfirmAuthCodeRequestDTO;
-import com.momentum.releaser.domain.user.dto.AuthResponseDto;
-import com.momentum.releaser.domain.user.dto.AuthResponseDto.ConfirmEmailResponseDTO;
-import com.momentum.releaser.domain.user.dto.AuthResponseDto.ConfirmPasswordCodeResponseDTO;
-import com.momentum.releaser.domain.user.dto.AuthResponseDto.UserInfoResponseDTO;
-import com.momentum.releaser.domain.user.mapper.UserMapper;
-import com.momentum.releaser.redis.RedisUtil;
-import com.momentum.releaser.redis.password.Password;
-import com.momentum.releaser.redis.password.PasswordRedisRepository;
-import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -22,8 +12,15 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import lombok.RequiredArgsConstructor;
-
+import com.momentum.releaser.domain.user.dto.AuthRequestDto.ConfirmAuthCodeRequestDTO;
+import com.momentum.releaser.domain.user.dto.AuthRequestDto.SavePasswordRequestDTO;
+import com.momentum.releaser.domain.user.dto.AuthResponseDto.ConfirmEmailResponseDTO;
+import com.momentum.releaser.domain.user.dto.AuthResponseDto.ConfirmPasswordCodeResponseDTO;
+import com.momentum.releaser.domain.user.dto.AuthResponseDto.UserInfoResponseDTO;
+import com.momentum.releaser.domain.user.mapper.UserMapper;
+import com.momentum.releaser.redis.RedisUtil;
+import com.momentum.releaser.redis.password.Password;
+import com.momentum.releaser.redis.password.PasswordRedisRepository;
 import com.momentum.releaser.domain.user.dao.AuthPasswordRepository;
 import com.momentum.releaser.domain.user.dao.RefreshTokenRepository;
 import com.momentum.releaser.domain.user.dao.UserRepository;
@@ -35,6 +32,9 @@ import com.momentum.releaser.domain.user.dto.AuthRequestDto.UserLoginReqestDTO;
 import com.momentum.releaser.domain.user.dto.TokenDto;
 import com.momentum.releaser.global.exception.CustomException;
 import com.momentum.releaser.global.jwt.JwtTokenProvider;
+
+import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 
 /**
  * 사용자 인증과 관련된 기능을 제공하는 서비스 구현 클래스입니다.
@@ -122,6 +122,8 @@ public class AuthServiceImpl implements AuthService {
      * @param userEmail                 사용자 이메일
      * @param confirmAuthCodeRequestDTO 사용자 이메일 인증 확인 코드
      * @return ConfirmEmailResponseDTO 사용자 이메일
+     * @author seonwoo
+     * @date 2023-08-02 (수)
      */
     @Override
     public ConfirmEmailResponseDTO confirmEmail(String userEmail, ConfirmAuthCodeRequestDTO confirmAuthCodeRequestDTO) {
@@ -140,10 +142,12 @@ public class AuthServiceImpl implements AuthService {
     /**
      * 2.9 비밀번호 변경 인증 확인
      *
-     * @param email 사용자 이메일
-     * @param name 사용자 이름
+     * @param email                     사용자 이메일
+     * @param name                      사용자 이름
      * @param confirmAuthCodeRequestDTO 사용자 이메일 인증 확인 코드
      * @return ConfirmPasswordCodeResponseDTO 사용자 이메일, 사용자 이름
+     * @author seonwoo
+     * @date 2023-08-02 (수)
      */
     @Override
     public ConfirmPasswordCodeResponseDTO confirmPasswordCode(String email, String name, ConfirmAuthCodeRequestDTO confirmAuthCodeRequestDTO) {
@@ -154,6 +158,32 @@ public class AuthServiceImpl implements AuthService {
         User user = findUserByEmailAndName(email, name);
 
         return UserMapper.INSTANCE.toConfirmPasswordCodeResponseDTO(user);
+    }
+
+    /**
+     * 2.10 비밀번호 변경
+     *
+     * @param email                  사용자 이메일
+     * @param savePasswordRequestDTO 변경하려는 비밀번호
+     * @return 비밀번호 변경 성공 메시지
+     * @author seonwoo
+     * @date 2023-08-02 (수)
+     */
+    @Override
+    public String savePassword(String email, SavePasswordRequestDTO savePasswordRequestDTO) {
+        // 비밀번호와 확인용 비밀번호가 같은지 검증한다.
+        verifyPasswordAndConfirmPassword(savePasswordRequestDTO);
+
+        // 사용자 이메일을 이용해 사용자 객체를 가져온다.
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(NOT_EXISTS_USER));
+
+        // 기존의 비밀번호를 삭제한다.
+        deleteExistingPassword(user);
+
+        // 비밀번호를 변경한다.
+        createAndSaveAuthPassword(user, savePasswordRequestDTO.getPassword());
+
+        return "비밀번호 변경에 성공하였습니다.";
     }
 
     // =================================================================================================================
@@ -315,10 +345,10 @@ public class AuthServiceImpl implements AuthService {
     /**
      * Redis에 저장된 인증 코드와 동일한지 확인한다.
      *
+     * @param email 사용자 이메일
+     * @param name  사용자 이름
      * @author seonwoo
      * @date 2023-08-02 (수)
-     * @param email 사용자 이메일
-     * @param name 사용자 이름
      */
     private void verifyAuthCodeWithEmailAndName(String email, String name, String code) {
         // Redis의 키 값(email, name)을 이용하여 저장된 인증 코드 값을 가져온다.
@@ -340,8 +370,10 @@ public class AuthServiceImpl implements AuthService {
      * 사용자 이메일과 이름을 이용하여 데이터베이스에 저장된 객체를 가져온다.
      *
      * @param email 사용자 이메일
-     * @param name 사용자 이름
+     * @param name  사용자 이름
      * @return user 사용자 객체
+     * @author seonwoo
+     * @date 2023-08-02 (수)
      */
     private User findUserByEmailAndName(String email, String name) {
         // 이메일을 이용하여 사용자 객체를 가져온다.
@@ -354,5 +386,38 @@ public class AuthServiceImpl implements AuthService {
 
         // 정보가 다 같은 경우 사용자 객체를 반환한다.
         return user;
+    }
+
+    /**
+     * 사용자가 변경하려고 하는 비밀번호와 확인용 비밀번호가 같은지 검사한다.
+     * 다르다면 예외를 발생시킨다.
+     *
+     * @param savePasswordRequestDTO 비밀번호, 확인용 비밀번호
+     * @author seonwoo
+     * @date 2023-08-02 (수)
+     */
+    private void verifyPasswordAndConfirmPassword(SavePasswordRequestDTO savePasswordRequestDTO) {
+        String password = savePasswordRequestDTO.getPassword();
+        String confirmPassword = savePasswordRequestDTO.getConfirmPassword();
+
+        if (!password.equals(confirmPassword)) {
+            throw new CustomException(NOT_EQUAL_PASSWORD_AND_CONFIRM_PASSWORD);
+        }
+    }
+
+    /**
+     * 이미 존재하는 비밀번호를 삭제한다.
+     *
+     * @param user 사용자 객체
+     * @author seonwoo
+     * @date 2023-08-02 (수)
+     */
+    private void deleteExistingPassword(User user) {
+        AuthPassword authPassword = authPasswordRepository.findByUser(user);
+
+        if (authPassword != null) {
+            // 기존의 비밀번호 정보를 삭제한다.
+            authPasswordRepository.delete(authPassword);
+        }
     }
 }
