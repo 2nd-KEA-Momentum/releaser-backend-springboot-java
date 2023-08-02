@@ -111,4 +111,28 @@ public class AuthRequestDto {
             this.email = email;
         }
     }
+
+    /**
+     * 2.10 비밀번호 변경
+     */
+    @Getter
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    public static class SavePasswordRequestDTO {
+
+        @NotBlank(message = "비밀번호를 입력해 주세요.")
+        @Pattern(regexp="(?=.*[0-9])(?=.*[a-zA-Z])(?=.*\\W)(?=\\S+$).{8,20}",
+                message = "비밀번호는 영문 대소문자와 숫자, 특수 기호가 적어도 1개 이상씩 포함된 8자 ~ 20자여야 합니다.")
+        private String password;
+
+        @NotBlank(message = "확인용 비밀번호를 입력해 주세요.")
+        @Pattern(regexp="(?=.*[0-9])(?=.*[a-zA-Z])(?=.*\\W)(?=\\S+$).{8,20}",
+                message = "비밀번호는 영문 대소문자와 숫자, 특수 기호가 적어도 1개 이상씩 포함된 8자 ~ 20자여야 합니다.")
+        private String confirmPassword;
+
+        @Builder
+        public SavePasswordRequestDTO(String password, String confirmPassword) {
+            this.password = password;
+            this.confirmPassword = confirmPassword;
+        }
+    }
 }

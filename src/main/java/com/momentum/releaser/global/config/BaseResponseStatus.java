@@ -22,6 +22,7 @@ public enum BaseResponseStatus {
     NOT_EXISTS_REDIS_CODE(false, 2001, "유효하지 않은 코드입니다."),
     INVALID_REDIS_CODE(false, 2002, "잘못된 코드입니다."),
     INVALID_REDIS_KEY(false, 2003, "유효하지 않은 키 값입니다."),
+    NOT_EQUAL_PASSWORD_AND_CONFIRM_PASSWORD(false, 2100, "비밀번호와 확인용 비밀번호가 일치하지 않습니다."),
     NOT_PROJECT_PM(false, 2200, "해당 프로젝트의 관리자가 아닙니다."),
     INVALID_RELEASE_VERSION_TYPE(false, 2400, "릴리즈 버전 타입이 올바르지 않습니다. MAJOR, MINOR, PATCH 중 하나여야 합니다."),
     EXISTS_DEPLOYED_RELEASE_NOTE_AFTER_THIS(false, 2401, "배포된 상위 버전의 릴리즈 노트가 있어 삭제할 수 없습니다."),

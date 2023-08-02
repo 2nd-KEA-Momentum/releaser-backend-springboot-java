@@ -1,6 +1,8 @@
 package com.momentum.releaser.domain.user.application;
 
+import com.momentum.releaser.domain.user.dto.AuthRequestDto;
 import com.momentum.releaser.domain.user.dto.AuthRequestDto.ConfirmAuthCodeRequestDTO;
+import com.momentum.releaser.domain.user.dto.AuthRequestDto.SavePasswordRequestDTO;
 import com.momentum.releaser.domain.user.dto.AuthRequestDto.UserInfoReqestDTO;
 import com.momentum.releaser.domain.user.dto.AuthRequestDto.UserLoginReqestDTO;
 import com.momentum.releaser.domain.user.dto.AuthResponseDto;
@@ -44,10 +46,23 @@ public interface AuthService {
     /**
      * 2.8 비밀번호 변경 인증 확인
      *
+     * @author seonwoo
+     * @date 2023-08-02 (수)
      * @param email 사용자 이메일
      * @param name 사용자 이름
      * @param confirmAuthCodeRequestDTO 사용자 비밀번호 변경 인증 코드
      * @return ConfirmPasswordCodeResponseDTO 사용자 이메일, 사용자 이름
      */
     ConfirmPasswordCodeResponseDTO confirmPasswordCode(String email, String name, ConfirmAuthCodeRequestDTO confirmAuthCodeRequestDTO);
+
+    /**
+     * 2.10 비밀번호 변경
+     *
+     * @author seonwoo
+     * @date 2023-08-02 (수)
+     * @param email 사용자 이메일
+     * @param savePasswordRequestDTO 변경하려는 비밀번호
+     * @return 비밀번호 변경 성공 메시지
+     */
+    String savePassword(String email, SavePasswordRequestDTO savePasswordRequestDTO);
 }
