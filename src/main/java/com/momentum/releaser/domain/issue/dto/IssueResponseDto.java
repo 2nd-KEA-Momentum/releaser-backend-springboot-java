@@ -3,6 +3,7 @@ package com.momentum.releaser.domain.issue.dto;
 import java.util.Date;
 import java.util.List;
 
+import com.momentum.releaser.domain.issue.dto.IssueDataDto.IssueDetailsDataDTO;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
@@ -155,28 +156,13 @@ public class IssueResponseDto {
     @Data
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     public static class IssueDetailsDTO {
-        private Long issueNum;
-        private String title;
-        private String content;
-        private String tag;
-        private Date endDate;
-        private char edit;
-        private Long manager; //담당자
-        private char deployYN;
-        private List<GetMembers> memberList;
-        private List<OpinionInfoResponseDTO> opinionList;
+        private char pmCheck;
+        private IssueDetailsDataDTO issueDetails;
 
         @Builder
-        public IssueDetailsDTO(Long issueNum, String title, String content, String tag, Date endDate, char edit, Long manager, List<GetMembers> memberList, List<OpinionInfoResponseDTO> opinionList) {
-            this.issueNum = issueNum;
-            this.title = title;
-            this.content = content;
-            this.tag = tag;
-            this.endDate = endDate;
-            this.edit = edit;
-            this.manager = manager;
-            this.memberList = memberList;
-            this.opinionList = opinionList;
+        public IssueDetailsDTO(char pmCheck, IssueDetailsDataDTO issueDetails) {
+            this.pmCheck = pmCheck;
+            this.issueDetails = issueDetails;
         }
     }
 

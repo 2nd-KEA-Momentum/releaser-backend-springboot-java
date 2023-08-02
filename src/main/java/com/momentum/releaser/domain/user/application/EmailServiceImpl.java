@@ -8,10 +8,8 @@ import javax.mail.internet.MimeMessage;
 
 import com.momentum.releaser.domain.user.dao.UserRepository;
 import com.momentum.releaser.domain.user.domain.User;
-import com.momentum.releaser.domain.user.dto.AuthRequestDto.ConfirmEmailRequestDTO;
 import com.momentum.releaser.domain.user.dto.AuthRequestDto.SendEmailForPasswordRequestDTO;
 import com.momentum.releaser.domain.user.dto.AuthRequestDto.SendEmailRequestDTO;
-import com.momentum.releaser.domain.user.dto.AuthResponseDto.ConfirmEmailResponseDTO;
 import com.momentum.releaser.global.exception.CustomException;
 import com.momentum.releaser.redis.password.Password;
 import com.momentum.releaser.redis.password.PasswordRedisRepository;
@@ -75,27 +73,6 @@ public class EmailServiceImpl implements EmailService {
 
         // 인증 코드 반환
         return "이메일 인증 메일이 전송되었습니다.";
-    }
-
-    /**
-     * 2.7 이메일 인증 확인
-     *
-     * @param userEmail              사용자 이메일
-     * @param confirmEmailRequestDTO 사용자 이메일 인증 확인 코드
-     * @return ConfirmEmailResponseDTO 사용자 이메일
-     */
-    @Override
-    public ConfirmEmailResponseDTO confirmEmail(String userEmail, ConfirmEmailRequestDTO confirmEmailRequestDTO) {
-        // Redis에 저장된 값과 일치하는지 확인한다.
-        int successStatus = verifyEmailAndAuthCode(userEmail, confirmEmailRequestDTO.getAuthCode());
-
-        if (successStatus != 1) {
-            // 만약 값이 일치하지 않는다면 예외를 발생시킨다.
-            throw new CustomException(INVALID_REDIS_CODE);
-        }
-
-        // 만약 일치한다면 이메일 값을 담아 반환한다.
-        return ConfirmEmailResponseDTO.builder().email(userEmail).build();
     }
 
     /**
@@ -168,28 +145,6 @@ public class EmailServiceImpl implements EmailService {
     private void deleteIfExistsPasswordInRedis(String name, String email) {
         Optional<Password> optionalPassword = passwordRedisRepository.findByNameAndEmail(name, email);
         optionalPassword.ifPresent(passwordRedisRepository::delete);
-    }
-
-    /**
-     * Redis에 저장된 이메일과 인증 코드 값이 올바른지 확인한다.
-     *
-     * @param email    사용자 이메일
-     * @param authCode 사용자 이메일 인증 코드
-     * @return 이메일 인증 성공 여부
-     * @author seonwoo
-     * @date 2023-08-01 (화)
-     */
-    private int verifyEmailAndAuthCode(String email, String authCode) {
-        // 사용자 이메일 키 값을 가지고 인증 코드를 가져온다.
-        String savedAuthCode = redisUtil.getData(email);
-
-        if (savedAuthCode == null) {
-            // 만약 유효 시간이 만료되었다면 예외를 발생시킨다.
-            throw new CustomException(NOT_EXISTS_REDIS_CODE);
-        }
-
-        // 인증 코드가 동일한지 비교한다.
-        return savedAuthCode.equals(authCode) ? 1 : 0;
     }
 
     /**
