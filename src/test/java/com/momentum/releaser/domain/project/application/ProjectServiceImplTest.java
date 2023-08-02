@@ -47,26 +47,55 @@ class ProjectServiceImplTest {
         projectService = new ProjectServiceImpl(projectRepository, projectMemberRepository, userRepository, issueRepository, releaseApprovalRepository, modelMapper, s3Upload);
     }
 
+    @Test
+    @DisplayName("3.3 프로젝트 삭제")
+    void testRemoveProject() {
+        // Mock data
+        Long mockProjectId = 123L;
+        Project mockProject = new Project(
+                "project Title",
+                "project Content",
+                "project Team",
+                "",
+                "linkkkk",
+                'Y'
+        );
+
+        // projectRepository.findById() 메서드 동작 가짜 구현(Mock)
+        when(projectRepository.findById(mockProjectId)).thenReturn(Optional.of(mockProject));
+
+        // 테스트할 메서드 실행
+        String result = projectService.removeProject(mockProjectId);
+
+        // 필요한 메서드가 호출되었는지 검증
+        verify(projectRepository, times(1)).findById(mockProjectId);
+        verify(projectRepository, times(1)).deleteById(mockProject.getProjectId());
+        verify(issueRepository, times(1)).deleteByIssueNum();
+        verify(releaseApprovalRepository, times(1)).deleteByReleaseApproval();
+
+        // 결과 검증
+        assertEquals("프로젝트가 삭제되었습니다.", result);
+    }
 
     @Test
-    @DisplayName("프로젝트 조회")
+    @DisplayName("3.4 프로젝트 조회")
     void testFindProjects() {
         // Mock 데이터 설정
-        String email = "test@example.com";
-        User user1 = new User(
+        String mockEmail = "test@example.com";
+        User mockUser1 = new User(
                 "Test User1",
-                email,
+                mockEmail,
                 "",
                 'Y'
         );
-        User user2 = new User(
+        User mockUser2 = new User(
                 "Test User2",
                 "test@releaser.com",
                 "",
                 'Y'
         );
         List<ProjectMember> projectMemberList = new ArrayList<>();
-        Project project1 = new Project(
+        Project mockProject1 = new Project(
                 "test project1Title",
                 "test project1Content",
                 "test project1Team",
@@ -74,7 +103,7 @@ class ProjectServiceImplTest {
                 "lrngwoignw",
                 'Y'
         );
-        Project project2 = new Project(
+        Project mockProject2 = new Project(
                 "test project2Title",
                 "test project2Content",
                 "test project2Team",
@@ -84,44 +113,44 @@ class ProjectServiceImplTest {
         );
 
         // userRepository.findByEmail() 메서드 동작 가짜 구현(Mock)
-        when(userRepository.findByEmail(email)).thenReturn(Optional.of(user1));
+        when(userRepository.findByEmail(mockEmail)).thenReturn(Optional.of(mockUser1));
 
         // projectMemberRepository.findByUser() 메서드 동작 가짜 구현(Mock)
-        when(projectMemberRepository.findByUser(user1)).thenReturn(projectMemberList);
+        when(projectMemberRepository.findByUser(mockUser1)).thenReturn(projectMemberList);
 
         // project1에 대한 ProjectMember 객체 생성 및 리스트에 추가
-        ProjectMember projectMember1 = new ProjectMember(
+        ProjectMember mockProjectMember1 = new ProjectMember(
                 'L',
                 'Y',
-                user1,
-                project1
+                mockUser1,
+                mockProject1
         );
-        projectMemberList.add(projectMember1);
+        projectMemberList.add(mockProjectMember1);
 
         // project2에 대한 ProjectMember 객체 생성 및 리스트에 추가
         ProjectMember projectMember2 = new ProjectMember(
                 'M',
                 'Y',
-                user2,
-                project2
+                mockUser2,
+                mockProject2
         );
         projectMemberList.add(projectMember2);
 
         // userRepository.findByEmail() 메서드 동작 가짜 구현(Mock)
-        when(userRepository.findByEmail(email)).thenReturn(Optional.of(user1));
+        when(userRepository.findByEmail(mockEmail)).thenReturn(Optional.of(mockUser1));
 
         // projectMemberRepository.findByUser() 메서드 동작 가짜 구현(Mock)
-        when(projectMemberRepository.findByUser(user1)).thenReturn(projectMemberList);
+        when(projectMemberRepository.findByUser(mockUser1)).thenReturn(projectMemberList);
 
         // 테스트할 메서드 실행
-        GetProjectResponseDTO result = projectService.findProjects(email);
+        GetProjectResponseDTO result = projectService.findProjects(mockEmail);
 
         // 예상되는 GetProjectResponseDTO 객체 생성
         List<GetProjectDateDTO> expectedGetCreateProjectList = new ArrayList<>();
         List<GetProjectDateDTO> expectedGetEnterProjectList = new ArrayList<>();
 
-        expectedGetCreateProjectList.add(modelMapper.map(project1, GetProjectDateDTO.class));
-        expectedGetEnterProjectList.add(modelMapper.map(project2, GetProjectDateDTO.class));
+        expectedGetCreateProjectList.add(modelMapper.map(mockProject1, GetProjectDateDTO.class));
+        expectedGetEnterProjectList.add(modelMapper.map(mockProject2, GetProjectDateDTO.class));
 
         GetProjectResponseDTO expectedResponse = GetProjectResponseDTO.builder()
                 .getCreateProjectList(expectedGetCreateProjectList)
@@ -133,39 +162,10 @@ class ProjectServiceImplTest {
         assertEquals(expectedResponse.getGetEnterProjectList().size(), result.getGetEnterProjectList().size());
 
         // 필요한 메서드가 호출되었는지 검증
-        verify(userRepository, times(1)).findByEmail(email);
-        verify(projectMemberRepository, times(1)).findByUser(user1);
+        verify(userRepository, times(1)).findByEmail(mockEmail);
+        verify(projectMemberRepository, times(1)).findByUser(mockUser1);
     }
 
-    @Test
-    @DisplayName("프로젝트 삭제")
-    void testRemoveProject() {
-        // Mock data
-        Long projectId = 123L;
-        Project project = new Project(
-                "project Title",
-                "project Content",
-                "project Team",
-                "",
-                "linkkkk",
-                'Y'
-        );
-
-        // projectRepository.findById() 메서드 동작 가짜 구현(Mock)
-        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
-
-        // 테스트할 메서드 실행
-        String result = projectService.removeProject(projectId);
-
-        // 필요한 메서드가 호출되었는지 검증
-        verify(projectRepository, times(1)).findById(projectId);
-        verify(projectRepository, times(1)).deleteById(project.getProjectId());
-        verify(issueRepository, times(1)).deleteByIssueNum();
-        verify(releaseApprovalRepository, times(1)).deleteByReleaseApproval();
-
-        // 결과 검증
-        assertEquals("프로젝트가 삭제되었습니다.", result);
-    }
 }
 
 

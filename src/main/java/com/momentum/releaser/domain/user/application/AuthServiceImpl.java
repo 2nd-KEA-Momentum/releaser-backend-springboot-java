@@ -222,13 +222,13 @@ public class AuthServiceImpl implements AuthService{
 
     /**
      * 주어진 Refresh Token으로 사용자 이메일 확인하고 반환
-     * 만약 Refresh Token이 유효하지 않거나 해당 사용자의 Refresh Token이 존재하지 않을 경우 예외를 발생시킵니다.
+     * 만약 Refresh Token이 유효하지 않거나 해당 사용자의 Refresh Token이 존재하지 않을 경우 예외 발생
      *
      * @author chaeanna
      * @date 2023-07-19
      * @param refreshToken 확인할 Refresh Token
      * @return 해당 사용자의 이메일
-     * @throws CustomException Refresh Token이 유효하지 않거나 해당 사용자의 Refresh Token이 존재하지 않을 경우 발생하는 예외
+     * @throws CustomException Refresh Token이 유효하지 않거나 해당 사용자의 Refresh Token이 존재하지 않을 경우 예외 발생
      */
     private String validateAndGetEmailFromRefreshToken(String refreshToken) {
         // Refresh Token에서 사용자 이메일 추출
