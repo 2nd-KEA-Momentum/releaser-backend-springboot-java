@@ -31,13 +31,29 @@ public class AuthResponseDto {
      * 2.7 이메일 인증 확인
      */
     @Getter
-    @NoArgsConstructor
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
     public static class ConfirmEmailResponseDTO {
         private String email;
 
         @Builder
         public ConfirmEmailResponseDTO(String email) {
             this.email = email;
+        }
+    }
+
+    /**
+     * 2.9 비밀번호 변경 인증 확인
+     */
+    @Getter
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    public static class ConfirmPasswordCodeResponseDTO {
+        private String email;
+        private String name;
+
+        @Builder
+        public ConfirmPasswordCodeResponseDTO(String email, String name) {
+            this.email = email;
+            this.name = name;
         }
     }
 }

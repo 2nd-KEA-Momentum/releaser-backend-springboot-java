@@ -4,20 +4,18 @@ import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.validation.constraints.Email;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-import com.momentum.releaser.domain.user.dto.AuthRequestDto;
-import com.momentum.releaser.domain.user.dto.AuthRequestDto.*;
 import com.momentum.releaser.domain.user.dto.AuthResponseDto;
-import com.momentum.releaser.domain.user.dto.AuthResponseDto.ConfirmEmailResponseDTO;
+import com.momentum.releaser.domain.user.dto.AuthResponseDto.ConfirmPasswordCodeResponseDTO;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import com.momentum.releaser.domain.user.dto.AuthRequestDto.*;
+import com.momentum.releaser.domain.user.dto.AuthResponseDto.ConfirmEmailResponseDTO;
 import com.momentum.releaser.domain.user.application.EmailService;
 import com.momentum.releaser.domain.user.dto.AuthResponseDto.UserInfoResponseDTO;
-
 import com.momentum.releaser.domain.user.application.AuthService;
 import com.momentum.releaser.domain.user.dto.TokenDto;
 import com.momentum.releaser.global.config.BaseResponse;
@@ -109,15 +107,16 @@ public class AuthController {
      * @author seonwoo
      * @date 2023-08-01 (화)
      * @param email 사용자 이메일
-     * @param confirmEmailRequestDTO 사용자 이메일 인증 확인 코드
+     * @param confirmAuthCodeRequestDTO 사용자 이메일 인증 확인 코드
      * @return ConfirmEmailRequestDTO 사용자 이메일
      */
     @RequestMapping(value = "/emails", method = RequestMethod.POST, params = "email")
     public BaseResponse<ConfirmEmailResponseDTO> userEmailConfirm(
-            @RequestParam(value = "email") @NotBlank(message = "이메일을 입력해 주세요.") @Email(message = "올바르지 않은 이메일 형식입니다.") String email,
-            @Valid @RequestBody ConfirmEmailRequestDTO confirmEmailRequestDTO) {
+            @RequestParam(value = "email")
+            @NotBlank(message = "이메일을 입력해 주세요.") @Email(message = "올바르지 않은 이메일 형식입니다.") String email,
+            @Valid @RequestBody ConfirmAuthCodeRequestDTO confirmAuthCodeRequestDTO) {
 
-        return new BaseResponse<>(emailService.confirmEmail(email, confirmEmailRequestDTO));
+        return new BaseResponse<>(authService.confirmEmail(email, confirmAuthCodeRequestDTO));
     }
 
     /**
@@ -129,10 +128,29 @@ public class AuthController {
      * @return 비밀번호 변경 인증 메일 전송 성공 메시지
      * @throws MessagingException 이메일 전송 및 작성에 문제가 생긴 경우
      */
-    @RequestMapping(value = "/password", method = RequestMethod.POST, params = {"!name", "!email"})
+    @RequestMapping(value = "/password", method = RequestMethod.POST, params = {"!email", "!name"})
     public BaseResponse<String> userPasswordSend(
             @RequestBody @Valid SendEmailForPasswordRequestDTO sendPasswordRequestDTO) throws MessagingException {
 
         return new BaseResponse<>(emailService.sendEmailForPassword(sendPasswordRequestDTO));
+    }
+
+    /**
+     * 2.9 비밀번호 변경 인증 확인
+     *
+     * @author seonwoo
+     * @date 2023-08-02 (수)
+     * @param email 사용자 이메일
+     * @param name 사용자 이름
+     * @param confirmAuthCodeRequestDTO 비밀번호 변경 인증 코드가 담긴 객체
+     * @return ConfirmPasswordCodeResponseDTO 사용자 이메일과 이름이 담긴 객체
+     */
+    @RequestMapping(value = "/password", method = RequestMethod.POST, params = {"email", "name"})
+    public BaseResponse<ConfirmPasswordCodeResponseDTO> userPasswordCodeConfirm(
+            @NotBlank(message = "이메일을 입력해 주세요.") @Email(message = "올바르지 않은 이메일 형식입니다.") @RequestParam(value = "email") String email,
+            @NotBlank(message = "이름을 입력해 주세요.") @RequestParam(value = "name") String name,
+            @Valid @RequestBody ConfirmAuthCodeRequestDTO confirmAuthCodeRequestDTO)  {
+
+        return new BaseResponse<>(authService.confirmPasswordCode(email, name, confirmAuthCodeRequestDTO));
     }
 }

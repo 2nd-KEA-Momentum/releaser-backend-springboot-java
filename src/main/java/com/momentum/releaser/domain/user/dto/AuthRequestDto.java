@@ -4,7 +4,6 @@ import javax.validation.constraints.*;
 
 import lombok.*;
 
-
 public class AuthRequestDto {
     /**
      * 2.1 회원가입
@@ -82,12 +81,12 @@ public class AuthRequestDto {
      */
     @Getter
     @NoArgsConstructor
-    public static class ConfirmEmailRequestDTO {
+    public static class ConfirmAuthCodeRequestDTO {
         @NotEmpty(message = "인증 코드를 입력해 주세요.")
         private String authCode;
 
         @Builder
-        public ConfirmEmailRequestDTO(String authCode) {
+        public ConfirmAuthCodeRequestDTO(String authCode) {
             this.authCode = authCode;
         }
     }
