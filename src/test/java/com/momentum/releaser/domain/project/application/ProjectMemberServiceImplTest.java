@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -215,5 +216,132 @@ class ProjectMemberServiceImplTest {
         verify(releaseApprovalRepository, times(1)).saveAll(anyList());
     }
 
+    @Test
+    @DisplayName("4.3 프로젝트 멤버 제거 - pm인 경우 삭제 가능")
+    void testRemoveProjectMember() {
+        // Mock 데이터 설정
+        Long mockMemberId = 1L; // 삭제할 memberId
+        String mockEmail = "testLeader@releaser.com"; // 접근 유저
+
+        Project mockProject = new Project(
+                "projectTitle",
+                "projectContent",
+                "projectTeam",
+                "",
+                "testLink",
+                'Y'
+        );
+        User mockAccessUser = new User(
+                "testUserName",
+                mockEmail,
+                "",
+                'Y'
+        );
+        User mockRemovedUser = new User(
+                "testUserName",
+                "remove@releaser.com",
+                "",
+                'Y'
+        );
+        ProjectMember mockLeaderMember = new ProjectMember(
+                'L',
+                'Y',
+                mockAccessUser,
+                mockProject
+        );
+        ProjectMember mockMember = new ProjectMember(
+                'M',
+                'Y',
+                mockRemovedUser,
+                mockProject
+        );
+
+        // userRepository.findByEmail() 메서드 동작 가짜 구현(Mock)
+        when(userRepository.findByEmail(mockEmail)).thenReturn(Optional.of(mockAccessUser));
+
+        // projectMemberRepository.findById() 메서드 동작 가짜 구현(Mock)
+        when(projectMemberRepository.findById(mockMemberId)).thenReturn(Optional.of(mockMember));
+
+        // projectMemberRepository.findByUserAndProject() 메서드 동작 가짜 구현(Mock)
+        when(projectMemberRepository.findByUserAndProject(mockAccessUser, mockProject)).thenReturn(mockLeaderMember);
+
+        // 테스트할 메서드 실행
+        projectMemberRepository.deleteById(mockMemberId);
+        releaseApprovalRepository.deleteByReleaseApproval();
+
+        String result = projectMemberService.removeProjectMember(mockMemberId, mockEmail);
+
+        // 결과 검증
+        assertEquals("프로젝트 멤버가 제거되었습니다.", result);
+
+        // 필요한 메서드가 호출되었는지 검증
+        verify(userRepository, times(1)).findByEmail(mockEmail);
+        verify(projectMemberRepository, times(1)).findById(mockMemberId);
+        verify(projectMemberRepository, times(1)).findByUserAndProject(mockAccessUser, mockProject);
+
+    }
+
+    @Test
+    @DisplayName("4.3 프로젝트 멤버 제거 - member인 경우 삭제 불가능")
+    void testRemoveProjectMember_Impossible() {
+        // Mock 데이터 설정
+        Long mockMemberId = 1L; // 삭제할 memberId
+        String mockEmail = "testMember@releaser.com"; // 접근 유저
+
+        Project mockProject = new Project(
+                "projectTitle",
+                "projectContent",
+                "projectTeam",
+                "",
+                "testLink",
+                'Y'
+        );
+        User mockAccessUser = new User(
+                "testUserName",
+                mockEmail,
+                "",
+                'Y'
+        );
+        User mockLeaderUser = new User(
+                "testUserName",
+                "testLeader@releaser.com",
+                "",
+                'Y'
+        );
+        User mockRemovedUser = new User(
+                "testUserName",
+                "remove@releaser.com",
+                "",
+                'Y'
+        );
+        ProjectMember mockLeaderMember = new ProjectMember(
+                'L',
+                'Y',
+                mockLeaderUser,
+                mockProject
+        );
+        ProjectMember mockMember = new ProjectMember(
+                'M',
+                'Y',
+                mockRemovedUser,
+                mockProject
+        );
+
+        // userRepository.findByEmail() 메서드 동작 가짜 구현(Mock)
+        when(userRepository.findByEmail(mockEmail)).thenReturn(Optional.of(mockAccessUser));
+
+        // projectMemberRepository.findById() 메서드 동작 가짜 구현(Mock)
+        when(projectMemberRepository.findById(mockMemberId)).thenReturn(Optional.of(mockMember));
+
+        // 테스트할 메서드 실행
+        assertThrows(CustomException.class, () -> {
+            projectMemberService.removeProjectMember(mockMemberId, mockEmail);
+        });
+
+        // 필요한 메서드가 호출되었는지 검증
+        verify(userRepository, times(1)).findByEmail(mockEmail);
+        verify(projectMemberRepository, times(1)).findById(mockMemberId);
+
+    }
 
 }
