@@ -4,6 +4,8 @@ import static com.momentum.releaser.global.config.BaseResponseStatus.*;
 
 import java.util.Optional;
 
+import com.momentum.releaser.domain.user.dto.AuthResponseDto.UserInfoResponseDTO;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -12,15 +14,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.momentum.releaser.domain.user.dto.AuthRequestDto.ConfirmAuthCodeRequestDTO;
-import com.momentum.releaser.domain.user.dto.AuthRequestDto.SavePasswordRequestDTO;
-import com.momentum.releaser.domain.user.dto.AuthResponseDto.ConfirmEmailResponseDTO;
-import com.momentum.releaser.domain.user.dto.AuthResponseDto.ConfirmPasswordCodeResponseDTO;
-import com.momentum.releaser.domain.user.dto.AuthResponseDto.UserInfoResponseDTO;
-import com.momentum.releaser.domain.user.mapper.UserMapper;
-import com.momentum.releaser.redis.RedisUtil;
-import com.momentum.releaser.redis.password.Password;
-import com.momentum.releaser.redis.password.PasswordRedisRepository;
+import lombok.RequiredArgsConstructor;
+
 import com.momentum.releaser.domain.user.dao.AuthPasswordRepository;
 import com.momentum.releaser.domain.user.dao.RefreshTokenRepository;
 import com.momentum.releaser.domain.user.dao.UserRepository;
@@ -33,8 +28,6 @@ import com.momentum.releaser.domain.user.dto.TokenDto;
 import com.momentum.releaser.global.exception.CustomException;
 import com.momentum.releaser.global.jwt.JwtTokenProvider;
 
-import lombok.extern.slf4j.Slf4j;
-import lombok.RequiredArgsConstructor;
 
 /**
  * 사용자 인증과 관련된 기능을 제공하는 서비스 구현 클래스입니다.
@@ -42,7 +35,7 @@ import lombok.RequiredArgsConstructor;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class AuthServiceImpl implements AuthService {
+public class AuthServiceImpl implements AuthService{
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final AuthPasswordRepository authPasswordRepository;
@@ -50,9 +43,6 @@ public class AuthServiceImpl implements AuthService {
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final JwtTokenProvider jwtTokenProvider;
     private final ModelMapper modelMapper;
-
-    private final RedisUtil redisUtil;
-    private final PasswordRedisRepository passwordRedisRepository;
 
     /**
      * 2.1 회원가입
@@ -116,85 +106,29 @@ public class AuthServiceImpl implements AuthService {
                 .build();
     }
 
-    /**
-     * 2.7 이메일 인증 확인
-     *
-     * @param userEmail                 사용자 이메일
-     * @param confirmAuthCodeRequestDTO 사용자 이메일 인증 확인 코드
-     * @return ConfirmEmailResponseDTO 사용자 이메일
-     * @author seonwoo
-     * @date 2023-08-02 (수)
-     */
-    @Override
-    public ConfirmEmailResponseDTO confirmEmail(String userEmail, ConfirmAuthCodeRequestDTO confirmAuthCodeRequestDTO) {
-        // Redis에 저장된 값과 일치하는지 확인한다.
-        int successStatus = verifyEmailAndAuthCode(userEmail, confirmAuthCodeRequestDTO.getAuthCode());
 
-        if (successStatus != 1) {
-            // 만약 값이 일치하지 않는다면 예외를 발생시킨다.
-            throw new CustomException(INVALID_REDIS_CODE);
-        }
-
-        // 만약 일치한다면 이메일 값을 담아 반환한다.
-        return ConfirmEmailResponseDTO.builder().email(userEmail).build();
-    }
 
     /**
-     * 2.9 비밀번호 변경 인증 확인
-     *
-     * @param email                     사용자 이메일
-     * @param name                      사용자 이름
-     * @param confirmAuthCodeRequestDTO 사용자 이메일 인증 확인 코드
-     * @return ConfirmPasswordCodeResponseDTO 사용자 이메일, 사용자 이름
-     * @author seonwoo
-     * @date 2023-08-02 (수)
+     * 2.4 카카오 로그인
      */
-    @Override
-    public ConfirmPasswordCodeResponseDTO confirmPasswordCode(String email, String name, ConfirmAuthCodeRequestDTO confirmAuthCodeRequestDTO) {
-        // Redis에 저장된 값과 일치하는지 확인한다.
-        verifyAuthCodeWithEmailAndName(email, name, confirmAuthCodeRequestDTO.getAuthCode());
-
-        // 만약 일치한다면 해당하는 사용자 객체를 가져온다.
-        User user = findUserByEmailAndName(email, name);
-
-        return UserMapper.INSTANCE.toConfirmPasswordCodeResponseDTO(user);
-    }
 
     /**
-     * 2.10 비밀번호 변경
-     *
-     * @param email                  사용자 이메일
-     * @param savePasswordRequestDTO 변경하려는 비밀번호
-     * @return 비밀번호 변경 성공 메시지
-     * @author seonwoo
-     * @date 2023-08-02 (수)
+     * 2.5 구글 로그인
      */
-    @Override
-    public String savePassword(String email, SavePasswordRequestDTO savePasswordRequestDTO) {
-        // 비밀번호와 확인용 비밀번호가 같은지 검증한다.
-        verifyPasswordAndConfirmPassword(savePasswordRequestDTO);
 
-        // 사용자 이메일을 이용해 사용자 객체를 가져온다.
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(NOT_EXISTS_USER));
-
-        // 기존의 비밀번호를 삭제한다.
-        deleteExistingPassword(user);
-
-        // 비밀번호를 변경한다.
-        createAndSaveAuthPassword(user, savePasswordRequestDTO.getPassword());
-
-        return "비밀번호 변경에 성공하였습니다.";
-    }
+    /**
+     * 2.6 로그아웃
+     */
 
     // =================================================================================================================
 
     /**
      * 주어진 이메일이 이미 등록되어 있는지 확인하고, 중복된 이메일일 경우 예외 발생
      *
-     * @param email 확인할 이메일
-     * @throws CustomException 이미 등록된 이메일인 경우 발생하는 예외
      * @author chaeanna
      * @date 2023-07-18
+     * @param email 확인할 이메일
+     * @throws CustomException 이미 등록된 이메일인 경우 발생하는 예외
      */
     private void validateUniqueEmail(String email) {
         if (userRepository.findByEmail(email).isPresent()) {
@@ -202,25 +136,27 @@ public class AuthServiceImpl implements AuthService {
         }
     }
 
+
     /**
      * 사용자 정보를 받아서 새로운 사용자 생성하고 저장
      *
-     * @param userInfoReq 사용자 정보 요청 객체
-     * @return 생성된 사용자 엔티티
      * @author chaeanna
      * @date 2023-07-18
+     * @param userInfoReq 사용자 정보 요청 객체
+     * @return 생성된 사용자 엔티티
      */
     private User createUser(UserInfoReqestDTO userInfoReq) {
         return userRepository.save(modelMapper.map(userInfoReq, User.class));
     }
 
+
     /**
      * 사용자의 비밀번호를 암호화하여 인증 정보 저장
      *
-     * @param user     사용자 엔티티
-     * @param password 사용자 비밀번호
      * @author chaeanna
      * @date 2023-07-18
+     * @param user 사용자 엔티티
+     * @param password 사용자 비밀번호
      */
     private void createAndSaveAuthPassword(User user, String password) {
         // 비밀번호를 암호화하여 저장

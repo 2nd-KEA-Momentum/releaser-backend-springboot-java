@@ -2,6 +2,7 @@ package com.momentum.releaser.domain.project.application;
 
 import static com.momentum.releaser.global.config.BaseResponseStatus.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -262,15 +263,17 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
         if (releaseNotes != null) {
 
             // 각 릴리스 노트에 대해 프로젝트 멤버와 관련된 ReleaseApproval을 생성하여 저장
+            List<ReleaseApproval> releaseApprovals = new ArrayList<>();
             for (ReleaseNote releaseNote : releaseNotes) {
                 ReleaseApproval releaseApproval = ReleaseApproval.builder()
                         .member(member)
                         .release(releaseNote)
                         .build();
 
-                releaseApprovalRepository.save(releaseApproval);
+                releaseApprovals.add(releaseApproval);
             }
 
+            releaseApprovalRepository.saveAll(releaseApprovals);
         }
     }
 
