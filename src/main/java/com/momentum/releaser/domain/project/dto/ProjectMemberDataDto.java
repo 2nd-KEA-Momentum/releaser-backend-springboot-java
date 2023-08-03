@@ -41,7 +41,7 @@ public class ProjectMemberDataDto {
 
         @QueryProjection
         @Builder
-        public ProjectMemberInfoDTO(String link, Long memberId, Long userId, String name, String img, char position) {
+        public ProjectMemberInfoDTO(Long memberId, Long userId, String name, String img, char position) {
             this.memberId = memberId;
             this.userId = userId;
             this.name = name;

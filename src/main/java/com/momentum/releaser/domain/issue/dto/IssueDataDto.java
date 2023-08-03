@@ -1,11 +1,11 @@
 package com.momentum.releaser.domain.issue.dto;
 
 import java.util.Date;
+import java.util.List;
 
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import com.momentum.releaser.domain.project.dto.ProjectDataDto;
+import com.momentum.releaser.domain.project.dto.ProjectDataDto.GetMembersDataDTO;
+import lombok.*;
 
 public class IssueDataDto {
 
@@ -37,6 +37,38 @@ public class IssueDataDto {
             this.memberId = memberId;
             this.memberName = memberName;
             this.memberProfileImg = memberProfileImg;
+        }
+    }
+
+    /**
+     * 이슈별 조회 - 이슈에 필요한 정보
+     */
+    @Data
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    public static class IssueDetailsDataDTO {
+        private Long issueNum;
+        private String title;
+        private String content;
+        private String tag;
+        private Date endDate;
+        private char edit;
+        private Long manager; //담당자
+        private char deployYN;
+        private List<GetMembersDataDTO> memberList;
+        private List<IssueResponseDto.OpinionInfoResponseDTO> opinionList;
+
+        @Builder
+        public IssueDetailsDataDTO(Long issueNum, String title, String content, String tag, Date endDate, char edit, Long manager, char deployYN, List<GetMembersDataDTO> memberList, List<IssueResponseDto.OpinionInfoResponseDTO> opinionList) {
+            this.issueNum = issueNum;
+            this.title = title;
+            this.content = content;
+            this.tag = tag;
+            this.endDate = endDate;
+            this.edit = edit;
+            this.manager = manager;
+            this.deployYN = deployYN;
+            this.memberList = memberList;
+            this.opinionList = opinionList;
         }
     }
 }

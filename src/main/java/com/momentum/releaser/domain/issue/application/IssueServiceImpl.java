@@ -8,6 +8,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.momentum.releaser.domain.issue.dto.IssueDataDto.IssueDetailsDataDTO;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -240,7 +241,7 @@ public class IssueServiceImpl implements IssueService {
         // 프로젝트의 모든 멤버 리스트
         List<GetMembersDataDTO> memberRes = getProjectMembers(member.getProject());
 
-        IssueDetailsDTO getIssue = createIssueDetails(issue, memberRes, opinionRes);
+        IssueDetailsDTO getIssue = createIssueDetails(member, issue, memberRes, opinionRes);
 
         return getIssue;
     }
@@ -525,9 +526,9 @@ public class IssueServiceImpl implements IssueService {
      * @param opinionRes 의견 리스트
      * @return IssueDetailsDTO 생성된 이슈 상세 정보
      */
-    private IssueDetailsDTO createIssueDetails(Issue issue, List<GetMembersDataDTO> memberRes, List<OpinionInfoResponseDTO> opinionRes) {
+    private IssueDetailsDTO createIssueDetails(ProjectMember member, Issue issue, List<GetMembersDataDTO> memberRes, List<OpinionInfoResponseDTO> opinionRes) {
         // 이슈 상세 정보 생성
-        IssueDetailsDTO getIssue = IssueMapper.INSTANCE.mapToGetIssue(issue, memberRes, opinionRes);
+        IssueDetailsDataDTO getIssue = IssueMapper.INSTANCE.mapToGetIssue(issue, memberRes, opinionRes);
 
         // 이슈에 연결된 담당자의 식별 번호 조회
         Long memberId = getIssue.getManager();
@@ -541,7 +542,7 @@ public class IssueServiceImpl implements IssueService {
         ReleaseNote release = issue.getRelease();
         getIssue.setDeployYN(release != null && "DEPLOYED".equals(String.valueOf(release.getDeployStatus())) ? 'Y' : 'N');
 
-        return getIssue;
+        return IssueDetailsDTO.builder().pmCheck(member.getPosition() == 'L' ? 'Y' : 'N').issueDetails(getIssue).build();
     }
 
     /**

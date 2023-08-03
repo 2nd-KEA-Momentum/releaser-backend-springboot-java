@@ -19,8 +19,10 @@ public enum BaseResponseStatus {
      */
 
     INVALID_REQUEST_BODY(false, 2000, "요청 데이터가 잘못되었습니다."),
-    NOT_EXISTS_EMAIL_AND_AUTH_CODE(false, 2100, "유효하지 않은 코드입니다."),
-    INVALID_EMAIL_AND_AUTH_CODE(false, 2101, "잘못된 코드입니다."),
+    NOT_EXISTS_REDIS_CODE(false, 2001, "유효하지 않은 코드입니다."),
+    INVALID_REDIS_CODE(false, 2002, "잘못된 코드입니다."),
+    INVALID_REDIS_KEY(false, 2003, "유효하지 않은 키 값입니다."),
+    NOT_EQUAL_PASSWORD_AND_CONFIRM_PASSWORD(false, 2100, "비밀번호와 확인용 비밀번호가 일치하지 않습니다."),
     NOT_PROJECT_PM(false, 2200, "해당 프로젝트의 관리자가 아닙니다."),
     INVALID_RELEASE_VERSION_TYPE(false, 2400, "릴리즈 버전 타입이 올바르지 않습니다. MAJOR, MINOR, PATCH 중 하나여야 합니다."),
     EXISTS_DEPLOYED_RELEASE_NOTE_AFTER_THIS(false, 2401, "배포된 상위 버전의 릴리즈 노트가 있어 삭제할 수 없습니다."),
@@ -51,6 +53,7 @@ public enum BaseResponseStatus {
     OVERLAP_CHECK_EMAIL(false, 4102, "중복된 이메일입니다."),
     NOT_MATCHES_PASSWORD(false, 4103, "일치하는 비밀번호가 없습니다."),
     INVALID_REFRESH_TOKEN(false, 4104, "유효하지 않은 Refresh Token 입니다."),
+    INVALID_USER_NAME(false, 4105, "사용자 정보가 올바르지 않습니다."),
 
     NOT_EXISTS_PROJECT(false, 4200, "존재하지 않는 프로젝트입니다."),
     FAILED_TO_CREATE_PROJECT(false, 4201, "프로젝트 생성에 실패하였습니다."),

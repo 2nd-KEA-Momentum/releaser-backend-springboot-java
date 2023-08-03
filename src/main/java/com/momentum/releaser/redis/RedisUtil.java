@@ -1,4 +1,4 @@
-package com.momentum.releaser.global.util;
+package com.momentum.releaser.redis;
 
 import java.time.Duration;
 

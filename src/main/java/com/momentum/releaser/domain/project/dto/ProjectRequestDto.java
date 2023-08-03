@@ -35,7 +35,7 @@ public class ProjectRequestDto {
             this.title = title;
             this.content = content;
             this.team = team;
-            this.img = img;
+            this.img = img == null ? "" : img;
         }
     }
 
