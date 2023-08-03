@@ -36,6 +36,7 @@ public class Base64 {
         byte[] data = DatatypeConverter.parseBase64Binary(base64s[1]);
         LocalDateTime localDateTime = LocalDateTime.now();
         long currentTimeMills = Timestamp.valueOf(localDateTime).getTime();
+
         File file = new File(currentTimeMills + extension);
         log.info("file: {}", file.getName());
 

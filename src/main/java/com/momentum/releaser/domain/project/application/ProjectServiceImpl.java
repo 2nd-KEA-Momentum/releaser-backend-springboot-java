@@ -226,10 +226,14 @@ public class ProjectServiceImpl implements ProjectService {
 
         String img = projectInfoReq.getImg();
 
+        log.info("Project images before base64 decoding: {}", img);
+
         // Base64로 인코딩된 이미지 파일을 파일 형태로 가져온다.
         File file = getImageUrlFromBase64(img);
 
         String url = s3Upload.upload(file, file.getName(), "projects");
+
+        log.info("AWS S3 url: {}", url);
 
         if (file.delete()) {
             return url;
