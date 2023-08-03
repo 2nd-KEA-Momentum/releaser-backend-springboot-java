@@ -56,6 +56,10 @@ jobs:
           spring.redis.port: ${{secrets.REDIS_PORT}}
           url.image.banner-project: ${{secrets.URL_BANNER_PROJECT}}
           url.image.logo-team: ${{secrets.URL_LOGO_TEAM}}
+          logging.slack.webhook-url-prod-error: ${{secrets.SLACK_WEBHOOK_URL_PROD_ERROR}}
+          logging.slack.webhook-url-dev-warn: ${{secrets.SLACK_WEBHOOK_URL_DEV_WARN}}
+          logging.slack.webhook-url-dev-error: ${{secrets.SLACK_WEBHOOK_URL_DEV_ERROR}}
+          
           
           
           
