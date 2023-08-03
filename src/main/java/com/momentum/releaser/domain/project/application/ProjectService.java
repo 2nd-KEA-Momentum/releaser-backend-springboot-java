@@ -39,5 +39,5 @@ public interface ProjectService {
     /**
      * 10.1 프로젝트 내 통합 검색
      */
-    ProjectSearchResponseDTO findProjectSearch(Long projectId, String filterType, FilterIssueRequestDTO filterIssueGroup, FilterReleaseRequestDTO filterReleaseGroup)
+    ProjectSearchResponseDTO findProjectSearch(Long projectId, String filterType, FilterIssueRequestDTO filterIssueGroup, FilterReleaseRequestDTO filterReleaseGroup);
 }

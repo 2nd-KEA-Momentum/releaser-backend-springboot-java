@@ -168,60 +168,14 @@ public class ProjectServiceImpl implements ProjectService {
      */
     @Override
     @Transactional
-    public ProjectSearchResponseDTO findProjectSearch(Long projectId, String filterType, FilterIssueRequestDTO filterIssueGroup, FilterReleaseRequestDTO filterReleaseGroup) throws ParseException {
-
-        //filterGroup 파싱하여 검색조건 만들기
-        Predicate predicateRelease = buildPredicateFromReleaseFilters(filterReleaseGroup);
-        Predicate predicateIssue = buildPredicateFromIssueFilters(filterIssueGroup);
-
-        // Query 실행
-        Iterable<ReleaseNote> resultRelease = releaseRepository.findAll(predicateRelease);
-        Iterable<Issue> resultIssue = issueRepository.findAll(predicateIssue);
-
-        // Iterable을 List로 변환
-        List<ReleaseNote> releaseNotes = StreamSupport.stream(resultRelease.spliterator(), false)
-                .collect(Collectors.toList());
-
-        List<Issue> issues = StreamSupport.stream(resultIssue.spliterator(), false)
-                .collect(Collectors.toList());
-
-        //mapper 사용해서 releaseRes 만들기
-        //mapper 사용해서 issueRes 만들기
-
-        //ProjectSearchRes 만들기
-        return null;
-    }
-
-    private Predicate buildPredicateFromIssueFilters(FilterIssueRequestDTO filterIssueGroup) throws ParseException {
-        BooleanBuilder builder = new BooleanBuilder();
-
-        QIssue issue = QIssue.issue;
-        Date startDate = filterIssueGroup.getStartDate();
-        Date endDate = filterIssueGroup.getEndDate();
-        Long manager = filterIssueGroup.getManagerId();
-        String startVersion = filterIssueGroup.getStartVersion();
-        String endVersion = filterIssueGroup.getEndVersion();
-        List<String> tag = filterIssueGroup.getTag();
-        String title = filterIssueGroup.getIssueTitle();
-
-        if (startDate != null && endDate != null) {
-            builder.and(issue.endDate.between(startDate, endDate));
-        }
-        if (manager != null) {
-            builder.and(issue.member.memberId.eq(manager));
-        }
-        if (!startVersion.isEmpty() && !endVersion.isEmpty()) {
-            builder.and(issue.release.version.between(startVersion, endVersion));
-        }
-        if (tag != null) {
-            builder.and(issue.tag.eq(Tag.valueOf(tag)));
-        }
-        if (title != null) {
-            builder.and(issue.title.containsIgnoreCase(title));
-        }
+    public ProjectSearchResponseDTO findProjectSearch(Long projectId, String filterType,
+                                                      FilterIssueRequestDTO filterIssueGroup,
+                                                      FilterReleaseRequestDTO filterReleaseGroup) {
 
         return null;
+
     }
+
 
     // =================================================================================================================
 
