@@ -3,9 +3,14 @@
 
     <conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter"/>
 
+    <!-- 환경 변수 -->
     <property name="CONSOLE_LOG_PATTERN"
               value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %clr(%5level) %cyan(%logger) - %msg%n"/>
     <property name="FILE_LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %5level %logger - %msg%n"/>
+    <property name="SLACK_LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %5level %logger %n %n %msg %n"/>
+    <springProperty name="SLACK_WEBHOOK_URL_DEV_WARN" source="${logging.slack.webhook-url-dev-warn"/>
+    <springProperty name="SLACK_WEBHOOK_URL_DEV_ERROR" source="${logging.slack.webhook-url-dev-error"/>
+    <springProperty name="SLACK_WEBHOOK_URL_PROD_ERROR" source="${logging.slack.webhook-url-prod-error}"/>
 
     <!-- Console 출력 -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
@@ -114,6 +119,55 @@
         </rollingPolicy>
     </appender>
 
+    <!-- Slack -->
+    <appender name="SLACK_DEV_WARN" class="com.github.maricn.logback.SlackAppender">
+        <webhookUri>${SLACK_WEBHOOK_URL_DEV_WARN}</webhookUri>
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <pattern>${SLACK_LOG_PATTERN}</pattern>
+        </layout>
+        <username>backend-dev</username>
+        <iconEmoji>:eyes:</iconEmoji>
+        <colorCoding>true</colorCoding>
+    </appender>
+    <appender name="ASYNC_SLACK_DEV_WARN" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="SLACK_DEV_WARN"/>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>WARN</level>
+        </filter>
+    </appender>
+
+    <appender name="SLACK_DEV_ERROR" class="com.github.maricn.logback.SlackAppender">
+        <webhookUri>${SLACK_WEBHOOK_URL_DEV_ERROR}</webhookUri>
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <pattern>${SLACK_LOG_PATTERN}</pattern>
+        </layout>
+        <username>backend-dev</username>
+        <iconEmoji>:rotating_light:</iconEmoji>
+        <colorCoding>true</colorCoding>
+    </appender>
+    <appender name="ASYNC_SLACK_DEV_ERROR" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="SLACK_DEV_ERROR"/>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter>
+    </appender>
+
+    <appender name="SLACK_PROD_ERROR" class="com.github.maricn.logback.SlackAppender">
+        <webhookUri>${SLACK_WEBHOOK_URL_PROD_ERROR}</webhookUri>
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <pattern>${SLACK_LOG_PATTERN}</pattern>
+        </layout>
+        <username>backend-prod</username>
+        <iconEmoji>:rotating_light:</iconEmoji>
+        <colorCoding>true</colorCoding>
+    </appender>
+    <appender name="ASYNC_SLACK_PROD_ERROR" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="SLACK_PROD_ERROR"/>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter>
+    </appender>
+
     <!-- Spring profile 설정 -->
     <springProfile name="local">
         <logger name="com.momentum.releaser" level="DEBUG"/>
@@ -128,6 +182,7 @@
             <appender-ref ref="INFO"/>
             <appender-ref ref="WARN"/>
             <appender-ref ref="ERROR"/>
+            <appender-ref ref="ASYNC_SLACK_DEV_WARN"/>
         </root>
     </springProfile>
 

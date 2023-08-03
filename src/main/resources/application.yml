@@ -6,7 +6,7 @@ spring:
       "local": "local, common"
 
     # 활성 프로필 설정
-    active: local
+    active: prod
 
 ---
 # prod
@@ -15,12 +15,21 @@ spring:
     activate:
       on-profile: "prod"
 
+logging:
+  slack:
+    webhook-url-prod-error: ${SLACK_WEBHOOK_URL_PROD_ERROR}
+
 ---
 # dev
 spring:
   config:
     activate:
       on-profile: "dev"
+
+logging:
+  slack:
+    webhook-url-dev-warn: ${SLACK_WEBHOOK_URL_DEV_WARN}
+    webhook-url-dev-error: ${SLACK_WEBHOOK_URL_DEV_ERROR}
 
 ---
 # local
