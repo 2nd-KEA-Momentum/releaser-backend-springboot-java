@@ -1,19 +1,19 @@
 spring:
   profiles:
     group:
-      "prod": "prod, common"
-      "dev": "dev, common"
-      "local": "local, common"
+      prod: prod, common
+      dev: dev, common
+      local: local, common
 
     # 활성 프로필 설정
-    active: prod
+    active: dev
 
 ---
 # prod
 spring:
   config:
     activate:
-      on-profile: "prod"
+      on-profile: prod
 
 logging:
   slack:
@@ -24,21 +24,23 @@ logging:
 spring:
   config:
     activate:
-      on-profile: "dev"
+      on-profile: dev
 
 logging:
   slack:
     webhook-url-dev-warn: ${SLACK_WEBHOOK_URL_DEV_WARN}
     webhook-url-dev-error: ${SLACK_WEBHOOK_URL_DEV_ERROR}
 
+
 ---
 # local
 spring:
   config:
     activate:
-      on-profile: "local"
+      on-profile: local
 
 ---
+
 # common
 server:
   port: 8080
@@ -46,7 +48,7 @@ server:
 spring:
   config:
     activate:
-      on-profile: "common"
+      on-profile: common
 
   thymeleaf:
     prefix: classpath:templates/
