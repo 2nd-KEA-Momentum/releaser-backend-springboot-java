@@ -53,7 +53,9 @@ public class S3Upload {
     /**
      * S3에 파일을 업로드한다.
      */
-    private String uploadFileToS3(File file, String fileName) throws IOException {
+    private String uploadFileToS3(File file, String fileName) {
+        log.info("file: {}, fileName: {}", file, fileName);
+
         // 파일의 사이즈를 ContentLength로 S3에게 알려준다.
         ObjectMetadata objectMetadata = new ObjectMetadata();
         objectMetadata.setContentLength(file.length());
