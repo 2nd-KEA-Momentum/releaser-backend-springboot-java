@@ -27,8 +27,6 @@ import com.momentum.releaser.domain.release.domain.QReleaseNote;
 import com.momentum.releaser.domain.release.domain.ReleaseNote;
 import com.momentum.releaser.domain.user.domain.QUser;
 
-import static com.momentum.releaser.domain.release.domain.QReleaseNote.releaseNote;
-
 @Slf4j
 @Repository
 @RequiredArgsConstructor
@@ -237,11 +235,21 @@ public class IssueRepositoryImpl implements IssueRepositoryCustom{
         return opinionInfoRes;
     }
 
+    /**
+     * FULLTEXT 검색을 이용하여 필터링된 이슈 정보 조회
+     *
+     * @param booleanTemplate FULLTEXT 검색에 사용할 NumberTemplate
+     * @param project 검색할 프로젝트 정보
+     * @return FULLTEXT 검색 결과로 필터링된 이슈 정보 리스트
+     * @date 2023-08-06
+     * @author chaeanna
+     */
     @Override
     public List<Issue> getSearch(NumberTemplate booleanTemplate, Project project) {
         QIssue issue = QIssue.issue;
-        List<Issue> result = queryFactory.
-                select(issue)
+        // FULLTEXT 검색을 적용하여 이슈 정보 조회
+        List<Issue> result = queryFactory
+                .select(issue)
                 .from(issue)
                 .where(booleanTemplate.gt(0)
                         .and(issue.project.eq(project))
@@ -249,4 +257,5 @@ public class IssueRepositoryImpl implements IssueRepositoryCustom{
                 .fetch();
         return result;
     }
+
 }

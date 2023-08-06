@@ -5,11 +5,7 @@ import static com.momentum.releaser.domain.release.domain.QReleaseNote.releaseNo
 import java.util.List;
 
 import com.momentum.releaser.domain.release.domain.QReleaseNote;
-import com.momentum.releaser.global.config.MySQL8DialectCustom;
-import com.querydsl.core.types.Operator;
-import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.NumberTemplate;
-import com.querydsl.jpa.impl.JPAQuery;
 import org.springframework.stereotype.Repository;
 
 import lombok.RequiredArgsConstructor;
@@ -102,10 +98,21 @@ public class ReleaseRepositoryImpl implements ReleaseRepositoryCustom {
                 .fetch();
     }
 
+    /**
+     * FULLTEXT 검색을 이용하여 필터링된 릴리즈 정보 조회
+     *
+     * @param booleanTemplate FULLTEXT 검색에 사용할 NumberTemplate
+     * @param project 검색할 프로젝트 정보
+     * @return FULLTEXT 검색 결과로 필터링된 릴리즈 정보 리스트
+     * @date 2023-08-06
+     * @auther chaeanna
+     */
     @Override
     public List<ReleaseNote> getSearch(NumberTemplate booleanTemplate, Project project) {
-        List<ReleaseNote> result = queryFactory.
-                select(releaseNote)
+        QReleaseNote releaseNote = QReleaseNote.releaseNote;
+        // FULLTEXT 검색을 적용하여 릴리즈 정보 조회
+        List<ReleaseNote> result = queryFactory
+                .select(releaseNote)
                 .from(releaseNote)
                 .where(booleanTemplate.gt(0)
                         .and(releaseNote.project.eq(project))
@@ -113,4 +120,5 @@ public class ReleaseRepositoryImpl implements ReleaseRepositoryCustom {
                 .fetch();
         return result;
     }
+
 }
