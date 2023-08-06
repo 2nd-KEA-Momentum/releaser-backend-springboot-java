@@ -1,6 +1,7 @@
 package com.momentum.releaser.domain.project.dto;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 import lombok.*;
@@ -48,9 +49,12 @@ public class ProjectRequestDto {
         private Date startDate;
         private Date endDate;
         private Long managerId;
-        private String startVersion;
-        private String endVersion;
-        private List<String> tag;
+        private String startReleaseVersion;
+        private String endReleaseVersion;
+
+        @Pattern(regexp = "(?i)^(DEPRECATED|CHANGED|NEW|FEATURE|FIXED)$", message = "태그 타입은 DEPRECATED, CHANGED, NEW, FEATURE, FIXED 중 하나여야 합니다.")
+        private String tag;
+
         private String issueTitle;
     }
 

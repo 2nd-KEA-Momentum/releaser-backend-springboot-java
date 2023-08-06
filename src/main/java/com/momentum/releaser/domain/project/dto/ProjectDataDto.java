@@ -93,18 +93,18 @@ public class ProjectDataDto {
         private Long issueId;
         private String title;
         private String tag;
-        private String releaserVersion;
+        private String releaseVersion;
         private Date endDate;
         private Long manager;
         private String managerName;
         private String managerImg;
 
         @Builder
-        public GetIssueInfoDataDTO(Long issueId, String title, String tag, String releaserVersion, Date endDate, Long manager, String managerName, String managerImg) {
+        public GetIssueInfoDataDTO(Long issueId, String title, String tag, String releaseVersion, Date endDate, Long manager, String managerName, String managerImg) {
             this.issueId = issueId;
             this.title = title;
             this.tag = tag;
-            this.releaserVersion = releaserVersion;
+            this.releaseVersion = releaseVersion;
             this.endDate = endDate;
             this.manager = manager;
             this.managerName = managerName;

@@ -53,6 +53,8 @@ public class ReleaseServiceImpl implements ReleaseService {
     private final ReleaseApprovalRepository releaseApprovalRepository;
     private final IssueRepository issueRepository;
 
+
+
     /**
      * 5.1 프로젝트별 릴리즈 노트 목록 조회
      *

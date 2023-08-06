@@ -4,6 +4,12 @@ import static com.momentum.releaser.domain.release.domain.QReleaseNote.releaseNo
 
 import java.util.List;
 
+import com.momentum.releaser.domain.release.domain.QReleaseNote;
+import com.momentum.releaser.global.config.MySQL8DialectCustom;
+import com.querydsl.core.types.Operator;
+import com.querydsl.core.types.Predicate;
+import com.querydsl.core.types.dsl.NumberTemplate;
+import com.querydsl.jpa.impl.JPAQuery;
 import org.springframework.stereotype.Repository;
 
 import lombok.RequiredArgsConstructor;
@@ -94,5 +100,17 @@ public class ReleaseRepositoryImpl implements ReleaseRepositoryCustom {
                 .where(releaseNote.version.lt(version))
                 .orderBy(releaseNote.version.desc())
                 .fetch();
+    }
+
+    @Override
+    public List<ReleaseNote> getSearch(NumberTemplate booleanTemplate, Project project) {
+        List<ReleaseNote> result = queryFactory.
+                select(releaseNote)
+                .from(releaseNote)
+                .where(booleanTemplate.gt(0)
+                        .and(releaseNote.project.eq(project))
+                )
+                .fetch();
+        return result;
     }
 }

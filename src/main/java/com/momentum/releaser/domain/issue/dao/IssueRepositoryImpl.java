@@ -7,6 +7,7 @@ import com.momentum.releaser.domain.issue.dto.QIssueResponseDto_ConnectionIssues
 import com.momentum.releaser.domain.issue.dto.QIssueResponseDto_DoneIssuesResponseDTO;
 import com.momentum.releaser.domain.issue.dto.QIssueResponseDto_IssueInfoResponseDTO;
 import com.momentum.releaser.domain.issue.dto.QIssueResponseDto_OpinionInfoResponseDTO;
+import com.querydsl.core.types.dsl.NumberTemplate;
 import org.springframework.stereotype.Repository;
 
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,8 @@ import com.momentum.releaser.domain.project.domain.QProjectMember;
 import com.momentum.releaser.domain.release.domain.QReleaseNote;
 import com.momentum.releaser.domain.release.domain.ReleaseNote;
 import com.momentum.releaser.domain.user.domain.QUser;
+
+import static com.momentum.releaser.domain.release.domain.QReleaseNote.releaseNote;
 
 @Slf4j
 @Repository
@@ -234,4 +237,16 @@ public class IssueRepositoryImpl implements IssueRepositoryCustom{
         return opinionInfoRes;
     }
 
+    @Override
+    public List<Issue> getSearch(NumberTemplate booleanTemplate, Project project) {
+        QIssue issue = QIssue.issue;
+        List<Issue> result = queryFactory.
+                select(issue)
+                .from(issue)
+                .where(booleanTemplate.gt(0)
+                        .and(issue.project.eq(project))
+                )
+                .fetch();
+        return result;
+    }
 }

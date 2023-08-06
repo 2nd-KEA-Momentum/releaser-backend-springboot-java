@@ -1,52 +1,57 @@
 package com.momentum.releaser.domain.project.application;
 
-import static com.momentum.releaser.domain.project.dto.ProjectDataDto.*;
-import static com.momentum.releaser.global.common.Base64.getImageUrlFromBase64;
-import static com.momentum.releaser.global.common.CommonEnum.DEFAULT_PROJECT_IMG;
-import static com.momentum.releaser.global.config.BaseResponseStatus.*;
+import static org.springframework.util.StringUtils.hasText;
 
-import java.io.File;
-import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
-
+import com.momentum.releaser.domain.issue.dao.IssueRepository;
 import com.momentum.releaser.domain.issue.domain.Issue;
 import com.momentum.releaser.domain.issue.domain.QIssue;
 import com.momentum.releaser.domain.issue.domain.Tag;
-import com.momentum.releaser.domain.project.dto.ProjectRequestDto;
-import com.momentum.releaser.domain.project.dto.ProjectRequestDto.FilterIssueRequestDTO;
-import com.momentum.releaser.domain.project.dto.ProjectRequestDto.FilterReleaseRequestDTO;
-import com.momentum.releaser.domain.project.dto.ProjectResponseDto;
-import com.momentum.releaser.domain.project.dto.ProjectResponseDto.ProjectSearchResponseDTO;
-import com.momentum.releaser.domain.release.dao.release.ReleaseRepository;
-import com.momentum.releaser.domain.release.domain.QReleaseNote;
-import com.momentum.releaser.domain.release.domain.ReleaseNote;
-import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.types.Predicate;
-import org.modelmapper.ModelMapper;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-
-import com.momentum.releaser.domain.issue.dao.IssueRepository;
+import com.momentum.releaser.domain.issue.mapper.IssueMapper;
 import com.momentum.releaser.domain.project.dao.ProjectMemberRepository;
 import com.momentum.releaser.domain.project.dao.ProjectRepository;
 import com.momentum.releaser.domain.project.domain.Project;
 import com.momentum.releaser.domain.project.domain.ProjectMember;
+import com.momentum.releaser.domain.project.dto.ProjectRequestDto.FilterIssueRequestDTO;
+import com.momentum.releaser.domain.project.dto.ProjectRequestDto.FilterReleaseRequestDTO;
 import com.momentum.releaser.domain.project.dto.ProjectRequestDto.ProjectInfoRequestDTO;
 import com.momentum.releaser.domain.project.dto.ProjectResponseDto.GetProjectResponseDTO;
 import com.momentum.releaser.domain.project.dto.ProjectResponseDto.ProjectInfoResponseDTO;
+import com.momentum.releaser.domain.project.dto.ProjectResponseDto.ProjectSearchResponseDTO;
 import com.momentum.releaser.domain.project.mapper.ProjectMapper;
 import com.momentum.releaser.domain.release.dao.approval.ReleaseApprovalRepository;
+import com.momentum.releaser.domain.release.dao.release.ReleaseRepository;
+import com.momentum.releaser.domain.release.domain.QReleaseNote;
+import com.momentum.releaser.domain.release.domain.ReleaseNote;
+import com.momentum.releaser.domain.release.mapper.ReleaseMapper;
 import com.momentum.releaser.domain.user.dao.UserRepository;
 import com.momentum.releaser.domain.user.domain.User;
+import com.momentum.releaser.global.config.MySQL8DialectCustom;
 import com.momentum.releaser.global.config.aws.S3Upload;
 import com.momentum.releaser.global.exception.CustomException;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Predicate;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.NumberTemplate;
+import com.querydsl.core.types.dsl.StringExpression;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.hibernate.dialect.function.SQLFunctionTemplate;
+import org.modelmapper.ModelMapper;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
+
+import static com.momentum.releaser.domain.project.dto.ProjectDataDto.*;
+import static com.momentum.releaser.global.common.Base64.getImageUrlFromBase64;
+import static com.momentum.releaser.global.common.CommonEnum.DEFAULT_PROJECT_IMG;
+import static com.momentum.releaser.global.config.BaseResponseStatus.*;
 
 /**
  * 프로젝트와 관련된 기능을 제공하는 서비스 구현 클래스입니다.
@@ -168,11 +173,110 @@ public class ProjectServiceImpl implements ProjectService {
      */
     @Override
     @Transactional
-    public ProjectSearchResponseDTO findProjectSearch(Long projectId, String filterType,
-                                                      FilterIssueRequestDTO filterIssueGroup,
-                                                      FilterReleaseRequestDTO filterReleaseGroup) {
+    public ProjectSearchResponseDTO findProjectSearch(Long projectId, String filterType, FilterIssueRequestDTO filterIssueGroup, FilterReleaseRequestDTO filterReleaseGroup) {
+        ProjectMember member = projectRepository.getProjectMemberPostionPM(projectId);
+        List<GetIssueInfoDataDTO> issueResponses = null;
+        List<GetReleaseInfoDataDTO> releaseResponses = null;
 
-        return null;
+        if ("issue".equals(filterType)) {
+            Predicate predicateIssue = buildPredicateFromIssueFilters(filterIssueGroup, member.getProject());
+            Iterable<Issue> resultIssue = issueRepository.findAll(predicateIssue);
+            List<Issue> issues = StreamSupport.stream(resultIssue.spliterator(), false)
+                    .collect(Collectors.toList());
+            issueResponses = issues.stream()
+                    .map(this::toGetIssueInfoDataDTO)
+                    .collect(Collectors.toList());
+        } else {
+            Predicate predicateRelease = buildPredicateFromReleaseFilters(filterReleaseGroup, member.getProject());
+            Iterable<ReleaseNote> resultRelease = releaseRepository.findAll(predicateRelease);
+            List<ReleaseNote> releaseNotes = StreamSupport.stream(resultRelease.spliterator(), false)
+                    .collect(Collectors.toList());
+            releaseResponses = releaseNotes.stream()
+                    .map(release -> toGetReleaseInfoDataDTO(release, member))
+                    .collect(Collectors.toList());
+        }
+
+        // 빈 리스트로 초기화
+        issueResponses = Optional.ofNullable(issueResponses).orElse(Collections.emptyList());
+        releaseResponses = Optional.ofNullable(releaseResponses).orElse(Collections.emptyList());
+
+        return ProjectSearchResponseDTO.builder()
+                .getIssueInfoList(issueResponses)
+                .getReleaseInfoList(releaseResponses)
+                .build();
+    }
+
+    private GetReleaseInfoDataDTO toGetReleaseInfoDataDTO(ReleaseNote releaseNote, ProjectMember member) {
+        return ReleaseMapper.INSTANCE.toGetReleaseInfoDataDTO(releaseNote, member);
+    }
+
+    private GetIssueInfoDataDTO toGetIssueInfoDataDTO(Issue issue) {
+        return IssueMapper.INSTANCE.toGetIssueInfoDataDTO(issue);
+    }
+
+    private Predicate buildPredicateFromIssueFilters(FilterIssueRequestDTO filterIssueGroup, Project project) {
+        BooleanBuilder builder = new BooleanBuilder();
+        QIssue issue = QIssue.issue;
+
+        Date startDate = filterIssueGroup.getStartDate();
+        Date endDate = filterIssueGroup.getEndDate();
+        Long manager = filterIssueGroup.getManagerId();
+        String startVersion = filterIssueGroup.getStartReleaseVersion();
+        String endVersion = filterIssueGroup.getEndReleaseVersion();
+        String tag = filterIssueGroup.getTag();
+        String title = filterIssueGroup.getIssueTitle();
+
+        if (startDate != null && endDate != null) {
+            builder.and(issue.endDate.between(startDate, endDate));
+        }
+        if (manager != null) {
+            builder.and(issue.member.memberId.eq(manager));
+        }
+        if (hasText(startVersion) && hasText(endVersion)) {
+            builder.and(issue.release.version.goe(startVersion))
+                    .and(issue.release.version.loe(endVersion));
+        }
+        // FULLTEXT 검색을 위해 match 함수를 사용한 조건 추가
+        if (hasText(tag)) {
+            NumberTemplate booleanTemplate = Expressions.numberTemplate(Double.class,
+                    "function('match',{0},{1})", issue.tag, "+" + tag + "*");
+            List<Issue> result = issueRepository.getSearch(booleanTemplate, project);
+
+            builder.and(issue.in(result));
+        }
+        if (hasText(title)) {
+            NumberTemplate booleanTemplate = Expressions.numberTemplate(Double.class,
+                    "function('match',{0},{1})", issue.title, "+" + title + "*");
+            List<Issue> result = issueRepository.getSearch(booleanTemplate, project);
+
+            builder.and(issue.in(result));
+        }
+        return builder.getValue();
+    }
+
+    private Predicate buildPredicateFromReleaseFilters(FilterReleaseRequestDTO filterReleaseGroup, Project project) {
+        BooleanBuilder builder = new BooleanBuilder();
+
+        QReleaseNote release = QReleaseNote.releaseNote;
+
+        String startVersion = filterReleaseGroup.getStartVersion();
+        String endVersion = filterReleaseGroup.getEndVersion();
+        String title = filterReleaseGroup.getReleaseTitle();
+
+        if (hasText(startVersion) && hasText(endVersion)) {
+            builder.and(release.version.goe(startVersion))
+                    .and(release.version.loe(endVersion));
+        }
+
+        // FULLTEXT 검색을 위해 match 함수를 사용한 조건 추가
+        if (hasText(title)) {
+            NumberTemplate booleanTemplate = Expressions.numberTemplate(Double.class,
+                    "function('match',{0},{1})", release.title, "+" + title + "*");
+            List<ReleaseNote> result = releaseRepository.getSearch(booleanTemplate, project);
+
+            builder.and(release.in(result));
+        }
+            return builder.getValue();
 
     }
 

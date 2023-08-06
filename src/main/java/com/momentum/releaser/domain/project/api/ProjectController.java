@@ -17,6 +17,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.Min;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 import static com.momentum.releaser.domain.project.dto.ProjectResponseDto.*;
 
@@ -98,9 +99,27 @@ public class ProjectController {
     public BaseResponse<ProjectSearchResponseDTO> projectSearchList(
             @PathVariable @Min(value = 1, message = "프로젝트 식별 번호는 1 이상의 숫자여야 합니다.") Long projectId,
             @RequestParam String filterType,
-            @RequestParam(required = false) FilterIssueRequestDTO filterIssueGroup,
-            @RequestParam(required = false) FilterReleaseRequestDTO filterReleaseGroup) {
+            FilterIssueRequestDTO filterIssueGroup,
+            FilterReleaseRequestDTO filterReleaseGroup) {
         return new BaseResponse<>(projectService.findProjectSearch(projectId, filterType, filterIssueGroup, filterReleaseGroup));
+    }
+
+    /**
+     * 10.1 프로젝트 내 통합검색
+     */
+    @GetMapping("/search/test")
+    public BaseResponse<String> projectSearchTestList(
+            @RequestParam String filterType,
+            FilterIssueRequestDTO filterIssueGroup,
+            FilterReleaseRequestDTO filterReleaseGroup
+            ) {
+        System.out.println(filterType);
+        System.out.println(filterIssueGroup.getIssueTitle());
+        System.out.println(filterIssueGroup.getStartReleaseVersion());
+        System.out.println(filterIssueGroup.getTag());
+        System.out.println(filterReleaseGroup.getStartVersion());
+        System.out.println(filterReleaseGroup.getReleaseTitle());
+        return new BaseResponse<>("테스트 성공하였습니다.");
     }
 
 }

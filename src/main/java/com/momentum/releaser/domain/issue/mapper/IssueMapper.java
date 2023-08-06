@@ -8,6 +8,7 @@ import com.momentum.releaser.domain.issue.dto.IssueResponseDto;
 import com.momentum.releaser.domain.issue.dto.IssueResponseDto.IssueModifyResponseDTO;
 import com.momentum.releaser.domain.project.domain.ProjectMember;
 import com.momentum.releaser.domain.project.dto.ProjectDataDto;
+import com.momentum.releaser.domain.project.dto.ProjectDataDto.GetIssueInfoDataDTO;
 import com.momentum.releaser.domain.project.dto.ProjectDataDto.GetMembersDataDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -36,8 +37,8 @@ public interface IssueMapper {
     /**
      * Entity (Issue), DTO(GetMembers, OpinionInfoResponseDTO) -> DTO(ConnectedIssuesDataDto)
      */
-    @Mapping(source = "issue.issueNum.issueNum", target = "issueNum")
-    @Mapping(source = "issue.member.memberId", target = "manager")
+    @Mapping(target = "issueNum", source = "issue.issueNum.issueNum")
+    @Mapping(target = "manager", source = "issue.member.memberId")
     @Mapping(target = "memberList", source = "memberRes")
     @Mapping(target = "opinionList", source = "opinionRes")
     IssueDetailsDataDTO mapToGetIssue(Issue issue, List<GetMembersDataDTO> memberRes, List<OpinionInfoResponseDTO> opinionRes);
@@ -46,4 +47,11 @@ public interface IssueMapper {
      * Entity (ProjectMember) -> DTO(IssueModifyResponseDTO)
      */
     IssueModifyResponseDTO toIssueModifyResponseDTO(ProjectMember projectMember);
+
+
+    @Mapping(target = "releaseVersion", source = "issue.release.version")
+    @Mapping(target = "manager", source = "issue.member.memberId")
+    @Mapping(target = "managerName", source = "issue.member.user.name")
+    @Mapping(target = "managerImg", source = "issue.member.user.img")
+    GetIssueInfoDataDTO toGetIssueInfoDataDTO(Issue issue);
 }

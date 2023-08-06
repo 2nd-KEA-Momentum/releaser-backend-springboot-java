@@ -2,6 +2,7 @@ package com.momentum.releaser.domain.project.dao;
 
 import java.util.List;
 
+import com.momentum.releaser.domain.project.domain.ProjectMember;
 import org.springframework.stereotype.Repository;
 
 import lombok.RequiredArgsConstructor;
@@ -48,5 +49,18 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom {
                 .where(member.project.eq(project))
                 .fetch();
         return getMembersRes;
+    }
+
+    @Override
+    public ProjectMember getProjectMemberPostionPM(Long projectId) {
+        QProjectMember member = QProjectMember.projectMember;
+
+        ProjectMember memberRes = queryFactory
+                .select(member)
+                .from(member)
+                .where(member.project.projectId.eq(projectId)
+                        .and(member.position.eq('L')))
+                .fetchOne();
+        return memberRes;
     }
 }

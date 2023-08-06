@@ -2,6 +2,9 @@ package com.momentum.releaser.domain.release.mapper;
 
 import java.util.List;
 
+import com.momentum.releaser.domain.project.domain.ProjectMember;
+import com.momentum.releaser.domain.project.dto.ProjectDataDto;
+import com.momentum.releaser.domain.project.dto.ProjectDataDto.GetReleaseInfoDataDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
@@ -68,4 +71,8 @@ public interface ReleaseMapper {
     @Mapping(target = "memberProfileImg", source = "releaseOpinion.member.user.img")
     ReleaseOpinionsResponseDTO toReleaseOpinionsResponseDto(ReleaseOpinion releaseOpinion);
 
+    @Mapping(target = "pmId", source = "member.memberId")
+    @Mapping(target = "pmName", source = "member.user.name")
+    @Mapping(target = "pmImg", source = "member.user.img")
+    GetReleaseInfoDataDTO toGetReleaseInfoDataDTO(ReleaseNote release, ProjectMember member);
 }

@@ -4,6 +4,8 @@ import java.util.List;
 
 import com.momentum.releaser.domain.project.domain.Project;
 import com.momentum.releaser.domain.release.domain.ReleaseNote;
+import com.querydsl.core.types.Predicate;
+import com.querydsl.core.types.dsl.NumberTemplate;
 
 /**
  * Querydsl을 사용하는 repository
@@ -18,4 +20,7 @@ public interface ReleaseRepositoryCustom {
     List<ReleaseNote> findByProjectAndNotInVersion(Project project, String version);
 
     List<ReleaseNote> findPreviousReleaseNotes(Project project, String version);
+
+    List<ReleaseNote> getSearch(NumberTemplate booleanTemplate, Project project);
+
 }
