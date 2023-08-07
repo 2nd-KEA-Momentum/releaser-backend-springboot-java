@@ -106,7 +106,7 @@ public class ProjectController {
             @PathVariable @Min(value = 1, message = "프로젝트 식별 번호는 1 이상의 숫자여야 합니다.") Long projectId,
             @RequestParam String filterType,
             @Valid FilterIssueRequestDTO filterIssueGroup,
-            FilterReleaseRequestDTO filterReleaseGroup) {
+            @Valid FilterReleaseRequestDTO filterReleaseGroup) {
         return new BaseResponse<>(projectService.findProjectSearch(projectId, filterType, filterIssueGroup, filterReleaseGroup));
     }
 

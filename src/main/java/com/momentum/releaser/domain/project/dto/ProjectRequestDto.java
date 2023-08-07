@@ -75,6 +75,7 @@ public class ProjectRequestDto {
         private String startVersion;
         @Pattern(regexp = "^(?!0)\\d+\\.\\d+\\.\\d+$", message = "릴리즈 버전 형식에 맞지 않습니다.")
         private String endVersion;
+
         private String releaseTitle;
     }
 
