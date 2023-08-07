@@ -1,10 +1,9 @@
 package com.momentum.releaser.domain.project.dto;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
 
 import lombok.*;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 import java.util.List;
@@ -46,9 +45,15 @@ public class ProjectRequestDto {
     @Data
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     public static class FilterIssueRequestDTO {
+        @DateTimeFormat(pattern = "yyyy-MM-dd")
         private Date startDate;
+
+        @DateTimeFormat(pattern = "yyyy-MM-dd")
         private Date endDate;
+
+        @Positive(message = "담당자 식별 번호는 양수만 가능합니다.")
         private Long managerId;
+
         private String startReleaseVersion;
         private String endReleaseVersion;
 

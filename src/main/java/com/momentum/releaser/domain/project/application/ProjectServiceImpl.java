@@ -182,10 +182,11 @@ public class ProjectServiceImpl implements ProjectService {
         // 검색 대상이 issue인 경우 이슈 정보 검색
         if ("issue".equals(filterType)) {
             issueResponses = findIssueResponses(filterIssueGroup, member.getProject());
-        }
-        // 검색 대상이 release인 경우 릴리즈 정보 검색
-        else {
+        } else if ("release".equals(filterType)) {
+            // 검색 대상이 release인 경우 릴리즈 정보 검색
             releaseResponses = findReleaseResponses(filterReleaseGroup, member);
+        } else {
+            throw new CustomException(INVALID_FILTER_TYPE);
         }
 
         // 검색 결과가 null인 경우 빈 리스트로 초기화
@@ -499,36 +500,36 @@ public class ProjectServiceImpl implements ProjectService {
         if (startDate != null && endDate != null) {
             builder.and(issue.endDate.between(startDate, endDate));
         }
-
         // 이슈의 담당자 검색 조건 추가
         if (manager != null) {
             builder.and(issue.member.memberId.eq(manager));
         }
-
         // 이슈의 릴리즈 버전 범위 검색 조건 추가
         if (hasText(startVersion) && hasText(endVersion)) {
             builder.and(issue.release.version.goe(startVersion))
                     .and(issue.release.version.loe(endVersion));
         }
-
         // 이슈의 태그를 이용한 FULLTEXT 검색 조건 추가
         if (hasText(tag)) {
             NumberTemplate booleanTemplate = Expressions.numberTemplate(Double.class,
                     "function('match',{0},{1})", issue.tag, "+" + tag + "*");
             List<Issue> result = issueRepository.getSearch(booleanTemplate, project);
+
             if (result != null) {
                 builder.and(issue.in(result));
             }
-        }
 
+        }
         // 이슈의 제목을 이용한 FULLTEXT 검색 조건 추가
         if (hasText(title)) {
             NumberTemplate booleanTemplate = Expressions.numberTemplate(Double.class,
                     "function('match',{0},{1})", issue.title, "+" + title + "*");
             List<Issue> result = issueRepository.getSearch(booleanTemplate, project);
+
             if (result != null) {
                 builder.and(issue.in(result));
             }
+
         }
 
         return builder.getValue();
@@ -559,14 +560,16 @@ public class ProjectServiceImpl implements ProjectService {
             builder.and(release.version.goe(startVersion))
                     .and(release.version.loe(endVersion));
         }
-
         // 릴리즈의 제목을 이용한 FULLTEXT 검색 조건 추가
         if (hasText(title)) {
             NumberTemplate booleanTemplate = Expressions.numberTemplate(Double.class,
                     "function('match',{0},{1})", release.title, "+" + title + "*");
             List<ReleaseNote> result = releaseRepository.getSearch(booleanTemplate, project);
 
-            builder.and(release.in(result));
+            if (result != null) {
+                builder.and(release.in(result));
+            }
+
         }
 
         return builder.getValue();

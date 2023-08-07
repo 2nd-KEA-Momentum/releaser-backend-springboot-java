@@ -19,9 +19,11 @@ public enum BaseResponseStatus {
      */
 
     INVALID_REQUEST_BODY(false, 2000, "요청 데이터가 잘못되었습니다."),
-    NOT_EXISTS_REDIS_CODE(false, 2001, "유효하지 않은 코드입니다."),
-    INVALID_REDIS_CODE(false, 2002, "잘못된 코드입니다."),
-    INVALID_REDIS_KEY(false, 2003, "유효하지 않은 키 값입니다."),
+    INVALID_QUERY_STRING(false, 2001, "QueryString 요청 데이터가 잘못되었습니다."),
+    NOT_EXISTS_REDIS_CODE(false, 2002, "유효하지 않은 코드입니다."),
+    INVALID_REDIS_CODE(false, 2003, "잘못된 코드입니다."),
+    INVALID_REDIS_KEY(false, 2004, "유효하지 않은 키 값입니다."),
+    INVALID_FILTER_TYPE(false, 2005, "유효하지않은 필터 타입입니다."),
     NOT_EQUAL_PASSWORD_AND_CONFIRM_PASSWORD(false, 2100, "비밀번호와 확인용 비밀번호가 일치하지 않습니다."),
     NOT_PROJECT_PM(false, 2200, "해당 프로젝트의 관리자가 아닙니다."),
     INVALID_RELEASE_VERSION_TYPE(false, 2400, "릴리즈 버전 타입이 올바르지 않습니다. MAJOR, MINOR, PATCH 중 하나여야 합니다."),

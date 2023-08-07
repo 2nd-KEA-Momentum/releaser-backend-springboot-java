@@ -50,7 +50,6 @@ public class IssueServiceImpl implements IssueService {
     private final ProjectMemberRepository projectMemberRepository;
     private final UserRepository userRepository;
     private final ReleaseRepository releaseRepository;
-    private final ModelMapper modelMapper;
 
     /**
      * 7.1 이슈 생성
@@ -654,7 +653,7 @@ public class IssueServiceImpl implements IssueService {
         // 사용자의 프로젝트 멤버 정보 조회
         Long accessMember = getProjectMemberByUserAndProject(user, project).getMemberId();
 
-        // memberid와 이슈 의견 작성자의 memberId 비교하여 일치 여부 반환
+        // memberId와 이슈 의견 작성자의 memberId 비교하여 일치 여부 반환
         return Objects.equals(accessMember, opinion.getMember().getMemberId());
     }
 
