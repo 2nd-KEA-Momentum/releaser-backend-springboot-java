@@ -8,6 +8,7 @@ import static org.springframework.util.StringUtils.hasText;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -498,7 +499,13 @@ public class ProjectServiceImpl implements ProjectService {
 
         // 이슈의 종료일 범위 검색 조건 추가
         if (startDate != null && endDate != null) {
-            builder.and(issue.endDate.between(startDate, endDate));
+            // endDate를 하루 뒤로 이동하여 포함되게 조회
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(endDate);
+            calendar.add(Calendar.DATE, 1);
+            Date adjustedEndDate = calendar.getTime();
+
+            builder.and(issue.endDate.between(startDate, adjustedEndDate));
         }
         // 이슈의 담당자 검색 조건 추가
         if (manager != null) {
