@@ -104,7 +104,7 @@ public class GlobalControllerAdvice {
                 errors.put(fieldName, "태그 타입은 DEPRECATED, CHANGED, NEW, FEATURE, FIXED 중 하나여야 합니다.");
             } else if ("managerId".equals(fieldName)) {
                 errors.put(fieldName, "담당자 식별 번호는 양수만 가능합니다.");
-            } else if ("startReleaseVersion".equals(fieldName) || "endReleaseVersion".equals(fieldName)) {
+            } else if ("startReleaseVersion".equals(fieldName) || "endReleaseVersion".equals(fieldName) || "startVersion".equals(fieldName) || "endVersion".equals(fieldName)) {
                 errors.put(fieldName, "릴리즈 버전 형식에 맞지 않습니다.");
             } else {
                 errors.put(fieldName, "날짜 형식이 맞지 않습니다.");
