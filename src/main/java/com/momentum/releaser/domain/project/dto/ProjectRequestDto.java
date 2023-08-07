@@ -54,7 +54,9 @@ public class ProjectRequestDto {
         @Positive(message = "담당자 식별 번호는 양수만 가능합니다.")
         private Long managerId;
 
+        @Pattern(regexp = "^(?!0)\\d+\\.\\d+\\.\\d+$", message = "릴리즈 버전 형식에 맞지 않습니다.")
         private String startReleaseVersion;
+        @Pattern(regexp = "^(?!0)\\d+\\.\\d+\\.\\d+$", message = "릴리즈 버전 형식에 맞지 않습니다.")
         private String endReleaseVersion;
 
         @Pattern(regexp = "(?i)^(DEPRECATED|CHANGED|NEW|FEATURE|FIXED)$", message = "태그 타입은 DEPRECATED, CHANGED, NEW, FEATURE, FIXED 중 하나여야 합니다.")
