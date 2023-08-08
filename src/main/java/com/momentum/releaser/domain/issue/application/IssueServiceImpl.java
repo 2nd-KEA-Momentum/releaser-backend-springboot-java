@@ -95,7 +95,7 @@ public class IssueServiceImpl implements IssueService {
         ProjectMember projectMember = getProjectMemberByUserAndProject(user, issue.getProject());
 
         // 접근한 유저가 멤버일 경우 edit 상태 변경
-        char edit = decideEditStatus(projectMember.getMemberId());
+        char edit = decideEditStatus(projectMember);
 
         ProjectMember manager = null;
         // 담당자 memberId가 null이 아닌 경우 프로젝트 멤버 조회
@@ -339,9 +339,9 @@ public class IssueServiceImpl implements IssueService {
      * @return ProjectMember 프로젝트 멤버 정보
      * @throws CustomException 프로젝트 멤버가 존재하지 않을 경우 예외 발생
      */
-    private ProjectMember getProjectMemberById(Long memberId) {
+    ProjectMember getProjectMemberById(Long memberId) {
         return projectMemberRepository.findById(memberId)
-                .orElseThrow(() -> new CustomException(BaseResponseStatus.NOT_EXISTS_PROJECT_MEMBER));
+                .orElseThrow(() -> new CustomException(NOT_EXISTS_PROJECT_MEMBER));
     }
 
     /**
@@ -349,12 +349,12 @@ public class IssueServiceImpl implements IssueService {
      *
      * @author chaeanna
      * @date 2023-07-05
-     * @param user 사용자 정보
-     * @param project 프로젝트 정보
+     * @param user 사용자 엔티티
+     * @param project 프로젝트 엔티티
      * @return ProjectMember 프로젝트 멤버 정보
      */
     private ProjectMember getProjectMemberByUserAndProject(User user, Project project) {
-        return projectMemberRepository.findByUserAndProject(user, project);
+        return projectMemberRepository.findByUserAndProject(user, project).orElseThrow(() -> new CustomException(NOT_EXISTS_PROJECT_MEMBER));
     }
 
     /**
@@ -460,12 +460,9 @@ public class IssueServiceImpl implements IssueService {
      * @return 편집 가능 여부 ('Y' 또는 'N')
      * @throws CustomException 멤버가 존재하지 않을 경우 예외 발생
      */
-    private char decideEditStatus(Long memberId) {
-        // memberId로 해당 프로젝트 멤버 정보를 가져옵니다.
-        ProjectMember projectMember = getProjectMemberById(memberId);
-
+    private char decideEditStatus(ProjectMember member) {
         // 멤버의 포지션이 'M'인 경우 'Y'(편집 가능)을 반환하고, 그 외에는 'N'(편집 불가능)을 반환합니다.
-        return (projectMember.getPosition() == 'M') ? 'Y' : 'N';
+        return (member.getPosition() == 'M') ? 'Y' : 'N';
     }
 
     /**

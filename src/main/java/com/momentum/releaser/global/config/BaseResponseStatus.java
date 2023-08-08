@@ -24,12 +24,15 @@ public enum BaseResponseStatus {
     INVALID_REDIS_CODE(false, 2003, "잘못된 코드입니다."),
     INVALID_REDIS_KEY(false, 2004, "유효하지 않은 키 값입니다."),
     INVALID_FILTER_TYPE(false, 2005, "유효하지않은 필터 타입입니다."),
+
     NOT_EQUAL_PASSWORD_AND_CONFIRM_PASSWORD(false, 2100, "비밀번호와 확인용 비밀번호가 일치하지 않습니다."),
     NOT_PROJECT_PM(false, 2200, "해당 프로젝트의 관리자가 아닙니다."),
+
     INVALID_RELEASE_VERSION_TYPE(false, 2400, "릴리즈 버전 타입이 올바르지 않습니다. MAJOR, MINOR, PATCH 중 하나여야 합니다."),
     EXISTS_DEPLOYED_RELEASE_NOTE_AFTER_THIS(false, 2401, "배포된 상위 버전의 릴리즈 노트가 있어 삭제할 수 없습니다."),
     EXISTS_NOT_DEPLOYED_RELEASE_NOTE_BEFORE_THIS(false, 2402, "배포되지 않은 하위 버전의 릴리즈 노트가 있어 현재 릴리즈 노트를 배포할 수 없습니다."),
     UNAUTHORIZED_TO_DELETE_RELEASE_OPINION(false, 2403, "해당 릴리즈 노트 의견 삭제 권한이 없습니다."),
+
     INVALID_ISSUE_TAG(false, 2500, "이슈 태그가 올바르지 않습니다."),
     INVALID_LIFECYCLE(false, 2501, "이슈 상태가 올바르지 않습니다."),
     CONNECTED_ISSUE_EXISTS(false, 2502, "릴리즈와 연결된 이슈이므로 상태 변경이 불가능합니다."),

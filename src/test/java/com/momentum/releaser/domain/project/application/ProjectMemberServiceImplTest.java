@@ -87,13 +87,13 @@ class ProjectMemberServiceImplTest {
         projectMembers.add(mockMember);
 
         // projectRepository.findById() 메서드 동작 가짜 구현(Mock)
-        when(projectRepository.findById(mockProjectId)).thenReturn(java.util.Optional.of(mockProject));
+        when(projectRepository.findById(mockProjectId)).thenReturn(Optional.of(mockProject));
 
         // userRepository.findByEmail() 메서드 동작 가짜 구현(Mock)
-        when(userRepository.findByEmail(mockEmail)).thenReturn(java.util.Optional.of(mockUser1));
+        when(userRepository.findByEmail(mockEmail)).thenReturn(Optional.of(mockUser1));
 
         // projectMemberRepository.findByUserAndProject() 메서드 동작 가짜 구현(Mock)
-        when(projectMemberRepository.findByUserAndProject(mockUser1, mockProject)).thenReturn(mockAccessMember);
+        when(projectMemberRepository.findByUserAndProject(mockUser1, mockProject)).thenReturn(Optional.of(mockAccessMember));
 
         // projectMemberRepository.findByProject() 메서드 동작 가짜 구현(Mock)
         when(projectMemberRepository.findByProject(mockProject)).thenReturn(projectMembers);
@@ -145,13 +145,13 @@ class ProjectMemberServiceImplTest {
         );
 
         // projectRepository.findByLink() 메서드 동작 가짜 구현(Mock)
-        when(projectRepository.findByLink(mockLink)).thenReturn(java.util.Optional.of(mockProject));
+        when(projectRepository.findByLink(mockLink)).thenReturn(Optional.of(mockProject));
 
         // userRepository.findByEmail() 메서드 동작 가짜 구현(Mock)
-        when(userRepository.findByEmail(mockEmail)).thenReturn(java.util.Optional.of(mockUser1));
+        when(userRepository.findByEmail(mockEmail)).thenReturn(Optional.of(mockUser1));
 
         // projectMemberRepository.findByUserAndProject() 메서드 동작 가짜 구현(Mock)
-        when(projectMemberRepository.findByUserAndProject(mockUser1, mockProject)).thenReturn(mockAccessMember);
+        when(projectMemberRepository.findByUserAndProject(mockUser1, mockProject)).thenReturn(Optional.of(mockAccessMember));
 
         // 테스트할 메서드 실행
         assertThrows(CustomException.class, () -> {
@@ -190,10 +190,10 @@ class ProjectMemberServiceImplTest {
         );
 
         // projectRepository.findByLink() 메서드 동작 가짜 구현(Mock)
-        when(projectRepository.findByLink(mockLink)).thenReturn(java.util.Optional.of(mockProject));
+        when(projectRepository.findByLink(mockLink)).thenReturn(Optional.of(mockProject));
 
         // userRepository.findByEmail() 메서드 동작 가짜 구현(Mock)
-        when(userRepository.findByEmail(mockEmail)).thenReturn(java.util.Optional.of(mockUser1));
+        when(userRepository.findByEmail(mockEmail)).thenReturn(Optional.of(mockUser1));
 
         // projectMemberRepository.findByUserAndProject() 메서드 동작 가짜 구현(Mock)
         when(projectMemberRepository.findByUserAndProject(mockUser1, mockProject)).thenReturn(null);
@@ -262,7 +262,7 @@ class ProjectMemberServiceImplTest {
         when(projectMemberRepository.findById(mockMemberId)).thenReturn(Optional.of(mockMember));
 
         // projectMemberRepository.findByUserAndProject() 메서드 동작 가짜 구현(Mock)
-        when(projectMemberRepository.findByUserAndProject(mockAccessUser, mockProject)).thenReturn(mockLeaderMember);
+        when(projectMemberRepository.findByUserAndProject(mockAccessUser, mockProject)).thenReturn(Optional.of(mockLeaderMember));
 
         // 테스트할 메서드 실행
         projectMemberRepository.deleteById(mockMemberId);
