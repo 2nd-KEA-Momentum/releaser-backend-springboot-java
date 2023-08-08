@@ -319,7 +319,7 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
      */
     private ProjectMember findProjectMemberByUserAndProject(User user, Project project) {
         // 사용자와 프로젝트를 매개변수로 하여 프로젝트 멤버를 조회합니다.
-        return projectMemberRepository.findByUserAndProject(user, project);
+        return projectMemberRepository.findByUserAndProject(user, project).orElseThrow(() -> new CustomException(NOT_EXISTS_PROJECT_MEMBER));
     }
 
 

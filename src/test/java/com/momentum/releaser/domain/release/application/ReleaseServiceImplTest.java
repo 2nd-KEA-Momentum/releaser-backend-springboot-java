@@ -157,7 +157,7 @@ class ReleaseServiceImplTest {
         );
         when(projectRepository.findById(projectId)).thenReturn(Optional.of(mockProject));
         when(userRepository.findByEmail(userEmail)).thenReturn(Optional.of(mockUser1));
-        when(projectMemberRepository.findByUserAndProject(mockUser1, mockProject)).thenReturn(mockLeaderMember);
+        when(projectMemberRepository.findByUserAndProject(mockUser1, mockProject)).thenReturn(Optional.of(mockLeaderMember));
         when(issueRepository.findById(mockIssue1.getIssueId())).thenReturn(Optional.of(mockIssue1));
         when(issueRepository.findById(mockIssue2.getIssueId())).thenReturn(Optional.of(mockIssue2));
         when(releaseRepository.save(any(ReleaseNote.class))).thenReturn(mockSavedReleaseNote);

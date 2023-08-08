@@ -1269,7 +1269,7 @@ public class ReleaseServiceImpl implements ReleaseService {
         // 프로젝트 조회
         Project project = getProjectById(projectId);
         // 사용자와 프로젝트로 구성원 정보 조회
-        return projectMemberRepository.findByUserAndProject(user, project);
+        return projectMemberRepository.findByUserAndProject(user, project).orElseThrow(() -> new CustomException(NOT_EXISTS_PROJECT_MEMBER));
     }
 
     /**
@@ -1300,12 +1300,7 @@ public class ReleaseServiceImpl implements ReleaseService {
      */
     private void isProjectManager(String email, Project project) {
         User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(NOT_EXISTS_USER));
-        ProjectMember member = projectMemberRepository.findByUserAndProject(user, project);
-
-        if (member == null) {
-            // 프로젝트 멤버가 아닐 경우 예외를 발생시킨다.
-            throw new CustomException(NOT_EXISTS_PROJECT_MEMBER);
-        }
+        ProjectMember member = projectMemberRepository.findByUserAndProject(user, project).orElseThrow(() -> new CustomException(NOT_EXISTS_PROJECT_MEMBER));;
 
         if (member.getPosition() != 'L') {
             // 프로젝트의 관리자가 아닌 경우 예외를 발생시킨다.
@@ -1325,12 +1320,7 @@ public class ReleaseServiceImpl implements ReleaseService {
      */
     private ProjectMember getProjectMember(String email, Project project) {
         User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(NOT_EXISTS_USER));
-        ProjectMember member = projectMemberRepository.findByUserAndProject(user, project);
-
-        if (member == null) {
-            // 프로젝트 멤버가 아닐 경우 예외를 발생시킨다.
-            throw new CustomException(NOT_EXISTS_PROJECT_MEMBER);
-        }
+        ProjectMember member = projectMemberRepository.findByUserAndProject(user, project).orElseThrow(() -> new CustomException(NOT_EXISTS_PROJECT_MEMBER));;
 
         return member;
     }
