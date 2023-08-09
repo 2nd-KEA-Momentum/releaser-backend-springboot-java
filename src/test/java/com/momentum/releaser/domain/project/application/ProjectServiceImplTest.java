@@ -1,35 +1,45 @@
 package com.momentum.releaser.domain.project.application;
 
-import static com.momentum.releaser.global.config.BaseResponseStatus.CONNECTED_RELEASE_EXISTS;
-import static com.momentum.releaser.global.config.BaseResponseStatus.NOT_PROJECT_PM;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
+import com.momentum.releaser.domain.issue.dao.IssueRepository;
+import com.momentum.releaser.domain.issue.domain.Issue;
+import com.momentum.releaser.domain.issue.domain.LifeCycle;
+import com.momentum.releaser.domain.issue.domain.Tag;
+import com.momentum.releaser.domain.project.dao.ProjectMemberRepository;
+import com.momentum.releaser.domain.project.dao.ProjectRepository;
+import com.momentum.releaser.domain.project.domain.Project;
+import com.momentum.releaser.domain.project.domain.ProjectMember;
+import com.momentum.releaser.domain.project.dto.ProjectDataDto;
+import com.momentum.releaser.domain.project.dto.ProjectDataDto.GetIssueInfoDataDTO;
+import com.momentum.releaser.domain.project.dto.ProjectDataDto.GetProjectDataDTO;
+import com.momentum.releaser.domain.project.dto.ProjectRequestDto;
+import com.momentum.releaser.domain.project.dto.ProjectRequestDto.FilterIssueRequestDTO;
+import com.momentum.releaser.domain.project.dto.ProjectRequestDto.FilterReleaseRequestDTO;
 import com.momentum.releaser.domain.project.dto.ProjectRequestDto.ProjectInfoRequestDTO;
+import com.momentum.releaser.domain.project.dto.ProjectResponseDto;
+import com.momentum.releaser.domain.project.dto.ProjectResponseDto.GetProjectResponseDTO;
 import com.momentum.releaser.domain.project.dto.ProjectResponseDto.ProjectInfoResponseDTO;
+import com.momentum.releaser.domain.project.dto.ProjectResponseDto.ProjectSearchResponseDTO;
+import com.momentum.releaser.domain.release.dao.approval.ReleaseApprovalRepository;
 import com.momentum.releaser.domain.release.dao.release.ReleaseRepository;
+import com.momentum.releaser.domain.user.dao.UserRepository;
+import com.momentum.releaser.domain.user.domain.User;
+import com.momentum.releaser.global.config.aws.S3Upload;
 import com.momentum.releaser.global.exception.CustomException;
+import com.querydsl.core.types.Predicate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
 
-import com.momentum.releaser.domain.issue.dao.IssueRepository;
-import com.momentum.releaser.domain.project.dao.ProjectMemberRepository;
-import com.momentum.releaser.domain.project.dao.ProjectRepository;
-import com.momentum.releaser.domain.project.domain.Project;
-import com.momentum.releaser.domain.project.domain.ProjectMember;
-import com.momentum.releaser.domain.project.dto.ProjectDataDto.GetProjectDataDTO;
-import com.momentum.releaser.domain.project.dto.ProjectResponseDto.GetProjectResponseDTO;
-import com.momentum.releaser.domain.release.dao.approval.ReleaseApprovalRepository;
-import com.momentum.releaser.domain.user.dao.UserRepository;
-import com.momentum.releaser.domain.user.domain.User;
-import com.momentum.releaser.global.config.aws.S3Upload;
+import java.io.IOException;
+import java.sql.Date;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import static com.momentum.releaser.global.config.BaseResponseStatus.NOT_PROJECT_PM;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 class ProjectServiceImplTest {
 
@@ -47,6 +57,7 @@ class ProjectServiceImplTest {
     void setUp() {
         projectRepository = mock(ProjectRepository.class);
         issueRepository = mock(IssueRepository.class);
+        releaseRepository = mock(ReleaseRepository.class);
         releaseApprovalRepository = mock(ReleaseApprovalRepository.class);
         projectMemberRepository = mock(ProjectMemberRepository.class);
         userRepository = mock(UserRepository.class);
@@ -258,6 +269,67 @@ class ProjectServiceImplTest {
         verify(userRepository, times(1)).findByEmail(mockEmail);
         verify(projectMemberRepository, times(1)).findByUser(mockUser1);
     }
+
+    @Test
+    @DisplayName("10.1 프로젝트 내 통합검색 - 이슈 검색")
+    void testFindIssueSearch() {
+        Long mockProjectId = 1L;
+        String mockFilterType = "issue";
+
+        FilterIssueRequestDTO mockIssueReqDTO = new FilterIssueRequestDTO(
+                Date.valueOf("2023-08-01"), Date.valueOf("2023-08-09"), 1L,
+                "1.0.0", "1.2.0",
+                "NEW", "title"
+        );
+        User mockUser = new User(
+                "userName", "test@releaser.com", null, 'Y'
+
+        );
+        Project mockProject = new Project(
+                mockProjectId, "project Title", "project Content", "project Team", null, "testLink", 'Y'
+        );
+        ProjectMember mockMember = new ProjectMember(
+                1L, 'L', 'Y', mockUser, mockProject
+        );
+
+        when(projectRepository.getProjectMemberPostionPM(mockProjectId)).thenReturn(mockMember);
+
+        ProjectSearchResponseDTO result = projectService.findProjectSearch(mockProjectId, mockFilterType, mockIssueReqDTO, null);
+
+        assertNotNull(result);
+
+        verify(projectRepository, times(1)).getProjectMemberPostionPM(mockProjectId);
+    }
+
+    @Test
+    @DisplayName("10.1 프로젝트 내 통합검색 - 릴리즈 검색")
+    void testFindReleaseSearch() {
+        Long mockProjectId = 1L;
+        String mockFilterType = "release";
+
+        FilterReleaseRequestDTO mockReleaseReqDTO = new FilterReleaseRequestDTO(
+                "1.0.0", "2.0.0", "Title"
+        );
+        User mockUser = new User(
+                "userName", "test@releaser.com", null, 'Y'
+
+        );
+        Project mockProject = new Project(
+                mockProjectId, "project Title", "project Content", "project Team", null, "testLink", 'Y'
+        );
+        ProjectMember mockMember = new ProjectMember(
+                1L, 'L', 'Y', mockUser, mockProject
+        );
+
+        when(projectRepository.getProjectMemberPostionPM(mockProjectId)).thenReturn(mockMember);
+
+        ProjectSearchResponseDTO result = projectService.findProjectSearch(mockProjectId, mockFilterType, null, mockReleaseReqDTO);
+
+        assertNotNull(result);
+
+        verify(projectRepository, times(1)).getProjectMemberPostionPM(mockProjectId);
+    }
+
 
 }
 
