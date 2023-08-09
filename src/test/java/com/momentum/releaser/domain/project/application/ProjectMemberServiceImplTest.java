@@ -51,37 +51,20 @@ class ProjectMemberServiceImplTest {
         String mockEmail = "testUser@releaser.com";
 
         Project mockProject = new Project(
-                "projectTitle",
-                "projectContent",
-                "projectTeam",
-                "",
-                "testlinktestlink",
-                'Y'
+                mockProjectId, "projectTitle", "projectContent", "projectTeam", null, "testlinktestlink", 'Y'
         );
         User mockUser1 = new User(
-                "testUserName",
-                mockEmail,
-                "",
-                'Y'
+                "testUserName", mockEmail, null, 'Y'
         );
         User mockUser2 = new User(
-                "testUserName2",
-                "testUser2@releaser.com",
-                "",
-                'Y'
+                "testUserName2", "testUser2@releaser.com", null, 'Y'
         );
         ProjectMember mockAccessMember = new ProjectMember(
-                1L, 'L',
-                'Y',
-                mockUser1,
-                mockProject
+                1L, 'L', 'Y', mockUser1, mockProject
         );
         List<ProjectMember> projectMembers = new ArrayList<>();
         ProjectMember mockMember = new ProjectMember(
-                2L, 'M',
-                'Y',
-                mockUser2,
-                mockProject
+                2L, 'M', 'Y', mockUser2, mockProject
         );
         projectMembers.add(mockAccessMember);
         projectMembers.add(mockMember);
@@ -124,24 +107,14 @@ class ProjectMemberServiceImplTest {
         String mockEmail = "testUser@releaser.com";
 
         Project mockProject = new Project(
-                "projectTitle",
-                "projectContent",
-                "projectTeam",
-                "",
-                mockLink,
-                'Y'
+                1L, "projectTitle", "projectContent", "projectTeam",
+                null, mockLink, 'Y'
         );
         User mockUser1 = new User(
-                "testUserName",
-                mockEmail,
-                "",
-                'Y'
+                "testUserName", mockEmail, null, 'Y'
         );
         ProjectMember mockAccessMember = new ProjectMember(
-                1L, 'L',
-                'Y',
-                mockUser1,
-                mockProject
+                1L, 'L', 'Y', mockUser1, mockProject
         );
 
         // projectRepository.findByLink() 메서드 동작 가짜 구현(Mock)
@@ -175,18 +148,11 @@ class ProjectMemberServiceImplTest {
         String mockEmail = "testUser@releaser.com";
 
         Project mockProject = new Project(
-                "projectTitle",
-                "projectContent",
-                "projectTeam",
-                "",
-                mockLink,
-                'Y'
+                1L, "projectTitle", "projectContent", "projectTeam",
+                null, mockLink, 'Y'
         );
         User mockUser1 = new User(
-                "testUserName",
-                mockEmail,
-                "",
-                'Y'
+                "testUserName", mockEmail, null, 'Y'
         );
 
         // projectRepository.findByLink() 메서드 동작 가짜 구현(Mock)
@@ -223,36 +189,20 @@ class ProjectMemberServiceImplTest {
         String mockEmail = "testLeader@releaser.com"; // 접근 유저
 
         Project mockProject = new Project(
-                "projectTitle",
-                "projectContent",
-                "projectTeam",
-                "",
-                "testLink",
-                'Y'
+                1L, "projectTitle", "projectContent", "projectTeam",
+                null, "testLink", 'Y'
         );
         User mockAccessUser = new User(
-                "testUserName",
-                mockEmail,
-                "",
-                'Y'
+                "testUserName", mockEmail, null, 'Y'
         );
         User mockRemovedUser = new User(
-                "testUserName",
-                "remove@releaser.com",
-                "",
-                'Y'
+                "testUserName", "remove@releaser.com", null, 'Y'
         );
         ProjectMember mockLeaderMember = new ProjectMember(
-                1L, 'L',
-                'Y',
-                mockAccessUser,
-                mockProject
+                1L, 'L', 'Y', mockAccessUser, mockProject
         );
         ProjectMember mockMember = new ProjectMember(
-                2L, 'M',
-                'Y',
-                mockRemovedUser,
-                mockProject
+                2L, 'M', 'Y', mockRemovedUser, mockProject
         );
 
         // userRepository.findByEmail() 메서드 동작 가짜 구현(Mock)
@@ -288,42 +238,23 @@ class ProjectMemberServiceImplTest {
         String mockEmail = "testMember@releaser.com"; // 접근 유저
 
         Project mockProject = new Project(
-                "projectTitle",
-                "projectContent",
-                "projectTeam",
-                "",
-                "testLink",
-                'Y'
+                1L, "projectTitle", "projectContent", "projectTeam",
+                null, "testLink", 'Y'
         );
         User mockAccessUser = new User(
-                "testUserName",
-                mockEmail,
-                "",
-                'Y'
+                "testUserName", mockEmail, null, 'Y'
         );
         User mockLeaderUser = new User(
-                "testUserName",
-                "testLeader@releaser.com",
-                "",
-                'Y'
+                "testUserName", "testLeader@releaser.com", null, 'Y'
         );
         User mockRemovedUser = new User(
-                "testUserName",
-                "remove@releaser.com",
-                "",
-                'Y'
+                "testUserName", "remove@releaser.com", null, 'Y'
         );
         ProjectMember mockLeaderMember = new ProjectMember(
-                1L, 'L',
-                'Y',
-                mockLeaderUser,
-                mockProject
+                1L, 'L', 'Y', mockLeaderUser, mockProject
         );
         ProjectMember mockMember = new ProjectMember(
-                2L, 'M',
-                'Y',
-                mockRemovedUser,
-                mockProject
+                2L, 'M', 'Y', mockRemovedUser, mockProject
         );
 
         // userRepository.findByEmail() 메서드 동작 가짜 구현(Mock)

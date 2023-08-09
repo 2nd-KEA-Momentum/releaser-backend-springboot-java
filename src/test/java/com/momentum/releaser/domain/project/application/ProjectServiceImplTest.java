@@ -1,13 +1,19 @@
 package com.momentum.releaser.domain.project.application;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static com.momentum.releaser.global.config.BaseResponseStatus.CONNECTED_RELEASE_EXISTS;
+import static com.momentum.releaser.global.config.BaseResponseStatus.NOT_PROJECT_PM;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import com.momentum.releaser.domain.project.dto.ProjectRequestDto.ProjectInfoRequestDTO;
+import com.momentum.releaser.domain.project.dto.ProjectResponseDto.ProjectInfoResponseDTO;
 import com.momentum.releaser.domain.release.dao.release.ReleaseRepository;
+import com.momentum.releaser.global.exception.CustomException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -50,12 +56,122 @@ class ProjectServiceImplTest {
     }
 
     @Test
+    @DisplayName("3.1 프로젝트 생성")
+    void testAddProject() throws IOException {
+        //Mock 데이터 설정
+        String mockUserEmail = "test@releaser.com";
+
+        User mockUser = new User(
+                "userName", mockUserEmail, null, 'Y'
+        );
+        ProjectInfoRequestDTO mockReqDTO = new ProjectInfoRequestDTO(
+                "project Title", "project Content", "project Team", null
+        );
+        Project mockProject = new Project(
+                1L, "project Title", "project Content", "project Team", "s3Url", "testLink", 'Y'
+        );
+
+        when(userRepository.findByEmail(mockUserEmail)).thenReturn(Optional.of(mockUser));
+        when(s3Upload.upload(any(), anyString(), anyString())).thenReturn("s3Url");
+        when(projectRepository.save(any())).thenReturn(mockProject);
+
+        // When
+        ProjectInfoResponseDTO result = projectService.addProject(mockUserEmail, mockReqDTO);
+
+        // Then
+        assertNotNull(result);
+
+        verify(userRepository, times(1)).findByEmail(mockUserEmail);
+        verify(projectRepository, times(1)).save(any());
+    }
+
+    @Test
+    @DisplayName("3.2 프로젝트 수정 - 프로젝트 PM이 수정한 경우")
+    void testModifyProjectWithPM() throws IOException {
+        Long mockProjectId = 1L;
+        String mockUserEmail = "test@releaser.com";
+
+        ProjectInfoRequestDTO mockReqDTO = new ProjectInfoRequestDTO(
+                "project Update Title", "project Update Content", "project Team", null
+        );
+        User mockUser = new User(
+                "pmUserName", mockUserEmail, null, 'Y'
+        );
+        Project mockProject = new Project(
+                mockProjectId, "project Title", "project Content", "project Team", "s3Url", "testLink", 'Y'
+        );
+        ProjectMember mockPM = new ProjectMember(
+                1L, 'L', 'Y', mockUser, mockProject
+        );
+        List<ProjectMember> memberList = new ArrayList<>();
+        memberList.add(mockPM);
+
+        when(projectRepository.findById(mockProjectId)).thenReturn(Optional.of(mockProject));
+        when(userRepository.findByEmail(mockUserEmail)).thenReturn(Optional.of(mockUser));
+        when(projectMemberRepository.findByProject(mockProject)).thenReturn(memberList);
+        when(s3Upload.upload(any(), anyString(), anyString())).thenReturn("s3Url");
+        when(projectRepository.save(any())).thenReturn(mockProject);
+
+        ProjectInfoResponseDTO result = projectService.modifyProject(mockProjectId, mockUserEmail, mockReqDTO);
+
+        assertNotNull(result);
+
+        verify(projectRepository, times(1)).findById(mockProjectId);
+        verify(userRepository, times(1)).findByEmail(mockUserEmail);
+        verify(projectMemberRepository, times(1)).findByProject(mockProject);
+        verify(projectRepository, times(1)).save(any());
+    }
+
+    @Test
+    @DisplayName("3.2 프로젝트 수정 - PM이 아닌 다른 멤버가 수정한 경우")
+    void testModifyProjectWithoutPM() throws IOException {
+        Long mockProjectId = 1L;
+        String mockUserEmail = "testMember@releaser.com";
+
+        ProjectInfoRequestDTO mockReqDTO = new ProjectInfoRequestDTO(
+                "project Update Title", "project Update Content", "project Team", null
+        );
+        User mockLeaderUser = new User(
+                "pmUserName", "testLeader@releaser.com", null, 'Y'
+        );
+        User mockMemberUser = new User(
+                "memberUserName", mockUserEmail, null, 'Y'
+        );
+        Project mockProject = new Project(
+                mockProjectId, "project Title", "project Content", "project Team", "s3Url", "testLink", 'Y'
+        );
+        ProjectMember mockPM = new ProjectMember(
+                1L, 'L', 'Y', mockLeaderUser, mockProject
+        );
+        ProjectMember mockMember = new ProjectMember(
+                2L, 'M', 'Y', mockMemberUser, mockProject
+        );
+        List<ProjectMember> memberList = new ArrayList<>();
+        memberList.add(mockPM);
+        memberList.add(mockMember);
+
+        when(projectRepository.findById(mockProjectId)).thenReturn(Optional.of(mockProject));
+        when(userRepository.findByEmail(mockUserEmail)).thenReturn(Optional.of(mockMemberUser));
+        when(projectMemberRepository.findByProject(mockProject)).thenReturn(memberList);
+
+        // 예외 메시지 검증용
+        String expectedExceptionMessage = String.valueOf(NOT_PROJECT_PM);
+
+        // 테스트 실행 및 예외 검증
+        assertThrows(CustomException.class, () -> projectService.modifyProject(mockProjectId, mockUserEmail, mockReqDTO), expectedExceptionMessage);
+
+        verify(projectRepository, times(1)).findById(mockProjectId);
+        verify(userRepository, times(1)).findByEmail(mockUserEmail);
+        verify(projectMemberRepository, times(1)).findByProject(mockProject);
+    }
+
+    @Test
     @DisplayName("3.3 프로젝트 삭제")
     void testRemoveProject() {
         // Mock data
         Long mockProjectId = 123L;
         Project mockProject = new Project(
-                "project Title", "project Content", "project Team", null, "testLink", 'Y'
+                mockProjectId, "project Title", "project Content", "project Team", null, "testLink", 'Y'
         );
 
         // projectRepository.findById() 메서드 동작 가짜 구현(Mock)
@@ -87,11 +203,11 @@ class ProjectServiceImplTest {
         );
         List<ProjectMember> projectMemberList = new ArrayList<>();
         Project mockProject1 = new Project(
-                "test project1Title", "test project1Content", "test project1Team",
+                1L, "test project1Title", "test project1Content", "test project1Team",
                 null, "testLink", 'Y'
         );
         Project mockProject2 = new Project(
-                "test project2Title", "test project2Content", "test project2Team",
+                2L, "test project2Title", "test project2Content", "test project2Team",
                 null, "testLink", 'Y'
         );
 

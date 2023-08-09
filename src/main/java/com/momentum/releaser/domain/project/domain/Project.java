@@ -70,7 +70,8 @@ public class Project extends BaseTime {
     private List<IssueNum> issueNums = new ArrayList<>();
 
     @Builder
-    public Project(String title, String content, String team, String img, String link, char status) {
+    public Project(Long projectId, String title, String content, String team, String img, String link, char status) {
+        this.projectId = projectId;
         this.title = title;
         this.content = content;
         this.team = team;
