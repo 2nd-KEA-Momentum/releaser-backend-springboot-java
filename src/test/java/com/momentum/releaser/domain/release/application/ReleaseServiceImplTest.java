@@ -14,9 +14,11 @@ import com.momentum.releaser.domain.release.dao.opinion.ReleaseOpinionRepository
 import com.momentum.releaser.domain.release.dao.release.ReleaseRepository;
 import com.momentum.releaser.domain.release.domain.ReleaseApproval;
 import com.momentum.releaser.domain.release.domain.ReleaseEnum;
+import com.momentum.releaser.domain.release.domain.ReleaseEnum.ReleaseDeployStatus;
 import com.momentum.releaser.domain.release.domain.ReleaseNote;
 import com.momentum.releaser.domain.release.dto.ReleaseRequestDto;
 import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.ReleaseCreateRequestDTO;
+import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.ReleaseUpdateRequestDTO;
 import com.momentum.releaser.domain.release.dto.ReleaseResponseDto;
 import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.ReleaseCreateAndUpdateResponseDTO;
 import com.momentum.releaser.domain.user.dao.UserRepository;
@@ -70,88 +72,37 @@ class ReleaseServiceImplTest {
         String userEmail = "testLeader@releaser.com";
 
         Project mockProject = new Project(
-                "projectTitle",
-                "projectContent",
-                "projectTeam",
-                "",
-                "testLink",
-                'Y'
+                "projectTitle", "projectContent", "projectTeam", null, "testLink", 'Y'
         );
         User mockUser1 = new User(
-                "testUser1Name",
-                userEmail,
-                "",
-                'Y'
+                "testUser1Name", userEmail, null, 'Y'
         );
         User mockUser2 = new User(
-                "testUser2Name",
-                "testMember@releaser.com",
-                "",
-                'Y'
+                "testUser2Name", "testMember@releaser.com", null, 'Y'
         );
         ProjectMember mockLeaderMember = new ProjectMember(
-                'L',
-                'Y',
-                mockUser1,
-                mockProject
+                'L', 'Y', mockUser1, mockProject
         );
         ProjectMember mockMember = new ProjectMember(
-                'M',
-                'Y',
-                mockUser2,
-                mockProject
+                'M', 'Y', mockUser2, mockProject
         );
         List<ProjectMember> mockMemberList = List.of(mockLeaderMember, mockMember);
         Issue mockIssue1 = new Issue(
-                1L,
-                "Test Issue Title",
-                "Test Issue Content",
-                "",
-                Tag.NEW,
-                Date.valueOf("2023-08-02"),
-                LifeCycle.DONE,
-                'N',
-                'Y',
-                mockProject,
-                mockLeaderMember,
-                null,
-                null
+                1L, "Test Issue Title", "Test Issue Content", null,
+                Tag.NEW, Date.valueOf("2023-08-02"), LifeCycle.DONE, 'N', 'Y', mockProject, mockLeaderMember, null, null
         );
         Issue mockIssue2 = new Issue(
-                2L,
-                "Test Issue Title",
-                "Test Issue Content",
-                "",
-                Tag.NEW,
-                Date.valueOf("2023-08-02"),
-                LifeCycle.DONE,
-                'N',
-                'Y',
-                mockProject,
-                mockLeaderMember,
-                null,
-                null
+                2L, "Test Issue Title", "Test Issue Content", null,
+                Tag.NEW, Date.valueOf("2023-08-02"), LifeCycle.DONE, 'N', 'Y',
+                mockProject, mockLeaderMember, null, null
         );
         ReleaseCreateRequestDTO mockReleaseCreateRequestDto = new ReleaseCreateRequestDTO(
-                "Test Release",
-                "MAJOR",
-                "Test Release Content",
-                "Test Release Summary",
-                50.0,
-                50.0,
-                List.of(1L, 2L)
+                "Test Release", "MAJOR", "Test Release Content", "Test Release Summary",
+                50.0, 50.0, List.of(1L, 2L)
         );
         ReleaseNote mockSavedReleaseNote = new ReleaseNote(
-                1L,
-                "save Release Title",
-                "save Release Content",
-                "save Release Summary",
-                "1.0.0",
-                Date.valueOf("2023-08-02"),
-                ReleaseEnum.ReleaseDeployStatus.PLANNING,
-                mockProject,
-                50.0,
-                50.0
+                1L, "save Release Title", "save Release Content", "save Release Summary", "1.0.0",
+                Date.valueOf("2023-08-02"), ReleaseDeployStatus.PLANNING, mockProject, 50.0, 50.0
         );
         when(projectRepository.findById(projectId)).thenReturn(Optional.of(mockProject));
         when(userRepository.findByEmail(userEmail)).thenReturn(Optional.of(mockUser1));
@@ -187,12 +138,7 @@ class ReleaseServiceImplTest {
     void testAddReleaseNote_ValidVersion() {
         // Mock 데이터
         Project mockProject = new Project(
-                "projectTitle",
-                "projectContent",
-                "projectTeam",
-                "",
-                "testLink",
-                'Y'
+                "projectTitle", "projectContent", "projectTeam", null, "testLink", 'Y'
         );
 
         // releaseRepository가 빈 리스트를 반환하도록 설정
@@ -208,6 +154,39 @@ class ReleaseServiceImplTest {
 
         // 필요한 메서드가 호출되었는지 검증
         verify(releaseRepository, times(1)).findAllVersionsByProject(mockProject);
+    }
+
+    @Test
+    @DisplayName("5.3 릴리즈 노트 수정 - PM이 아닌 멤버가 수정 시 불가능")
+    void testAddReleaseWithoutPM() {
+        String mockUserEmail = "testMember@releaser.com";
+        Long mockReleaseId = 1L;
+
+        User mockMemberUser = new User(
+                "testUserName", mockUserEmail, null, 'Y'
+        );
+        Project mockProject = new Project(
+                "projectTitle", "projectContent", "projectTeam", null, "testLink", 'Y'
+        );
+        ProjectMember mockMember = new ProjectMember(
+                'M', 'Y', mockMemberUser, mockProject
+        );
+        ReleaseNote mockRelease = new ReleaseNote(
+                1L, "release Title", "release Content", null,
+                "1.0.0", null, ReleaseDeployStatus.PLANNING, mockProject, 50.0, 50.0
+        );
+        ReleaseUpdateRequestDTO mockReqDTO = new ReleaseUpdateRequestDTO(
+                "release Update Title", "2.0.0", "release Update Content",
+                null, "PLANNING", null
+        );
+
+        when(releaseRepository.findById(mockReleaseId)).thenReturn(Optional.of(mockRelease));
+        when(userRepository.findByEmail(mockUserEmail)).thenReturn(Optional.of(mockMemberUser));
+        when(projectMemberRepository.findOneByUserAndProject(mockMemberUser, mockProject)).thenReturn(Optional.of(mockMember));
+
+
+
+
     }
 
 }
