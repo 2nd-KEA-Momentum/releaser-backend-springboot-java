@@ -4,9 +4,7 @@ import com.momentum.releaser.domain.issue.dao.IssueNumRepository;
 import com.momentum.releaser.domain.issue.dao.IssueOpinionRepository;
 import com.momentum.releaser.domain.issue.dao.IssueRepository;
 import com.momentum.releaser.domain.issue.domain.*;
-import com.momentum.releaser.domain.issue.dto.IssueRequestDto;
 import com.momentum.releaser.domain.issue.dto.IssueRequestDto.IssueInfoRequestDTO;
-import com.momentum.releaser.domain.issue.dto.IssueResponseDto;
 import com.momentum.releaser.domain.issue.dto.IssueResponseDto.IssueIdResponseDTO;
 import com.momentum.releaser.domain.issue.dto.IssueResponseDto.IssueModifyResponseDTO;
 import com.momentum.releaser.domain.issue.dto.IssueResponseDto.OpinionInfoResponseDTO;
@@ -15,7 +13,6 @@ import com.momentum.releaser.domain.project.dao.ProjectRepository;
 import com.momentum.releaser.domain.project.domain.Project;
 import com.momentum.releaser.domain.project.domain.ProjectMember;
 import com.momentum.releaser.domain.release.dao.release.ReleaseRepository;
-import com.momentum.releaser.domain.release.domain.ReleaseEnum;
 import com.momentum.releaser.domain.release.domain.ReleaseEnum.ReleaseDeployStatus;
 import com.momentum.releaser.domain.release.domain.ReleaseNote;
 import com.momentum.releaser.domain.user.dao.UserRepository;
@@ -24,7 +21,6 @@ import com.momentum.releaser.global.exception.CustomException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatchers;
 
 import java.sql.Date;
 import java.util.ArrayList;
@@ -32,8 +28,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.momentum.releaser.domain.issue.dto.IssueRequestDto.*;
-import static com.momentum.releaser.global.config.BaseResponseStatus.CONNECTED_ISSUE_EXISTS;
-import static com.momentum.releaser.global.config.BaseResponseStatus.CONNECTED_RELEASE_EXISTS;
+import static com.momentum.releaser.global.config.BaseResponseStatus.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -436,7 +431,7 @@ class IssueServiceImplTest {
 
     @Test
     @DisplayName("8.2 이슈 삭제 - 접근한 유저가 작성한 의견 삭제할 경우")
-    void testRemoveIssueOpinion() {
+    void testRemoveIssueOpinionWithCommentUser() {
         // Mock 데이터 설정
         Long mockOpinionId = 1L;
         String mockAccessUserEmail = "testUser@releaser.com";
@@ -468,6 +463,51 @@ class IssueServiceImplTest {
         List<OpinionInfoResponseDTO> result = issueService.removeIssueOpinion(mockOpinionId, mockAccessUserEmail);
 
         assertIterableEquals(mockOpinionResponseList, result);
+
+        verify(userRepository, times(1)).findOneByEmail(mockAccessUserEmail);
+        verify(issueOpinionRepository, times(1)).findById(mockOpinionId);
+    }
+
+    @Test
+    @DisplayName("8.2 이슈 삭제 - 삭제 권한이 없을 경우")
+    void testRemoveIssueOpinionWithoutCommentUser() {
+        // Mock 데이터 설정
+        Long mockOpinionId = 1L;
+        String mockAccessUserEmail = "testUser@releaser.com";
+
+        // Mock 엔티티 생성
+        User mockAccessUser = new User(
+                "testUserName", mockAccessUserEmail, null, 'Y'
+        );
+        User mockCommentUser = new User(
+                "testUser2Name", "testComment@releaser.com", null, 'Y'
+        );
+        Project mockProject = new Project(
+                "projectTitle", "projectContent", "projectTeam", null, "testLink", 'Y'
+        );
+        ProjectMember mockProjectMember = new ProjectMember(
+                1L, 'M', 'Y', mockAccessUser, mockProject
+        );
+        ProjectMember mockCommentMember = new ProjectMember(
+                2L, 'M', 'Y', mockCommentUser, mockProject
+
+        );
+        Issue mockIssue = new Issue(
+                2L, "issueTitle", "issueContent", null, Tag.FIXED, null,
+                LifeCycle.NOT_STARTED, 'N', 'Y', mockProject, mockProjectMember, null, null
+        );
+        IssueOpinion mockIssueOpinion = new IssueOpinion(
+                mockOpinionId, "opinion", 'Y', mockCommentMember, mockIssue
+        );
+
+        when(userRepository.findOneByEmail(mockAccessUserEmail)).thenReturn(Optional.of(mockAccessUser));
+        when(issueOpinionRepository.findById(mockOpinionId)).thenReturn(Optional.of(mockIssueOpinion));
+
+        // 예외 메시지 검증용
+        String expectedExceptionMessage = String.valueOf(NOT_ISSUE_COMMENTER);
+
+        // 테스트 실행 및 예외 검증
+        assertThrows(CustomException.class, () -> issueService.removeIssueOpinion(mockOpinionId, mockAccessUserEmail), expectedExceptionMessage);
 
         verify(userRepository, times(1)).findOneByEmail(mockAccessUserEmail);
         verify(issueOpinionRepository, times(1)).findById(mockOpinionId);
