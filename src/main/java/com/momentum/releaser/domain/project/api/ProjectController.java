@@ -1,21 +1,25 @@
 package com.momentum.releaser.domain.project.api;
 
-import com.momentum.releaser.domain.project.application.ProjectService;
-import com.momentum.releaser.domain.project.dto.ProjectRequestDto.ProjectInfoRequestDTO;
-import com.momentum.releaser.global.config.BaseResponse;
-import com.momentum.releaser.global.jwt.UserPrincipal;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import static com.momentum.releaser.domain.project.dto.ProjectResponseDto.*;
+
+import java.io.IOException;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 
-import java.io.IOException;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
-import static com.momentum.releaser.domain.project.dto.ProjectResponseDto.*;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
+import com.momentum.releaser.domain.project.application.ProjectService;
+import com.momentum.releaser.domain.project.dto.ProjectRequestDto.FilterIssueRequestDTO;
+import com.momentum.releaser.domain.project.dto.ProjectRequestDto.FilterReleaseRequestDTO;
+import com.momentum.releaser.domain.project.dto.ProjectRequestDto.ProjectInfoRequestDTO;
+import com.momentum.releaser.global.config.BaseResponse;
+import com.momentum.releaser.global.jwt.UserPrincipal;
 
 /**
  * ProjectController는 프로젝트 관련된 API 엔드포인트를 처리하는 컨트롤러입니다.
@@ -87,4 +91,23 @@ public class ProjectController {
         String email = userPrincipal.getEmail();
         return new BaseResponse<>(projectService.findProjects(email));
     }
+
+    /**
+     * 10.1 프로젝트 내 통합검색
+     *
+     * @param projectId 검색할 프로젝트 식별 번호
+     * @param filterType  검색할 이슈 혹은 릴리즈 타입 선택
+     * @param filterIssueGroup 이슈 필터링 그룹 DTO
+     * @param filterReleaseGroup 릴리즈 필터링 그룹 DTO
+     * @return ProjectSearchResponseDTO 검색한 정보 응답 DTO
+     */
+    @GetMapping("/{projectId}/search")
+    public BaseResponse<ProjectSearchResponseDTO> projectSearchList(
+            @PathVariable @Min(value = 1, message = "프로젝트 식별 번호는 1 이상의 숫자여야 합니다.") Long projectId,
+            @RequestParam String filterType,
+            @Valid FilterIssueRequestDTO filterIssueGroup,
+            @Valid FilterReleaseRequestDTO filterReleaseGroup) {
+        return new BaseResponse<>(projectService.findProjectSearch(projectId, filterType, filterIssueGroup, filterReleaseGroup));
+    }
+
 }

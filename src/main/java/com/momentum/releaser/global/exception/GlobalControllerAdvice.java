@@ -4,8 +4,12 @@ import com.momentum.releaser.global.config.BaseException;
 import com.momentum.releaser.global.config.BaseResponse;
 import com.momentum.releaser.global.config.BaseResponseStatus;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.convert.ConversionFailedException;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,8 +17,10 @@ import javax.validation.ConstraintViolationException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import static com.momentum.releaser.global.config.BaseResponseStatus.INVALID_QUERY_STRING;
 import static com.momentum.releaser.global.config.BaseResponseStatus.INVALID_REQUEST_BODY;
 
 
@@ -74,6 +80,38 @@ public class GlobalControllerAdvice {
                 .forEach(c -> errors.put(((FieldError) c).getField(), c.getDefaultMessage()));
 
         return new BaseResponse<>(INVALID_REQUEST_BODY, errors);
+    }
+
+    /**
+     * Validation 검증 에러 (QueryString)
+     */
+    @ExceptionHandler(BindException.class)
+    public BaseResponse<Map<String, String>> handleBindException(BindException e) {
+        log.debug(e.getMessage());
+
+        Map<String, String> errors = new HashMap<>();
+
+        e.getBindingResult().getAllErrors().forEach(error -> {
+            String fieldName;
+            if (error instanceof FieldError) {
+                fieldName = ((FieldError) error).getField();
+            } else {
+                fieldName = error.getObjectName();
+            }
+
+            // 태그 필드인 경우 특별한 메시지 처리
+            if ("tag".equals(fieldName)) {
+                errors.put(fieldName, "태그 타입은 DEPRECATED, CHANGED, NEW, FEATURE, FIXED 중 하나여야 합니다.");
+            } else if ("managerId".equals(fieldName)) {
+                errors.put(fieldName, "담당자 식별 번호는 양수만 가능합니다.");
+            } else if ("startReleaseVersion".equals(fieldName) || "endReleaseVersion".equals(fieldName) || "startVersion".equals(fieldName) || "endVersion".equals(fieldName)) {
+                errors.put(fieldName, "릴리즈 버전 형식에 맞지 않습니다.");
+            } else {
+                errors.put(fieldName, "날짜 형식이 맞지 않습니다.");
+            }
+        });
+
+        return new BaseResponse<>(INVALID_QUERY_STRING, errors);
     }
 
     /**

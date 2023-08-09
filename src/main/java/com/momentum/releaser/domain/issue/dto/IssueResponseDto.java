@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 
 import com.querydsl.core.annotations.QueryProjection;
 
-import com.momentum.releaser.domain.project.dto.ProjectDataDto.GetMembers;
+import com.momentum.releaser.domain.project.dto.ProjectDataDto.GetMembersDataDTO;
 
 public class IssueResponseDto {
 

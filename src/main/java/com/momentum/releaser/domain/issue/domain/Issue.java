@@ -37,7 +37,7 @@ public class Issue extends BaseTime {
     private Long issueId;
 
     @NotNull
-    @Column(name = "title")
+    @Column(name = "title", columnDefinition = "TEXT")
     private String title;
 
     @NotNull
@@ -48,7 +48,7 @@ public class Issue extends BaseTime {
     private String summary;
 
     @NotNull
-    @Column(name = "tag")
+    @Column(name = "tag", columnDefinition = "TEXT")
     @Enumerated(EnumType.STRING)
     private Tag tag;
 
@@ -202,5 +202,6 @@ public class Issue extends BaseTime {
     public void updateLifeCycle(String lifeCycle) {
         this.lifeCycle = LifeCycle.valueOf(lifeCycle);
     }
+
 
 }

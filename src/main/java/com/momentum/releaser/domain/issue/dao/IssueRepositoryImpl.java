@@ -7,6 +7,7 @@ import com.momentum.releaser.domain.issue.dto.QIssueResponseDto_ConnectionIssues
 import com.momentum.releaser.domain.issue.dto.QIssueResponseDto_DoneIssuesResponseDTO;
 import com.momentum.releaser.domain.issue.dto.QIssueResponseDto_IssueInfoResponseDTO;
 import com.momentum.releaser.domain.issue.dto.QIssueResponseDto_OpinionInfoResponseDTO;
+import com.querydsl.core.types.dsl.NumberTemplate;
 import org.springframework.stereotype.Repository;
 
 import lombok.RequiredArgsConstructor;
@@ -232,6 +233,29 @@ public class IssueRepositoryImpl implements IssueRepositoryCustom{
                 .fetchResults().getResults();
 
         return opinionInfoRes;
+    }
+
+    /**
+     * FULLTEXT 검색을 이용하여 필터링된 이슈 정보 조회
+     *
+     * @param booleanTemplate FULLTEXT 검색에 사용할 NumberTemplate
+     * @param project 검색할 프로젝트 정보
+     * @return FULLTEXT 검색 결과로 필터링된 이슈 정보 리스트
+     * @date 2023-08-06
+     * @author chaeanna
+     */
+    @Override
+    public List<Issue> getSearch(NumberTemplate booleanTemplate, Project project) {
+        QIssue issue = QIssue.issue;
+        // FULLTEXT 검색을 적용하여 이슈 정보 조회
+        List<Issue> result = queryFactory
+                .select(issue)
+                .from(issue)
+                .where(booleanTemplate.gt(0)
+                        .and(issue.project.eq(project))
+                )
+                .fetch();
+        return result;
     }
 
 }

@@ -39,11 +39,12 @@ public class IssueRequestDto {
         private Long memberId;
 
         @Builder
-        public IssueInfoRequestDTO(String title, String content, String tag, Date endDate) {
+        public IssueInfoRequestDTO(String title, String content, String tag, Date endDate, Long memberId) {
             this.title = title;
             this.content = content;
             this.tag = tag;
             this.endDate = endDate;
+            this.memberId = memberId;
         }
     }
 

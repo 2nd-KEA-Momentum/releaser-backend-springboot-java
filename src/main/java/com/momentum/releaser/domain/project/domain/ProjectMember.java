@@ -64,7 +64,8 @@ public class ProjectMember extends BaseTime {
     private List<ReleaseApproval> approvals = new ArrayList<>();
 
     @Builder
-    public ProjectMember(char position, char status, User user, Project project) {
+    public ProjectMember(Long memberId, char position, char status, User user, Project project) {
+        this.memberId = memberId;
         this.position = position;
         this.status = status;
         this.user = user;

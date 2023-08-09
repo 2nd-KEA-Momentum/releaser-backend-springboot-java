@@ -6,6 +6,7 @@ import com.momentum.releaser.domain.issue.domain.Issue;
 import com.momentum.releaser.domain.issue.dto.IssueResponseDto.*;
 import com.momentum.releaser.domain.project.domain.Project;
 import com.momentum.releaser.domain.release.domain.ReleaseNote;
+import com.querydsl.core.types.dsl.NumberTemplate;
 
 public interface IssueRepositoryCustom {
 
@@ -26,5 +27,8 @@ public interface IssueRepositoryCustom {
 
     // 이슈에 속한 의견 목록 List 형태로 반환
     List<OpinionInfoResponseDTO> getIssueOpinion(Issue issue);
+
+    // 이슈를 검색할 시 필터링을 거친 정보를 List 형태로 반환
+    List<Issue> getSearch(NumberTemplate booleanTemplate, Project project);
 
 }

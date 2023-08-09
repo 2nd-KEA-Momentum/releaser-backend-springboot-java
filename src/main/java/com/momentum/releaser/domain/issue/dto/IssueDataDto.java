@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.momentum.releaser.domain.project.dto.ProjectDataDto;
+import com.momentum.releaser.domain.project.dto.ProjectDataDto.GetMembersDataDTO;
 import lombok.*;
 
 public class IssueDataDto {
@@ -53,11 +54,11 @@ public class IssueDataDto {
         private char edit;
         private Long manager; //담당자
         private char deployYN;
-        private List<ProjectDataDto.GetMembers> memberList;
+        private List<GetMembersDataDTO> memberList;
         private List<IssueResponseDto.OpinionInfoResponseDTO> opinionList;
 
         @Builder
-        public IssueDetailsDataDTO(Long issueNum, String title, String content, String tag, Date endDate, char edit, Long manager, char deployYN, List<ProjectDataDto.GetMembers> memberList, List<IssueResponseDto.OpinionInfoResponseDTO> opinionList) {
+        public IssueDetailsDataDTO(Long issueNum, String title, String content, String tag, Date endDate, char edit, Long manager, char deployYN, List<GetMembersDataDTO> memberList, List<IssueResponseDto.OpinionInfoResponseDTO> opinionList) {
             this.issueNum = issueNum;
             this.title = title;
             this.content = content;

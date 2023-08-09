@@ -37,7 +37,7 @@ public class ReleaseNote extends BaseTime {
     @NotNull
     @NotBlank(message = "릴리즈 제목을 입력해 주세요.")
     @Size(min = 1, max = 45, message = "릴리즈 제목은 1자 이상 45자 이하여야 합니다.")
-    @Column(name = "title")
+    @Column(name = "title", columnDefinition = "TEXT")
     private String title;
 
     @NotNull
