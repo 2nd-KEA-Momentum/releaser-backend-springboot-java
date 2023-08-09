@@ -63,6 +63,17 @@ public class ProjectRequestDto {
         private String tag;
 
         private String issueTitle;
+
+        @Builder
+        public FilterIssueRequestDTO(Date startDate, Date endDate, Long managerId, String startReleaseVersion, String endReleaseVersion, String tag, String issueTitle) {
+            this.startDate = startDate;
+            this.endDate = endDate;
+            this.managerId = managerId;
+            this.startReleaseVersion = startReleaseVersion;
+            this.endReleaseVersion = endReleaseVersion;
+            this.tag = tag;
+            this.issueTitle = issueTitle;
+        }
     }
 
     /**
@@ -77,6 +88,13 @@ public class ProjectRequestDto {
         private String endVersion;
 
         private String releaseTitle;
+
+        @Builder
+        public FilterReleaseRequestDTO(String startVersion, String endVersion, String releaseTitle) {
+            this.startVersion = startVersion;
+            this.endVersion = endVersion;
+            this.releaseTitle = releaseTitle;
+        }
     }
 
 }
