@@ -24,9 +24,16 @@ import com.momentum.releaser.domain.project.dto.ProjectResponseDto.ProjectSearch
 import com.momentum.releaser.domain.release.dao.release.ReleaseRepository;
 import com.momentum.releaser.domain.release.domain.QReleaseNote;
 import com.momentum.releaser.domain.release.domain.ReleaseNote;
+import com.momentum.releaser.redis.RedisUtil;
+import com.momentum.releaser.redis.notification.NotificationRedisRepository;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
 import org.modelmapper.ModelMapper;
+import org.springframework.amqp.core.*;
+import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
+import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -60,17 +67,24 @@ public class ProjectServiceImpl implements ProjectService {
     private final ProjectMemberRepository projectMemberRepository;
     private final UserRepository userRepository;
     private final IssueRepository issueRepository;
-    private final ReleaseRepository releaseRepository;
+    private ReleaseRepository releaseRepository;
     private final ReleaseApprovalRepository releaseApprovalRepository;
     private final ModelMapper modelMapper;
     private final S3Upload s3Upload;
 
+    private final RedisUtil redisUtil;
+    private final NotificationRedisRepository notificationRedisRepository;
+
+    private final AmqpAdmin rabbitAdmin;
+    private final DirectExchange projectDirectExchange;
+    private final ConnectionFactory connectionFactory;
+
     /**
      * 3.1 프로젝트 생성
      *
+     * @param email 사용자 이메일
      * @author chaeanna, seonwoo
      * @date 2023-07-04
-     * @param email 사용자 이메일
      */
     @Override
     @Transactional
@@ -83,6 +97,8 @@ public class ProjectServiceImpl implements ProjectService {
         Project newProject = createNewProject(projectInfoReq, url);
         // 프로젝트 멤버 추가
         addProjectMember(newProject, user);
+        // 생성된 프로젝트에 해당하는 큐를 생성하고, 연결한다.
+        createAndBindQueueAndRegisterListener(newProject.getProjectId());
         // 프로젝트 응답 객체 생성
         return ProjectMapper.INSTANCE.toProjectInfoRes(newProject);
     }
@@ -90,9 +106,9 @@ public class ProjectServiceImpl implements ProjectService {
     /**
      * 3.2 프로젝트 수정
      *
+     * @param email 사용자 이메일
      * @author chaeanna, seonwoo
      * @date 2023-07-04
-     * @param email 사용자 이메일
      */
     @Override
     @Transactional
@@ -133,9 +149,9 @@ public class ProjectServiceImpl implements ProjectService {
     /**
      * 3.4 프로젝트 조회
      *
+     * @param email 사용자 이메일
      * @author chaeanna
      * @date 2023-07-04
-     * @param email 사용자 이메일
      */
     @Override
     @Transactional
@@ -182,11 +198,11 @@ public class ProjectServiceImpl implements ProjectService {
     /**
      * 이메일로 User 가져오기
      *
-     * @author chaeanna
-     * @date 2023-07-04
      * @param email 사용자 이메일
      * @return User 조회된 사용자 엔티티
      * @throws CustomException 사용자가 존재하지 않을 경우 발생하는 예외
+     * @author chaeanna
+     * @date 2023-07-04
      */
     private User getUserByEmail(String email) {
         return userRepository.findByEmail(email).orElseThrow(() -> new CustomException(NOT_EXISTS_USER));
@@ -195,11 +211,11 @@ public class ProjectServiceImpl implements ProjectService {
     /**
      * 프로젝트 식별 번호를 이용하여 프로젝트 엔티티 가져오기
      *
-     * @author seonwoo
-     * @date 2023-07-04
      * @param projectId 프로젝트 식별 번호
      * @return Project 조회된 프로젝트 엔티티
      * @throws CustomException 프로젝트가 존재하지 않을 경우 발생하는 예외
+     * @author seonwoo
+     * @date 2023-07-04
      */
     private Project getProjectById(Long projectId) {
         return projectRepository.findById(projectId).orElseThrow(() -> new CustomException(NOT_EXISTS_PROJECT));
@@ -208,11 +224,11 @@ public class ProjectServiceImpl implements ProjectService {
     /**
      * 클라이언트로부터 받은 프로젝트 이미지를 S3에 업로드한다.
      *
-     * @author seonwoo
-     * @date 2023-07-04
      * @param projectInfoReq 프로젝트 생성 또는 수정 요청 객체
      * @return String 업로드된 이미지의 S3 URL
      * @throws IOException 이미지 업로드 중 오류가 발생한 경우 발생하는 예외
+     * @author seonwoo
+     * @date 2023-07-04
      */
     String uploadProjectImg(ProjectInfoRequestDTO projectInfoReq) throws IOException {
         if (projectInfoReq == null) {
@@ -245,12 +261,12 @@ public class ProjectServiceImpl implements ProjectService {
     /**
      * 클라이언트로부터 받은 프로젝트 이미지로 수정한다.
      *
-     * @author seonwoo
-     * @date 2023-07-04
-     * @param project 프로젝트 엔티티
+     * @param project        프로젝트 엔티티
      * @param projectInfoReq 프로젝트 수정 요청 객체
      * @return String 수정된 프로젝트 이미지의 S3 URL
      * @throws IOException 이미지 업로드 중 오류가 발생한 경우 발생하는 예외
+     * @author seonwoo
+     * @date 2023-07-04
      */
     private String updateProjectImg(Project project, ProjectInfoRequestDTO projectInfoReq) throws IOException {
         deleteIfExistsProjectImg(project);
@@ -260,10 +276,10 @@ public class ProjectServiceImpl implements ProjectService {
     /**
      * 해당 프로젝트의 관리자 찾기
      *
-     * @author chaeanna
-     * @date 2023-07-04
      * @param project 프로젝트 엔티티
      * @return ProjectMember 관리자(L) 포지션을 가진 프로젝트 멤버 엔티티
+     * @author chaeanna
+     * @date 2023-07-04
      */
     private ProjectMember findLeaderForProject(Project project) {
         List<ProjectMember> members = projectMemberRepository.findByProject(project);
@@ -280,9 +296,9 @@ public class ProjectServiceImpl implements ProjectService {
     /**
      * 프로젝트 이미지 값이 null이 아닌 경우 한 번 지운다.
      *
+     * @param project 프로젝트 엔티티
      * @author seonwoo
      * @date 2023-07-04
-     * @param project 프로젝트 엔티티
      */
     private void deleteIfExistsProjectImg(Project project) {
         Project updatedProject = project;
@@ -302,12 +318,12 @@ public class ProjectServiceImpl implements ProjectService {
     /**
      * 프로필 이미지를 제외한 프로젝트 데이터를 업데이트한다.
      *
+     * @param project        프로젝트 엔티티
+     * @param projectInfoReq 프로젝트 수정 요청 객체
+     * @param url            업로드된 프로젝트 이미지의 S3 URL
+     * @return Project 업데이트된 프로젝트 엔티티
      * @author seonwoo
      * @date 2023-07-04
-     * @param project 프로젝트 엔티티
-     * @param projectInfoReq 프로젝트 수정 요청 객체
-     * @param url 업로드된 프로젝트 이미지의 S3 URL
-     * @return Project 업데이트된 프로젝트 엔티티
      */
     private Project getAndUpdateProject(Project project, ProjectInfoRequestDTO projectInfoReq, String url) {
         project.updateProject(projectInfoReq, url);
@@ -317,11 +333,11 @@ public class ProjectServiceImpl implements ProjectService {
     /**
      * 프로젝트 생성
      *
+     * @param registerReq 프로젝트 생성 요청 객체
+     * @param url         업로드된 프로젝트 이미지의 S3 URL
+     * @return Project 생성된 프로젝트 엔티티
      * @author seonwoo, chaeanna
      * @date 2023-07-04
-     * @param registerReq 프로젝트 생성 요청 객체
-     * @param url 업로드된 프로젝트 이미지의 S3 URL
-     * @return Project 생성된 프로젝트 엔티티
      */
     Project createNewProject(ProjectInfoRequestDTO registerReq, String url) {
         //초대 링크 생성
@@ -340,9 +356,9 @@ public class ProjectServiceImpl implements ProjectService {
     /**
      * 초대 링크 생성
      *
+     * @return String 생성된 초대 링크
      * @author chaeanna
      * @date 2023-07-04
-     * @return String 생성된 초대 링크
      */
     private String generateInviteLink() {
         // UUID를 이용하여 무작위의 초대 링크를 생성
@@ -352,10 +368,10 @@ public class ProjectServiceImpl implements ProjectService {
     /**
      * 프로젝트 멤버 추가
      *
+     * @param project 프로젝트 엔티티
+     * @param user    사용자 엔티티
      * @author seonwoo
      * @date 2023-07-04
-     * @param project 프로젝트 엔티티
-     * @param user 사용자 엔티티
      */
     void addProjectMember(Project project, User user) {
         ProjectMember projectMember = ProjectMember.builder()
@@ -371,13 +387,68 @@ public class ProjectServiceImpl implements ProjectService {
     /**
      * project mapper 사용
      *
-     * @author chaeanna
-     * @date 2023-07-04
      * @param project 프로젝트 엔티티
      * @return GetProjectDateDTO 변환된 프로젝트 DTO
+     * @author chaeanna
+     * @date 2023-07-04
      */
     private GetProjectDataDTO mapToGetProject(Project project) {
         return modelMapper.map(project, GetProjectDataDTO.class);
     }
 
+    /**
+     * 프로젝트 생성 시 큐를 생성하고 바인딩하는 메서드
+     *
+     * @param projectId 프로젝트 식별 번호
+     * @author seonwoo
+     * @date 2023-08-09 (수)
+     */
+    private void createAndBindQueueAndRegisterListener(Long projectId) {
+        String queueName = "releaser.project." + projectId;
+        String routingKey = "releaser.project." + projectId;
+
+        createProjectQueue(queueName);
+        bindProjectQueue(queueName, routingKey);
+        registerListener(queueName);
+    }
+
+    /**
+     * 프로젝트 큐를 생성한다.
+     *
+     * @param queueName 큐 이름
+     * @author seonwoo
+     * @date 2023-08-09 (수)
+     */
+    private void createProjectQueue(String queueName) {
+        Queue queue = new Queue(queueName, true, false, false);
+        rabbitAdmin.declareQueue(queue);
+    }
+
+    /**
+     * 생성한 프로젝트 큐를 바인딩한다.
+     *
+     * @param queueName  큐 이름
+     * @param routingKey 라우팅 키
+     * @author seonwoo
+     * @date 2023-08-09 (수)
+     */
+    private void bindProjectQueue(String queueName, String routingKey) {
+        Binding binding = BindingBuilder.bind(new Queue(queueName)).to(projectDirectExchange).with(routingKey);
+        rabbitAdmin.declareBinding(binding);
+    }
+
+    /**
+     * 리스너를 등록한다.
+     *
+     * @param queueName 큐 이름
+     * @author seonwoo
+     * @date 2023-08-09 (수)
+     */
+    private void registerListener(String queueName) {
+        SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
+        container.setConnectionFactory(connectionFactory);
+        container.setQueueNames(queueName);
+        container.setMessageListener(new MessageListenerAdapter(this, "receiveMessagePerProject"));
+        container.start();
+    }
 }

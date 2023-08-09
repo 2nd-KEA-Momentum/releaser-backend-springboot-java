@@ -6,7 +6,7 @@ spring:
       local: local, common
 
     # 활성 프로필 설정
-    active: dev
+    active: local
 
 ---
 # prod
@@ -38,6 +38,31 @@ spring:
   config:
     activate:
       on-profile: local
+
+  rabbitmq:
+    host: ${RABBITMQ_LOCAL_HOST}
+    port: ${RABBITMQ_LOCAL_PORT}
+    username: ${RABBITMQ_LOCAL_USERNAME}
+    password: ${RABBITMQ_LOCAL_PASSWORD}
+
+rabbitmq:
+  sample:
+    queue.name: ${RABBITMQ_LOCAL_SAMPLE_QUEUE}
+    exchange.name: ${RABBITMQ_LOCAL_SAMPLE_EXCHANGE}
+    routing.key: ${RABBITMQ_LOCAL_SAMPLE_ROUTINGKEY}
+
+  user:
+    queue.name: ${RABBITMQ_LOCAL_USER_QUEUE}
+    exchange.name: ${RABBITMQ_LOCAL_USER_EXCHANGE}
+    routing.key: ${RABBITMQ_LOCAL_USER_ROUTINGKEY}
+
+  project:
+    queue.name: ${RABBITMQ_LOCAL_PROJECT_QUEUE}
+    exchange.name: ${RABBITMQ_LOCAL_PROJECT_EXCHANGE}
+    routing.key: ${RABBITMQ_LOCAL_PROJECT_ROUTINGKEY}
+
+stomp:
+  relay.port: ${STOMP_RELAY_PORT}
 
 ---
 

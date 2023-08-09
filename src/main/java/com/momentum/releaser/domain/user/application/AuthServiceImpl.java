@@ -5,6 +5,10 @@ import static com.momentum.releaser.global.config.BaseResponseStatus.*;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.amqp.core.*;
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
+import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -54,6 +58,10 @@ public class AuthServiceImpl implements AuthService {
     private final RedisUtil redisUtil;
     private final PasswordRedisRepository passwordRedisRepository;
 
+    private final AmqpAdmin rabbitAdmin;
+    private final DirectExchange userDirectExchange;
+    private final ConnectionFactory connectionFactory;
+
     /**
      * 2.1 회원가입
      *
@@ -69,6 +77,8 @@ public class AuthServiceImpl implements AuthService {
         User user = createUser(userInfoReq);
         // 패스워드 암호화 후 저장
         createAndSaveAuthPassword(user, userInfoReq.getPassword());
+        // 사용자 이메일에 해당하는 큐를 생성하고, 연결한다.
+        createAndBindQueueAndRegisterListener(userInfoReq.getEmail());
         return modelMapper.map(user, UserInfoResponseDTO.class);
     }
 
@@ -419,5 +429,59 @@ public class AuthServiceImpl implements AuthService {
             // 기존의 비밀번호 정보를 삭제한다.
             authPasswordRepository.delete(authPassword);
         }
+    }
+
+    /**
+     * 사용자가 가입할 때 큐를 생성하고 바인딩하는 메서드
+     *
+     * @param userEmail 사용자 이메일
+     */
+    private void createAndBindQueueAndRegisterListener(String userEmail) {
+        String queueName = "releaser.user." + userEmail;
+        String routingKey = "releaser.user." + userEmail;
+
+        createUserQueue(queueName);
+        bindUserQueue(queueName, routingKey);
+        registerListener(queueName);
+    }
+
+    /**
+     * 개별 사용자 큐를 생성한다.
+     *
+     * @param queueName 큐 이름
+     * @author seonwoo
+     * @date 2023-08-07 (월)
+     */
+    private void createUserQueue(String queueName) {
+        Queue queue = new Queue(queueName, true, false, false);
+        rabbitAdmin.declareQueue(queue);
+    }
+
+    /**
+     * 생성한 사용자 큐를 바인딩한다.
+     *
+     * @param queueName  큐 이름
+     * @param routingKey 라우팅 키
+     * @author seonwoo
+     * @date 2023-08-07 (월)
+     */
+    private void bindUserQueue(String queueName, String routingKey) {
+        Binding binding = BindingBuilder.bind(new Queue(queueName)).to(userDirectExchange).with(routingKey);
+        rabbitAdmin.declareBinding(binding);
+    }
+
+    /**
+     * 리스너를 등록한다.
+     *
+     * @param queueName 큐 이름
+     * @author seonwoo
+     * @date 2023-08-07 (월)
+     */
+    private void registerListener(String queueName) {
+        SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
+        container.setConnectionFactory(connectionFactory);
+        container.setQueueNames(queueName);
+        container.setMessageListener(new MessageListenerAdapter(this, "receiveMessagePerUser"));
+        container.start();
     }
 }
