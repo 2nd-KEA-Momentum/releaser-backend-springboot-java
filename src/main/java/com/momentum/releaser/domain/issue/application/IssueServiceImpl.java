@@ -278,21 +278,20 @@ public class IssueServiceImpl implements IssueService {
      */
     @Override
     @Transactional
-    public List<OpinionInfoResponseDTO> registerOpinion(Long issueId, String email, RegisterOpinionRequestDTO issueOpinionReq) {
+    public List<OpinionInfoResponseDTO> addIssueOpinion(Long issueId, String email, RegisterOpinionRequestDTO issueOpinionReq) {
         // 이슈 정보 조회
         Issue issue = getIssueById(issueId);
         // 사용자 정보 조회
         User user = getUserByEmail(email);
 
-        // 사용자와 이슈의 프로젝트 멤버 정보 조회
-        Long memberId = getProjectMemberByUserAndProject(user, issue.getProject()).getMemberId();
-        ProjectMember member = getProjectMemberById(memberId);
+        // 접근한 사용자의 프로젝트 멤버 정보 조회
+        ProjectMember member = getProjectMemberByUserAndProject(user, issue.getProject());
 
         // 의견 등록
-        IssueOpinion issueOpinion = saveOpinion(issue, member, issueOpinionReq.getOpinion());
+        saveOpinion(issue, member, issueOpinionReq.getOpinion());
 
         // 등록된 의견 리스트 조회 (삭제 여부 포함)
-        List<OpinionInfoResponseDTO> opinionRes = getIssueOpinionsWithDeleteYN(issue, memberId);
+        List<OpinionInfoResponseDTO> opinionRes = getIssueOpinionsWithDeleteYN(issue, member.getMemberId());
 
         return opinionRes;
     }
@@ -307,12 +306,12 @@ public class IssueServiceImpl implements IssueService {
      */
     @Override
     @Transactional
-    public List<OpinionInfoResponseDTO> deleteOpinion(Long opinionId, String email) {
+    public List<OpinionInfoResponseDTO> removeIssueOpinion(Long opinionId, String email) {
         // 사용자 정보 조회
         User user = getUserByEmail(email);
 
         // 의견 정보 조회
-        IssueOpinion issueOpinion = issueOpinionRepository.findById(opinionId).orElseThrow(() -> new CustomException(NOT_EXISTS_ISSUE_OPINION));
+        IssueOpinion issueOpinion = getOpinionById(opinionId);
 
         // 접근 유저가 해당 의견 작성자인지 확인하여 삭제 권한이 있으면 삭제
         if (equalsMember(user, issueOpinion)) {
@@ -456,7 +455,7 @@ public class IssueServiceImpl implements IssueService {
      *
      * @author chaeanna
      * @date 2023-07-05
-     * @param memberId 조회할 멤버의 식별 번호
+     * @param member 조회할 멤버 엔티티
      * @return 편집 가능 여부 ('Y' 또는 'N')
      * @throws CustomException 멤버가 존재하지 않을 경우 예외 발생
      */
@@ -577,7 +576,7 @@ public class IssueServiceImpl implements IssueService {
         // 각 의견에 대해 주어진 멤버 식별 번호와 비교하여 삭제 가능 여부 설정
         for (OpinionInfoResponseDTO opinion : issueOpinion) {
             // 의견의 작성자가 일치하는 경우 deleteYN 'Y'로 설정, 그렇지 않은 경우 'N' 설정
-            opinion.setDeleteYN(opinion.getMemberId().equals(memberId) ? 'Y' : 'N');
+            opinion.setDeleteYN(memberId != null && opinion.getMemberId().equals(memberId) ? 'Y' : 'N');
         }
 
         return issueOpinion;
@@ -643,7 +642,7 @@ public class IssueServiceImpl implements IssueService {
      * @param opinion 이슈 의견 정보
      * @return boolean 해당 사용자가 이슈 의견 작성자인지 여부
      */
-    private boolean equalsMember(User user, IssueOpinion opinion) {
+    boolean equalsMember(User user, IssueOpinion opinion) {
         // 이슈가 속한 프로젝트 정보 조회
         Project project = opinion.getIssue().getProject();
 
@@ -652,6 +651,16 @@ public class IssueServiceImpl implements IssueService {
 
         // memberId와 이슈 의견 작성자의 memberId 비교하여 일치 여부 반환
         return Objects.equals(accessMember, opinion.getMember().getMemberId());
+    }
+
+    /**
+     * opinionId로 issueOpinion 가져오기
+     *
+     * @param opinionId 이슈 의견 식별 번호
+     * @return IssueOpinion 이슈 의견 엔티티
+     */
+    private IssueOpinion getOpinionById(Long opinionId) {
+        return issueOpinionRepository.findById(opinionId).orElseThrow(() -> new CustomException(NOT_EXISTS_ISSUE_OPINION));
     }
 
 }

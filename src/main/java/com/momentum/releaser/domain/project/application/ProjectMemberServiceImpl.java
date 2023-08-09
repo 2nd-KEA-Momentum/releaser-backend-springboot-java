@@ -226,7 +226,7 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
      * @return 사용자가 프로젝트 멤버인 경우 true, 아닌 경우 false 반환
      */
     private boolean isProjectMember(User user, Project project) {
-        return findProjectMemberByUserAndProject(user, project) != null;
+        return projectMemberRepository.findByUserAndProject(user, project) != null;
     }
 
     /**

@@ -92,13 +92,13 @@ class ReleaseServiceImplTest {
                 'Y'
         );
         ProjectMember mockLeaderMember = new ProjectMember(
-                'L',
+                1L, 'L',
                 'Y',
                 mockUser1,
                 mockProject
         );
         ProjectMember mockMember = new ProjectMember(
-                'M',
+                2L, 'M',
                 'Y',
                 mockUser2,
                 mockProject

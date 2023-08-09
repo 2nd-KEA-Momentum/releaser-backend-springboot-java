@@ -122,7 +122,7 @@ class ProjectServiceImplTest {
 
         // project1에 대한 ProjectMember 객체 생성 및 리스트에 추가
         ProjectMember mockProjectMember1 = new ProjectMember(
-                'L',
+                1L, 'L',
                 'Y',
                 mockUser1,
                 mockProject1
@@ -131,7 +131,7 @@ class ProjectServiceImplTest {
 
         // project2에 대한 ProjectMember 객체 생성 및 리스트에 추가
         ProjectMember projectMember2 = new ProjectMember(
-                'M',
+                2L, 'M',
                 'Y',
                 mockUser2,
                 mockProject2
