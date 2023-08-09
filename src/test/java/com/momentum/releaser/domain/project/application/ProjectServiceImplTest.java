@@ -55,12 +55,7 @@ class ProjectServiceImplTest {
         // Mock data
         Long mockProjectId = 123L;
         Project mockProject = new Project(
-                "project Title",
-                "project Content",
-                "project Team",
-                "",
-                "linkkkk",
-                'Y'
+                "project Title", "project Content", "project Team", null, "testLink", 'Y'
         );
 
         // projectRepository.findById() 메서드 동작 가짜 구현(Mock)
@@ -85,33 +80,19 @@ class ProjectServiceImplTest {
         // Mock 데이터 설정
         String mockEmail = "test@example.com";
         User mockUser1 = new User(
-                "Test User1",
-                mockEmail,
-                "",
-                'Y'
+                "Test User1", mockEmail, null, 'Y'
         );
         User mockUser2 = new User(
-                "Test User2",
-                "test@releaser.com",
-                "",
-                'Y'
+                "Test User2", "test@releaser.com", null, 'Y'
         );
         List<ProjectMember> projectMemberList = new ArrayList<>();
         Project mockProject1 = new Project(
-                "test project1Title",
-                "test project1Content",
-                "test project1Team",
-                "",
-                "lrngwoignw",
-                'Y'
+                "test project1Title", "test project1Content", "test project1Team",
+                null, "testLink", 'Y'
         );
         Project mockProject2 = new Project(
-                "test project2Title",
-                "test project2Content",
-                "test project2Team",
-                "",
-                "sdkfnsfn",
-                'Y'
+                "test project2Title", "test project2Content", "test project2Team",
+                null, "testLink", 'Y'
         );
 
         // userRepository.findByEmail() 메서드 동작 가짜 구현(Mock)
@@ -122,19 +103,13 @@ class ProjectServiceImplTest {
 
         // project1에 대한 ProjectMember 객체 생성 및 리스트에 추가
         ProjectMember mockProjectMember1 = new ProjectMember(
-                1L, 'L',
-                'Y',
-                mockUser1,
-                mockProject1
+                1L, 'L', 'Y', mockUser1, mockProject1
         );
         projectMemberList.add(mockProjectMember1);
 
         // project2에 대한 ProjectMember 객체 생성 및 리스트에 추가
         ProjectMember projectMember2 = new ProjectMember(
-                2L, 'M',
-                'Y',
-                mockUser2,
-                mockProject2
+                2L, 'M', 'Y', mockUser2, mockProject2
         );
         projectMemberList.add(projectMember2);
 
