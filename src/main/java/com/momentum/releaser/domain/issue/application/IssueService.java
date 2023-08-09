@@ -54,11 +54,11 @@ public interface IssueService {
     /**
      * 8.1 이슈 의견 추가
      */
-    List<OpinionInfoResponseDTO> registerOpinion(Long issueId, String email, RegisterOpinionRequestDTO opinionReq);
+    List<OpinionInfoResponseDTO> addIssueOpinion(Long issueId, String email, RegisterOpinionRequestDTO opinionReq);
 
     /**
      * 8.2 이슈 의견 삭제
      */
-    List<OpinionInfoResponseDTO> deleteOpinion(Long opinionId, String email);
+    List<OpinionInfoResponseDTO> removeIssueOpinion(Long opinionId, String email);
 
 }

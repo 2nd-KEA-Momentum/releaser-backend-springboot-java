@@ -71,14 +71,14 @@ class ProjectMemberServiceImplTest {
                 'Y'
         );
         ProjectMember mockAccessMember = new ProjectMember(
-                'L',
+                1L, 'L',
                 'Y',
                 mockUser1,
                 mockProject
         );
         List<ProjectMember> projectMembers = new ArrayList<>();
         ProjectMember mockMember = new ProjectMember(
-                'M',
+                2L, 'M',
                 'Y',
                 mockUser2,
                 mockProject
@@ -138,7 +138,7 @@ class ProjectMemberServiceImplTest {
                 'Y'
         );
         ProjectMember mockAccessMember = new ProjectMember(
-                'L',
+                1L, 'L',
                 'Y',
                 mockUser1,
                 mockProject
@@ -243,13 +243,13 @@ class ProjectMemberServiceImplTest {
                 'Y'
         );
         ProjectMember mockLeaderMember = new ProjectMember(
-                'L',
+                1L, 'L',
                 'Y',
                 mockAccessUser,
                 mockProject
         );
         ProjectMember mockMember = new ProjectMember(
-                'M',
+                2L, 'M',
                 'Y',
                 mockRemovedUser,
                 mockProject
@@ -314,13 +314,13 @@ class ProjectMemberServiceImplTest {
                 'Y'
         );
         ProjectMember mockLeaderMember = new ProjectMember(
-                'L',
+                1L, 'L',
                 'Y',
                 mockLeaderUser,
                 mockProject
         );
         ProjectMember mockMember = new ProjectMember(
-                'M',
+                2L, 'M',
                 'Y',
                 mockRemovedUser,
                 mockProject
