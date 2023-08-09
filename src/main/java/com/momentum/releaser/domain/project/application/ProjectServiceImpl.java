@@ -319,7 +319,10 @@ public class ProjectServiceImpl implements ProjectService {
 
         // 만약 프로젝트 이미지가 기본 이미지가 아닌 다른 파일이 들어가 있는 경우 파일을 삭제한다.
         if (!Objects.equals(updatedProject.getImg(), DEFAULT_PROJECT_IMG.url()) && updatedProject.getImg() != null) {
-            s3Upload.delete(updatedProject.getImg().substring(55));
+            String img = updatedProject.getImg();
+            if (img.length() > 55) {
+                s3Upload.delete(updatedProject.getImg().substring(55));
+            }
         }
     }
 

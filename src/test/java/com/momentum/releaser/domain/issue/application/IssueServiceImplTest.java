@@ -68,7 +68,7 @@ class IssueServiceImplTest {
         String mockUserEmail = "testLeader@releaser.com";
 
         Project mockProject = new Project(
-                "projectTitle", "projectContent", "projectTeam",
+                mockProjectId, "projectTitle", "projectContent", "projectTeam",
                 null, "testLink", 'Y'
         );
 
@@ -134,7 +134,7 @@ class IssueServiceImplTest {
                 "accessUser", mockAccessUserEmail, null, 'Y'
         );
         Project mockProject = new Project(
-                "projectTitle", "projectContent", "projectTeam",
+                1L, "projectTitle", "projectContent", "projectTeam",
                 null, "testLink", 'Y'
         );
         ProjectMember mockAccessMember = new ProjectMember(
@@ -185,7 +185,7 @@ class IssueServiceImplTest {
                 "accessUser", mockAccessUserEmail, null, 'Y'
         );
         Project mockProject = new Project(
-                "projectTitle", "projectContent", "projectTeam",
+                1L, "projectTitle", "projectContent", "projectTeam",
                 null, "testLink", 'Y'
         );
         ProjectMember mockAccessMember = new ProjectMember(
@@ -233,7 +233,7 @@ class IssueServiceImplTest {
         // Mock 데이터 설정
         Long mockIssueId = 1L;
         Project mockProject = new Project(
-                "projectTitle", "projectContent", "projectTeam",
+                1L, "projectTitle", "projectContent", "projectTeam",
                 null, "testLink", 'Y'
         );
         IssueNum mockIssueNum = new IssueNum(
@@ -268,7 +268,7 @@ class IssueServiceImplTest {
         Long mockIssueId = 1L;
         Long mockReleaseId = 2L;
         Project mockProject = new Project(
-                "projectTitle", "projectContent", "projectTeam",
+                1L, "projectTitle", "projectContent", "projectTeam",
                 null, "testLink", 'Y'
         );
         ReleaseNote mockRelease = new ReleaseNote(
@@ -368,7 +368,7 @@ class IssueServiceImplTest {
                 "testUserName", mockUserEmail, null, 'Y'
         );
         Project mockProject = new Project(
-                "projectTitle", "projectContent", "projectTeam", null, "testLink", 'Y'
+                1L, "projectTitle", "projectContent", "projectTeam", null, "testLink", 'Y'
         );
         Issue mockIssue = new Issue(
                 mockIssueId, "issueTitle", "issueContent", null, Tag.FIXED, null,
@@ -441,7 +441,7 @@ class IssueServiceImplTest {
                 "testUserName", mockAccessUserEmail, null, 'Y'
         );
         Project mockProject = new Project(
-                "projectTitle", "projectContent", "projectTeam", null, "testLink", 'Y'
+                1L, "projectTitle", "projectContent", "projectTeam", null, "testLink", 'Y'
         );
         ProjectMember mockProjectMember = new ProjectMember(
                 1L, 'M', 'Y', mockAccessUser, mockProject
@@ -483,7 +483,7 @@ class IssueServiceImplTest {
                 "testUser2Name", "testComment@releaser.com", null, 'Y'
         );
         Project mockProject = new Project(
-                "projectTitle", "projectContent", "projectTeam", null, "testLink", 'Y'
+                1L, "projectTitle", "projectContent", "projectTeam", null, "testLink", 'Y'
         );
         ProjectMember mockProjectMember = new ProjectMember(
                 1L, 'M', 'Y', mockAccessUser, mockProject

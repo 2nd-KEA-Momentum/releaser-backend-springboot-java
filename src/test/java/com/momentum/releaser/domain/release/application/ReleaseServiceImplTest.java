@@ -68,94 +68,45 @@ class ReleaseServiceImplTest {
     @DisplayName("5.2 릴리즈 노트 생성 - pm만 릴리즈 노트 생성 가능")
     void testAddReleaseNote_ByPM() {
         // Mock 데이터
-        Long projectId = 1L;
+        Long mockProjectId = 1L;
         String userEmail = "testLeader@releaser.com";
 
         Project mockProject = new Project(
-                "projectTitle",
-                "projectContent",
-                "projectTeam",
-                "",
-                "testLink",
-                'Y'
+                mockProjectId, "projectTitle", "projectContent", "projectTeam",
+                null, "testLink", 'Y'
         );
         User mockUser1 = new User(
-                "testUser1Name",
-                userEmail,
-                "",
-                'Y'
+                "testUser1Name", userEmail, null, 'Y'
         );
         User mockUser2 = new User(
-                "testUser2Name",
-                "testMember@releaser.com",
-                "",
-                'Y'
+                "testUser2Name", "testMember@releaser.com", null, 'Y'
         );
         ProjectMember mockLeaderMember = new ProjectMember(
-                1L, 'L',
-                'Y',
-                mockUser1,
-                mockProject
+                1L, 'L', 'Y', mockUser1, mockProject
         );
         ProjectMember mockMember = new ProjectMember(
-                2L, 'M',
-                'Y',
-                mockUser2,
-                mockProject
+                2L, 'M', 'Y', mockUser2, mockProject
         );
         List<ProjectMember> mockMemberList = List.of(mockLeaderMember, mockMember);
         Issue mockIssue1 = new Issue(
-                1L,
-                "Test Issue Title",
-                "Test Issue Content",
-                "",
-                Tag.NEW,
-                Date.valueOf("2023-08-02"),
-                LifeCycle.DONE,
-                'N',
-                'Y',
-                mockProject,
-                mockLeaderMember,
-                null,
-                null
+                1L, "Test Issue Title", "Test Issue Content", null,
+                Tag.NEW, Date.valueOf("2023-08-02"), LifeCycle.DONE, 'N', 'Y',
+                mockProject, mockLeaderMember, null, null
         );
         Issue mockIssue2 = new Issue(
-                2L,
-                "Test Issue Title",
-                "Test Issue Content",
-                "",
-                Tag.NEW,
-                Date.valueOf("2023-08-02"),
-                LifeCycle.DONE,
-                'N',
-                'Y',
-                mockProject,
-                mockLeaderMember,
-                null,
-                null
+                2L, "Test Issue Title", "Test Issue Content", null,
+                Tag.NEW, Date.valueOf("2023-08-02"), LifeCycle.DONE, 'N', 'Y',
+                mockProject, mockLeaderMember, null, null
         );
         ReleaseCreateRequestDTO mockReleaseCreateRequestDto = new ReleaseCreateRequestDTO(
-                "Test Release",
-                "MAJOR",
-                "Test Release Content",
-                "Test Release Summary",
-                50.0,
-                50.0,
-                List.of(1L, 2L)
+                "Test Release", "MAJOR", "Test Release Content", "Test Release Summary",
+                50.0, 50.0, List.of(1L, 2L)
         );
         ReleaseNote mockSavedReleaseNote = new ReleaseNote(
-                1L,
-                "save Release Title",
-                "save Release Content",
-                "save Release Summary",
-                "1.0.0",
-                Date.valueOf("2023-08-02"),
-                ReleaseEnum.ReleaseDeployStatus.PLANNING,
-                mockProject,
-                50.0,
-                50.0
+                1L, "save Release Title", "save Release Content", "save Release Summary", "1.0.0",
+                Date.valueOf("2023-08-02"), ReleaseEnum.ReleaseDeployStatus.PLANNING, mockProject, 50.0, 50.0
         );
-        when(projectRepository.findById(projectId)).thenReturn(Optional.of(mockProject));
+        when(projectRepository.findById(mockProjectId)).thenReturn(Optional.of(mockProject));
         when(userRepository.findByEmail(userEmail)).thenReturn(Optional.of(mockUser1));
         when(projectMemberRepository.findByUserAndProject(mockUser1, mockProject)).thenReturn(Optional.of(mockLeaderMember));
         when(issueRepository.findById(mockIssue1.getIssueId())).thenReturn(Optional.of(mockIssue1));
@@ -164,7 +115,7 @@ class ReleaseServiceImplTest {
         when(projectMemberRepository.findByProject(mockProject)).thenReturn(mockMemberList);
 
         // 메서드 실행
-        ReleaseCreateAndUpdateResponseDTO result = releaseService.addReleaseNote(userEmail, projectId, mockReleaseCreateRequestDto);
+        ReleaseCreateAndUpdateResponseDTO result = releaseService.addReleaseNote(userEmail, mockProjectId, mockReleaseCreateRequestDto);
 
         // 결과 검증
         assertNotNull(result);
@@ -175,7 +126,7 @@ class ReleaseServiceImplTest {
         assertEquals(mockSavedReleaseNote.getCoordY(), result.getCoordY());
 
         // 필요한 메서드가 호출되었는지 검증
-        verify(projectRepository, times(1)).findById(projectId);
+        verify(projectRepository, times(1)).findById(mockProjectId);
         verify(userRepository, times(1)).findByEmail(userEmail);
         verify(projectMemberRepository, times(1)).findByUserAndProject(mockUser1, mockProject);
         verify(issueRepository, times(2)).findById(anyLong()); // 리스트에 두 개의 이슈가 있으므로 2번 호출
@@ -189,12 +140,8 @@ class ReleaseServiceImplTest {
     void testAddReleaseNote_ValidVersion() {
         // Mock 데이터
         Project mockProject = new Project(
-                "projectTitle",
-                "projectContent",
-                "projectTeam",
-                "",
-                "testLink",
-                'Y'
+                1L, "projectTitle", "projectContent", "projectTeam",
+                null, "testLink", 'Y'
         );
 
         // releaseRepository가 빈 리스트를 반환하도록 설정
