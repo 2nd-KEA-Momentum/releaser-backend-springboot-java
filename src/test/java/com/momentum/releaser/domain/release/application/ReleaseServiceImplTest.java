@@ -14,9 +14,13 @@ import com.momentum.releaser.domain.release.dao.opinion.ReleaseOpinionRepository
 import com.momentum.releaser.domain.release.dao.release.ReleaseRepository;
 import com.momentum.releaser.domain.release.domain.ReleaseApproval;
 import com.momentum.releaser.domain.release.domain.ReleaseEnum;
+import com.momentum.releaser.domain.release.domain.ReleaseEnum.ReleaseDeployStatus;
 import com.momentum.releaser.domain.release.domain.ReleaseNote;
+import com.momentum.releaser.domain.release.domain.ReleaseOpinion;
 import com.momentum.releaser.domain.release.dto.ReleaseRequestDto;
+import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.ReleaseApprovalRequestDTO;
 import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.ReleaseCreateRequestDTO;
+import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.ReleaseUpdateRequestDTO;
 import com.momentum.releaser.domain.release.dto.ReleaseResponseDto;
 import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.ReleaseCreateAndUpdateResponseDTO;
 import com.momentum.releaser.domain.user.dao.UserRepository;
@@ -34,8 +38,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static com.momentum.releaser.global.config.BaseResponseStatus.INVALID_RELEASE_VERSION_TYPE;
-import static com.momentum.releaser.global.config.BaseResponseStatus.NOT_EXISTS_ISSUE;
+import static com.momentum.releaser.global.config.BaseResponseStatus.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -158,5 +161,332 @@ class ReleaseServiceImplTest {
         // 필요한 메서드가 호출되었는지 검증
         verify(releaseRepository, times(1)).findAllVersionsByProject(mockProject);
     }
+
+    @Test
+    @DisplayName("5.3 릴리즈 노트 수정 - PM이 아닌 멤버가 수정 시 불가능")
+    void testSaveReleaseWithoutPM() {
+        String mockUserEmail = "testMember@releaser.com";
+        Long mockReleaseId = 1L;
+
+        User mockMemberUser = new User(
+                "testUserName", mockUserEmail, null, 'Y'
+        );
+        Project mockProject = new Project(
+                1L, "projectTitle", "projectContent", "projectTeam", null, "testLink", 'Y'
+        );
+        ProjectMember mockMember = new ProjectMember(
+                1L, 'M', 'Y', mockMemberUser, mockProject
+        );
+        ReleaseNote mockRelease = new ReleaseNote(
+                1L, "release Title", "release Content", null,
+                "1.0.0", null, ReleaseDeployStatus.PLANNING, mockProject, 50.0, 50.0
+        );
+        ReleaseUpdateRequestDTO mockReqDTO = new ReleaseUpdateRequestDTO(
+                "release Update Title", "2.0.0", "release Update Content",
+                null, "PLANNING", null
+        );
+
+        when(releaseRepository.findById(mockReleaseId)).thenReturn(Optional.of(mockRelease));
+        when(userRepository.findByEmail(mockUserEmail)).thenReturn(Optional.of(mockMemberUser));
+        when(projectMemberRepository.findByUserAndProject(mockMemberUser, mockProject)).thenReturn(Optional.of(mockMember));
+
+        // 예외 메시지 검증용
+        String expectedExceptionMessage = String.valueOf(NOT_PROJECT_MANAGER);
+
+        // 테스트 실행 및 예외 검증
+        assertThrows(CustomException.class, () -> releaseService.saveReleaseNote(mockUserEmail, mockReleaseId, mockReqDTO), expectedExceptionMessage);
+
+        verify(releaseRepository, times(1)).findById(mockReleaseId);
+        verify(userRepository, times(1)).findByEmail(mockUserEmail);
+        verify(projectMemberRepository, times(1)).findByUserAndProject(mockMemberUser, mockProject);
+    }
+
+    @Test
+    @DisplayName("5.3 릴리즈 노트 수정 - 수정하려는 버전이 1.0.0인 경우 예외 발생")
+    void testSaveReleaseWithVersion1_0_0() {
+        String mockLeaderUserEmail = "testLeader@releaser.com";
+        Long mockReleaseId = 1L;
+
+        User mockLeaderUser = new User(
+                "testUserName", mockLeaderUserEmail, null, 'Y'
+        );
+        Project mockProject = new Project(
+                1L, "projectTitle", "projectContent", "projectTeam", null, "testLink", 'Y'
+        );
+        ProjectMember mockMember = new ProjectMember(
+                1L, 'M', 'Y', mockLeaderUser, mockProject
+        );
+        ReleaseNote mockRelease = new ReleaseNote(
+                mockReleaseId, "release Title", "release Content", null,
+                "1.0.0", null, ReleaseDeployStatus.PLANNING, mockProject, 50.0, 50.0
+        );
+        ReleaseUpdateRequestDTO mockReqDTO = new ReleaseUpdateRequestDTO(
+                "release Update Title", "2.0.0", "release Update Content",
+                null, "PLANNING", null
+        );
+
+        when(releaseRepository.findById(mockReleaseId)).thenReturn(Optional.of(mockRelease));
+        when(userRepository.findByEmail(mockLeaderUserEmail)).thenReturn(Optional.of(mockLeaderUser));
+        when(projectMemberRepository.findByUserAndProject(mockLeaderUser, mockProject)).thenReturn(Optional.of(mockMember));
+
+        // 예외를 확인하기 위해 assertThrows 사용
+        String expectedExceptionMessage = String.valueOf(FAILED_TO_UPDATE_INITIAL_RELEASE_VERSION);
+
+        assertThrows(CustomException.class, () -> releaseService.updateReleaseVersion(mockRelease, mockReqDTO.getVersion()), expectedExceptionMessage);
+
+    }
+
+    @Test
+    @DisplayName("5.3 릴리즈 노트 수정 - 중복 버전인 경우 예외 발생")
+    void testSaveReleaseWithDuplicatedVersion() {
+        String mockLeaderUserEmail = "testLeader@releaser.com";
+        Long mockReleaseId = 1L;
+
+        User mockLeaderUser = new User(
+                "testUserName", mockLeaderUserEmail, null, 'Y'
+        );
+        Project mockProject = new Project(
+                1L, "projectTitle", "projectContent", "projectTeam", null, "testLink", 'Y'
+        );
+        ProjectMember mockMember = new ProjectMember(
+                1L, 'M', 'Y', mockLeaderUser, mockProject
+        );
+        ReleaseNote mockRelease = new ReleaseNote(
+                mockReleaseId, "release Title", "release Content", null,
+                "1.0.1", null, ReleaseDeployStatus.PLANNING, mockProject, 50.0, 50.0
+        );
+        ReleaseUpdateRequestDTO mockReqDTO = new ReleaseUpdateRequestDTO(
+                "release Update Title", "1.0.3", "release Update Content",
+                null, "PLANNING", null
+        );
+
+        when(releaseRepository.findById(mockReleaseId)).thenReturn(Optional.of(mockRelease));
+        when(userRepository.findByEmail(mockLeaderUserEmail)).thenReturn(Optional.of(mockLeaderUser));
+        when(projectMemberRepository.findByUserAndProject(mockLeaderUser, mockProject)).thenReturn(Optional.of(mockMember));
+        when(releaseRepository.existsByProjectAndVersion(eq(mockProject), eq(mockReleaseId), eq(mockReqDTO.getVersion()))).thenReturn(true);
+
+
+        // 예외를 확인하기 위해 assertThrows 사용
+        String expectedExceptionMessage = String.valueOf(DUPLICATED_RELEASE_VERSION);
+
+        assertThrows(CustomException.class, () -> releaseService.updateReleaseVersion(mockRelease, mockReqDTO.getVersion()), expectedExceptionMessage);
+
+    }
+
+    @Test
+    @DisplayName("5.3 릴리즈 노트 수정 - 잘못된 버전을 입력한 경우 예외 발생")
+    void testSaveReleaseWithWrongVersion() {
+        String mockLeaderUserEmail = "testLeader@releaser.com";
+        Long mockReleaseId = 1L;
+
+        User mockLeaderUser = new User(
+                "testUserName", mockLeaderUserEmail, null, 'Y'
+        );
+        Project mockProject = new Project(
+                1L, "projectTitle", "projectContent", "projectTeam", null, "testLink", 'Y'
+        );
+        ProjectMember mockMember = new ProjectMember(
+                1L, 'M', 'Y', mockLeaderUser, mockProject
+        );
+        ReleaseNote mockRelease = new ReleaseNote(
+                mockReleaseId, "release Title", "release Content", null,
+                "1.0.0", null, ReleaseDeployStatus.PLANNING, mockProject, 50.0, 50.0
+        );
+        ReleaseUpdateRequestDTO mockReqDTO = new ReleaseUpdateRequestDTO(
+                "release Update Title", "4.0.0", "release Update Content",
+                null, "PLANNING", null
+        );
+
+        when(releaseRepository.findById(mockReleaseId)).thenReturn(Optional.of(mockRelease));
+        when(userRepository.findByEmail(mockLeaderUserEmail)).thenReturn(Optional.of(mockLeaderUser));
+        when(projectMemberRepository.findByUserAndProject(mockLeaderUser, mockProject)).thenReturn(Optional.of(mockMember));
+
+        int[] majors = {1, 4};
+        int[] minors = {0, 0};
+        int[] patches = {0, 0};
+
+        int end = majors.length - 1;
+        int majorStartIdx = 0;
+        int minorStartIdx = 0;
+
+        String expectedExceptionMessage = String.valueOf(INVALID_RELEASE_VERSION);
+
+        assertThrows(CustomException.class, () -> {
+            releaseService.validateMajorVersion(majors, minors, patches, end, majorStartIdx, minorStartIdx);
+        }, expectedExceptionMessage);
+
+    }
+
+    @Test
+    @DisplayName("5.4 릴리즈 노트 삭제 - PM이 아닌 멤버가 삭제할 경우")
+    void testRemoveReleaseNoteWithoutPM() {
+        String mockUserEmail = "testMember@releaser.com";
+        Long mockReleaseId = 1L;
+
+        User mockMemberUser = new User(
+                "memberUserName", mockUserEmail, null, 'Y'
+        );
+        Project mockProject = new Project(
+                1L, "projectTitle", "projectContent", "projectTeam", null, "testLink", 'Y'
+        );
+        ProjectMember mockMember = new ProjectMember(
+                1L, 'M', 'Y', mockMemberUser, mockProject
+        );
+        ReleaseNote mockRelease = new ReleaseNote(
+                mockReleaseId, "release Title", "release Content", null,
+                "1.0.0", null, ReleaseDeployStatus.PLANNING, mockProject, 50.0, 50.0
+        );
+
+        when(releaseRepository.findById(mockReleaseId)).thenReturn(Optional.of(mockRelease));
+        when(userRepository.findByEmail(mockUserEmail)).thenReturn(Optional.of(mockMemberUser));
+        when(projectMemberRepository.findByUserAndProject(mockMemberUser, mockProject)).thenReturn(Optional.of(mockMember));
+
+        String expectedExceptionMessage = String.valueOf(NOT_PROJECT_MANAGER);
+
+        assertThrows(CustomException.class, () -> {
+            releaseService.removeReleaseNote(mockUserEmail, mockReleaseId);
+        }, expectedExceptionMessage);
+
+    }
+
+    @Test
+    @DisplayName("5.4 릴리즈 노트 삭제 - 배포된 릴리즈 노트일 경우 삭제 불가능")
+    void testRemoveReleaseNoteWithDeployedRelease() {
+        String mockUserEmail = "testLeader@releaser.com";
+        Long mockReleaseId = 1L;
+
+        User mockLeaderUser = new User(
+                "leaderUserName", mockUserEmail, null, 'Y'
+        );
+        Project mockProject = new Project(
+                1L, "projectTitle", "projectContent", "projectTeam", null, "testLink", 'Y'
+        );
+        ProjectMember mockMember = new ProjectMember(
+                1L, 'M', 'Y', mockLeaderUser, mockProject
+        );
+        ReleaseNote mockRelease = new ReleaseNote(
+                mockReleaseId, "release Title", "release Content", null,
+                "1.0.0", null, ReleaseDeployStatus.DEPLOYED, mockProject, 50.0, 50.0
+        );
+
+        when(releaseRepository.findById(mockReleaseId)).thenReturn(Optional.of(mockRelease));
+        when(userRepository.findByEmail(mockUserEmail)).thenReturn(Optional.of(mockLeaderUser));
+        when(projectMemberRepository.findByUserAndProject(mockLeaderUser, mockProject)).thenReturn(Optional.of(mockMember));
+
+        String expectedExceptionMessage = String.valueOf(FAILED_TO_DELETE_DEPLOYED_RELEASE_NOTE);
+
+        assertThrows(CustomException.class, () -> {
+            releaseService.removeReleaseNote(mockUserEmail, mockReleaseId);
+        }, expectedExceptionMessage);
+
+    }
+
+    @Test
+    @DisplayName("5.6 릴리즈 노트 배포 동의 여부 선택 - 프로젝트 멤버가 아닌 경우")
+    void testModifyReleaseApprovalWithoutMember() {
+        String mockUserEmail = "test@releaser.com";
+        Long mockReleaseId = 1L;
+
+        User mockUser = new User(
+                "UserName", mockUserEmail, null, 'Y'
+        );
+        Project mockProject = new Project(
+                1L, "projectTitle", "projectContent", "projectTeam", null, "testLink", 'Y'
+        );
+
+        ReleaseNote mockRelease = new ReleaseNote(
+                mockReleaseId, "release Title", "release Content", null,
+                "1.0.0", null, ReleaseDeployStatus.PLANNING, mockProject, 50.0, 50.0
+        );
+        ReleaseApprovalRequestDTO mockReqDTO = new ReleaseApprovalRequestDTO(
+                "Y"
+        );
+
+        when(releaseRepository.findById(mockReleaseId)).thenReturn(Optional.of(mockRelease));
+        when(userRepository.findByEmail(mockUserEmail)).thenReturn(Optional.of(mockUser));
+
+        String expectedExceptionMessage = String.valueOf(NOT_EXISTS_PROJECT_MEMBER);
+
+        assertThrows(CustomException.class, () -> {
+            releaseService.modifyReleaseApproval(mockUserEmail, mockReleaseId, mockReqDTO);
+        }, expectedExceptionMessage);
+
+    }
+
+    @Test
+    @DisplayName("5.6 릴리즈 노트 배포 동의 여부 선택 - 배포된 릴리즈 노트인 경우 예외 발생")
+    void testModifyReleaseApproval() {
+        String mockMemberUserEmail = "testMember@releaser.com";
+        Long mockReleaseId = 1L;
+
+        User mockMemberUser = new User(
+                "UserName", mockMemberUserEmail, null, 'Y'
+        );
+        Project mockProject = new Project(
+                1L, "projectTitle", "projectContent", "projectTeam", null, "testLink", 'Y'
+        );
+        ProjectMember mockMember = new ProjectMember(
+                1L, 'M', 'Y', mockMemberUser, mockProject
+        );
+        ReleaseNote mockRelease = new ReleaseNote(
+                mockReleaseId, "release Title", "release Content", null,
+                "1.0.0", null, ReleaseDeployStatus.DEPLOYED, mockProject, 50.0, 50.0
+        );
+        ReleaseApprovalRequestDTO mockReqDTO = new ReleaseApprovalRequestDTO(
+                "Y"
+        );
+
+        when(releaseRepository.findById(mockReleaseId)).thenReturn(Optional.of(mockRelease));
+        when(userRepository.findByEmail(mockMemberUserEmail)).thenReturn(Optional.of(mockMemberUser));
+        when(projectMemberRepository.findByUserAndProject(mockMemberUser, mockProject)).thenReturn(Optional.of(mockMember));
+
+        String expectedExceptionMessage = String.valueOf(FAILED_TO_APPROVE_RELEASE_NOTE);
+
+        assertThrows(CustomException.class, () -> {
+            releaseService.modifyReleaseApproval(mockMemberUserEmail, mockReleaseId, mockReqDTO);
+        }, expectedExceptionMessage);
+
+    }
+
+    @Test
+    @DisplayName("6.2 릴리즈 노트 의견 삭제 - 해당 의견 작성자가 아닌 경우 예외 발생")
+    void testRemoveReleaseOpinionWithoutCommenter() {
+        String mockUserEmail = "test@releaser.com";
+        Long mockOpinionId = 1L;
+
+        User mockMemberUser = new User(
+                "UserName", mockUserEmail, null, 'Y'
+        );
+        User mockCommenterUser = new User(
+                "CommenterUserName", "testCommenter@releaser.com", null, 'Y'
+        );
+        Project mockProject = new Project(
+                1L, "projectTitle", "projectContent", "projectTeam", null, "testLink", 'Y'
+        );
+        ProjectMember mockMember = new ProjectMember(
+                1L, 'M', 'Y', mockMemberUser, mockProject
+        );
+        ProjectMember mockCommenterMember = new ProjectMember(
+                1L, 'M', 'Y', mockCommenterUser, mockProject
+        );
+        ReleaseNote mockRelease = new ReleaseNote(
+                1L, "release Title", "release Content", null,
+                "1.0.0", null, ReleaseDeployStatus.PLANNING, mockProject, 50.0, 50.0
+        );
+        ReleaseOpinion mockReleaseOpinion = new ReleaseOpinion(
+                "opinion", mockRelease, mockCommenterMember
+        );
+
+        when(releaseOpinionRepository.findById(mockOpinionId)).thenReturn(Optional.of(mockReleaseOpinion));
+        when(userRepository.findByEmail(mockUserEmail)).thenReturn(Optional.of(mockMemberUser));
+        when(projectMemberRepository.findByUserAndProject(mockMemberUser, mockProject)).thenReturn(Optional.of(mockMember));
+
+        String expectedExceptionMessage = String.valueOf(UNAUTHORIZED_TO_DELETE_RELEASE_OPINION);
+
+        assertThrows(CustomException.class, () -> {
+            releaseService.removeReleaseOpinion(mockUserEmail, mockOpinionId);
+        }, expectedExceptionMessage);
+    }
+
 
 }
