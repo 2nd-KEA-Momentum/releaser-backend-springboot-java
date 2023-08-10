@@ -92,6 +92,20 @@ dependencies {
     implementation 'ch.qos.logback.contrib:logback-json-classic:0.1.5'
     implementation 'net.logstash.logback:logstash-logback-encoder:6.1'
     implementation 'com.github.maricn:logback-slack-appender:1.4.0'
+
+    // RabbitMQ
+    implementation 'org.springframework.boot:spring-boot-starter-amqp'
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
+
+    implementation 'org.springframework.boot:spring-boot-starter-reactor-netty' // 외부 브로커 사용 위해
+    implementation 'io.netty:netty-resolver-dns-native-macos:4.1.68.Final:osx-aarch_64' // macOS용
+    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.12.4' // LocalDateTime
+
+    // WebSocket
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+    implementation group: 'org.webjars', name: 'sockjs-client', version: '1.1.2'
+    implementation group: 'org.webjars', name: 'stomp-websocket', version: '2.3.3'
+    implementation group: 'org.webjars', name: 'webjars-locator-core', version: '0.47'
 }
 
 //tasks.named('compileJava') {
