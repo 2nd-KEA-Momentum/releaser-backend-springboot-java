@@ -8,9 +8,7 @@ import java.util.stream.Collectors;
 
 import com.momentum.releaser.domain.notification.event.NotificationEventPublisher;
 import com.momentum.releaser.domain.notification.event.ReleaseNoteMessageEvent;
-import com.momentum.releaser.rabbitmq.MessageDto;
 import com.momentum.releaser.rabbitmq.MessageDto.ReleaseNoteMessageDto;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -1377,7 +1375,7 @@ public class ReleaseServiceImpl implements ReleaseService {
         ReleaseNoteMessageDto message = ReleaseNoteMessageDto.builder()
                 .project(project.getTitle())
                 .message("새로운 릴리즈 노트가 생성되었습니다.")
-                .date(LocalDateTime.now())
+                .date(LocalDateTime.now()) // FIXME: 데이터 변경
                 .releaseNoteId(releaseNote.getReleaseId()).build();
 
         List<String> consumers = projectMemberRepository.findByProject(project).stream()
