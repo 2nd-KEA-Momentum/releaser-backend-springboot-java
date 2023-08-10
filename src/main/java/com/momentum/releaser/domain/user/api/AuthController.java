@@ -76,7 +76,6 @@ public class AuthController {
 
     /**
      * 2.3 Token 재발급
-     * <p>
      * Authorization 헤더에서 토큰을 추출
      *
      * @param authorizationHeader Authorization 헤더 값
