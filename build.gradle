@@ -98,6 +98,7 @@ dependencies {
     implementation 'com.fasterxml.jackson.core:jackson-databind'
 
     implementation 'org.springframework.boot:spring-boot-starter-reactor-netty' // 외부 브로커 사용 위해
+    implementation 'io.netty:netty-resolver-dns-native-macos:4.1.68.Final:osx-aarch_64' // macOS용
     implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.12.4' // LocalDateTime
 
     // WebSocket
