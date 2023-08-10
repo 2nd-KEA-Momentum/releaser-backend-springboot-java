@@ -745,7 +745,7 @@ public class ReleaseServiceImpl implements ReleaseService {
      * @param version 클라이언트로부터 전달받은 변경하려는 버전
      * @return String 검사가 완료된 올바른 버전
      */
-    private String updateReleaseVersion(ReleaseNote releaseNote, String version) {
+    String updateReleaseVersion(ReleaseNote releaseNote, String version) {
 
         // 1. 만약 수정하려고 하는 릴리즈 노트의 원래 버전이 1.0.0인 경우 수정하지 못하도록 한다. 이 경우 릴리즈 노트 내용만 수정해야 한다.
         if (!Objects.equals(version, "1.0.0") && Objects.equals(releaseNote.getVersion(), "1.0.0")) {
@@ -801,7 +801,7 @@ public class ReleaseServiceImpl implements ReleaseService {
      * @param majorStartIdx 현재 메이저 버전 검사의 시작 인덱스
      * @param minorStartIdx 현재 마이너 버전 검사의 시작 인덱스
      */
-    private void validateMajorVersion(int[] majors, int[] minors, int[] patches, int end, int majorStartIdx, int minorStartIdx) {
+    void validateMajorVersion(int[] majors, int[] minors, int[] patches, int end, int majorStartIdx, int minorStartIdx) {
 
         for (int i = 0; i < end; i++) {
             int currentMajor = majors[i];
