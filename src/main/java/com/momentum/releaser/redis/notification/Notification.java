@@ -1,8 +1,8 @@
 package com.momentum.releaser.redis.notification;
 
+import java.time.LocalDateTime;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
 
 import org.springframework.data.redis.core.RedisHash;
 import org.springframework.data.redis.core.TimeToLive;
@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 public class Notification {
 
     @Id
-    private Long notificationId;
+    private String notificationId;
 
     private String type;
 
@@ -31,13 +31,13 @@ public class Notification {
 
     private Date date;
 
-    private Set<String> markByUsers = new HashSet<>();
+    private HashMap<String, Integer> markByUsers = new HashMap<>();
 
     @TimeToLive
     private long expiredTime;
 
     @Builder
-    public Notification(Long notificationId, String type, String projectTitle, String projectImg, String message, Date date, Set<String> markByUsers, long expiredTime) {
+    public Notification(String notificationId, String type, String projectTitle, String projectImg, String message, Date date, HashMap<String, Integer> markByUsers, long expiredTime) {
         this.notificationId = notificationId;
         this.type = type;
         this.projectTitle = projectTitle;

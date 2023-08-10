@@ -9,7 +9,9 @@ import com.momentum.releaser.rabbitmq.MessageDto.ReleaseNoteMessageDto;
 import lombok.Builder;
 import lombok.Data;
 import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Data
 @Builder
 @ToString

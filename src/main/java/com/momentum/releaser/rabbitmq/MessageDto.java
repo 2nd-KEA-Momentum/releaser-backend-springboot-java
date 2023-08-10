@@ -3,6 +3,8 @@ package com.momentum.releaser.rabbitmq;
 import java.time.LocalDateTime;
 import java.util.Date;
 
+import com.momentum.releaser.domain.project.dto.ProjectResponseDto;
+import com.momentum.releaser.domain.project.dto.ProjectResponseDto.ProjectInfoResponseDTO;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -48,14 +50,18 @@ public class MessageDto {
     @Getter
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     public static class ReleaseNoteMessageDto {
-        private String project;
+        private Long projectId;
+        private String projectName;
+        private String projectImg;
         private String message;
-        private LocalDateTime date;
+        private Date date;
         private Long releaseNoteId;
 
         @Builder
-        public ReleaseNoteMessageDto(String project, String message, LocalDateTime date, Long releaseNoteId) {
-            this.project = project;
+        public ReleaseNoteMessageDto(Long projectId, String projectName, String projectImg, String message, Date date, Long releaseNoteId) {
+            this.projectId = projectId;
+            this.projectName = projectName;
+            this.projectImg = projectImg;
             this.message = message;
             this.date = date;
             this.releaseNoteId = releaseNoteId;

@@ -2,7 +2,7 @@ package com.momentum.releaser.redis.notification;
 
 import org.springframework.data.repository.CrudRepository;
 
-public interface NotificationRedisRepository extends CrudRepository<Notification, Long> {
+public interface NotificationRedisRepository extends CrudRepository<Notification, String> {
 
     /**
      * Notification 데이터를 가져온다.
@@ -12,5 +12,5 @@ public interface NotificationRedisRepository extends CrudRepository<Notification
      * @author seonwoo
      * @date 2023-08-09 (수)
      */
-    Notification findByNotificationId(Long notificationId);
+    Notification findByNotificationId(String notificationId);
 }

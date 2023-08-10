@@ -2,7 +2,7 @@ package com.momentum.releaser.domain.release.application;
 
 import static com.momentum.releaser.global.config.BaseResponseStatus.*;
 
-import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -1271,7 +1271,8 @@ public class ReleaseServiceImpl implements ReleaseService {
      */
     private void isProjectManager(String email, Project project) {
         User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(NOT_EXISTS_USER));
-        ProjectMember member = projectMemberRepository.findByUserAndProject(user, project).orElseThrow(() -> new CustomException(NOT_EXISTS_PROJECT_MEMBER));;
+        ProjectMember member = projectMemberRepository.findByUserAndProject(user, project).orElseThrow(() -> new CustomException(NOT_EXISTS_PROJECT_MEMBER));
+        ;
 
         if (member.getPosition() != 'L') {
             // 프로젝트의 관리자가 아닌 경우 예외를 발생시킨다.
@@ -1291,7 +1292,8 @@ public class ReleaseServiceImpl implements ReleaseService {
      */
     private ProjectMember getProjectMember(String email, Project project) {
         User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(NOT_EXISTS_USER));
-        ProjectMember member = projectMemberRepository.findByUserAndProject(user, project).orElseThrow(() -> new CustomException(NOT_EXISTS_PROJECT_MEMBER));;
+        ProjectMember member = projectMemberRepository.findByUserAndProject(user, project).orElseThrow(() -> new CustomException(NOT_EXISTS_PROJECT_MEMBER));
+        ;
 
         return member;
     }
@@ -1361,17 +1363,31 @@ public class ReleaseServiceImpl implements ReleaseService {
         }
     }
 
+    /**
+     * 이벤트 리스너를 이용하여 트랜잭션 처리 후 릴리즈 노트 생성 알림을 전달한다.
+     *
+     * @param project     프로젝트
+     * @param releaseNote 릴리즈 노트
+     * @author seonwoo
+     * @date 2023-08-10 (목)
+     */
     private void notifyCreateReleaseNote(Project project, ReleaseNote releaseNote) {
+        // 알림 메시지를 정의한다.
         ReleaseNoteMessageDto message = ReleaseNoteMessageDto.builder()
-                .project(project.getTitle())
+                .projectId(project.getProjectId())
+                .projectName(project.getTitle())
+                .projectImg(project.getImg())
                 .message("새로운 릴리즈 노트가 생성되었습니다.")
-                .date(LocalDateTime.now()) // FIXME: 데이터 변경
-                .releaseNoteId(releaseNote.getReleaseId()).build();
+                .date(Date.from(releaseNote.getCreatedDate().atZone(ZoneId.systemDefault()).toInstant()))
+                .releaseNoteId(releaseNote.getReleaseId())
+                .build();
 
+        // 알림 메시지를 보낼 대상 목록을 가져온다.
         List<String> consumers = projectMemberRepository.findByProject(project).stream()
                 .map(m -> m.getUser().getEmail())
                 .collect(Collectors.toList());
 
+        // 이벤트 리스너를 호출하여 릴리즈 노트 생성 트랜잭션이 완료된 후 호출하도록 한다.
         notificationEventPublisher.notifyReleaseNote(ReleaseNoteMessageEvent.toNotifyAllReleaseNote(message, consumers));
     }
 }
