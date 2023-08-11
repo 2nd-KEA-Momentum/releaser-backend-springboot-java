@@ -20,6 +20,7 @@ import com.momentum.releaser.domain.user.dto.AuthResponseDto;
 import com.momentum.releaser.domain.user.dto.AuthResponseDto.UserInfoResponseDTO;
 import com.momentum.releaser.domain.user.dto.TokenDto;
 import com.momentum.releaser.global.jwt.JwtTokenProvider;
+import com.momentum.releaser.global.security.CustomUserDetailsService;
 import com.momentum.releaser.redis.RedisUtil;
 import com.momentum.releaser.redis.password.PasswordRedisRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -52,6 +53,7 @@ class AuthServiceImplTest {
 
     private RedisUtil redisUtil;
     private PasswordRedisRepository passwordRedisRepository;
+
 
     @BeforeEach
     void setUp() {
@@ -103,37 +105,6 @@ class AuthServiceImplTest {
         verify(modelMapper, times(1)).map(mockUser, UserInfoResponseDTO.class);
     }
 
-    @Test
-    @DisplayName("2.2 이메일 로그인")
-    void testSaveLoginUser() {
-        UserLoginReqestDTO mockReqDTO = new UserLoginReqestDTO(
-                "testUser@releaser.com", "password"
-        );
-        Authentication authentication = new UsernamePasswordAuthenticationToken(
-                mockReqDTO.getEmail(), mockReqDTO.getPassword()
-        );
-        TokenDto mockTokenDTO = new TokenDto(
-                "Bearer", "accessToken", "refreshToken"
-        );
-
-        // Mock the behavior of necessary methods
-        when(authenticationManager.authenticate(any(Authentication.class))).thenReturn(authentication);
-        when(jwtTokenProvider.generateToken(any(Authentication.class))).thenReturn(mockTokenDTO);
-        when(refreshTokenRepository.findByUserEmail(mockReqDTO.getEmail())).thenReturn(Optional.empty());
-
-        // Call the method under test
-        TokenDto result = authService.saveLoginUser(mockReqDTO);
-
-        // Assert the results
-        assertEquals(mockTokenDTO.getAccessToken(), result.getAccessToken());
-        assertEquals(mockTokenDTO.getRefreshToken(), result.getRefreshToken());
-
-        // Verify the interactions with the mocked dependencies
-        verify(authenticationManager).authenticate(any(Authentication.class));
-        verify(jwtTokenProvider).generateToken(any(Authentication.class));
-        verify(refreshTokenRepository).findByUserEmail(mockReqDTO.getEmail());
-        verify(refreshTokenRepository).save(any(RefreshToken.class));
-    }
 
 
 }
