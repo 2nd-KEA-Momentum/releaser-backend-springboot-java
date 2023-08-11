@@ -103,7 +103,7 @@ public class ReleaseServiceImpl implements ReleaseService {
         createReleaseApprovals(savedReleaseNote);
 
         // 릴리즈 노트 생성 알림
-        notifyCreateReleaseNote(project, savedReleaseNote);
+         notifyCreateReleaseNote(project, savedReleaseNote, "새로운 릴리즈 노트가 생성되었습니다.");
 
         return ReleaseMapper.INSTANCE.toReleaseCreateAndUpdateResponseDto(savedReleaseNote);
     }
@@ -1023,6 +1023,18 @@ public class ReleaseServiceImpl implements ReleaseService {
             releaseNote.updateDeployStatus(ReleaseDeployStatus.DEPLOYED);
             releaseRepository.save(releaseNote);
         }
+
+        if (member.getPosition() == 'L' && approval == 'N') {
+            // 배포 동의 상태 값을 전달한 사용자가 관리자이고, 관리자가 배포 거부를 선택한 경우
+            // 릴리즈 노트 배포 거부 알림을 프로젝트 멤버 모두에게 준다.
+            notifyCreateReleaseNote(releaseNote.getProject(), releaseNote, "릴리즈 노트의 배포가 거부되었습니다.");
+        }
+
+        if (member.getPosition() == 'M' && approval == 'Y') {
+            // 배포 동의 상태 값을 전달한 사용자가 멤버이고, 멤버가 동의를 선택한 경우
+            // 릴리즈 노트 배포 결정 알림을 프로젝트 PM에게 준다.
+            notifyReleaseNoteApprovalToManager(releaseNote.getProject(), releaseNote);
+        }
     }
 
     /**
@@ -1371,13 +1383,13 @@ public class ReleaseServiceImpl implements ReleaseService {
      * @author seonwoo
      * @date 2023-08-10 (목)
      */
-    private void notifyCreateReleaseNote(Project project, ReleaseNote releaseNote) {
+    private void notifyCreateReleaseNote(Project project, ReleaseNote releaseNote, String alarmMessage) {
         // 알림 메시지를 정의한다.
         ReleaseNoteMessageDto message = ReleaseNoteMessageDto.builder()
                 .projectId(project.getProjectId())
                 .projectName(project.getTitle())
                 .projectImg(project.getImg())
-                .message("새로운 릴리즈 노트가 생성되었습니다.")
+                .message(alarmMessage)
                 .date(Date.from(releaseNote.getCreatedDate().atZone(ZoneId.systemDefault()).toInstant()))
                 .releaseNoteId(releaseNote.getReleaseId())
                 .build();
@@ -1390,4 +1402,23 @@ public class ReleaseServiceImpl implements ReleaseService {
         // 이벤트 리스너를 호출하여 릴리즈 노트 생성 트랜잭션이 완료된 후 호출하도록 한다.
         notificationEventPublisher.notifyReleaseNote(ReleaseNoteMessageEvent.toNotifyAllReleaseNote(message, consumers));
     }
+
+    private void notifyReleaseNoteApprovalToManager(Project project, ReleaseNote releaseNote) {
+        // 알림 메시지를 정의한다.
+        ReleaseNoteMessageDto message = ReleaseNoteMessageDto.builder()
+                .projectId(project.getProjectId())
+                .projectName(project.getTitle())
+                .projectImg(project.getImg())
+                .message("릴리즈 노트 배포를 결정해 주세요.")
+                .date(Date.from(releaseNote.getCreatedDate().atZone(ZoneId.systemDefault()).toInstant()))
+                .releaseNoteId(releaseNote.getReleaseId())
+                .build();
+
+        // 프로젝트 PM의 이메일을 가져온다.
+        ProjectMember member = projectRepository.getProjectMemberPostionPM(project.getProjectId());
+
+        // 이벤트 리스너를 호출하여 릴리즈 노트 생성 트랜잭션이 완료된 후 호출하도록 한다.
+        notificationEventPublisher.notifyReleaseNote(ReleaseNoteMessageEvent.toNotifyOneReleaseNote(message, member.getUser().getEmail()));
+    }
+
 }

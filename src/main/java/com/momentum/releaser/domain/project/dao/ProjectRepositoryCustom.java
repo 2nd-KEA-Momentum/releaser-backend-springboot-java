@@ -12,6 +12,4 @@ public interface ProjectRepositoryCustom {
     List<GetMembersDataDTO> getMemberList(Project project);
 
     ProjectMember getProjectMemberPostionPM(Long projectId);
-
-
 }
