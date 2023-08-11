@@ -146,19 +146,25 @@ public class ReleaseResponseDto {
     @Getter
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     public static class ReleaseOpinionsResponseDTO {
-        private Long releaseOpinionId;
+        private Long opinionId;
         private String opinion;
         private Long memberId;
         private String memberName;
-        private String memberProfileImg;
+        private String memberImg;
+        private char deleteYN;
 
         @Builder
-        public ReleaseOpinionsResponseDTO(Long releaseOpinionId, String opinion, Long memberId, String memberName, String memberProfileImg) {
-            this.releaseOpinionId = releaseOpinionId;
+        public ReleaseOpinionsResponseDTO(Long opinionId, String opinion, Long memberId, String memberName, String memberImg, char deleteYN) {
+            this.opinionId = opinionId;
             this.opinion = opinion;
             this.memberId = memberId;
             this.memberName = memberName;
-            this.memberProfileImg = memberProfileImg;
+            this.memberImg = memberImg;
+            this.deleteYN = deleteYN;
+        }
+
+        public void updateDeleteYN(char deleteYN) {
+            this.deleteYN = deleteYN;
         }
     }
 
