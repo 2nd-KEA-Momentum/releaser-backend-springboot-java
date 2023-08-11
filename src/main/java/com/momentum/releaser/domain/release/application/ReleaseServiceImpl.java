@@ -716,7 +716,7 @@ public class ReleaseServiceImpl implements ReleaseService {
      * @author seonwoo
      * @date 2023-07-14
      */
-    private String updateReleaseVersion(ReleaseNote releaseNote, String version) {
+    String updateReleaseVersion(ReleaseNote releaseNote, String version) {
 
         // 1. 만약 수정하려고 하는 릴리즈 노트의 원래 버전이 1.0.0인 경우 수정하지 못하도록 한다. 이 경우 릴리즈 노트 내용만 수정해야 한다.
         if (!Objects.equals(version, "1.0.0") && Objects.equals(releaseNote.getVersion(), "1.0.0")) {
@@ -772,7 +772,7 @@ public class ReleaseServiceImpl implements ReleaseService {
      * @author seonwoo
      * @date 2023-07-14
      */
-    private void validateMajorVersion(int[] majors, int[] minors, int[] patches, int end, int majorStartIdx, int minorStartIdx) {
+    void validateMajorVersion(int[] majors, int[] minors, int[] patches, int end, int majorStartIdx, int minorStartIdx) {
 
         for (int i = 0; i < end; i++) {
             int currentMajor = majors[i];
