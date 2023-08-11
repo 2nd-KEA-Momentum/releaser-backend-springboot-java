@@ -47,21 +47,21 @@ public class ReleaseDataDto {
     @Getter
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     public static class ReleaseOpinionsDataDTO {
-        private Long releaseOpinionId;
+        private Long opinionId;
         private String opinion;
         private Long memberId;
         private String memberName;
-        private String memberProfileImg;
+        private String memberImg;
         private char deleteYN;
 
         @QueryProjection
         @Builder
-        public ReleaseOpinionsDataDTO(Long releaseOpinionId, String opinion, Long memberId, String memberName, String memberProfileImg) {
-            this.releaseOpinionId = releaseOpinionId;
+        public ReleaseOpinionsDataDTO(Long opinionId, String opinion, Long memberId, String memberName, String memberImg) {
+            this.opinionId = opinionId;
             this.opinion = opinion;
             this.memberId = memberId;
             this.memberName = memberName;
-            this.memberProfileImg = memberProfileImg;
+            this.memberImg = memberImg;
         }
 
         /**
