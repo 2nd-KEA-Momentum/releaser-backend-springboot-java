@@ -45,6 +45,7 @@ class AuthServiceImplTest {
     private UserRepository userRepository;
     private AuthPasswordRepository authPasswordRepository;
     private RefreshTokenRepository refreshTokenRepository;
+    private AuthenticationManager authenticationManager;
     private AuthenticationManagerBuilder authenticationManagerBuilder;
     private JwtTokenProvider jwtTokenProvider;
     private ModelMapper modelMapper;
@@ -58,6 +59,7 @@ class AuthServiceImplTest {
         userRepository = mock(UserRepository.class);
         authPasswordRepository = mock(AuthPasswordRepository.class);
         refreshTokenRepository = mock(RefreshTokenRepository.class);
+        authenticationManager = mock(AuthenticationManager.class);
         authenticationManagerBuilder = mock(AuthenticationManagerBuilder.class);
         jwtTokenProvider = mock(JwtTokenProvider.class);
         modelMapper = mock(ModelMapper.class);
@@ -111,23 +113,27 @@ class AuthServiceImplTest {
                 mockReqDTO.getEmail(), mockReqDTO.getPassword()
         );
         TokenDto mockTokenDTO = new TokenDto(
-                "Bearer" , "accessToken", "refreshToken"
+                "Bearer", "accessToken", "refreshToken"
         );
 
-        when(authenticationManagerBuilder.getObject()).thenReturn(any(AuthenticationManager.class));
-        when(authenticationManagerBuilder.getObject().authenticate(any(Authentication.class))).thenReturn(authentication);
+        // Mock the behavior of necessary methods
+        when(authenticationManager.authenticate(any(Authentication.class))).thenReturn(authentication);
         when(jwtTokenProvider.generateToken(any(Authentication.class))).thenReturn(mockTokenDTO);
         when(refreshTokenRepository.findByUserEmail(mockReqDTO.getEmail())).thenReturn(Optional.empty());
 
+        // Call the method under test
         TokenDto result = authService.saveLoginUser(mockReqDTO);
 
+        // Assert the results
         assertEquals(mockTokenDTO.getAccessToken(), result.getAccessToken());
         assertEquals(mockTokenDTO.getRefreshToken(), result.getRefreshToken());
 
-        verify(authenticationManagerBuilder.getObject()).authenticate(any(Authentication.class));
+        // Verify the interactions with the mocked dependencies
+        verify(authenticationManager).authenticate(any(Authentication.class));
         verify(jwtTokenProvider).generateToken(any(Authentication.class));
         verify(refreshTokenRepository).findByUserEmail(mockReqDTO.getEmail());
         verify(refreshTokenRepository).save(any(RefreshToken.class));
     }
+
 
 }
