@@ -4,7 +4,6 @@ import static com.momentum.releaser.global.config.BaseResponseStatus.*;
 
 import java.time.ZoneId;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import com.momentum.releaser.domain.notification.event.NotificationEventPublisher;
@@ -104,7 +103,7 @@ public class ReleaseServiceImpl implements ReleaseService {
         createReleaseApprovals(savedReleaseNote);
 
         // 릴리즈 노트 생성 알림
-         notifyCreateReleaseNote(project, savedReleaseNote, "새로운 릴리즈 노트가 생성되었습니다.");
+        notifyReleaseNote(project, savedReleaseNote, "새로운 릴리즈 노트가 생성되었습니다.");
 
         return ReleaseMapper.INSTANCE.toReleaseCreateAndUpdateResponseDto(savedReleaseNote);
     }
@@ -1023,12 +1022,15 @@ public class ReleaseServiceImpl implements ReleaseService {
             // 3. 모든 조건을 만족했다면 릴리즈 노트의 배포 상태 값을 배포 완료로 변경한다.
             releaseNote.updateDeployStatus(ReleaseDeployStatus.DEPLOYED);
             releaseRepository.save(releaseNote);
+
+            // 4. 릴리즈 배포 상태 알림을 보낸다.
+            notifyReleaseNote(releaseNote.getProject(), releaseNote, "릴리즈 노트가 배포되었습니다.");
         }
 
         if (member.getPosition() == 'L' && approval == 'N') {
             // 배포 동의 상태 값을 전달한 사용자가 관리자이고, 관리자가 배포 거부를 선택한 경우
             // 릴리즈 노트 배포 거부 알림을 프로젝트 멤버 모두에게 준다.
-            notifyCreateReleaseNote(releaseNote.getProject(), releaseNote, "릴리즈 노트의 배포가 거부되었습니다.");
+            notifyReleaseNote(releaseNote.getProject(), releaseNote, "릴리즈 노트의 배포가 거부되었습니다.");
         }
 
         if (member.getPosition() == 'M' && approval == 'Y') {
@@ -1389,7 +1391,7 @@ public class ReleaseServiceImpl implements ReleaseService {
      * @author seonwoo
      * @date 2023-08-10 (목)
      */
-    private void notifyCreateReleaseNote(Project project, ReleaseNote releaseNote, String alarmMessage) {
+    private void notifyReleaseNote(Project project, ReleaseNote releaseNote, String alarmMessage) {
         // 알림 메시지를 정의한다.
         ReleaseNoteMessageDto message = ReleaseNoteMessageDto.builder()
                 .projectId(project.getProjectId())
