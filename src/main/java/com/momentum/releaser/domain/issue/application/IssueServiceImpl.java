@@ -3,13 +3,17 @@ package com.momentum.releaser.domain.issue.application;
 import static com.momentum.releaser.domain.issue.dto.IssueResponseDto.*;
 import static com.momentum.releaser.global.config.BaseResponseStatus.*;
 
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.momentum.releaser.domain.issue.dto.IssueDataDto.IssueDetailsDataDTO;
-import org.modelmapper.ModelMapper;
+import com.momentum.releaser.domain.notification.event.IssueMessageEvent;
+import com.momentum.releaser.domain.notification.event.NotificationEventPublisher;
+import com.momentum.releaser.rabbitmq.MessageDto.IssueMessageDto;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,6 +55,8 @@ public class IssueServiceImpl implements IssueService {
     private final UserRepository userRepository;
     private final ReleaseRepository releaseRepository;
 
+    private final NotificationEventPublisher notificationEventPublisher;
+
     /**
      * 7.1 이슈 생성
      *
@@ -71,6 +77,9 @@ public class IssueServiceImpl implements IssueService {
 
         // 이슈를 생성하고 이슈 번호를 할당하여 저장
         Issue newIssue = createIssueNumAndSaveIssue(createReq, project, projectMember);
+
+        // 이슈 생성 시 알림
+        notifyIssueAll(project, newIssue);
 
         return IssueIdResponseDTO.builder()
                 .issueId(newIssue.getIssueId())
@@ -663,4 +672,23 @@ public class IssueServiceImpl implements IssueService {
         return issueOpinionRepository.findById(opinionId).orElseThrow(() -> new CustomException(NOT_EXISTS_ISSUE_OPINION));
     }
 
+    private void notifyIssueAll(Project project, Issue issue) {
+        // 알림 메시지를 정의한다.
+        IssueMessageDto message = IssueMessageDto.builder()
+                .projectId(project.getProjectId())
+                .projectName(project.getTitle())
+                .projectImg(project.getImg())
+                .message("새로운 이슈가 생성되었습니다.")
+                .date(Date.from(issue.getCreatedDate().atZone(ZoneId.systemDefault()).toInstant()))
+                .issueId(issue.getIssueId())
+                .build();
+
+        // 알림 메시지를 보낼 대상 목록을 가져온다.
+        List<String> consumers = projectMemberRepository.findByProject(project).stream()
+                .map(m -> m.getUser().getEmail())
+                .collect(Collectors.toList());
+
+        // 이벤트 리스너를 호출하여 이슈 생성 트랜잭션이 완료된 후 호출하도록 한다.
+        notificationEventPublisher.notifyIssue(IssueMessageEvent.toNotifyAllIssue(message, consumers));
+    }
 }
