@@ -14,7 +14,7 @@ public interface IssueService {
     /**
      * 7.1 이슈 생성
      */
-    IssueIdResponseDTO addIssue(Long projectId, IssueInfoRequestDTO issueInfoReq);
+    IssueIdResponseDTO addIssue(String userEmail, Long projectId, IssueInfoRequestDTO issueInfoReq);
 
     /**
      * 7.2 이슈 수정
