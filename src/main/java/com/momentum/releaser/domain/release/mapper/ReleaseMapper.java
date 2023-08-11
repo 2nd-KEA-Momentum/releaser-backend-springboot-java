@@ -68,7 +68,8 @@ public interface ReleaseMapper {
      */
     @Mapping(target = "memberId", source = "releaseOpinion.member.memberId")
     @Mapping(target = "memberName", source = "releaseOpinion.member.user.name")
-    @Mapping(target = "memberProfileImg", source = "releaseOpinion.member.user.img")
+    @Mapping(target = "memberImg", source = "releaseOpinion.member.user.img")
+    @Mapping(target = "opinionId", source = "releaseOpinion.releaseOpinionId")
     ReleaseOpinionsResponseDTO toReleaseOpinionsResponseDto(ReleaseOpinion releaseOpinion);
 
     @Mapping(target = "pmId", source = "member.memberId")
