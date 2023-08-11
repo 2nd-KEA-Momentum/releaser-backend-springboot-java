@@ -37,13 +37,13 @@ public class ReleaseOpinionRepositoryImpl implements ReleaseOpinionRepositoryCus
 
         return queryFactory
                 .select(new QReleaseDataDto_ReleaseOpinionsDataDTO(
-                        releaseOpinion.releaseOpinionId,
+                        releaseOpinion.releaseOpinionId.as("opinionId"),
                         releaseOpinion.opinion,
                         Expressions.cases().when(releaseOpinion.member.status.eq('N'))
                                 .then(0L)
                                 .otherwise(releaseOpinion.member.memberId),
                         releaseOpinion.member.user.name.as("memberName"),
-                        releaseOpinion.member.user.img.as("memberProfileImg")
+                        releaseOpinion.member.user.img.as("memberImg")
                 ))
                 .from(releaseOpinion)
                 .leftJoin(releaseOpinion.member, projectMember)
