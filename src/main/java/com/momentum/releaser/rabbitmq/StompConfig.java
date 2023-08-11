@@ -36,7 +36,7 @@ public class StompConfig implements WebSocketMessageBrokerConfigurer {
      */
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/api/notification")
+        registry.addEndpoint("/notification")
 //                .setAllowedOriginPatterns("https://*.*.*.*", "https://*")
                 .withSockJS();
     }
@@ -51,7 +51,7 @@ public class StompConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         // 클라이언트에서 메시지를 보낼 때 사용할 애플리케이션의 destination prefix
-        registry.setApplicationDestinationPrefixes("/api/notification");
+        registry.setApplicationDestinationPrefixes("/notification");
 
         // STOMP 메시지 전송 시 사용할 경로 구분자 설정
         registry.setPathMatcher(new AntPathMatcher("."));
