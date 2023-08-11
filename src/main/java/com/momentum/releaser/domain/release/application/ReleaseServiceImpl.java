@@ -4,6 +4,7 @@ import static com.momentum.releaser.global.config.BaseResponseStatus.*;
 
 import java.time.ZoneId;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import com.momentum.releaser.domain.notification.event.NotificationEventPublisher;
@@ -238,7 +239,7 @@ public class ReleaseServiceImpl implements ReleaseService {
 
         saveReleaseOpinion(releaseNote, projectMember, releaseOpinionCreateRequestDto);
 
-        return createReleaseOpinionsResponseDto(releaseNote);
+        return createReleaseOpinionsResponseDto(releaseNote, projectMember.getMemberId());
     }
 
     /**
@@ -261,7 +262,7 @@ public class ReleaseServiceImpl implements ReleaseService {
 
         releaseOpinionRepository.deleteById(opinionId);
 
-        return createReleaseOpinionsResponseDto(releaseOpinion.getRelease());
+        return createReleaseOpinionsResponseDto(releaseOpinion.getRelease(), member.getMemberId());
     }
 
     /**
@@ -1352,12 +1353,17 @@ public class ReleaseServiceImpl implements ReleaseService {
      * @author seonwoo
      * @date 2023-07-26
      */
-    private List<ReleaseOpinionsResponseDTO> createReleaseOpinionsResponseDto(ReleaseNote releaseNote) {
+    private List<ReleaseOpinionsResponseDTO> createReleaseOpinionsResponseDto(ReleaseNote releaseNote, Long memberId) {
         List<ReleaseOpinion> opinions = releaseOpinionRepository.findAllByRelease(releaseNote);
 
         return opinions.stream()
-                .map(ReleaseMapper.INSTANCE::toReleaseOpinionsResponseDto)
+                .map(opinion -> {
+                    ReleaseOpinionsResponseDTO resDTO = ReleaseMapper.INSTANCE.toReleaseOpinionsResponseDto(opinion);
+                    resDTO.updateDeleteYN(memberId != null && opinion.getMember().getMemberId().equals(memberId) ? 'Y' : 'N');
+                    return resDTO;
+                })
                 .collect(Collectors.toList());
+
     }
 
     /**
