@@ -267,7 +267,7 @@ class ProjectMemberServiceImplTest {
         assertThrows(CustomException.class, () ->
             projectMemberService.removeProjectMember(mockMemberId, mockEmail), expectedExceptionMessage);
 
-        // 각 메서드가 호출됐는지 확인
+        // 각 메서드 호출됐는지 확인
         verify(userRepository, times(1)).findByEmail(mockEmail);
         verify(projectMemberRepository, times(1)).findById(mockMemberId);
     }

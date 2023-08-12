@@ -377,13 +377,12 @@ class IssueServiceImplTest {
     @Test
     @DisplayName("8.1 이슈 의견 추가")
     void testAddIssueOpinion() {
-        // Mock 데이터 설정
+        // 테스트를 위한 mock 이슈 의견 추가 정보
         Long mockIssueId = 1L;
         Long mockMemberId = 2L;
         String mockUserEmail = "testUser@releaser.com";
         String mockOpinion = "test opinion.";
 
-        // Mock 엔티티 생성
         User mockUser = new User(
                 "testUserName", mockUserEmail, null, 'Y'
         );
@@ -397,11 +396,9 @@ class IssueServiceImplTest {
         RegisterOpinionRequestDTO mockReqDTO = new RegisterOpinionRequestDTO(
                 mockOpinion
         );
-        // Mock 프로젝트 멤버 생성
         ProjectMember mockProjectMember = new ProjectMember(
                 mockMemberId, 'M', 'Y', mockUser, mockProject
         );
-
         // Mock 의견 등록 결과 리스트
         List<OpinionInfoResponseDTO> mockOpinionResponseList = new ArrayList<>();
         OpinionInfoResponseDTO mockOpinionResponse = new OpinionInfoResponseDTO(
@@ -409,39 +406,38 @@ class IssueServiceImplTest {
         );
         mockOpinionResponse.setDeleteYN('Y');
         mockOpinionResponseList.add(mockOpinionResponse);
-
         IssueOpinion mockIssueOpinion = new IssueOpinion(
                 1L, mockOpinion, 'Y', mockProjectMember, mockIssue
         );
 
-        // issueRepository.findById() 메서드 동작 가짜 구현(Mock)
+        // issueRepository.findById() 메서드가 mockIssue를 반환하도록 설정
         when(issueRepository.findById(mockIssueId)).thenReturn(Optional.of(mockIssue));
 
-        // userRepository.findOneByEmail() 메서드 동작 가짜 구현(Mock)
+        // userRepository.findOneByEmail() 메서드가 mockUser를 반환하도록 설정 (접근한 유저 정보)
         when(userRepository.findOneByEmail(mockUserEmail)).thenReturn(Optional.of(mockUser));
 
-        // projectMemberRepository.findByUserAndProject() 메서드 동작 가짜 구현(Mock)
+        // projectMemberRepository.findByUserAndProject() 메서드가 mockProjectMember를 반환하도록 설정
         when(projectMemberRepository.findByUserAndProject(mockUser, mockProject)).thenReturn(Optional.of(mockProjectMember));
 
-        when(projectMemberRepository.findById(mockMemberId)).thenReturn(Optional.of(mockProjectMember));
-        // issueOpinionRepository.save() 메서드 동작 가짜 구현(Mock)
+        // issueOpinionRepository.save() 메서드가 mockIssueOpinion를 반환하도록 설정
         when(issueOpinionRepository.save(any(IssueOpinion.class))).thenReturn(mockIssueOpinion);
 
-        // issueRepository.getIssueOpinion() 메서드 동작 가짜 구현(Mock)
+        // issueRepository.getIssueOpinion() 메서드가 mockOpinionResponseList를 반환하도록 설정 (해당 이슈에 달린 의견 리스트)
         when(issueRepository.getIssueOpinion(mockIssue)).thenReturn(mockOpinionResponseList);
 
-        // 메서드 실행
+        // 이슈 의견 추가 서비스 호출
         List<OpinionInfoResponseDTO> result = issueService.addIssueOpinion(mockIssueId, mockUserEmail, mockReqDTO);
 
         // 결과 검증
         assertNotNull(result);
         assertEquals(1, result.size());
 
+        // 해당 이슈 의견 응답에 대한 정보 검증
         OpinionInfoResponseDTO opinionResponse = result.get(0);
         assertEquals(mockMemberId, opinionResponse.getMemberId());
         assertEquals('Y', opinionResponse.getDeleteYN());
 
-        // 필요한 메서드가 호출되었는지 검증
+        // 각 메서드 호출됐는지 확인
         verify(issueRepository, times(1)).findById(mockIssueId);
         verify(userRepository, times(1)).findOneByEmail(mockUserEmail);
         verify(projectMemberRepository, times(1)).findByUserAndProject(mockUser, mockProject);
@@ -452,11 +448,10 @@ class IssueServiceImplTest {
     @Test
     @DisplayName("8.2 이슈 의견 삭제 - 접근한 유저가 작성한 의견 삭제할 경우")
     void testRemoveIssueOpinionWithCommentUser() {
-        // Mock 데이터 설정
+        // 테스트를 위한 mock 이슈 의견 삭제 정보
         Long mockOpinionId = 1L;
         String mockAccessUserEmail = "testUser@releaser.com";
 
-        // Mock 엔티티 생성
         User mockAccessUser = new User(
                 "testUserName", mockAccessUserEmail, null, 'Y'
         );
@@ -476,14 +471,22 @@ class IssueServiceImplTest {
         // Mock 의견 등록 결과 리스트
         List<OpinionInfoResponseDTO> mockOpinionResponseList = new ArrayList<>();
 
+        // userRepository.findOneByEmail() 메서드가 mockAccessUser를 반환하도록 설정
         when(userRepository.findOneByEmail(mockAccessUserEmail)).thenReturn(Optional.of(mockAccessUser));
+
+        // issueOpinionRepository.findById() 메서드가 mockIssueOpinion를 반환하도록 설정 (삭제할 이슈 의견 존재 여부 확인)
         when(issueOpinionRepository.findById(mockOpinionId)).thenReturn(Optional.of(mockIssueOpinion));
+
+        // projectMemberRepository.findByUserAndProject() 메서드가 mockProjectMember를 반환하도록 설정 (해당 의견 작성자인지 확인을 위한 멤버 정보 조회)
         when(projectMemberRepository.findByUserAndProject(mockAccessUser, mockProject)).thenReturn(Optional.of(mockProjectMember));
 
+        // 이슈 의견 제거 서비스 호출
         List<OpinionInfoResponseDTO> result = issueService.removeIssueOpinion(mockOpinionId, mockAccessUserEmail);
 
+        // 결과 검증
         assertIterableEquals(mockOpinionResponseList, result);
 
+        // 각 메서드 호출됐는지 확인
         verify(userRepository, times(1)).findOneByEmail(mockAccessUserEmail);
         verify(issueOpinionRepository, times(1)).findById(mockOpinionId);
     }
@@ -491,11 +494,10 @@ class IssueServiceImplTest {
     @Test
     @DisplayName("8.2 이슈 의견 삭제 - 삭제 권한이 없을 경우")
     void testRemoveIssueOpinionWithoutCommentUser() {
-        // Mock 데이터 설정
+        // 테스트를 위한 Mock 이슈 의견 삭제 정보
         Long mockOpinionId = 1L;
         String mockAccessUserEmail = "testUser@releaser.com";
 
-        // Mock 엔티티 생성
         User mockAccessUser = new User(
                 "testUserName", mockAccessUserEmail, null, 'Y'
         );
@@ -520,15 +522,19 @@ class IssueServiceImplTest {
                 mockOpinionId, "opinion", 'Y', mockCommentMember, mockIssue
         );
 
+        // userRepository.findOneByEmail() 메서드가 mockAccessUser를 반환하도록 설정
         when(userRepository.findOneByEmail(mockAccessUserEmail)).thenReturn(Optional.of(mockAccessUser));
+
+        // issueOpinionRepository.findById() 메서드가 mockIssueOpinion를 반환하도록 설정 (삭제할 이슈 의견 존재 여부 확인)
         when(issueOpinionRepository.findById(mockOpinionId)).thenReturn(Optional.of(mockIssueOpinion));
 
-        // 예외 메시지 검증용
+        // 예외 메시지 검증용 (해당 의견 작성자가 아닌 경우)
         String expectedExceptionMessage = String.valueOf(NOT_ISSUE_COMMENTER);
 
-        // 테스트 실행 및 예외 검증
+        // 이슈 의견 삭제 서비스 호출
         assertThrows(CustomException.class, () -> issueService.removeIssueOpinion(mockOpinionId, mockAccessUserEmail), expectedExceptionMessage);
 
+        // 각 메서드 호출됐는지 확인
         verify(userRepository, times(1)).findOneByEmail(mockAccessUserEmail);
         verify(issueOpinionRepository, times(1)).findById(mockOpinionId);
     }
