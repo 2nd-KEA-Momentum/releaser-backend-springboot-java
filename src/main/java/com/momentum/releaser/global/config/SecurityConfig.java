@@ -141,6 +141,7 @@ public class SecurityConfig {
                 .and()
                 .authorizeRequests()
                 .antMatchers("/api/auth/**").permitAll()
+                .antMatchers("/notification/**").permitAll()
                 .anyRequest().authenticated()
 
                 .and()

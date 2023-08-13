@@ -57,7 +57,7 @@ public class StompConfig implements WebSocketMessageBrokerConfigurer {
         registry.setPathMatcher(new AntPathMatcher("."));
 
         // SMTP 브로커 릴레이 활성화
-        registry.enableStompBrokerRelay("/") // 지정한 경로로 시작하는 모든 메시지는 RabbitMQ에 전달된다.
+        registry.enableStompBrokerRelay("/notification") // 지정한 경로로 시작하는 모든 메시지는 RabbitMQ에 전달된다.
                 .setRelayHost(host)
                 .setRelayPort(port)
                 .setSystemLogin(userName)
