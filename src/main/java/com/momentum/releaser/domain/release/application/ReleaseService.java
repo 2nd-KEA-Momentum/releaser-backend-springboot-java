@@ -63,11 +63,11 @@ public interface ReleaseService {
     /**
      * 9.1 프로젝트별 릴리즈 보고서 조회
      */
-    List<ReleaseDocsResponseDTO> getReleaseDocs(Long projectId);
+    List<ReleaseDocsResponseDTO> findReleaseDocs(Long projectId);
 
     /**
      * 9.2 프로젝트별 릴리즈 보고서 수정
      */
-    String updateReleaseDocs(Long projectId, String email, List<UpdateReleaseDocsRequestDTO> updateReleaseDocsReq);
+    String modifyReleaseDocs(Long projectId, String email, List<UpdateReleaseDocsRequestDTO> updateReleaseDocsReq);
 
 }
