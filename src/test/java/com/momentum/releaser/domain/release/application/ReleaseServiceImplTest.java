@@ -21,6 +21,7 @@ import com.momentum.releaser.domain.release.dto.ReleaseRequestDto;
 import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.ReleaseApprovalRequestDTO;
 import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.ReleaseCreateRequestDTO;
 import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.ReleaseUpdateRequestDTO;
+import com.momentum.releaser.domain.release.dto.ReleaseRequestDto.UpdateReleaseDocsRequestDTO;
 import com.momentum.releaser.domain.release.dto.ReleaseResponseDto;
 import com.momentum.releaser.domain.release.dto.ReleaseResponseDto.ReleaseCreateAndUpdateResponseDTO;
 import com.momentum.releaser.domain.user.dao.UserRepository;
@@ -29,6 +30,7 @@ import com.momentum.releaser.global.exception.CustomException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.core.parameters.P;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -549,6 +551,184 @@ class ReleaseServiceImplTest {
         // 테스트 실행 및 예외 검증 (해당 의견 작성자 아닐 경우 예외 발생)
         assertThrows(CustomException.class, () ->
             releaseService.removeReleaseOpinion(mockUserEmail, mockOpinionId), expectedExceptionMessage);
+    }
+
+    @Test
+    @DisplayName("9.1 프로젝트별 릴리즈 보고서 조회")
+    void testFindReleaseDocs() {
+        // 테스트를 위한 mock 프로젝트별 릴리즈 보고서 조회 정보
+        Long mockProjectId = 1L;
+
+        Project mockProject = new Project(
+                mockProjectId, "projectTitle", "projectContent", "projectTeam", null, "testLink", 'Y'
+        );
+        // 릴리즈 노트 리스트 초기화
+        List<ReleaseNote> releaseNoteList = new ArrayList<>();
+        ReleaseNote mockRelease1 = new ReleaseNote(
+                1L, "release Title", "release Content", null,
+                "1.0.0", null, ReleaseDeployStatus.DEPLOYED, mockProject, 50.0, 50.0
+        );
+        ReleaseNote mockRelease2 = new ReleaseNote(
+                2L, "release Title", "release Content", null,
+                "2.0.0", null, ReleaseDeployStatus.DEPLOYED, mockProject, 50.0, 50.0
+        );
+        // 리스트에 릴리즈 추가
+        releaseNoteList.add(mockRelease1);
+        releaseNoteList.add(mockRelease2);
+        // 이슈 리스트 초기화
+        List<Issue> issueList = new ArrayList<>();
+        Issue mockIssueNew = new Issue(
+                1L, "Test Issue Title", "Test Issue Content", null,
+                Tag.NEW, Date.valueOf("2023-08-02"), LifeCycle.DONE, 'N', 'Y',
+                mockProject, null, mockRelease1, null
+        );
+        Issue mockIssueFeature = new Issue(
+                2L, "Test Issue Title", "Test Issue Content", null,
+                Tag.FEATURE, Date.valueOf("2023-08-02"), LifeCycle.DONE, 'N', 'Y',
+                mockProject, null, mockRelease2, null
+        );
+        // 리스트에 이슈 추가
+        issueList.add(mockIssueNew);
+        issueList.add(mockIssueFeature);
+
+        // projectRepository.findById() 메서드가 mockProject를 반환하도록 설정
+        when(projectRepository.findById(mockProjectId)).thenReturn(Optional.of(mockProject));
+
+        // releaseRepository.findAllByProject() 메서드가 releaseNoteList를 반환하도록 설정 (해당 프로젝트에 관련한 릴리즈 노트 정보 리스트 조회)
+        when(releaseRepository.findAllByProject(mockProject)).thenReturn(releaseNoteList);
+
+        // issueRepository.findByRelease() 메서드가 issueList를 반환하도록 설정 (해당 릴리즈 노트와 연결된 이슈 리스트 조회)
+        when(issueRepository.findByRelease(any(ReleaseNote.class))).thenReturn(issueList);
+
+        // 릴리즈 노트 보고서 조회 서비스 호출
+        List<ReleaseResponseDto.ReleaseDocsResponseDTO> result = releaseService.findReleaseDocs(mockProjectId);
+
+        // 결과 검증
+        assertNotNull(result);
+        assertEquals("NEW", result.get(0).getTagsList().get(0).getTag());
+        assertEquals("FEATURE", result.get(0).getTagsList().get(1).getTag());
+
+        // 각 메서드 호출됐는지 확인
+        verify(projectRepository, times(1)).findById(mockProjectId);
+        verify(releaseRepository, times(1)).findAllByProject(mockProject);
+        verify(issueRepository, times(2)).findByRelease(any(ReleaseNote.class));
+    }
+
+    @Test
+    @DisplayName("9.2 프로젝트별 릴리즈 보고서 수정 - PM이 수정할 경우")
+    void testModifyReleaseDocsWithPM() {
+        // 테스트를 위한 mock 프로젝트별 릴리즈 보고서 수정 정보
+        Long mockProjectId = 1L;
+        String mockUserEmail = "testLeader@releaser.com";
+
+        Project mockProject = new Project(
+                mockProjectId, "projectTitle", "projectContent", "projectTeam", null, "testLink", 'Y'
+        );
+        User mockLeaderUser = new User(
+                "leaderUserName", mockUserEmail, null, 'Y'
+
+        );
+        ProjectMember mockLeaderMember = new ProjectMember(
+                1L, 'L', 'Y', mockLeaderUser, mockProject
+
+        );
+        // 요청 DTO 리스트 초기화
+        List<UpdateReleaseDocsRequestDTO> mockReqDTOList = new ArrayList<>();
+        UpdateReleaseDocsRequestDTO mockReqDTO1 = new UpdateReleaseDocsRequestDTO(
+                1L, "summary1"
+        );
+        UpdateReleaseDocsRequestDTO mockReqDTO2 = new UpdateReleaseDocsRequestDTO(
+                2L, "summary2"
+        );
+        // 리스트에 요청 DTO 추가
+        mockReqDTOList.add(mockReqDTO1);
+        mockReqDTOList.add(mockReqDTO2);
+        Issue mockIssueNew = new Issue(
+                1L, "Test Issue Title", "Test Issue Content", null,
+                Tag.NEW, Date.valueOf("2023-08-02"), LifeCycle.DONE, 'N', 'Y',
+                mockProject, null, null, null
+        );
+        Issue mockIssueFeature = new Issue(
+                2L, "Test Issue Title", "Test Issue Content", null,
+                Tag.FEATURE, Date.valueOf("2023-08-02"), LifeCycle.DONE, 'N', 'Y',
+                mockProject, null, null, null
+        );
+
+        // userRepository.findByEmail() 메서드가 mockLeaderUser를 반환하도록 설정
+        when(userRepository.findByEmail(mockUserEmail)).thenReturn(Optional.of(mockLeaderUser));
+
+        // projectRepository.findById() 메서드가 mockProject를 반환하도록 설정
+        when(projectRepository.findById(mockProjectId)).thenReturn(Optional.of(mockProject));
+
+        // projectMemberRepository.findByUserAndProject() 메서드가 mockLeaderMember를 반환하도록 설정
+        when(projectMemberRepository.findByUserAndProject(mockLeaderUser, mockProject)).thenReturn(Optional.of(mockLeaderMember));
+
+        // issueRepository.findById() 메서드가 이슈를 반환하도록 설정
+        when(issueRepository.findById(1L)).thenReturn(Optional.of(mockIssueNew));
+        when(issueRepository.findById(2L)).thenReturn(Optional.of(mockIssueFeature));
+
+        // 릴리즈 노트 보고서 수정 서비스 호출
+        String result = releaseService.modifyReleaseDocs(mockProjectId, mockUserEmail, mockReqDTOList);
+
+        // 결과 검증
+        assertEquals("릴리즈 보고서가 수정되었습니다.", result);
+
+        // 각 메서드 호출됐는지 확인
+        verify(userRepository, times(1)).findByEmail(mockUserEmail);
+        verify(projectRepository, times(1)).findById(mockProjectId);
+        verify(projectMemberRepository, times(1)).findByUserAndProject(mockLeaderUser, mockProject);
+        verify(issueRepository, times(2)).findById(any(Long.class));
+    }
+
+    @Test
+    @DisplayName("9.2 프로젝트별 릴리즈 보고서 수정 - member 수정할 경우 예외 발생")
+    void testModifyReleaseDocsWithoutPM() {
+        // 테스트를 위한 mock 프로젝트별 릴리즈 보고서 수정 정보
+        Long mockProjectId = 1L;
+        String mockUserEmail = "testMember@releaser.com";
+
+        Project mockProject = new Project(
+                mockProjectId, "projectTitle", "projectContent", "projectTeam", null, "testLink", 'Y'
+        );
+        User mockMemberUser = new User(
+                "lmemberUserName", mockUserEmail, null, 'Y'
+
+        );
+        ProjectMember mockMember = new ProjectMember(
+                1L, 'M', 'Y', mockMemberUser, mockProject
+
+        );
+        // 요청 DTO 리스트 초기화
+        List<UpdateReleaseDocsRequestDTO> mockReqDTOList = new ArrayList<>();
+        UpdateReleaseDocsRequestDTO mockReqDTO1 = new UpdateReleaseDocsRequestDTO(
+                1L, "summary1"
+        );
+        UpdateReleaseDocsRequestDTO mockReqDTO2 = new UpdateReleaseDocsRequestDTO(
+                2L, "summary2"
+        );
+        // 리스트에 요청 DTO 추가
+        mockReqDTOList.add(mockReqDTO1);
+        mockReqDTOList.add(mockReqDTO2);
+
+        // userRepository.findByEmail() 메서드가 mockMemberUser를 반환하도록 설정
+        when(userRepository.findByEmail(mockUserEmail)).thenReturn(Optional.of(mockMemberUser));
+
+        // projectRepository.findById() 메서드가 mockProject를 반환하도록 설정
+        when(projectRepository.findById(mockProjectId)).thenReturn(Optional.of(mockProject));
+
+        // projectMemberRepository.findByUserAndProject() 메서드가 mockMember를 반환하도록 설정 (해당 유저는 프로젝트에서 멤버 역할)
+        when(projectMemberRepository.findByUserAndProject(mockMemberUser, mockProject)).thenReturn(Optional.of(mockMember));
+
+        // 예외 메시지 검증용 (프로젝트의 PM이 아닌 경우)
+        String expectedExceptionMessage = String.valueOf(NOT_ADMIN);
+
+        // 테스트 실행 및 예외 검증
+        assertThrows(CustomException.class, () -> releaseService.modifyReleaseDocs(mockProjectId, mockUserEmail, mockReqDTOList), expectedExceptionMessage);
+
+        // 각 메서드가 호출됐는지 확인
+        verify(userRepository, times(1)).findByEmail(mockUserEmail);
+        verify(projectRepository, times(1)).findById(mockProjectId);
+        verify(projectMemberRepository, times(1)).findByUserAndProject(mockMemberUser, mockProject);
     }
 
 }

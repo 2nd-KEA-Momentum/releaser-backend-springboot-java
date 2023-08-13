@@ -285,7 +285,7 @@ public class ReleaseServiceImpl implements ReleaseService {
      */
     @Override
     @Transactional
-    public List<ReleaseDocsResponseDTO> getReleaseDocs(Long projectId) {
+    public List<ReleaseDocsResponseDTO> findReleaseDocs(Long projectId) {
         // 프로젝트 조회
         Project project = getProjectById(projectId);
         // 해당 프로젝트와 연결된 모든 릴리즈 조회
@@ -321,11 +321,7 @@ public class ReleaseServiceImpl implements ReleaseService {
      */
     @Transactional
     @Override
-    public String updateReleaseDocs(Long projectId, String email, List<UpdateReleaseDocsRequestDTO> updateReq) {
-        // Token UserInfo
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(NOT_EXISTS_USER));
-        // 프로젝트 조회
-        Project project = getProjectById(projectId);
+    public String modifyReleaseDocs(Long projectId, String email, List<UpdateReleaseDocsRequestDTO> updateReq) {
         // 프로젝트 구성원 정보 조회
         ProjectMember member = getProjectMemberByEmailAndProjectId(email, projectId);
 
