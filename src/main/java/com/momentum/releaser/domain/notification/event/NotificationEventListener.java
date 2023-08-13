@@ -1,6 +1,9 @@
 package com.momentum.releaser.domain.notification.event;
 
+import com.momentum.releaser.global.exception.CustomException;
 import com.momentum.releaser.redis.notification.Notification;
+import com.momentum.releaser.redis.notification.NotificationPerUser;
+import com.momentum.releaser.redis.notification.NotificationPerUserRedisRepository;
 import com.momentum.releaser.redis.notification.NotificationRedisRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +17,7 @@ import java.util.*;
 
 import static com.momentum.releaser.domain.notification.event.ReleaseNoteMessageEvent.ConsumerType.PROJECT;
 import static com.momentum.releaser.domain.notification.event.ReleaseNoteMessageEvent.ConsumerType.USER;
+import static com.momentum.releaser.global.config.BaseResponseStatus.NOT_EXISTS_NOTIFICATION_PER_USER;
 
 @Slf4j
 @Component
@@ -25,6 +29,7 @@ public class NotificationEventListener {
     private final DirectExchange projectDirectExchange;
 
     private final NotificationRedisRepository notificationRedisRepository;
+    private final NotificationPerUserRedisRepository notificationPerUserRedisRepository;
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void onReleaseNoteEvent(final ReleaseNoteMessageEvent releaseNoteMessageEvent) {
@@ -101,9 +106,8 @@ public class NotificationEventListener {
                 .expiredTime(604800) // 일주일
                 .build();
 
-        log.info("Notification to Redis: {}", notification.toString());
-
         notificationRedisRepository.save(notification);
+        saveNotificationPerUserToRedis(notification, consumers);
     }
 
     private void saveIssueNotificationToRedis(IssueMessageEvent notificationEvent) {
@@ -114,7 +118,6 @@ public class NotificationEventListener {
             markByUsers.put(consumer, 0);
         }
 
-        // Redis에 저장하기 위한 데이터를 생성한다.
         Notification notification = Notification.builder()
                 .notificationId(notificationEvent.getEventId())
                 .type("Issue")
@@ -126,8 +129,33 @@ public class NotificationEventListener {
                 .expiredTime(604800) // 일주일
                 .build();
 
-        log.info("Notification to Redis: {}", notification.toString());
-
         notificationRedisRepository.save(notification);
+        saveNotificationPerUserToRedis(notification, consumers);
+    }
+
+    private void saveNotificationPerUserToRedis(Notification notification, List<String> consumers) {
+        for (String consumer : consumers) {
+            Optional<NotificationPerUser> optionalNotificationPerUser = notificationPerUserRedisRepository.findById(consumer);
+
+            if (optionalNotificationPerUser.isEmpty()) {
+                NotificationPerUser notificationPerUser = NotificationPerUser.builder()
+                        .email(consumer)
+                        .build();
+
+                notificationPerUserRedisRepository.save(notificationPerUser);
+            }
+
+            NotificationPerUser notificationPerUser = notificationPerUserRedisRepository.findById(consumer)
+                    .orElseThrow(() -> new CustomException(NOT_EXISTS_NOTIFICATION_PER_USER));
+
+            List<String> notifications = notificationPerUser.getNotifications();
+            if (notifications == null) {
+                notifications = new ArrayList<>();
+            }
+            notifications.add(notification.getNotificationId());
+
+            notificationPerUser.updateNotifications(notifications);
+            notificationPerUserRedisRepository.save(notificationPerUser);
+        }
     }
 }

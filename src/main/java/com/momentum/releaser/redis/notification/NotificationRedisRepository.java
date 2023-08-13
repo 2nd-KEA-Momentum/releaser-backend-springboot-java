@@ -1,16 +1,17 @@
 package com.momentum.releaser.redis.notification;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.CrudRepository;
+
+import java.util.Map;
+import java.util.Optional;
 
 public interface NotificationRedisRepository extends CrudRepository<Notification, String> {
 
-    /**
-     * Notification 데이터를 가져온다.
-     *
-     * @param notificationId 알림 식별 번호
-     * @return Notification
-     * @author seonwoo
-     * @date 2023-08-09 (수)
-     */
-    Notification findByNotificationId(String notificationId);
+    Optional<Notification> findByNotificationId(String notificationId);
+
+    Page<Notification> findByMarkByUsersOrderByDateDesc(Map<String, Integer> markByUsers, Pageable pageable);
+
+    Optional<Notification> findByNotificationIdAndMarkByUsers(String notificationId, Map<String, Integer> markByUsers);
 }

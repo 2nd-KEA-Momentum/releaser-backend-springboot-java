@@ -1,8 +1,8 @@
 package com.momentum.releaser.redis.notification;
 
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.data.redis.core.RedisHash;
 import org.springframework.data.redis.core.TimeToLive;
@@ -31,7 +31,7 @@ public class Notification {
 
     private Date date;
 
-    private HashMap<String, Integer> markByUsers = new HashMap<>();
+    private Map<String, Integer> markByUsers = new HashMap<>();
 
     @TimeToLive
     private long expiredTime;

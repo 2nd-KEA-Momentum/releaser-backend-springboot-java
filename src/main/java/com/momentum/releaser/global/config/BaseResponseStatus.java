@@ -41,6 +41,9 @@ public enum BaseResponseStatus {
     CONNECTED_RELEASE_EXISTS(false, 2503, "연결된 릴리즈가 존재하므로 삭제할 수 없습니다."),
     NOT_ADMIN(false, 2504, "프로젝트의 관리자만 수정이 가능합니다."),
 
+    NOT_EXISTS_NOTIFICATION(false, 2700, "존재하지 않는 알림 내역입니다."),
+    NOT_EXISTS_NOTIFICATION_PER_USER(false, 2701, "존재하지 않는 사용자 알림 데이터입니다."),
+
 
     /**
      * 3000 : Response 오류
@@ -94,7 +97,9 @@ public enum BaseResponseStatus {
     INVALID_ISSUE_WITH_NOT_DONE(false, 4502, "완료되지 않은 이슈는 연결할 수 없습니다."),
     FAILED_TO_CONNECT_ISSUE_WITH_RELEASE_NOTE(false, 4503, "이슈 연결에 실패하였습니다."),
     NOT_EXISTS_ISSUE_OPINION(false, 4504, "존재하지 않는 이슈 의견입니다."),
-    NOT_ISSUE_COMMENTER(false, 4505, "해당 의견 작성자가 아닙니다.");
+    NOT_ISSUE_COMMENTER(false, 4505, "해당 의견 작성자가 아닙니다."),
+
+    NOT_EXISTS_USERS_IN_NOTIFICATION_DATA(false, 4700, "사용자 정보가 알림 데이터 안에 존재하지 않습니다.");
 
     private final boolean isSuccess;
     private final int code;
