@@ -1,5 +1,20 @@
 package com.momentum.releaser.domain.project.application;
 
+import static com.momentum.releaser.global.config.BaseResponseStatus.NOT_PROJECT_PM;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+import java.io.IOException;
+import java.sql.Date;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.modelmapper.ModelMapper;
+
 import com.momentum.releaser.domain.issue.dao.IssueRepository;
 import com.momentum.releaser.domain.project.dao.ProjectMemberRepository;
 import com.momentum.releaser.domain.project.dao.ProjectRepository;
@@ -18,20 +33,6 @@ import com.momentum.releaser.domain.user.dao.UserRepository;
 import com.momentum.releaser.domain.user.domain.User;
 import com.momentum.releaser.global.config.aws.S3Upload;
 import com.momentum.releaser.global.exception.CustomException;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.modelmapper.ModelMapper;
-
-import java.io.IOException;
-import java.sql.Date;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import static com.momentum.releaser.global.config.BaseResponseStatus.NOT_PROJECT_PM;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 class ProjectServiceImplTest {
 
@@ -61,7 +62,7 @@ class ProjectServiceImplTest {
     @Test
     @DisplayName("3.1 프로젝트 생성")
     void testAddProject() throws IOException {
-        //Mock 데이터 설정
+        // 테스트를 위한 mock 프로젝트 생성 정보
         String mockUserEmail = "test@releaser.com";
 
         User mockUser = new User(
@@ -74,16 +75,22 @@ class ProjectServiceImplTest {
                 1L, "project Title", "project Content", "project Team", "s3Url", "testLink", 'Y'
         );
 
+        // userRepository.findByEmail() 메서드가 mockUser를 반환하도록 설정 (접근한 유저 체크)
         when(userRepository.findByEmail(mockUserEmail)).thenReturn(Optional.of(mockUser));
+
+        // s3Upload.upload() 메서드가 S3 URL 반환하도록 설정 (이미지를 S3 URL로 변환 과정)
         when(s3Upload.upload(any(), anyString(), anyString())).thenReturn("s3Url");
+
+        // projectRepository.save() 메서드가 mockProject를 반환하도록 설정 (프로젝트 정보를 바탕으로 프로젝트 생성)
         when(projectRepository.save(any())).thenReturn(mockProject);
 
-        // When
+        // 프로젝트 생성 서비스 호출
         ProjectInfoResponseDTO result = projectService.addProject(mockUserEmail, mockReqDTO);
 
-        // Then
+        // 실제 결과가 null인지 체크
         assertNotNull(result);
 
+        // 각 메서드가 호출 됐는지 확인
         verify(userRepository, times(1)).findByEmail(mockUserEmail);
         verify(projectRepository, times(1)).save(any());
     }
@@ -91,6 +98,7 @@ class ProjectServiceImplTest {
     @Test
     @DisplayName("3.2 프로젝트 수정 - 프로젝트 PM이 수정한 경우")
     void testModifyProjectWithPM() throws IOException {
+        // 테스트를 위한 mock 프로젝트 생성 정보
         Long mockProjectId = 1L;
         String mockUserEmail = "test@releaser.com";
 
@@ -109,16 +117,28 @@ class ProjectServiceImplTest {
         List<ProjectMember> memberList = new ArrayList<>();
         memberList.add(mockPM);
 
+        // projectRepository.findById() 메서드가 mockProject를 반환하도록 설정
         when(projectRepository.findById(mockProjectId)).thenReturn(Optional.of(mockProject));
+
+        // userRepository.findByEmail() 메서드가 mockUser를 반환하도록 설정 (접근한 유저 정보 설정)
         when(userRepository.findByEmail(mockUserEmail)).thenReturn(Optional.of(mockUser));
+
+        // projectMemberRepository.findByProject() 메서드가 memberList를 반환하도록 설정 (해당 프로젝트의 멤버 리스트를 설정)
         when(projectMemberRepository.findByProject(mockProject)).thenReturn(memberList);
+
+        // s3Upload.upload() 메서드가 S3URL로 반환하도록 설정 (요청받은 이미지를 s3URL로 변환하는 과정)
         when(s3Upload.upload(any(), anyString(), anyString())).thenReturn("s3Url");
+
+        // projectRepository.save() 메서드가 mockProject를 반환하도록 설정 (요청 받은 프로젝트 정보를 바탕으로 프로젝트 수정)
         when(projectRepository.save(any())).thenReturn(mockProject);
 
+        // 프로젝트 수정 서비스 호출
         ProjectInfoResponseDTO result = projectService.modifyProject(mockProjectId, mockUserEmail, mockReqDTO);
 
+        // 실제 결과가 존재하는 지 체크
         assertNotNull(result);
 
+        // 각 메서드가 호출 됐는지 확인
         verify(projectRepository, times(1)).findById(mockProjectId);
         verify(userRepository, times(1)).findByEmail(mockUserEmail);
         verify(projectMemberRepository, times(1)).findByProject(mockProject);
@@ -128,6 +148,7 @@ class ProjectServiceImplTest {
     @Test
     @DisplayName("3.2 프로젝트 수정 - PM이 아닌 다른 멤버가 수정한 경우")
     void testModifyProjectWithoutPM() throws IOException {
+        // 테스트를 위한 mock 프로젝트 수정 정보
         Long mockProjectId = 1L;
         String mockUserEmail = "testMember@releaser.com";
 
@@ -149,20 +170,27 @@ class ProjectServiceImplTest {
         ProjectMember mockMember = new ProjectMember(
                 2L, 'M', 'Y', mockMemberUser, mockProject
         );
+        // 해당 프로젝트 멤버 리스트
         List<ProjectMember> memberList = new ArrayList<>();
         memberList.add(mockPM);
         memberList.add(mockMember);
 
+        // projectRepository.findById() 메서드가 mockProject를 반환하도록 설정
         when(projectRepository.findById(mockProjectId)).thenReturn(Optional.of(mockProject));
+
+        // userRepository.findByEmail() 메서드가 mockMemberUser를 반환하도록 설정 (접근한 유저의 정보)
         when(userRepository.findByEmail(mockUserEmail)).thenReturn(Optional.of(mockMemberUser));
+
+        // projectMemberRepository.findByProject() 메서드가 memberList를 반환하도록 설정 (해당 프로젝트의 멤버 리스트)
         when(projectMemberRepository.findByProject(mockProject)).thenReturn(memberList);
 
         // 예외 메시지 검증용
         String expectedExceptionMessage = String.valueOf(NOT_PROJECT_PM);
 
-        // 테스트 실행 및 예외 검증
+        // 테스트 실행 및 예외 검증 (PM이 아닌 멤버가 수정할 경우 예외 발생)
         assertThrows(CustomException.class, () -> projectService.modifyProject(mockProjectId, mockUserEmail, mockReqDTO), expectedExceptionMessage);
 
+        // 각 메서드가 호출 됐는지 확인
         verify(projectRepository, times(1)).findById(mockProjectId);
         verify(userRepository, times(1)).findByEmail(mockUserEmail);
         verify(projectMemberRepository, times(1)).findByProject(mockProject);
@@ -171,100 +199,94 @@ class ProjectServiceImplTest {
     @Test
     @DisplayName("3.3 프로젝트 삭제")
     void testRemoveProject() {
-        // Mock data
+        // 테스트를 위한 mock 프로젝트 삭제 정보
         Long mockProjectId = 123L;
+
         Project mockProject = new Project(
                 mockProjectId, "project Title", "project Content", "project Team", null, "testLink", 'Y'
         );
 
-        // projectRepository.findById() 메서드 동작 가짜 구현(Mock)
+        // projectRepository.findById() 메서드가 mockProject를 반환하도록 설정
         when(projectRepository.findById(mockProjectId)).thenReturn(Optional.of(mockProject));
 
-        // 테스트할 메서드 실행
+        // 프로젝트 삭제 서비스 호출
         String result = projectService.removeProject(mockProjectId);
 
-        // 필요한 메서드가 호출되었는지 검증
+        // 결과 검증
+        assertEquals("프로젝트가 삭제되었습니다.", result);
+
+        // 각 메서드가 호출됐는지 확인
         verify(projectRepository, times(1)).findById(mockProjectId);
         verify(projectRepository, times(1)).deleteById(mockProject.getProjectId());
         verify(issueRepository, times(1)).deleteByIssueNum();
         verify(releaseApprovalRepository, times(1)).deleteByReleaseApproval();
-
-        // 결과 검증
-        assertEquals("프로젝트가 삭제되었습니다.", result);
     }
 
     @Test
     @DisplayName("3.4 프로젝트 조회")
     void testFindProjects() {
-        // Mock 데이터 설정
-        String mockEmail = "test@example.com";
-        User mockUser1 = new User(
-                "Test User1", mockEmail, null, 'Y'
+        // 테스트를 위한 mock 프로젝트 조회 정보
+        String mockUserEmail = "test@releaser.com";
+
+        User mockUser = new User(
+                "Test User", mockUserEmail, null, 'Y'
         );
-        User mockUser2 = new User(
-                "Test User2", "test@releaser.com", null, 'Y'
-        );
-        List<ProjectMember> projectMemberList = new ArrayList<>();
-        Project mockProject1 = new Project(
+        Project mockLeaderProject = new Project(
                 1L, "test project1Title", "test project1Content", "test project1Team",
                 null, "testLink", 'Y'
         );
-        Project mockProject2 = new Project(
-                2L, "test project2Title", "test project2Content", "test project2Team",
+        Project mockMemberProject = new Project(
+                2L, "test project1Title", "test project1Content", "test project1Team",
                 null, "testLink", 'Y'
         );
-
-        // userRepository.findByEmail() 메서드 동작 가짜 구현(Mock)
-        when(userRepository.findByEmail(mockEmail)).thenReturn(Optional.of(mockUser1));
-
-        // projectMemberRepository.findByUser() 메서드 동작 가짜 구현(Mock)
-        when(projectMemberRepository.findByUser(mockUser1)).thenReturn(projectMemberList);
-
-        // project1에 대한 ProjectMember 객체 생성 및 리스트에 추가
-        ProjectMember mockProjectMember1 = new ProjectMember(
-                1L, 'L', 'Y', mockUser1, mockProject1
+        ProjectMember mockLeaderMember = new ProjectMember(
+                1L, 'L', 'Y', mockUser, mockLeaderProject
         );
-        projectMemberList.add(mockProjectMember1);
-
-        // project2에 대한 ProjectMember 객체 생성 및 리스트에 추가
-        ProjectMember projectMember2 = new ProjectMember(
-                2L, 'M', 'Y', mockUser2, mockProject2
+        ProjectMember mockMember = new ProjectMember(
+                2L, 'M', 'Y', mockUser, mockMemberProject
         );
-        projectMemberList.add(projectMember2);
 
-        // userRepository.findByEmail() 메서드 동작 가짜 구현(Mock)
-        when(userRepository.findByEmail(mockEmail)).thenReturn(Optional.of(mockUser1));
+        // 프로젝트 멤버를 담을 리스트를 빈 리스트로 초기화
+        List<ProjectMember> projectMemberList = new ArrayList<>();
 
-        // projectMemberRepository.findByUser() 메서드 동작 가짜 구현(Mock)
-        when(projectMemberRepository.findByUser(mockUser1)).thenReturn(projectMemberList);
+        // 해당 유저가 참여하고 있는 프로젝트의 리스트에 멤버 정보 담기
+        projectMemberList.add(mockLeaderMember);
+        projectMemberList.add(mockMember);
 
-        // 테스트할 메서드 실행
-        GetProjectResponseDTO result = projectService.findProjects(mockEmail);
+        // userRepository.findByEmail() 메서드가 mockUser 반환하도록 설정
+        when(userRepository.findByEmail(mockUserEmail)).thenReturn(Optional.of(mockUser));
+
+        // projectMemberRepository.findByUser() 메서드가 projectMemberList를 반환하도록 설정 (해당 유저의 참여 중인 프로젝트의 멤버 정보 조회)
+        when(projectMemberRepository.findByUser(mockUser)).thenReturn(projectMemberList);
+
+        // 프로젝트 조회 서비스 호출
+        GetProjectResponseDTO result = projectService.findProjects(mockUserEmail);
 
         // 예상되는 GetProjectResponseDTO 객체 생성
         List<GetProjectDataDTO> expectedGetCreateProjectList = new ArrayList<>();
         List<GetProjectDataDTO> expectedGetEnterProjectList = new ArrayList<>();
 
-        expectedGetCreateProjectList.add(modelMapper.map(mockProject1, GetProjectDataDTO.class));
-        expectedGetEnterProjectList.add(modelMapper.map(mockProject2, GetProjectDataDTO.class));
+        expectedGetCreateProjectList.add(modelMapper.map(mockLeaderProject, GetProjectDataDTO.class));
+        expectedGetEnterProjectList.add(modelMapper.map(mockMemberProject, GetProjectDataDTO.class));
 
         GetProjectResponseDTO expectedResponse = GetProjectResponseDTO.builder()
                 .getCreateProjectList(expectedGetCreateProjectList)
                 .getEnterProjectList(expectedGetEnterProjectList)
                 .build();
 
-        // 결과 검증
+        // 예상된 결과와 실제 결과 비교
         assertEquals(expectedResponse.getGetCreateProjectList().size(), result.getGetCreateProjectList().size());
         assertEquals(expectedResponse.getGetEnterProjectList().size(), result.getGetEnterProjectList().size());
 
-        // 필요한 메서드가 호출되었는지 검증
-        verify(userRepository, times(1)).findByEmail(mockEmail);
-        verify(projectMemberRepository, times(1)).findByUser(mockUser1);
+        // 각 메서드가 호출됐는지 확인
+        verify(userRepository, times(1)).findByEmail(mockUserEmail);
+        verify(projectMemberRepository, times(1)).findByUser(mockUser);
     }
 
     @Test
     @DisplayName("10.1 프로젝트 내 통합검색 - 이슈 검색")
     void testFindIssueSearch() {
+        // 테스트를 위한 mock 검색 정보
         Long mockProjectId = 1L;
         String mockFilterType = "issue";
 
@@ -284,18 +306,23 @@ class ProjectServiceImplTest {
                 1L, 'L', 'Y', mockUser, mockProject
         );
 
+        // projectRepository.getProjectMemberPostionPM() 메서드가 mockMember를 반환하도록 설정 (해당 프로젝트의 PM 정보 조회)
         when(projectRepository.getProjectMemberPostionPM(mockProjectId)).thenReturn(mockMember);
 
+        // 검색 서비스 호출
         ProjectSearchResponseDTO result = projectService.findProjectSearch(mockProjectId, mockFilterType, mockIssueReqDTO, null);
 
+        // 결과가 null인지 확인
         assertNotNull(result);
 
+        // 각 메서드가 호출 됐는지 확인
         verify(projectRepository, times(1)).getProjectMemberPostionPM(mockProjectId);
     }
 
     @Test
     @DisplayName("10.1 프로젝트 내 통합검색 - 릴리즈 검색")
     void testFindReleaseSearch() {
+        // 테스트를 위한 mock 검색 정보
         Long mockProjectId = 1L;
         String mockFilterType = "release";
 
@@ -313,12 +340,16 @@ class ProjectServiceImplTest {
                 1L, 'L', 'Y', mockUser, mockProject
         );
 
+        // projectRepository.getProjectMemberPostionPM() 메서드가 mockMember를 반환하도록 설정 (해당 프로젝트의 PM 정보 조회)
         when(projectRepository.getProjectMemberPostionPM(mockProjectId)).thenReturn(mockMember);
 
+        // 검색 서비스 호출
         ProjectSearchResponseDTO result = projectService.findProjectSearch(mockProjectId, mockFilterType, null, mockReleaseReqDTO);
 
+        // 결과가 null인지 확인
         assertNotNull(result);
 
+        // 각 메서드가 호출됐는지 확인
         verify(projectRepository, times(1)).getProjectMemberPostionPM(mockProjectId);
     }
 
