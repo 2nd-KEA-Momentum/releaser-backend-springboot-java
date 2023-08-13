@@ -181,9 +181,9 @@ public class ReleaseController {
      * @return ReleaseDocsResponseDTO 릴리즈 문서 정보를 담은 응답 DTO
      */
     @GetMapping("/project/{projectId}/docs")
-    public BaseResponse<List<ReleaseDocsResponseDTO>> getReleaseDocs(@PathVariable @Min(value = 1, message = "프로젝트 식별 번호는 1 이상의 숫자여야 합니다.") Long projectId) {
+    public BaseResponse<List<ReleaseDocsResponseDTO>> releaseDocsList(@PathVariable @Min(value = 1, message = "프로젝트 식별 번호는 1 이상의 숫자여야 합니다.") Long projectId) {
 
-        return new BaseResponse<>(releaseService.getReleaseDocs(projectId));
+        return new BaseResponse<>(releaseService.findReleaseDocs(projectId));
     }
 
     /**
@@ -195,10 +195,10 @@ public class ReleaseController {
      * @return String "릴리즈 보고서가 수정되었습니다."
      */
     @PatchMapping("/project/{projectId}/docs")
-    public BaseResponse<String> updateReleaseDocs(@PathVariable @Min(value = 1, message = "프로젝트 식별 번호는 1 이상의 숫자여야 합니다.") Long projectId,
+    public BaseResponse<String> releaseDocsModify(@PathVariable @Min(value = 1, message = "프로젝트 식별 번호는 1 이상의 숫자여야 합니다.") Long projectId,
             @AuthenticationPrincipal UserPrincipal userPrincipal,
             @RequestBody @Valid List<UpdateReleaseDocsRequestDTO> updateReleaseDocsReq ) {
         String email = userPrincipal.getEmail();
-        return new BaseResponse<>(releaseService.updateReleaseDocs(projectId, email, updateReleaseDocsReq));
+        return new BaseResponse<>(releaseService.modifyReleaseDocs(projectId, email, updateReleaseDocsReq));
     }
 }

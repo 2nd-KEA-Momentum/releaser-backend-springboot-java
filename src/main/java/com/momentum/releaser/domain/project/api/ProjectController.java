@@ -96,7 +96,7 @@ public class ProjectController {
      * 10.1 프로젝트 내 통합검색
      *
      * @param projectId 검색할 프로젝트 식별 번호
-     * @param filterType  검색할 이슈 혹은 릴리즈 타입 선택
+     * @param filterType 검색할 이슈 혹은 릴리즈 타입 선택
      * @param filterIssueGroup 이슈 필터링 그룹 DTO
      * @param filterReleaseGroup 릴리즈 필터링 그룹 DTO
      * @return ProjectSearchResponseDTO 검색한 정보 응답 DTO
