@@ -65,10 +65,14 @@ public class UserController {
         return new BaseResponse<>(userService.removeUserProfileImg(userPrincipal.getEmail()));
     }
 
-    //    @Secured(value = UserRoleEnum.Authority.ADMIN)
-    @GetMapping("/test")
-    public String test(@AuthenticationPrincipal UserPrincipal userPrincipal) {
-        String userEmail = userPrincipal.getEmail();
-        return "email : " + userEmail;
+    /**
+     * 1.4 사용자 탈퇴
+     * @param userPrincipal JWT
+     * @return String "탈퇴가 완료되었습니다."
+     */
+    @PostMapping(value = "/withdraw")
+    public BaseResponse<String> userRemove(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+        String email = userPrincipal.getEmail();
+        return new BaseResponse<>(userService.removeUser(email));
     }
 }

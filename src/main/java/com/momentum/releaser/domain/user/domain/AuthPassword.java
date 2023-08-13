@@ -51,4 +51,11 @@ public class AuthPassword extends BaseTime {
     public void prePersist() {
         this.status = (this.status == '\0') ? 'Y' : this.status;
     }
+
+    /**
+     * 삭제를 위한 status ='N' 변경
+     */
+    public void statusToInactive() {
+        this.status = 'N';
+    }
 }

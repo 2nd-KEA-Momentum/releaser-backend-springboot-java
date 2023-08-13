@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.persistence.*;
 
+import com.momentum.releaser.domain.issue.domain.IssueOpinion;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
@@ -47,9 +48,11 @@ public class User extends BaseTime {
     private char status;
 
     @OneToOne(mappedBy = "user")
+    @JoinColumn(name = "auth_id")
     private AuthSocial authSocial;
 
     @OneToOne(mappedBy = "user")
+    @JoinColumn(name = "security_id")
     private AuthPassword authPassword;
 
     @OneToMany(mappedBy = "user")
@@ -61,6 +64,15 @@ public class User extends BaseTime {
         this.email = email;
         this.img = img;
         this.status = status;
+    }
+
+    /**
+     * delete 되기 전 실행된다.
+     */
+    @PreRemove
+    private void preRemove() {
+        authSocial.statusToInactive();
+        authPassword.statusToInactive();
     }
 
     /**

@@ -24,4 +24,9 @@ public interface UserService {
      * 1.3 사용자 프로필 이미지 삭제
      */
     UserProfileImgResponseDTO removeUserProfileImg(String userEmail);
+
+    /**
+     * 1.4 사용자 탈퇴
+     */
+    String removeUser(String userEmail);
 }

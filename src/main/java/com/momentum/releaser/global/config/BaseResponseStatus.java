@@ -59,6 +59,7 @@ public enum BaseResponseStatus {
     NOT_MATCHES_PASSWORD(false, 4103, "일치하는 비밀번호가 없습니다."),
     INVALID_REFRESH_TOKEN(false, 4104, "유효하지 않은 Refresh Token 입니다."),
     INVALID_USER_NAME(false, 4105, "사용자 정보가 올바르지 않습니다."),
+    PROJECT_DELETION_REQUIRED_FOR_USER_WITHDRAWAL(false, 4106, "관리자인 프로젝트가 존재하므로 탈퇴할 수 없습니다."),
 
     NOT_EXISTS_PROJECT(false, 4200, "존재하지 않는 프로젝트입니다."),
     FAILED_TO_CREATE_PROJECT(false, 4201, "프로젝트 생성에 실패하였습니다."),
