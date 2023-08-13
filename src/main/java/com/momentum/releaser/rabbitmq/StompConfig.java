@@ -3,6 +3,7 @@ package com.momentum.releaser.rabbitmq;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
+import org.springframework.messaging.tcp.reactor.ReactorNettyTcpClient;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
@@ -37,7 +38,7 @@ public class StompConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/notification")
-//                .setAllowedOriginPatterns("https://*.*.*.*", "https://*")
+                .setAllowedOriginPatterns("*") // CORS 에러
                 .withSockJS();
     }
 
@@ -57,7 +58,7 @@ public class StompConfig implements WebSocketMessageBrokerConfigurer {
         registry.setPathMatcher(new AntPathMatcher("."));
 
         // SMTP 브로커 릴레이 활성화
-        registry.enableStompBrokerRelay("/notification") // 지정한 경로로 시작하는 모든 메시지는 RabbitMQ에 전달된다.
+        registry.enableStompBrokerRelay("/queue") // 지정한 경로로 시작하는 모든 메시지는 RabbitMQ에 전달된다.
                 .setRelayHost(host)
                 .setRelayPort(port)
                 .setSystemLogin(userName)

@@ -33,6 +33,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import javax.servlet.http.HttpSession;
 import java.util.List;
