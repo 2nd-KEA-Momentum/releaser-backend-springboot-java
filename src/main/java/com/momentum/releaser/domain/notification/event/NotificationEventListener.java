@@ -1,5 +1,6 @@
 package com.momentum.releaser.domain.notification.event;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import com.momentum.releaser.global.exception.CustomException;
@@ -10,6 +11,8 @@ import com.momentum.releaser.redis.notification.NotificationRedisRepository;
 
 import org.springframework.amqp.core.DirectExchange;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
+import org.springframework.boot.autoconfigure.data.redis.RedisProperties.Jedis;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
@@ -105,6 +108,9 @@ public class NotificationEventListener {
             markByUsers.put(consumer, 0);
         }
 
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String dateAsString = dateFormat.format(notificationEvent.getMessage().getDate());
+
         // Redis에 저장하기 위한 데이터를 생성한다.
         Notification notification = Notification.builder()
                 .notificationId(notificationEvent.getEventId())
@@ -112,7 +118,7 @@ public class NotificationEventListener {
                 .projectTitle(notificationEvent.getMessage().getProjectName())
                 .projectImg(notificationEvent.getMessage().getProjectImg())
                 .message(notificationEvent.getMessage().getMessage())
-                .date(notificationEvent.getMessage().getDate())
+                .date(dateAsString)
                 .markByUsers(markByUsers)
                 .expiredTime(604800) // 일주일
                 .build();
@@ -136,13 +142,16 @@ public class NotificationEventListener {
             markByUsers.put(consumer, 0);
         }
 
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String dateAsString = dateFormat.format(notificationEvent.getMessage().getDate());
+
         Notification notification = Notification.builder()
                 .notificationId(notificationEvent.getEventId())
                 .type("Issue")
                 .projectTitle(notificationEvent.getMessage().getProjectName())
                 .projectImg(notificationEvent.getMessage().getProjectImg())
                 .message(notificationEvent.getMessage().getMessage())
-                .date(notificationEvent.getMessage().getDate())
+                .date(dateAsString)
                 .markByUsers(markByUsers)
                 .expiredTime(604800) // 일주일
                 .build();

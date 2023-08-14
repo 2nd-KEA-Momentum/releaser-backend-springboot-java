@@ -3,6 +3,7 @@ package com.momentum.releaser.domain.issue.application;
 import static com.momentum.releaser.domain.issue.dto.IssueResponseDto.*;
 import static com.momentum.releaser.global.config.BaseResponseStatus.*;
 
+import java.time.Instant;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -678,6 +679,7 @@ public class IssueServiceImpl implements IssueService {
     }
 
     private void notifyIssueAll(Project project, Issue issue) {
+
         // 알림 메시지를 정의한다.
         IssueMessageDto message = IssueMessageDto.builder()
                 .type("Issue")
