@@ -52,20 +52,18 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         }
 
         Optional<User> userOptional = userRepository.findByEmail(oAuth2UserInfo.getEmail());
-        Optional<AuthSocial> authSocialOptional = authSocialRepository.findByUser(userOptional);
         User user;
         AuthSocial authSocial;
         if(userOptional.isPresent()) {
             user = userOptional.get();
-            authSocial = authSocialOptional.get();
+            authSocial = userOptional.get().getAuthSocial();
             if(!authSocial.getProvider().equals(AuthProvider.valueOf(oAuth2UserRequest.getClientRegistration().getRegistrationId()))) {
                 throw new OAuth2AuthenticationProcessingException("이미 등록된 멤버입니다.");
             }
         } else {
             user = registerNewUser(oAuth2UserRequest, oAuth2UserInfo);
         }
-        AuthPassword authPassword = authPasswordRepository.findByUser(user);
-        return UserPrincipal.create(user, authPassword);
+        return UserPrincipal.create(user, user.getAuthPassword());
     }
 
     private User registerNewUser(OAuth2UserRequest oAuth2UserRequest, OAuth2UserInfo oAuth2UserInfo) {
@@ -86,10 +84,10 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 'Y'
 
         );
+        user.updateAuth(authSocial, authPassword);
         User saveUser = userRepository.save(user);
         authSocialRepository.save(authSocial);
         authPasswordRepository.save(authPassword);
-
 
         return saveUser;
     }
