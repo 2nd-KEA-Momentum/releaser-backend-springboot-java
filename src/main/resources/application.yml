@@ -15,6 +15,16 @@ spring:
     activate:
       on-profile: prod
 
+  rabbitmq:
+    host: ${RABBITMQ_HOST}
+    port: ${RABBITMQ_PORT}
+    username: ${RABBITMQ_USERNAME}
+    password: ${RABBITMQ_PASSWORD}
+
+  redis:
+    host: ${REDIS_PROD_HOST}
+    port: ${REDIS_PROD_PORT}
+
 logging:
   slack:
     webhook-url-prod-error: ${SLACK_WEBHOOK_URL_PROD_ERROR}
@@ -25,6 +35,16 @@ spring:
   config:
     activate:
       on-profile: dev
+
+  rabbitmq:
+    host: ${RABBITMQ_HOST}
+    port: ${RABBITMQ_PORT}
+    username: ${RABBITMQ_USERNAME}
+    password: ${RABBITMQ_PASSWORD}
+
+  redis:
+    host: ${REDIS_LOCAL_HOST}
+    port: ${REDIS_LOCAL_PORT}
 
 logging:
   slack:
