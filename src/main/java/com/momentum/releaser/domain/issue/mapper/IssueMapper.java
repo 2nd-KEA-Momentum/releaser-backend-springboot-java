@@ -32,6 +32,7 @@ public interface IssueMapper {
     @Mapping(target = "memberId", source = "issue.member.memberId")
     @Mapping(target = "memberName", source = "issue.member.user.name")
     @Mapping(target = "memberProfileImg", source = "issue.member.user.img")
+    @Mapping(target = "issueNum", source = "issue.issueNum.issueNum")
     ConnectedIssuesDataDTO toConnectedIssuesDataDto(Issue issue);
 
     /**

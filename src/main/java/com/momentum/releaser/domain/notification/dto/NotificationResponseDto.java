@@ -1,7 +1,5 @@
 package com.momentum.releaser.domain.notification.dto;
 
-import java.util.Date;
-
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -23,11 +21,11 @@ public class NotificationResponseDto {
         private String projectTitle;
         private String projectImg;
         private String message;
-        private Date date;
+        private String date;
         private int isRead;
 
         @Builder
-        public NotificationListResponseDto(String notificationId, String type, String projectTitle, String projectImg, String message, Date date, int isRead) {
+        public NotificationListResponseDto(String notificationId, String type, String projectTitle, String projectImg, String message, String date, int isRead) {
             this.notificationId = notificationId;
             this.type = type;
             this.projectTitle = projectTitle;

@@ -1,6 +1,5 @@
 package com.momentum.releaser.redis.notification;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,7 +28,7 @@ public class Notification {
 
     private String message;
 
-    private Date date;
+    private String date;
 
     private Map<String, Integer> markByUsers = new HashMap<>();
 
@@ -37,7 +36,7 @@ public class Notification {
     private long expiredTime;
 
     @Builder
-    public Notification(String notificationId, String type, String projectTitle, String projectImg, String message, Date date, HashMap<String, Integer> markByUsers, long expiredTime) {
+    public Notification(String notificationId, String type, String projectTitle, String projectImg, String message, String date, HashMap<String, Integer> markByUsers, long expiredTime) {
         this.notificationId = notificationId;
         this.type = type;
         this.projectTitle = projectTitle;
