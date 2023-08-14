@@ -70,7 +70,7 @@ jobs:
           sed -i 's|\${RABBITMQ_USERNAME}|${{secrets.RABBITMQ_USERNAME}}|g' ./src/main/resources/application.yml
           sed -i 's|\${REDIS_PROD_HOST}|${{secrets.REDIS_PROD_HOST}}|g' ./src/main/resources/application.yml
           sed -i 's|\${REDIS_PROD_PORT}|${{secrets.REDIS_PROD_PORT}}|g' ./src/main/resources/application.yml
-          sed -i 's|\${STOMP_RELAY_PORT}|${{secrets.STOMP_RELAY_PORT}}|g' ./src/main/resources/application.yml
+          sed -i 's|\${STOMP_PORT}|${{secrets.STOMP_PORT}}|g' ./src/main/resources/application.yml
           
           
           
