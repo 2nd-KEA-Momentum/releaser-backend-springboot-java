@@ -71,8 +71,12 @@ public class User extends BaseTime {
      */
     @PreRemove
     private void preRemove() {
-        authSocial.statusToInactive();
-        authPassword.statusToInactive();
+        if (authSocial != null) {
+            authSocial.statusToInactive();
+        }
+        if (authPassword != null) {
+            authPassword.statusToInactive();
+        }
     }
 
     /**
