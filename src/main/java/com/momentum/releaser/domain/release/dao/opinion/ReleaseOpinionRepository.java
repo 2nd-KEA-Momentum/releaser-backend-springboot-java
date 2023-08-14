@@ -10,7 +10,5 @@ import com.momentum.releaser.domain.release.domain.ReleaseOpinion;
 
 @RepositoryRestResource(collectionResourceRel="release-opinion", path="release-opinion")
 public interface ReleaseOpinionRepository extends JpaRepository<ReleaseOpinion, Long>, ReleaseOpinionRepositoryCustom {
-
     List<ReleaseOpinion> findAllByRelease(ReleaseNote release);
-
 }

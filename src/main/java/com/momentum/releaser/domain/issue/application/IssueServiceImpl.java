@@ -3,13 +3,14 @@ package com.momentum.releaser.domain.issue.application;
 import static com.momentum.releaser.domain.issue.dto.IssueResponseDto.*;
 import static com.momentum.releaser.global.config.BaseResponseStatus.*;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.time.ZoneId;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import com.momentum.releaser.domain.issue.dto.IssueDataDto.IssueDetailsDataDTO;
-import org.modelmapper.ModelMapper;
+import com.momentum.releaser.domain.notification.event.IssueMessageEvent;
+import com.momentum.releaser.domain.notification.event.NotificationEventPublisher;
+import com.momentum.releaser.rabbitmq.MessageDto.IssueMessageDto;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,6 +52,8 @@ public class IssueServiceImpl implements IssueService {
     private final UserRepository userRepository;
     private final ReleaseRepository releaseRepository;
 
+    private final NotificationEventPublisher notificationEventPublisher;
+
     /**
      * 7.1 이슈 생성
      *
@@ -59,7 +62,7 @@ public class IssueServiceImpl implements IssueService {
      */
     @Override
     @Transactional
-    public IssueIdResponseDTO addIssue(Long projectId, IssueInfoRequestDTO createReq) {
+    public IssueIdResponseDTO addIssue(String userEmail, Long projectId, IssueInfoRequestDTO createReq) {
         ProjectMember projectMember = null;
 
         // 담당자 memberId가 null이 아닌 경우 프로젝트 멤버 조회
@@ -72,6 +75,12 @@ public class IssueServiceImpl implements IssueService {
         // 이슈를 생성하고 이슈 번호를 할당하여 저장
         Issue newIssue = createIssueNumAndSaveIssue(createReq, project, projectMember);
 
+        // 이슈 생성 시 알림
+        notifyIssueAll(project, newIssue);
+
+        // 이슈 담당자 할당 시 알림
+        notifyIssueOne(userEmail, project, newIssue, null);
+
         return IssueIdResponseDTO.builder()
                 .issueId(newIssue.getIssueId())
                 .issueNum(newIssue.getIssueNum().getIssueNum())
@@ -81,15 +90,16 @@ public class IssueServiceImpl implements IssueService {
     /**
      * 7.2 이슈 수정
      *
+     * @param email 사용자 이메일
      * @author chaeanna
      * @date 2023-07-05
-     * @param email 사용자 이메일
      */
     @Override
     @Transactional
     public IssueModifyResponseDTO modifyIssue(Long issueId, String email, IssueInfoRequestDTO updateReq) {
         // 이슈 정보 조회
         Issue issue = getIssueById(issueId);
+        ProjectMember previousMember = issue.getMember();
 
         // Token UserInfo
         User user = getUserByEmail(email);
@@ -106,7 +116,10 @@ public class IssueServiceImpl implements IssueService {
 
         // 이슈 업데이트
         issue.updateIssue(updateReq, edit, manager);
-        issueRepository.save(issue);
+        Issue updatedIssue = issueRepository.save(issue);
+
+        // 이슈 담당자 할당 변경 시 알림
+        notifyIssueOne(email, issue.getProject(), updatedIssue, previousMember);
 
         return IssueMapper.INSTANCE.toIssueModifyResponseDTO(projectMember);
     }
@@ -219,9 +232,9 @@ public class IssueServiceImpl implements IssueService {
     /**
      * 7.7 이슈별 조회
      *
+     * @param email 사용자 이메일
      * @author chaeanna
      * @date 2023-07-09
-     * @param email 사용자 이메일
      */
     @Override
     @Transactional
@@ -253,9 +266,9 @@ public class IssueServiceImpl implements IssueService {
     /**
      * 7.8 이슈 상태 변경
      *
+     * @param lifeCycle 변경할 이슈의 상태 ("NOT_STARTED", "IN_PROGRESS", "DONE" 중 하나로 대소문자 구분 없이 입력)
      * @author chaeanna
      * @date 2023-07-08
-     * @param lifeCycle 변경할 이슈의 상태 ("NOT_STARTED", "IN_PROGRESS", "DONE" 중 하나로 대소문자 구분 없이 입력)
      */
     @Override
     @Transactional
@@ -277,9 +290,9 @@ public class IssueServiceImpl implements IssueService {
     /**
      * 8.1 이슈 의견 추가
      *
+     * @param email 사용자의 이메일
      * @author chaeanna
      * @date 2023-07-08
-     * @param email 사용자의 이메일
      */
     @Override
     @Transactional
@@ -304,10 +317,10 @@ public class IssueServiceImpl implements IssueService {
     /**
      * 8.2 이슈 의견 삭제
      *
-     * @author chaeanna
-     * @date 2023-07-08
      * @param email 사용자의 이메일
      * @throws CustomException 삭제 권한이 없을 경우 예외 발생
+     * @author chaeanna
+     * @date 2023-07-08
      */
     @Override
     @Transactional
@@ -337,11 +350,11 @@ public class IssueServiceImpl implements IssueService {
     /**
      * memberId로 프로젝트 멤버 가져오기
      *
-     * @author chaeanna
-     * @date 2023-07-05
      * @param memberId 조회할 프로젝트 멤버의 식별 번호
      * @return ProjectMember 프로젝트 멤버 정보
      * @throws CustomException 프로젝트 멤버가 존재하지 않을 경우 예외 발생
+     * @author chaeanna
+     * @date 2023-07-05
      */
     ProjectMember getProjectMemberById(Long memberId) {
         return projectMemberRepository.findById(memberId)
@@ -351,11 +364,11 @@ public class IssueServiceImpl implements IssueService {
     /**
      * 사용자와 프로젝트로 프로젝트 멤버 가져오기
      *
-     * @author chaeanna
-     * @date 2023-07-05
-     * @param user 사용자 엔티티
+     * @param user    사용자 엔티티
      * @param project 프로젝트 엔티티
      * @return ProjectMember 프로젝트 멤버 정보
+     * @author chaeanna
+     * @date 2023-07-05
      */
     private ProjectMember getProjectMemberByUserAndProject(User user, Project project) {
         return projectMemberRepository.findByUserAndProject(user, project).orElseThrow(() -> new CustomException(NOT_EXISTS_PROJECT_MEMBER));
@@ -364,11 +377,11 @@ public class IssueServiceImpl implements IssueService {
     /**
      * projectId로 프로젝트 가져오기
      *
-     * @author chaeanna
-     * @date 2023-07-05
      * @param projectId 조회할 프로젝트의 식별 번호
      * @return Project 프로젝트 정보
      * @throws CustomException 프로젝트가 존재하지 않을 경우 예외 발생
+     * @author chaeanna
+     * @date 2023-07-05
      */
     private Project getProjectById(Long projectId) {
         return projectRepository.findById(projectId)
@@ -378,12 +391,12 @@ public class IssueServiceImpl implements IssueService {
     /**
      * 이슈 저장
      *
-     * @author chaeanna
-     * @date 2023-07-05
-     * @param issueInfoReq 이슈 정보를 담고 있는 요청 DTO
-     * @param project 이슈가 속하는 프로젝트 정보
+     * @param issueInfoReq  이슈 정보를 담고 있는 요청 DTO
+     * @param project       이슈가 속하는 프로젝트 정보
      * @param projectMember 이슈를 등록하는 프로젝트 멤버 정보
      * @return Issue 생성된 이슈 정보
+     * @author chaeanna
+     * @date 2023-07-05
      */
     private Issue createIssueNumAndSaveIssue(IssueInfoRequestDTO issueInfoReq, Project project, ProjectMember projectMember) {
         // 프로젝트에 저장된 마지막 이슈 번호를 조회 후 + 1
@@ -411,12 +424,12 @@ public class IssueServiceImpl implements IssueService {
     /**
      * 이슈 번호 저장 및 연결
      *
+     * @param project  이슈가 속하는 프로젝트 정보
+     * @param newIssue 새로 생성된 이슈 정보
+     * @param number   새로 생성된 이슈 번호
+     * @return IssueNum 생성된 이슈 번호 정보
      * @author chaeanna
      * @date 2023-07
-     * @param project 이슈가 속하는 프로젝트 정보
-     * @param newIssue 새로 생성된 이슈 정보
-     * @param number 새로 생성된 이슈 번호
-     * @return IssueNum 생성된 이슈 번호 정보
      */
     private IssueNum saveIssueNumberForIssue(Project project, Issue newIssue, Long number) {
         // 새로운 이슈 번호 정보 생성, 프로젝트와 이슈 연결
@@ -430,11 +443,11 @@ public class IssueServiceImpl implements IssueService {
     /**
      * issueId로 issue 가져오기
      *
-     * @author chaeanna
-     * @date 2023-07-05
      * @param issueId 조회할 이슈의 식별 번호
      * @return Issue 조회된 이슈 정보
      * @throws CustomException 이슈가 존재하지 않을 경우 예외 발생
+     * @author chaeanna
+     * @date 2023-07-05
      */
     private Issue getIssueById(Long issueId) {
         return issueRepository.findById(issueId)
@@ -444,11 +457,11 @@ public class IssueServiceImpl implements IssueService {
     /**
      * email로 user 가져오기
      *
-     * @author chaeanna
-     * @date 2023-07-05
      * @param email 조회할 사용자의 이메일 주소
      * @return User 조회된 사용자 정보
      * @throws CustomException 사용자가 존재하지 않을 경우 예외 발생
+     * @author chaeanna
+     * @date 2023-07-05
      */
     private User getUserByEmail(String email) {
         return userRepository.findOneByEmail(email)
@@ -458,11 +471,11 @@ public class IssueServiceImpl implements IssueService {
     /**
      * 편집 여부를 멤버의 역할에 따라 결정
      *
-     * @author chaeanna
-     * @date 2023-07-05
      * @param member 조회할 멤버 엔티티
      * @return 편집 가능 여부 ('Y' 또는 'N')
      * @throws CustomException 멤버가 존재하지 않을 경우 예외 발생
+     * @author chaeanna
+     * @date 2023-07-05
      */
     private char decideEditStatus(ProjectMember member) {
         // 멤버의 포지션이 'M'인 경우 'Y'(편집 가능)을 반환하고, 그 외에는 'N'(편집 불가능)을 반환합니다.
@@ -472,11 +485,11 @@ public class IssueServiceImpl implements IssueService {
     /**
      * 이슈 필터링 및 배포 상태 설정
      *
-     * @author chaeanna
-     * @date 2023-07-08
-     * @param issues 이슈 리스트
+     * @param issues    이슈 리스트
      * @param lifeCycle 필터링할 배포 상태 (NOT_STARTED, IN_PROGRESS, DONE 중 하나로 대소문자 구분 없이 입력)
      * @return IssueInfoResponseDTO 필터링된 이슈 리스트
+     * @author chaeanna
+     * @date 2023-07-08
      */
     private List<IssueInfoResponseDTO> filterAndSetDeployStatus(List<IssueInfoResponseDTO> issues, String lifeCycle) {
         return issues.stream()
@@ -505,11 +518,11 @@ public class IssueServiceImpl implements IssueService {
     /**
      * releaseId로 releaseNote 찾기
      *
-     * @author chaeanna
-     * @date 2023-07-08
      * @param releaseId 조회할 릴리즈 노트의 식별 번호
      * @return ReleaseNote 조회된 릴리즈 노트 정보
      * @throws CustomException 릴리즈 노트가 존재하지 않을 경우 예외 발생
+     * @author chaeanna
+     * @date 2023-07-08
      */
     private ReleaseNote getReleaseNoteById(Long releaseId) {
         return releaseRepository.findById(releaseId)
@@ -519,12 +532,12 @@ public class IssueServiceImpl implements IssueService {
     /**
      * 이슈 상세 정보 생성
      *
-     * @author chaeanna
-     * @date 2023-07-09
-     * @param issue 이슈 정보
-     * @param memberRes 멤버 리스트
+     * @param issue      이슈 정보
+     * @param memberRes  멤버 리스트
      * @param opinionRes 의견 리스트
      * @return IssueDetailsDTO 생성된 이슈 상세 정보
+     * @author chaeanna
+     * @date 2023-07-09
      */
     private IssueDetailsDTO createIssueDetails(ProjectMember member, Issue issue, List<GetMembersDataDTO> memberRes, List<OpinionInfoResponseDTO> opinionRes) {
         // 이슈 상세 정보 생성
@@ -548,10 +561,10 @@ public class IssueServiceImpl implements IssueService {
     /**
      * 이슈 편집 상태 업데이트
      *
+     * @param issue  이슈 정보
+     * @param member 프로젝트 멤버 정보
      * @author chaeanna
      * @date 2023-07-09
-     * @param issue 이슈 정보
-     * @param member 프로젝트 멤버 정보
      */
     private void updateIssueEdit(Issue issue, ProjectMember member) {
         Project project = issue.getProject();
@@ -568,11 +581,11 @@ public class IssueServiceImpl implements IssueService {
     /**
      * 이슈의 의견 목록 조회 및 삭제 가능 여부 설정
      *
-     * @author chaeanna
-     * @date 2023-07-09
-     * @param issue 이슈 정보
+     * @param issue    이슈 정보
      * @param memberId 멤버 식별 번호
      * @return OpinionInfoResponseDTO 이슈의 의견 목록
+     * @author chaeanna
+     * @date 2023-07-09
      */
     private List<OpinionInfoResponseDTO> getIssueOpinionsWithDeleteYN(Issue issue, Long memberId) {
         // 이슈의 의견 목록 조회
@@ -590,10 +603,10 @@ public class IssueServiceImpl implements IssueService {
     /**
      * 프로젝트 멤버 리스트 조회
      *
-     * @author chaeanna
-     * @date 2023-07-09
      * @param project 프로젝트 정보
      * @return GetMembers 프로젝트의 멤버 리스트
+     * @author chaeanna
+     * @date 2023-07-09
      */
     private List<GetMembersDataDTO> getProjectMembers(Project project) {
         // 프로젝트에 속한 멤버 리스트를 조회
@@ -605,11 +618,11 @@ public class IssueServiceImpl implements IssueService {
     /**
      * 이슈 상태 변경
      *
-     * @author chaeanna
-     * @date 2023-07-08
-     * @param issue 이슈 정보
+     * @param issue     이슈 정보
      * @param lifeCycle 변경할 상태 ("NOT_STARTED", "IN_PROGRESS", "DONE" 중 하나로 대소문자 구분 없이 입력)
      * @return String "이슈 상태 변경이 완료되었습니다."
+     * @author chaeanna
+     * @date 2023-07-08
      */
     private String changeLifeCycle(Issue issue, String lifeCycle) {
         // 이슈의 상태를 주어진 상태로 변경
@@ -622,12 +635,12 @@ public class IssueServiceImpl implements IssueService {
     /**
      * 특정 이슈에 대한 의견을 저장하는 메서드입니다.
      *
-     * @author chaeanna
-     * @date 2023-07-08
-     * @param issue 이슈 정보
-     * @param member 프로젝트 멤버 정보
+     * @param issue   이슈 정보
+     * @param member  프로젝트 멤버 정보
      * @param opinion 의견 내용
      * @return IssueOpinion 저장된 의견 정보
+     * @author chaeanna
+     * @date 2023-07-08
      */
     private IssueOpinion saveOpinion(Issue issue, ProjectMember member, String opinion) {
         // 의견 저장
@@ -641,11 +654,11 @@ public class IssueServiceImpl implements IssueService {
     /**
      * 특정 사용자가 해당 이슈 의견 작성자인지 확인하는 메서드입니다.
      *
-     * @author chaeanna
-     * @date 2023-07-08
-     * @param user 사용자 정보
+     * @param user    사용자 정보
      * @param opinion 이슈 의견 정보
      * @return boolean 해당 사용자가 이슈 의견 작성자인지 여부
+     * @author chaeanna
+     * @date 2023-07-08
      */
     boolean equalsMember(User user, IssueOpinion opinion) {
         // 이슈가 속한 프로젝트 정보 조회
@@ -668,4 +681,48 @@ public class IssueServiceImpl implements IssueService {
         return issueOpinionRepository.findById(opinionId).orElseThrow(() -> new CustomException(NOT_EXISTS_ISSUE_OPINION));
     }
 
+    private void notifyIssueAll(Project project, Issue issue) {
+        // 알림 메시지를 정의한다.
+        IssueMessageDto message = IssueMessageDto.builder()
+                .type("Issue")
+                .projectId(project.getProjectId())
+                .projectName(project.getTitle())
+                .projectImg(project.getImg())
+                .message("새로운 이슈가 생성되었습니다.")
+                .date(Date.from(issue.getCreatedDate().atZone(ZoneId.systemDefault()).toInstant()))
+                .issueId(issue.getIssueId())
+                .build();
+
+        // 알림 메시지를 보낼 대상 목록을 가져온다.
+        List<String> consumers = projectMemberRepository.findByProject(project).stream()
+                .map(m -> m.getUser().getEmail())
+                .collect(Collectors.toList());
+
+        // 이벤트 리스너를 호출하여 이슈 생성 트랜잭션이 완료된 후 호출하도록 한다.
+        notificationEventPublisher.notifyIssue(IssueMessageEvent.toNotifyOneIssue(message, consumers));
+    }
+
+    private void notifyIssueOne(String userEmail, Project project, Issue issue, ProjectMember member) {
+
+        if (issue.getMember() != member) {
+            // 이전 멤버와 같지 않을 때 알림을 보내야 한다.
+
+            // 알림 메시지를 정의한다.
+            IssueMessageDto message = IssueMessageDto.builder()
+                    .type("Issue")
+                    .projectId(project.getProjectId())
+                    .projectName(project.getTitle())
+                    .projectImg(project.getImg())
+                    .message("귀하에게 이슈가 할당되었습니다.")
+                    .date(Date.from(issue.getCreatedDate().atZone(ZoneId.systemDefault()).toInstant()))
+                    .issueId(issue.getIssueId())
+                    .build();
+
+            List<String> consumers = new ArrayList<>();
+            consumers.add(userEmail);
+
+            // 이벤트 리스너를 호출하여 이슈 생성 트랜잭션이 완료된 후 호출하도록 한다.
+            notificationEventPublisher.notifyIssue(IssueMessageEvent.toNotifyOneIssue(message, consumers));
+        }
+    }
 }
