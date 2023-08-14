@@ -180,12 +180,16 @@ public class IssueServiceImpl implements IssueService {
         List<DoneIssuesResponseDTO> getDoneIssue = issueRepository.getDoneIssues(findProject, status.toUpperCase());
         // 이슈에 연결된 멤버가 없는 경우, memberId를 0으로 설정
         for (DoneIssuesResponseDTO doneIssue : getDoneIssue) {
+
             if (doneIssue.getMemberId() != null) {
                 Optional<ProjectMember> projectMember = projectMemberRepository.findById(doneIssue.getMemberId());
+
                 if (projectMember.isEmpty()) {
                     doneIssue.setMemberId(0L);
                 }
+
             }
+
         }
 
         return getDoneIssue;
