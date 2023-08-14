@@ -47,11 +47,11 @@ public class User extends BaseTime {
     @Column(name = "status")
     private char status;
 
-    @OneToOne(mappedBy = "user")
+    @OneToOne
     @JoinColumn(name = "auth_id")
     private AuthSocial authSocial;
 
-    @OneToOne(mappedBy = "user")
+    @OneToOne
     @JoinColumn(name = "security_id")
     private AuthPassword authPassword;
 
