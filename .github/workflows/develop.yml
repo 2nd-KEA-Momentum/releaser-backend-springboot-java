@@ -57,6 +57,23 @@ jobs:
           sed -i 's|\${SLACK_WEBHOOK_URL_PROD_ERROR}|${{ secrets.SLACK_WEBHOOK_URL_PROD_ERROR }}|g' ./src/main/resources/application.yml
           sed -i 's|\${SLACK_WEBHOOK_URL_DEV_WARN}|${{ secrets.SLACK_WEBHOOK_URL_DEV_WARN }}|g' ./src/main/resources/application.yml
           sed -i 's|\${SLACK_WEBHOOK_URL_DEV_ERROR}|${{ secrets.SLACK_WEBHOOK_URL_DEV_ERROR }}|g' ./src/main/resources/application.yml
+          sed -i 's|\${REDIS_LOCAL_HOST}|${{ secrets.REDIS_LOCAL_HOST }}|g' ./src/main/resources/application.yml
+          sed -i 's|\${REDIS_LOCAL_PORT}|${{secrets.REDIS_LOCAL_PORT}}|g' ./src/main/resources/application.yml
+          sed -i 's|\${RABBITMQ_HOST}|${{secrets.RABBITMQ_HOST}}|g' ./src/main/resources/application.yml
+          sed -i 's|\${RABBITMQ_LOCAL_HOST}|${{secrets.RABBITMQ_LOCAL_HOST}}|g' ./src/main/resources/application.yml
+          sed -i 's|\${RABBITMQ_LOCAL_PORT}|${{secrets.RABBITMQ_LOCAL_PORT}}|g' ./src/main/resources/application.yml
+          sed -i 's|\${RABBITMQ_PASSWORD}|${{secrets.RABBITMQ_PASSWORD}}|g' ./src/main/resources/application.yml
+          sed -i 's|\${RABBITMQ_PORT}|${{secrets.RABBITMQ_PORT}}|g' ./src/main/resources/application.yml
+          sed -i 's|\${RABBITMQ_USER_EXCHANGE}|${{secrets.RABBITMQ_USER_EXCHANGE}}|g' ./src/main/resources/application.yml
+          sed -i 's|\${RABBITMQ_USER_QUEUE}|${{secrets.RABBITMQ_USER_QUEUE}}|g' ./src/main/resources/application.yml
+          sed -i 's|\${RABBITMQ_USER_ROUTINGKEY}|${{secrets.RABBITMQ_USER_ROUTINGKEY}}|g' ./src/main/resources/application.yml
+          sed -i 's|\${RABBITMQ_USERNAME}|${{secrets.RABBITMQ_USERNAME}}|g' ./src/main/resources/application.yml
+          sed -i 's|\${REDIS_PROD_HOST}|${{secrets.REDIS_PROD_HOST}}|g' ./src/main/resources/application.yml
+          sed -i 's|\${REDIS_PROD_PORT}|${{secrets.REDIS_PROD_PORT}}|g' ./src/main/resources/application.yml
+          sed -i 's|\${STOMP_RELAY_PORT}|${{secrets.STOMP_RELAY_PORT}}|g' ./src/main/resources/application.yml
+          
+          
+          
 
 #      - name: Set Yaml
 #        uses: microsoft/variable-substitution@v1
