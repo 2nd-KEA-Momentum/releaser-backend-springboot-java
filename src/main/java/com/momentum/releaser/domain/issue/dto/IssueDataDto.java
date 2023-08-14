@@ -17,6 +17,7 @@ public class IssueDataDto {
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     public static class ConnectedIssuesDataDTO {
         private Long issueId;
+        private Long issueNum;
         private String title;
         private String lifeCycle;
         private String tag;
@@ -27,8 +28,9 @@ public class IssueDataDto {
         private String memberProfileImg;
 
         @Builder
-        public ConnectedIssuesDataDTO(Long issueId, String title, String lifeCycle, String tag, Date endDate, char edit, Long memberId, String memberName, String memberProfileImg) {
+        public ConnectedIssuesDataDTO(Long issueId, Long issueNum, String title, String lifeCycle, String tag, Date endDate, char edit, Long memberId, String memberName, String memberProfileImg) {
             this.issueId = issueId;
+            this.issueNum = issueNum;
             this.title = title;
             this.lifeCycle = lifeCycle;
             this.tag = tag;

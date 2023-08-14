@@ -256,6 +256,7 @@ public class IssueServiceImpl implements IssueService {
         List<GetMembersDataDTO> memberRes = getProjectMembers(member.getProject());
 
         IssueDetailsDTO getIssue = createIssueDetails(member, issue, memberRes, opinionRes);
+        log.info("endDate : {}", getIssue.getIssueDetails().getEndDate());
 
         return getIssue;
     }
@@ -679,6 +680,10 @@ public class IssueServiceImpl implements IssueService {
     }
 
     private void notifyIssueAll(Project project, Issue issue) {
+
+        if (issue == null || issue.getEndDate() == null) {
+            throw new CustomException(INVALID_ISSUE);
+        }
 
         // 알림 메시지를 정의한다.
         IssueMessageDto message = IssueMessageDto.builder()

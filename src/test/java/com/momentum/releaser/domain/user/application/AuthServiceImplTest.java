@@ -10,6 +10,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
+import org.springframework.amqp.core.AmqpAdmin;
+import org.springframework.amqp.core.DirectExchange;
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -38,6 +41,9 @@ class AuthServiceImplTest {
     private ModelMapper modelMapper;
     private RedisUtil redisUtil;
     private PasswordRedisRepository passwordRedisRepository;
+    private AmqpAdmin rabbitAdmin;
+    private DirectExchange userDirectExchange;
+    private ConnectionFactory connectionFactory;
 
 
     @BeforeEach
@@ -52,8 +58,12 @@ class AuthServiceImplTest {
         modelMapper = mock(ModelMapper.class);
         redisUtil = mock(RedisUtil.class);
         passwordRedisRepository = mock(PasswordRedisRepository.class);
+        rabbitAdmin = mock(AmqpAdmin.class);
+        userDirectExchange = mock(DirectExchange.class);
+        connectionFactory = mock(ConnectionFactory.class);
         authService = new AuthServiceImpl(passwordEncoder, userRepository, authPasswordRepository, refreshTokenRepository,
-                authenticationManagerBuilder, jwtTokenProvider, modelMapper, redisUtil, passwordRedisRepository);
+                authenticationManagerBuilder, jwtTokenProvider, modelMapper, redisUtil, passwordRedisRepository,
+                rabbitAdmin, userDirectExchange, connectionFactory);
     }
 
     @Test
