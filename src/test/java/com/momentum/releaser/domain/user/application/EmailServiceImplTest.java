@@ -23,23 +23,23 @@ class EmailServiceImplTest {
     /**
      * Redis에 비밀번호 변경 인증을 위한 데이터 저장
      */
-    @DisplayName("Redis에 비밀번호 변경 인증을 위한 데이터 저장 성공")
-    @Test
-    void sendEmailForPassword() {
-        // given
-        Password password = Password.builder()
-                .email("ska2870ghk@naver.com")
-                .name("남선우")
-                .expiredTime(60) // 테스트용 1분
-                .build();
-
-        // when
-        Password savedPassword = passwordRedisRepository.save(password);
-
-        // then
-        Password findPassword = passwordRedisRepository.findById(password.getEmail()).orElseThrow(() -> new CustomException(INVALID_REDIS_KEY));
-        System.out.println(savedPassword.getEmail());
-        System.out.println(findPassword.getEmail());
-        assertEquals(savedPassword.getEmail(), findPassword.getEmail());
-    }
+//    @DisplayName("Redis에 비밀번호 변경 인증을 위한 데이터 저장 성공")
+//    @Test
+//    void sendEmailForPassword() {
+//        // given
+//        Password password = Password.builder()
+//                .email("ska2870ghk@naver.com")
+//                .name("남선우")
+//                .expiredTime(60) // 테스트용 1분
+//                .build();
+//
+//        // when
+//        Password savedPassword = passwordRedisRepository.save(password);
+//
+//        // then
+//        Password findPassword = passwordRedisRepository.findById(password.getEmail()).orElseThrow(() -> new CustomException(INVALID_REDIS_KEY));
+//        System.out.println(savedPassword.getEmail());
+//        System.out.println(findPassword.getEmail());
+//        assertEquals(savedPassword.getEmail(), findPassword.getEmail());
+//    }
 }

@@ -52,7 +52,7 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
     @Override
     @Transactional
     public MembersResponseDTO findProjectMembers(Long projectId, String email) {
-        //Token UserInfo
+        // Token UserInfo
         User user = getUserByEmail(email);
         Project project = getProjectById(projectId);
 
@@ -78,10 +78,10 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
     @Override
     @Transactional
     public InviteProjectMemberResponseDTO addProjectMember(String link, String email) {
-        //Token UserInfo
+        // Token UserInfo
         User user = getUserByEmail(email);
 
-        //link check
+        // link check
         Project project = getProjectByLink(link);
 
         InviteProjectMemberResponseDTO res = InviteProjectMemberResponseDTO.builder()
@@ -89,7 +89,7 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
                 .projectName(project.getTitle())
                 .build();
 
-        //projectMember 존재여부 확인
+        // projectMember 존재여부 확인
         if (isProjectMember(user, project)) {
             throw new CustomException(ALREADY_EXISTS_PROJECT_MEMBER, res);
         }
@@ -137,11 +137,11 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
 
         Project project = getProjectById(projectId);
 
-        //project member 찾기
+        // project member 찾기
         ProjectMember member = findProjectMemberByUserAndProject(user, project);
-        //project member status = 'N'
+        // project member status = 'N'
         projectMemberRepository.deleteById(member.getMemberId());
-        //approval delete
+        // approval delete
         releaseApprovalRepository.deleteByReleaseApproval();
 
         return "프로젝트 탈퇴가 완료되었습니다.";
@@ -226,7 +226,7 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
      * @return 사용자가 프로젝트 멤버인 경우 true, 아닌 경우 false 반환
      */
     private boolean isProjectMember(User user, Project project) {
-        return projectMemberRepository.findByUserAndProject(user, project) != null;
+        return projectMemberRepository.findByUserAndProject(user, project).isPresent();
     }
 
     /**
