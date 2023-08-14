@@ -89,4 +89,8 @@ public class User extends BaseTime {
     public void updateImg(String img) {
         this.img = img;
     }
+
+    public void updateAuthPassword(AuthPassword authPassword) {
+        this.authPassword = authPassword;
+    }
 }
