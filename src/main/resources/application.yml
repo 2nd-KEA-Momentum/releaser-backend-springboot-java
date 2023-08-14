@@ -74,9 +74,6 @@ rabbitmq:
     exchange.name: ${RABBITMQ_USER_EXCHANGE}
     routing.key: ${RABBITMQ_USER_ROUTINGKEY}
 
-stomp:
-  relay.port: ${STOMP_RELAY_PORT}
-
 ---
 # common
 server:
@@ -162,3 +159,6 @@ url:
   image:
     banner-project: ${URL_BANNER_PROJECT}
     logo-team: ${URL_LOGO_TEAM}
+
+stomp:
+  relay.port: ${STOMP_RELAY_PORT}

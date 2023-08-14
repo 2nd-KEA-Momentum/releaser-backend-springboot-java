@@ -19,7 +19,7 @@ public class StompConfig implements WebSocketMessageBrokerConfigurer {
     private String host;
 
     @Value("${stomp.relay.port}")
-    private String port;
+    private int relayPort;
 
     @Value("${spring.rabbitmq.username}")
     private String userName;
@@ -59,7 +59,7 @@ public class StompConfig implements WebSocketMessageBrokerConfigurer {
         // SMTP 브로커 릴레이 활성화
         registry.enableStompBrokerRelay("/queue") // 지정한 경로로 시작하는 모든 메시지는 RabbitMQ에 전달된다.
                 .setRelayHost(host)
-                .setRelayPort(Integer.parseInt(port))
+                .setRelayPort(relayPort)
                 .setSystemLogin(userName)
                 .setSystemPasscode(password)
                 .setClientLogin(userName)
