@@ -197,10 +197,12 @@ public class IssueResponseDto {
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     public static class IssueIdResponseDTO {
         private Long issueId;
+        private Long issueNum;
 
         @Builder
-        public IssueIdResponseDTO(Long issueId) {
+        public IssueIdResponseDTO(Long issueId, Long issueNum) {
             this.issueId = issueId;
+            this.issueNum = issueNum;
         }
     }
 

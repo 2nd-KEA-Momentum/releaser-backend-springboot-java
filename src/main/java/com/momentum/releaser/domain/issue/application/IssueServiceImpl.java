@@ -74,6 +74,7 @@ public class IssueServiceImpl implements IssueService {
 
         return IssueIdResponseDTO.builder()
                 .issueId(newIssue.getIssueId())
+                .issueNum(newIssue.getIssueNum().getIssueNum())
                 .build();
     }
 
