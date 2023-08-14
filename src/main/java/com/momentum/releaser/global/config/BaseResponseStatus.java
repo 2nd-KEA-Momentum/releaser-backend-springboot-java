@@ -99,6 +99,7 @@ public enum BaseResponseStatus {
     FAILED_TO_CONNECT_ISSUE_WITH_RELEASE_NOTE(false, 4503, "이슈 연결에 실패하였습니다."),
     NOT_EXISTS_ISSUE_OPINION(false, 4504, "존재하지 않는 이슈 의견입니다."),
     NOT_ISSUE_COMMENTER(false, 4505, "해당 의견 작성자가 아닙니다."),
+    INVALID_ISSUE(false, 4506, "유효한 이슈가 아닙니다."),
 
     NOT_EXISTS_USERS_IN_NOTIFICATION_DATA(false, 4700, "사용자 정보가 알림 데이터 안에 존재하지 않습니다.");
 

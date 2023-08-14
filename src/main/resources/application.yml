@@ -6,7 +6,7 @@ spring:
       local: local, common
 
     # 활성 프로필 설정
-    active: dev
+    active: local
 
 ---
 # prod
@@ -59,8 +59,8 @@ spring:
       on-profile: local
 
   rabbitmq:
-    host: ${RABBITMQ_LOCAL_HOST}
-    port: ${RABBITMQ_LOCAL_PORT}
+    host: ${RABBITMQ_HOST}
+    port: ${RABBITMQ_PORT}
     username: ${RABBITMQ_USERNAME}
     password: ${RABBITMQ_PASSWORD}
 

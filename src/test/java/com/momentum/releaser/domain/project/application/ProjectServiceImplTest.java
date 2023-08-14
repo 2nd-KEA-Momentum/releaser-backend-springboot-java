@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import com.momentum.releaser.redis.RedisUtil;
+import com.momentum.releaser.redis.notification.NotificationRedisRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -33,10 +35,13 @@ import com.momentum.releaser.domain.user.dao.UserRepository;
 import com.momentum.releaser.domain.user.domain.User;
 import com.momentum.releaser.global.config.aws.S3Upload;
 import com.momentum.releaser.global.exception.CustomException;
+import org.springframework.amqp.core.AmqpAdmin;
+import org.springframework.amqp.core.DirectExchange;
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 
 class ProjectServiceImplTest {
 
-    private ProjectService projectService;
+    private ProjectServiceImpl projectService;
     private ProjectRepository projectRepository;
     private ProjectMemberRepository projectMemberRepository;
     private UserRepository userRepository;
@@ -45,6 +50,12 @@ class ProjectServiceImplTest {
     private ReleaseApprovalRepository releaseApprovalRepository;
     private ModelMapper modelMapper;
     private S3Upload s3Upload;
+
+    private RedisUtil redisUtil;
+    private NotificationRedisRepository notificationRedisRepository;
+    private AmqpAdmin rabbitAdmin;
+    private DirectExchange projectDirectExchange;
+    private ConnectionFactory connectionFactory;
 
     @BeforeEach
     void setUp() {
@@ -56,7 +67,14 @@ class ProjectServiceImplTest {
         userRepository = mock(UserRepository.class);
         modelMapper = new ModelMapper(); // modelMapper 초기화
         s3Upload = mock(S3Upload.class);
-//        projectService = new ProjectServiceImpl(projectRepository, projectMemberRepository, userRepository, issueRepository, releaseRepository, releaseApprovalRepository, modelMapper, s3Upload);
+        redisUtil = mock(RedisUtil.class);
+        notificationRedisRepository = mock(NotificationRedisRepository.class);
+        rabbitAdmin = mock(AmqpAdmin.class);
+        projectDirectExchange = mock(DirectExchange.class);
+        connectionFactory = mock(ConnectionFactory.class);
+        projectService = new ProjectServiceImpl(
+                projectRepository, projectMemberRepository, userRepository, issueRepository, releaseRepository, releaseApprovalRepository, modelMapper, s3Upload,
+                redisUtil, notificationRedisRepository, rabbitAdmin, projectDirectExchange, connectionFactory);
     }
 
     @Test
@@ -155,24 +173,17 @@ class ProjectServiceImplTest {
         ProjectInfoRequestDTO mockReqDTO = new ProjectInfoRequestDTO(
                 "project Update Title", "project Update Content", "project Team", null
         );
-        User mockLeaderUser = new User(
-                "pmUserName", "testLeader@releaser.com", null, 'Y'
-        );
         User mockMemberUser = new User(
                 "memberUserName", mockUserEmail, null, 'Y'
         );
         Project mockProject = new Project(
                 mockProjectId, "project Title", "project Content", "project Team", "s3Url", "testLink", 'Y'
         );
-        ProjectMember mockPM = new ProjectMember(
-                1L, 'L', 'Y', mockLeaderUser, mockProject
-        );
         ProjectMember mockMember = new ProjectMember(
                 2L, 'M', 'Y', mockMemberUser, mockProject
         );
         // 해당 프로젝트 멤버 리스트
         List<ProjectMember> memberList = new ArrayList<>();
-        memberList.add(mockPM);
         memberList.add(mockMember);
 
         // projectRepository.findById() 메서드가 mockProject를 반환하도록 설정

@@ -68,7 +68,7 @@ public class ProjectServiceImpl implements ProjectService {
     private final ProjectMemberRepository projectMemberRepository;
     private final UserRepository userRepository;
     private final IssueRepository issueRepository;
-    private ReleaseRepository releaseRepository;
+    private final ReleaseRepository releaseRepository;
     private final ReleaseApprovalRepository releaseApprovalRepository;
     private final ModelMapper modelMapper;
     private final S3Upload s3Upload;
@@ -119,13 +119,13 @@ public class ProjectServiceImpl implements ProjectService {
         ProjectMember leader = findLeaderForProject(project);
 
         // 접근 유저가 프로젝트 생성자인지 확인
-        if (user.equals(leader.getUser())) {
-            String url = updateProjectImg(project, projectInfoReq);
-            Project updatedProject = getAndUpdateProject(project, projectInfoReq, url);
-            return ProjectMapper.INSTANCE.toProjectInfoRes(updatedProject);
-        } else {
+        if (leader == null) {
             throw new CustomException(NOT_PROJECT_PM);
         }
+
+        String url = updateProjectImg(project, projectInfoReq);
+        Project updatedProject = getAndUpdateProject(project, projectInfoReq, url);
+        return ProjectMapper.INSTANCE.toProjectInfoRes(updatedProject);
     }
 
     /**
