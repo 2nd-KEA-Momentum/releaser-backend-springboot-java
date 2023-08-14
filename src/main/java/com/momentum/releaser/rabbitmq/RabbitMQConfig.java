@@ -34,12 +34,6 @@ public class RabbitMQConfig {
     @Value("${spring.rabbitmq.password}")
     private String password;
 
-    @Value("${rabbitmq.user.exchange.name}")
-    private String userExchange;
-
-    @Value("${rabbitmq.project.exchange.name}")
-    private String projectExchange;
-
     /**
      * RabbitMQ 연결을 위한 ConnectionFactory Bean을 생성하여 반환
      *
@@ -115,19 +109,7 @@ public class RabbitMQConfig {
      */
     @Bean
     public DirectExchange userDirectExchange() {
-        return new DirectExchange(userExchange);
-    }
-
-    /**
-     * 큐와 DirectExchange를 바인딩할 DirectExchange Bean을 생성
-     *
-     * @return DirectExchange
-     * @author seonwoo
-     * @date 2023-08-07 (월)
-     */
-    @Bean
-    public DirectExchange projectDirectExchange() {
-        return new DirectExchange(projectExchange);
+        return new DirectExchange("releaser.user");
     }
 
     /**

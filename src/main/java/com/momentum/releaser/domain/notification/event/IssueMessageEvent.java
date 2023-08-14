@@ -1,10 +1,8 @@
 package com.momentum.releaser.domain.notification.event;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import com.momentum.releaser.domain.notification.event.ReleaseNoteMessageEvent.ConsumerType;
 import com.momentum.releaser.rabbitmq.MessageDto.IssueMessageDto;
 
 import lombok.Builder;
@@ -17,19 +15,19 @@ import lombok.extern.slf4j.Slf4j;
 @Builder
 @ToString
 public class IssueMessageEvent {
-
     private String eventId;
     private ConsumerType type;
     private IssueMessageDto message;
     private List<String> consumers;
 
     /**
+     * (사용 X)
      * 이슈와 관련된 알림을 발생시킬 이벤트
+     * 모든 프로젝트 멤버에게 알림 전송
      *
-     * @param message 알림 메시지
+     * @param message   알림 메시지
+     * @param consumers 알림 소비자(대상) 목록
      * @return IssueMessageEvent
-     * @author seonwoo
-     * @date 2023-08-09 (수)
      */
     public static IssueMessageEvent toNotifyAllIssue(final IssueMessageDto message, List<String> consumers) {
         return IssueMessageEvent.builder()
@@ -40,10 +38,17 @@ public class IssueMessageEvent {
                 .build();
     }
 
-    public static IssueMessageEvent toNotifyOneIssue(final IssueMessageDto message, String consumer) {
-        List<String> consumers = new ArrayList<>();
-        consumers.add(consumer);
-
+    /**
+     * 이슈와 관련된 알림을 발생시킬 이벤트
+     * 개별 사용자에게 알림 전송
+     *
+     * @param message   알림 메시지
+     * @param consumers 알림 소비자(대상) 목록
+     * @return IssueMessageEvent
+     * @author seonwoo
+     * @date 2023-08-14 (월)
+     */
+    public static IssueMessageEvent toNotifyOneIssue(final IssueMessageDto message, List<String> consumers) {
         return IssueMessageEvent.builder()
                 .eventId(UUID.randomUUID().toString())
                 .message(message)

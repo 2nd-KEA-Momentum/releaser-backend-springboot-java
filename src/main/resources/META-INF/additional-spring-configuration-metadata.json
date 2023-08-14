@@ -21,21 +21,6 @@
       "description": "Description for logging.slack.webhook-url-dev-error."
     },
     {
-      "name": "rabbitmq.sample.queue.name",
-      "type": "java.lang.String",
-      "description": "Description for rabbitmq.sample.queue.name."
-    },
-    {
-      "name": "rabbitmq.sample.exchange.name",
-      "type": "java.lang.String",
-      "description": "Description for rabbitmq.sample.exchange.name."
-    },
-    {
-      "name": "rabbitmq.sample.routing.key",
-      "type": "java.lang.String",
-      "description": "Description for rabbitmq.sample.routing.key."
-    },
-    {
       "name": "rabbitmq.user.queue.name",
       "type": "java.lang.String",
       "description": "Description for rabbitmq.user.queue.name."
@@ -49,21 +34,6 @@
       "name": "rabbitmq.user.routing.key",
       "type": "java.lang.String",
       "description": "Description for rabbitmq.user.routing.key."
-    },
-    {
-      "name": "rabbitmq.project.queue.name",
-      "type": "java.lang.String",
-      "description": "Description for rabbitmq.project.queue.name."
-    },
-    {
-      "name": "rabbitmq.project.exchange.name",
-      "type": "java.lang.String",
-      "description": "Description for rabbitmq.project.exchange.name."
-    },
-    {
-      "name": "rabbitmq.project.routing.key",
-      "type": "java.lang.String",
-      "description": "Description for rabbitmq.project.routing.key."
     },
     {
       "name": "stomp.relay.port",

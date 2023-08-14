@@ -10,23 +10,14 @@ import lombok.NoArgsConstructor;
 public class MessageDto {
 
     /**
-     * RabbitMQ 테스트를 위한 샘플 메시지 데이터
-     */
-    @Getter
-    @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    public static class SampleMessageDto {
-
-        private String title;
-        private String content;
-    }
-
-    /**
      * Releaser 프로젝트 알림
+     *
+     * @author seonwoo
+     * @date 2023-08-14 (월)
      */
     @Getter
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     public static class ReleaserMessageDto {
-
         private String projectName;
         private String message;
         private String type;
@@ -43,10 +34,14 @@ public class MessageDto {
 
     /**
      * 릴리즈 노트 유형 알림 메시지
+     *
+     * @author seonwoo
+     * @date 2023-08-14 (월)
      */
     @Getter
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     public static class ReleaseNoteMessageDto {
+        private String type;
         private Long projectId;
         private String projectName;
         private String projectImg;
@@ -55,7 +50,8 @@ public class MessageDto {
         private Long releaseNoteId;
 
         @Builder
-        public ReleaseNoteMessageDto(Long projectId, String projectName, String projectImg, String message, Date date, Long releaseNoteId) {
+        public ReleaseNoteMessageDto(String type, Long projectId, String projectName, String projectImg, String message, Date date, Long releaseNoteId) {
+            this.type = type;
             this.projectId = projectId;
             this.projectName = projectName;
             this.projectImg = projectImg;
@@ -67,10 +63,14 @@ public class MessageDto {
 
     /**
      * 이슈 유형 알림 메시지
+     *
+     * @author seonwoo
+     * @date 2023-08-14 (월)
      */
     @Getter
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     public static class IssueMessageDto {
+        private String type;
         private Long projectId;
         private String projectName;
         private String projectImg;
@@ -79,7 +79,8 @@ public class MessageDto {
         private Long issueId;
 
         @Builder
-        public IssueMessageDto(Long projectId, String projectName, String projectImg, String message, Date date, Long issueId) {
+        public IssueMessageDto(String type, Long projectId, String projectName, String projectImg, String message, Date date, Long issueId) {
+            this.type = type;
             this.projectId = projectId;
             this.projectName = projectName;
             this.projectImg = projectImg;

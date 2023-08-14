@@ -4,26 +4,24 @@ import static com.momentum.releaser.domain.release.domain.QReleaseApproval.relea
 
 import org.springframework.stereotype.Repository;
 
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.momentum.releaser.domain.release.domain.ReleaseNote;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-import com.querydsl.jpa.impl.JPAQueryFactory;
-
-import com.momentum.releaser.domain.release.domain.ReleaseNote;
 
 @Slf4j
 @Repository
 @RequiredArgsConstructor
 public class ReleaseApprovalRepositoryImpl implements ReleaseApprovalCustom {
-
     private final JPAQueryFactory queryFactory;
 
     /**
      * 주어진 릴리즈 노트에 대한 모든 릴리즈 동의 정보를 삭제
      *
+     * @param releaseNote 삭제하려는 릴리즈 노트 정보
      * @author seonwoo
      * @date 2023-07-09
-     * @param releaseNote 삭제하려는 릴리즈 노트 정보
      */
     @Override
     public void deleteByReleaseNote(ReleaseNote releaseNote) {
@@ -47,5 +45,4 @@ public class ReleaseApprovalRepositoryImpl implements ReleaseApprovalCustom {
                         .or(releaseApproval.member.isNull()))
                 .execute();
     }
-
 }

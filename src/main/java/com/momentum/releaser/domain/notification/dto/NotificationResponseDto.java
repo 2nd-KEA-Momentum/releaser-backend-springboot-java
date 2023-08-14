@@ -1,14 +1,20 @@
 package com.momentum.releaser.domain.notification.dto;
 
+import java.util.Date;
+
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
-
 public class NotificationResponseDto {
 
+    /**
+     * 11.1 사용자별 알림 내역 조회
+     *
+     * @author seonwoo
+     * @date 2023-08-14 (월)
+     */
     @Getter
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     public static class NotificationListResponseDto {
@@ -31,6 +37,13 @@ public class NotificationResponseDto {
             this.isRead = isRead;
         }
 
+        /**
+         * 사용자 알림 확인 여부 확인
+         *
+         * @param isRead 알림 확인 여부
+         * @author seonwoo
+         * @date 2023-08-14 (월)
+         */
         public void updateIsRead(int isRead) {
             this.isRead = isRead;
         }

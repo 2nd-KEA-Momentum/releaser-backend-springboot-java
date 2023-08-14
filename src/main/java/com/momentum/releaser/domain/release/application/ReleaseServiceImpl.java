@@ -12,9 +12,6 @@ import com.momentum.releaser.rabbitmq.MessageDto.ReleaseNoteMessageDto;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-
 import com.momentum.releaser.domain.issue.dao.IssueRepository;
 import com.momentum.releaser.domain.issue.domain.Issue;
 import com.momentum.releaser.domain.issue.domain.LifeCycle;
@@ -41,6 +38,9 @@ import com.momentum.releaser.domain.user.dao.UserRepository;
 import com.momentum.releaser.domain.user.domain.User;
 import com.momentum.releaser.global.exception.CustomException;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * 릴리즈 노트와 관련된 기능을 제공하는 서비스 구현 클래스입니다.
  */
@@ -49,6 +49,7 @@ import com.momentum.releaser.global.exception.CustomException;
 @RequiredArgsConstructor
 public class ReleaseServiceImpl implements ReleaseService {
 
+    // Domain
     private final UserRepository userRepository;
     private final ProjectRepository projectRepository;
     private final ProjectMemberRepository projectMemberRepository;
@@ -57,6 +58,7 @@ public class ReleaseServiceImpl implements ReleaseService {
     private final ReleaseApprovalRepository releaseApprovalRepository;
     private final IssueRepository issueRepository;
 
+    // 알림
     private final NotificationEventPublisher notificationEventPublisher;
 
     /**
@@ -1062,7 +1064,6 @@ public class ReleaseServiceImpl implements ReleaseService {
             if (sortedReleaseNotes.get(i).getDeployStatus() != ReleaseDeployStatus.DEPLOYED) {
                 throw new CustomException(EXISTS_NOT_DEPLOYED_RELEASE_NOTE_BEFORE_THIS);
             }
-
         }
     }
 
@@ -1361,7 +1362,6 @@ public class ReleaseServiceImpl implements ReleaseService {
                     return resDTO;
                 })
                 .collect(Collectors.toList());
-
     }
 
     /**
@@ -1385,11 +1385,12 @@ public class ReleaseServiceImpl implements ReleaseService {
      * @param project     프로젝트
      * @param releaseNote 릴리즈 노트
      * @author seonwoo
-     * @date 2023-08-10 (목)
+     * @date 2023-08-14 (월)
      */
     private void notifyReleaseNote(Project project, ReleaseNote releaseNote, String alarmMessage) {
         // 알림 메시지를 정의한다.
         ReleaseNoteMessageDto message = ReleaseNoteMessageDto.builder()
+                .type("Release Note")
                 .projectId(project.getProjectId())
                 .projectName(project.getTitle())
                 .projectImg(project.getImg())
@@ -1404,12 +1405,21 @@ public class ReleaseServiceImpl implements ReleaseService {
                 .collect(Collectors.toList());
 
         // 이벤트 리스너를 호출하여 릴리즈 노트 생성 트랜잭션이 완료된 후 호출하도록 한다.
-        notificationEventPublisher.notifyReleaseNote(ReleaseNoteMessageEvent.toNotifyAllReleaseNote(message, consumers));
+        notificationEventPublisher.notifyReleaseNote(ReleaseNoteMessageEvent.toNotifyOneReleaseNote(message, consumers));
     }
 
+    /**
+     * 릴리즈 노트 배포 결정 알림 이벤트를 호출한다.
+     *
+     * @param project     프로젝트
+     * @param releaseNote 릴리즈 노트
+     * @author seonwoo
+     * @date 2023-08-14 (월)
+     */
     private void notifyReleaseNoteApprovalToManager(Project project, ReleaseNote releaseNote) {
         // 알림 메시지를 정의한다.
         ReleaseNoteMessageDto message = ReleaseNoteMessageDto.builder()
+                .type("Release Note")
                 .projectId(project.getProjectId())
                 .projectName(project.getTitle())
                 .projectImg(project.getImg())
@@ -1421,8 +1431,10 @@ public class ReleaseServiceImpl implements ReleaseService {
         // 프로젝트 PM의 이메일을 가져온다.
         ProjectMember member = projectRepository.getProjectMemberPostionPM(project.getProjectId());
 
-        // 이벤트 리스너를 호출하여 릴리즈 노트 생성 트랜잭션이 완료된 후 호출하도록 한다.
-        notificationEventPublisher.notifyReleaseNote(ReleaseNoteMessageEvent.toNotifyOneReleaseNote(message, member.getUser().getEmail()));
-    }
+        List<String> consumers = new ArrayList<>();
+        consumers.add(member.getUser().getEmail());
 
+        // 이벤트 리스너를 호출하여 릴리즈 노트 생성 트랜잭션이 완료된 후 호출하도록 한다.
+        notificationEventPublisher.notifyReleaseNote(ReleaseNoteMessageEvent.toNotifyOneReleaseNote(message, consumers));
+    }
 }

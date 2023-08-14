@@ -4,10 +4,7 @@ import static com.momentum.releaser.domain.issue.dto.IssueResponseDto.*;
 import static com.momentum.releaser.global.config.BaseResponseStatus.*;
 
 import java.time.ZoneId;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import com.momentum.releaser.domain.issue.dto.IssueDataDto.IssueDetailsDataDTO;
@@ -682,6 +679,7 @@ public class IssueServiceImpl implements IssueService {
     private void notifyIssueAll(Project project, Issue issue) {
         // 알림 메시지를 정의한다.
         IssueMessageDto message = IssueMessageDto.builder()
+                .type("Issue")
                 .projectId(project.getProjectId())
                 .projectName(project.getTitle())
                 .projectImg(project.getImg())
@@ -696,7 +694,7 @@ public class IssueServiceImpl implements IssueService {
                 .collect(Collectors.toList());
 
         // 이벤트 리스너를 호출하여 이슈 생성 트랜잭션이 완료된 후 호출하도록 한다.
-        notificationEventPublisher.notifyIssue(IssueMessageEvent.toNotifyAllIssue(message, consumers));
+        notificationEventPublisher.notifyIssue(IssueMessageEvent.toNotifyOneIssue(message, consumers));
     }
 
     private void notifyIssueOne(String userEmail, Project project, Issue issue, ProjectMember member) {
@@ -706,6 +704,7 @@ public class IssueServiceImpl implements IssueService {
 
             // 알림 메시지를 정의한다.
             IssueMessageDto message = IssueMessageDto.builder()
+                    .type("Issue")
                     .projectId(project.getProjectId())
                     .projectName(project.getTitle())
                     .projectImg(project.getImg())
@@ -714,8 +713,11 @@ public class IssueServiceImpl implements IssueService {
                     .issueId(issue.getIssueId())
                     .build();
 
+            List<String> consumers = new ArrayList<>();
+            consumers.add(userEmail);
+
             // 이벤트 리스너를 호출하여 이슈 생성 트랜잭션이 완료된 후 호출하도록 한다.
-            notificationEventPublisher.notifyIssue(IssueMessageEvent.toNotifyOneIssue(message, userEmail));
+            notificationEventPublisher.notifyIssue(IssueMessageEvent.toNotifyOneIssue(message, consumers));
         }
     }
 }

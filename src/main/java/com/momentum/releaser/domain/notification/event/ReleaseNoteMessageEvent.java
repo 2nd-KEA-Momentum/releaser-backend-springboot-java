@@ -1,6 +1,5 @@
 package com.momentum.releaser.domain.notification.event;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -22,12 +21,8 @@ public class ReleaseNoteMessageEvent {
     private ReleaseNoteMessageDto message;
     private List<String> consumers;
 
-    public enum ConsumerType {
-        PROJECT, // 프로젝트 멤버가 알림 대상인 경우
-        USER // 한 명이 알림 대상인 경우
-    }
-
     /**
+     * (사용 X)
      * 릴리즈 노트와 관련된 알림을 발생시킬 이벤트
      * 단, 이때 알림 대상은 모든 프로젝트 멤버이다.
      *
@@ -54,10 +49,7 @@ public class ReleaseNoteMessageEvent {
      * @author seonwoo
      * @date 2023-08-09 (수)
      */
-    public static ReleaseNoteMessageEvent toNotifyOneReleaseNote(final ReleaseNoteMessageDto message, String consumer) {
-        List<String> consumers = new ArrayList<>();
-        consumers.add(consumer);
-
+    public static ReleaseNoteMessageEvent toNotifyOneReleaseNote(final ReleaseNoteMessageDto message, List<String> consumers) {
         return ReleaseNoteMessageEvent.builder()
                 .eventId(UUID.randomUUID().toString())
                 .message(message)

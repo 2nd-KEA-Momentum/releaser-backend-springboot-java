@@ -42,24 +42,18 @@ spring:
   rabbitmq:
     host: ${RABBITMQ_LOCAL_HOST}
     port: ${RABBITMQ_LOCAL_PORT}
-    username: ${RABBITMQ_LOCAL_USERNAME}
-    password: ${RABBITMQ_LOCAL_PASSWORD}
+    username: ${RABBITMQ_USERNAME}
+    password: ${RABBITMQ_PASSWORD}
+
+  redis:
+    host: ${REDIS_LOCAL_HOST}
+    port: ${REDIS_LOCAL_PORT}
 
 rabbitmq:
-  sample:
-    queue.name: ${RABBITMQ_LOCAL_SAMPLE_QUEUE}
-    exchange.name: ${RABBITMQ_LOCAL_SAMPLE_EXCHANGE}
-    routing.key: ${RABBITMQ_LOCAL_SAMPLE_ROUTINGKEY}
-
   user:
-    queue.name: ${RABBITMQ_LOCAL_USER_QUEUE}
-    exchange.name: ${RABBITMQ_LOCAL_USER_EXCHANGE}
-    routing.key: ${RABBITMQ_LOCAL_USER_ROUTINGKEY}
-
-  project:
-    queue.name: ${RABBITMQ_LOCAL_PROJECT_QUEUE}
-    exchange.name: ${RABBITMQ_LOCAL_PROJECT_EXCHANGE}
-    routing.key: ${RABBITMQ_LOCAL_PROJECT_ROUTINGKEY}
+    queue.name: ${RABBITMQ_USER_QUEUE}
+    exchange.name: ${RABBITMQ_USER_EXCHANGE}
+    routing.key: ${RABBITMQ_USER_ROUTINGKEY}
 
 stomp:
   relay.port: ${STOMP_RELAY_PORT}
@@ -125,10 +119,6 @@ spring:
           connectiontimeout: 5000
           timeout: 5000
           writetimeout: 5000
-
-  redis:
-    host: ${REDIS_HOST}
-    port: ${REDIS_PORT}
 
 logging.level:
   org.hibernate.SQL: debug
