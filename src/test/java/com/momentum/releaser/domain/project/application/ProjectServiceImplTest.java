@@ -56,7 +56,7 @@ class ProjectServiceImplTest {
         userRepository = mock(UserRepository.class);
         modelMapper = new ModelMapper(); // modelMapper 초기화
         s3Upload = mock(S3Upload.class);
-        projectService = new ProjectServiceImpl(projectRepository, projectMemberRepository, userRepository, issueRepository, releaseRepository, releaseApprovalRepository, modelMapper, s3Upload);
+//        projectService = new ProjectServiceImpl(projectRepository, projectMemberRepository, userRepository, issueRepository, releaseRepository, releaseApprovalRepository, modelMapper, s3Upload);
     }
 
     @Test

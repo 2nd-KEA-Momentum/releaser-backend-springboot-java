@@ -32,12 +32,17 @@ public enum BaseResponseStatus {
     EXISTS_DEPLOYED_RELEASE_NOTE_AFTER_THIS(false, 2401, "배포된 상위 버전의 릴리즈 노트가 있어 삭제할 수 없습니다."),
     EXISTS_NOT_DEPLOYED_RELEASE_NOTE_BEFORE_THIS(false, 2402, "배포되지 않은 하위 버전의 릴리즈 노트가 있어 현재 릴리즈 노트를 배포할 수 없습니다."),
     UNAUTHORIZED_TO_DELETE_RELEASE_OPINION(false, 2403, "해당 릴리즈 노트 의견 삭제 권한이 없습니다."),
+    ALREADY_DEPLOYED_RELEASE_NOTE(false, 2404, "이미 배포된 릴리즈 노트입니다."),
+    ALREADY_ALL_APPROVALS_WITH_YES(false, 2405, "이미 모든 멤버의 동의가 완료되었습니다."),
 
     INVALID_ISSUE_TAG(false, 2500, "이슈 태그가 올바르지 않습니다."),
     INVALID_LIFECYCLE(false, 2501, "이슈 상태가 올바르지 않습니다."),
     CONNECTED_ISSUE_EXISTS(false, 2502, "릴리즈와 연결된 이슈이므로 상태 변경이 불가능합니다."),
     CONNECTED_RELEASE_EXISTS(false, 2503, "연결된 릴리즈가 존재하므로 삭제할 수 없습니다."),
     NOT_ADMIN(false, 2504, "프로젝트의 관리자만 수정이 가능합니다."),
+
+    NOT_EXISTS_NOTIFICATION(false, 2700, "존재하지 않는 알림 내역입니다."),
+    NOT_EXISTS_NOTIFICATION_PER_USER(false, 2701, "존재하지 않는 사용자 알림 데이터입니다."),
 
 
     /**
@@ -93,7 +98,9 @@ public enum BaseResponseStatus {
     INVALID_ISSUE_WITH_NOT_DONE(false, 4502, "완료되지 않은 이슈는 연결할 수 없습니다."),
     FAILED_TO_CONNECT_ISSUE_WITH_RELEASE_NOTE(false, 4503, "이슈 연결에 실패하였습니다."),
     NOT_EXISTS_ISSUE_OPINION(false, 4504, "존재하지 않는 이슈 의견입니다."),
-    NOT_ISSUE_COMMENTER(false, 4505, "해당 의견 작성자가 아닙니다.");
+    NOT_ISSUE_COMMENTER(false, 4505, "해당 의견 작성자가 아닙니다."),
+
+    NOT_EXISTS_USERS_IN_NOTIFICATION_DATA(false, 4700, "사용자 정보가 알림 데이터 안에 존재하지 않습니다.");
 
     private final boolean isSuccess;
     private final int code;

@@ -33,6 +33,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import javax.servlet.http.HttpSession;
 import java.util.List;
@@ -141,6 +144,7 @@ public class SecurityConfig {
                 .and()
                 .authorizeRequests()
                 .antMatchers("/api/auth/**").permitAll()
+                .antMatchers("/notification/**").permitAll()
                 .anyRequest().authenticated()
 
                 .and()

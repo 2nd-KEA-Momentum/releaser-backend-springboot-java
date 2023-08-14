@@ -15,6 +15,16 @@ spring:
     activate:
       on-profile: prod
 
+  rabbitmq:
+    host: ${RABBITMQ_HOST}
+    port: ${RABBITMQ_PORT}
+    username: ${RABBITMQ_USERNAME}
+    password: ${RABBITMQ_PASSWORD}
+
+  redis:
+    host: ${REDIS_PROD_HOST}
+    port: ${REDIS_PROD_PORT}
+
 logging:
   slack:
     webhook-url-prod-error: ${SLACK_WEBHOOK_URL_PROD_ERROR}
@@ -25,6 +35,16 @@ spring:
   config:
     activate:
       on-profile: dev
+
+  rabbitmq:
+    host: ${RABBITMQ_HOST}
+    port: ${RABBITMQ_PORT}
+    username: ${RABBITMQ_USERNAME}
+    password: ${RABBITMQ_PASSWORD}
+
+  redis:
+    host: ${REDIS_LOCAL_HOST}
+    port: ${REDIS_LOCAL_PORT}
 
 logging:
   slack:
@@ -37,6 +57,25 @@ spring:
   config:
     activate:
       on-profile: local
+
+  rabbitmq:
+    host: ${RABBITMQ_LOCAL_HOST}
+    port: ${RABBITMQ_LOCAL_PORT}
+    username: ${RABBITMQ_USERNAME}
+    password: ${RABBITMQ_PASSWORD}
+
+  redis:
+    host: ${REDIS_LOCAL_HOST}
+    port: ${REDIS_LOCAL_PORT}
+
+rabbitmq:
+  user:
+    queue.name: ${RABBITMQ_USER_QUEUE}
+    exchange.name: ${RABBITMQ_USER_EXCHANGE}
+    routing.key: ${RABBITMQ_USER_ROUTINGKEY}
+
+stomp:
+  relay.port: ${STOMP_RELAY_PORT}
 
 ---
 # common
@@ -71,6 +110,9 @@ spring:
         use_sql_comments: true
         dialect: com.momentum.releaser.global.config.MySQL8DialectCustom
 
+  main:
+    allow-bean-definition-overriding: true
+
   security:
     oauth2:
       client:
@@ -95,10 +137,6 @@ spring:
           connectiontimeout: 5000
           timeout: 5000
           writetimeout: 5000
-
-  redis:
-    host: ${REDIS_HOST}
-    port: ${REDIS_PORT}
 
 logging.level:
   org.hibernate.SQL: debug

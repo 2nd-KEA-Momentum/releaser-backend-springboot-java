@@ -12,7 +12,6 @@ import com.momentum.releaser.domain.release.domain.ReleaseNote;
 
 @RepositoryRestResource(collectionResourceRel="release-approval", path="release-approval")
 public interface ReleaseApprovalRepository extends JpaRepository<ReleaseApproval, Long>, ReleaseApprovalCustom {
-
     Optional<ReleaseApproval> findByMemberAndRelease(ProjectMember member, ReleaseNote releaseNote);
 
     List<ReleaseApproval> findAllByRelease(ReleaseNote releaseNote);
