@@ -244,6 +244,7 @@ public class AuthServiceImpl implements AuthService {
 
         // 인증 정보를 데이터베이스에 저장
         authPasswordRepository.save(authPassword);
+        user.updateAuthPassword(authPassword);
     }
 
     /**

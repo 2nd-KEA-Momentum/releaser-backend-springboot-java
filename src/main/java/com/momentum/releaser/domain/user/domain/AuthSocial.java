@@ -53,12 +53,6 @@ public class AuthSocial extends BaseTime {
         this.status = status;
     }
 
-
-    public AuthSocial(User user, AuthProvider authProvider, Object token, char y) {
-        super();
-    }
-
-
     /**
      * insert 되기전 (persist 되기전) 실행된다.
      */
@@ -66,4 +60,16 @@ public class AuthSocial extends BaseTime {
     public void prePersist() {
         this.status = (this.status == '\0') ? 'Y' : this.status;
     }
+
+    public AuthSocial(User user, AuthProvider authProvider, Object token, char y) {
+        super();
+    }
+
+    /**
+     * 삭제를 위한 status ='N' 변경
+     */
+    public void statusToInactive() {
+        this.status = 'N';
+    }
+
 }

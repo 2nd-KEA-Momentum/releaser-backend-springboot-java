@@ -101,6 +101,9 @@ class IssueServiceImplTest {
         // issueRepository.save() 메서드가 mockSavedIssue를 반환하도록 설정 (생성하고 싶은 이슈 정보 저장)
         when(issueRepository.save(any(Issue.class))).thenReturn(mockSavedIssue);
 
+        // issueNumRepository.save() 메서드가 mockIssueNum를 반환하도록 설정
+        when(issueNumRepository.save(any(IssueNum.class))).thenReturn(mockIssueNum);
+
         // 이슈 생성 서비스 호출
         IssueIdResponseDTO result = issueService.addIssue(mockProjectId, mockIssueInfoRequestDTO);
 
@@ -113,6 +116,7 @@ class IssueServiceImplTest {
         verify(projectMemberRepository, times(1)).findById(mockMemberId);
         verify(issueRepository, times(1)).getIssueNum(mockProject);
         verify(issueRepository, times(1)).save(any(Issue.class));
+        verify(issueNumRepository, times(1)).save(any(IssueNum.class));
     }
 
     @Test

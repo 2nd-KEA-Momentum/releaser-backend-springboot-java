@@ -6,8 +6,16 @@ import static com.momentum.releaser.global.config.BaseResponseStatus.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.Objects;
 
+import com.momentum.releaser.domain.issue.dao.IssueRepository;
+import com.momentum.releaser.domain.project.dao.ProjectMemberRepository;
+import com.momentum.releaser.domain.project.dao.ProjectRepository;
+import com.momentum.releaser.domain.project.domain.Project;
+import com.momentum.releaser.domain.project.domain.ProjectMember;
+import com.momentum.releaser.domain.release.dao.approval.ReleaseApprovalRepository;
+import com.momentum.releaser.domain.release.dao.release.ReleaseRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +39,8 @@ import com.momentum.releaser.global.exception.CustomException;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final ProjectMemberRepository projectMemberRepository;
+    private final ReleaseApprovalRepository releaseApprovalRepository;
     private final S3Upload s3Upload;
 
     /**
@@ -82,6 +92,28 @@ public class UserServiceImpl implements UserService {
         // 프로필 이미지를 삭제한 후 기본 이미지로 저장
         saveAfterDeleteProfileImg(user);
         return UserMapper.INSTANCE.toUserProfileImgResponseDto(user);
+    }
+
+    /**
+     * 1.4 사용자 탈퇴
+     *
+     * @author chaeanna
+     * @date 2023-08-13
+     * @param userEmail 사용자 이메일
+     */
+    @Override
+    @Transactional
+    public String removeUser(String userEmail) {
+        // 사용자 식별 번호로 사용자 정보 조회
+        User user = getUserByEmail(userEmail);
+
+        // 관리자인 프로젝트가 있는지 체크
+        List<ProjectMember> members = checkProjectPMWithUser(user);
+
+        // 참여 중인 프로젝트 탈퇴하기
+        withdrawProject(members);
+
+        return deleteUser(user);
     }
 
     // =================================================================================================================
@@ -154,7 +186,12 @@ public class UserServiceImpl implements UserService {
     private void deleteIfExistProfileImg(User user) {
         // 사용자의 프로필 이미지가 기본 이미지도, null도 아닌 경우 기존에 저장된 파일을 S3에서 삭제한다.
         if (!Objects.equals(user.getImg(), DEFAULT_USER_PROFILE_IMG.url()) && user.getImg() != null) {
-            s3Upload.delete(user.getImg().substring(55));
+            String img = user.getImg();
+
+            if (img.length() > 55) {
+                s3Upload.delete(user.getImg().substring(55));
+            }
+
         }
     }
 
@@ -168,6 +205,81 @@ public class UserServiceImpl implements UserService {
     private void saveAfterDeleteProfileImg(User user) {
         user.updateImg(DEFAULT_USER_PROFILE_IMG.url());
         userRepository.save(user);
+    }
+
+    /**
+     * 해당 유저가 관리자로 있는 프로젝트가 존재할 경우 예외를 발생시키는 메서드입니다.
+     *
+     * @param user 탈퇴하려는 사용자
+     * @date 2023-08-13
+     * @author chaeanna
+     */
+    private List<ProjectMember> checkProjectPMWithUser(User user) {
+        // 탈퇴하려는 사용자가 참여중인 프로젝트 멤버 정보 조회
+        List<ProjectMember> pm = projectMemberRepository.findByUser(user);
+
+        // 사용자가 어떤 프로젝트에도 참여중이지 않을 경우
+        if (pm.isEmpty()) {
+            return null;
+        }
+
+        // 멤버 역할이 PM일 경우 예외 발생
+        for (ProjectMember projectMember : pm) {
+            if (projectMember.getPosition() == 'L') {
+                throw new CustomException(PROJECT_DELETION_REQUIRED_FOR_USER_WITHDRAWAL);
+            }
+        }
+
+        return pm;
+    }
+
+    /**
+     * 참여 중인 프로젝트 탈퇴하기
+     *
+     * @param members 탈퇴하려는 멤버
+     * @date 2023-08-13
+     * @author chaeanna
+     */
+    private void withdrawProject(List<ProjectMember> members) {
+        // 사용자가 프로젝트에 참여 중이지 않아서 탈퇴할 프로젝트가 없는 경우
+        if (members == null) {
+            return;
+        }
+
+        for (ProjectMember member : members) {
+            // project member status = 'N' 변경
+            projectMemberRepository.deleteById(member.getMemberId());
+            // approval 삭제
+            releaseApprovalRepository.deleteByReleaseApproval();
+        }
+    }
+
+    /**
+     * 사용자와 프로젝트를 기반으로 프로젝트 멤버 조회
+     *
+     * @author chaeanna
+     * @date 2023-08-13
+     * @param user 사용자 엔티티
+     * @param project 프로젝트 엔티티
+     * @return ProjectMember 조회된 프로젝트 멤버 엔티티
+     */
+    private ProjectMember findProjectMemberByUserAndProject(User user, Project project) {
+        // 사용자와 프로젝트를 매개변수로 하여 프로젝트 멤버를 조회합니다.
+        return projectMemberRepository.findByUserAndProject(user, project).orElseThrow(() -> new CustomException(NOT_EXISTS_PROJECT_MEMBER));
+    }
+
+    /**
+     * 사용자 탈퇴
+     *
+     * @param user 탈퇴하려는 사용자
+     * @return String "탈퇴가 완료되었습니다."
+     * @date 2023-08-13
+     * @author chaeanna
+     */
+    private String deleteUser(User user) {
+        userRepository.deleteById(user.getUserId());
+
+        return "탈퇴가 완료되었습니다.";
     }
 
 }

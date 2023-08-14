@@ -31,7 +31,6 @@ logging:
     webhook-url-dev-warn: ${SLACK_WEBHOOK_URL_DEV_WARN}
     webhook-url-dev-error: ${SLACK_WEBHOOK_URL_DEV_ERROR}
 
-
 ---
 # local
 spring:
@@ -59,7 +58,6 @@ stomp:
   relay.port: ${STOMP_RELAY_PORT}
 
 ---
-
 # common
 server:
   port: 8080
