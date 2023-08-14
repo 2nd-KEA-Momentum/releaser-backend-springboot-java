@@ -40,8 +40,6 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final ProjectMemberRepository projectMemberRepository;
-    private final ProjectRepository projectRepository;
-    private final IssueRepository issueRepository;
     private final ReleaseApprovalRepository releaseApprovalRepository;
     private final S3Upload s3Upload;
 
@@ -188,7 +186,12 @@ public class UserServiceImpl implements UserService {
     private void deleteIfExistProfileImg(User user) {
         // 사용자의 프로필 이미지가 기본 이미지도, null도 아닌 경우 기존에 저장된 파일을 S3에서 삭제한다.
         if (!Objects.equals(user.getImg(), DEFAULT_USER_PROFILE_IMG.url()) && user.getImg() != null) {
-            s3Upload.delete(user.getImg().substring(55));
+            String img = user.getImg();
+
+            if (img.length() > 55) {
+                s3Upload.delete(user.getImg().substring(55));
+            }
+
         }
     }
 
