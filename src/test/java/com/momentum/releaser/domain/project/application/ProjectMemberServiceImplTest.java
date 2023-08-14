@@ -167,7 +167,7 @@ class ProjectMemberServiceImplTest {
         when(userRepository.findByEmail(mockUserEmail)).thenReturn(Optional.of(mockUser));
 
         // projectMemberRepository.findByUserAndProject() 메서드가 null을 반환하도록 설정 (존재하는 멤버인지 확인)
-        when(projectMemberRepository.findByUserAndProject(mockUser, mockProject)).thenReturn(null);
+        when(projectMemberRepository.findByUserAndProject(mockUser, mockProject)).thenReturn(Optional.empty());
 
         // 프로젝트 멤버 추가 서비스 호출
         InviteProjectMemberResponseDTO result = projectMemberService.addProjectMember(mockLink, mockUserEmail);
