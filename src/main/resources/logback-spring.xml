@@ -46,7 +46,7 @@
         </encoder>
 
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <!--            <fileNamePattern>./logs/info-%d{yyyy-MM-dd}.%i.log</fileNamePattern>-->
+<!--            <fileNamePattern>./logs/info-%d{yyyy-MM-dd}.%i.log</fileNamePattern>-->
             <fileNamePattern>~/logs/info-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
             <maxFileSize>100MB</maxFileSize>
             <maxHistory>30</maxHistory>
@@ -81,7 +81,7 @@
         </encoder>
 
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <!--            <fileNamePattern>./logs/warn-%d{yyyy-MM-dd}.%i.log</fileNamePattern>-->
+<!--            <fileNamePattern>./logs/warn-%d{yyyy-MM-dd}.%i.log</fileNamePattern>-->
             <fileNamePattern>~/logs/warn-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
             <maxFileSize>100MB</maxFileSize>
             <maxHistory>30</maxHistory>
@@ -116,7 +116,7 @@
         </encoder>
 
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <!--            <fileNamePattern>./logs/error-%d{yyyy-MM-dd}.%i.log</fileNamePattern>-->
+<!--            <fileNamePattern>./logs/error-%d{yyyy-MM-dd}.%i.log</fileNamePattern>-->
             <fileNamePattern>~/logs/error-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
             <maxFileSize>100MB</maxFileSize>
             <maxHistory>30</maxHistory>
@@ -136,11 +136,11 @@
 
     <appender name="ASYNC_SLACK_DEV_WARN" class="ch.qos.logback.classic.AsyncAppender">
         <appender-ref ref="SLACK_DEV_WARN"/>
-        <!--        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">-->
-        <!--            <level>WARN</level>-->
-        <!--            <onMatch>ACCEPT</onMatch>-->
-        <!--            <onMismatch>DENY</onMismatch>-->
-        <!--        </filter>-->
+<!--        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">-->
+<!--            <level>WARN</level>-->
+<!--            <onMatch>ACCEPT</onMatch>-->
+<!--            <onMismatch>DENY</onMismatch>-->
+<!--        </filter>-->
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
             <level>WARN</level>
             <onMatch>ACCEPT</onMatch>
