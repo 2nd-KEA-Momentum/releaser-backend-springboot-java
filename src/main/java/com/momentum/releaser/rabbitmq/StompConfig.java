@@ -37,7 +37,7 @@ public class StompConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/notification")
-                .setAllowedOriginPatterns("*") // CORS 에러
+//                .setAllowedOriginPatterns("*") // CORS 에러
                 .withSockJS();
     }
 
