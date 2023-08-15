@@ -158,14 +158,24 @@ public class SecurityConfig {
 
                 .and()
                 .oauth2Login()
-                .authorizationEndpoint()
-                .authorizationRequestRepository(httpCookieOAuth2AuthorizationRequestRepository())
+                .authorizationEndpoint().baseUri("/oauth2/authorize")  // 소셜 로그인 url
+                .authorizationRequestRepository(cookieAuthorizationRequestRepository())  // 인증 요청을 cookie 에 저장
                 .and()
-                .userInfoEndpoint()
-                .userService(customOAuth2UserService())
+                .redirectionEndpoint().baseUri("/oauth2/callback/*")  // 소셜 인증 후 redirect url
+                .and()
+                //userService()는 OAuth2 인증 과정에서 Authentication 생성에 필요한 OAuth2User 를 반환하는 클래스를 지정한다.
+                .userInfoEndpoint().userService(customOAuth2UserService())  // 회원 정보 처리
                 .and()
                 .successHandler(oAuth2AuthenticationSuccessHandler())
                 .failureHandler(oAuth2AuthenticationFailureHandler());
+//                .authorizationEndpoint()
+//                .authorizationRequestRepository(httpCookieOAuth2AuthorizationRequestRepository())
+//                .and()
+//                .userInfoEndpoint()
+//                .userService(customOAuth2UserService())
+//                .and()
+//                .successHandler(oAuth2AuthenticationSuccessHandler())
+//                .failureHandler(oAuth2AuthenticationFailureHandler());
 
         http
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);

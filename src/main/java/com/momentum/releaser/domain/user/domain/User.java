@@ -106,6 +106,10 @@ public class User extends BaseTime {
         this.authPassword = authPassword;
     }
 
+    public void updateRole(Role role) {
+        this.role = role;
+    }
+
     public String getRoleKey() {
         return this.role.getKey();
     }
