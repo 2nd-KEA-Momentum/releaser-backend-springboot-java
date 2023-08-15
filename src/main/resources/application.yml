@@ -172,4 +172,4 @@ app:
     # 쿠키는 모바일 클라이언트에서 잘 작동하지 않기 때문에 사용하지 않습니다
     authorizedRedirectUris:
       - http://localhost:3000/oauth2/redirect
-      - https://releaser.shop/oauth2/redirect
+      - https://www.releaser.shop/oauth2/redirect
