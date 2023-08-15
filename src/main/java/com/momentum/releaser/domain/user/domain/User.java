@@ -43,6 +43,10 @@ public class User extends BaseTime {
     @Column(name = "img")
     private String img;
 
+    @Column(name = "role")
+    @Enumerated(EnumType.STRING)
+    private Role role;
+
     @NotNull
     @Column(name = "status")
     private char status;
@@ -101,4 +105,9 @@ public class User extends BaseTime {
         this.authSocial = authSocial;
         this.authPassword = authPassword;
     }
+
+    public String getRoleKey() {
+        return this.role.getKey();
+    }
+
 }
