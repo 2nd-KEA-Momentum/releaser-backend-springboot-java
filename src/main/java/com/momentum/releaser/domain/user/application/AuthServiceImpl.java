@@ -4,6 +4,7 @@ import static com.momentum.releaser.global.config.BaseResponseStatus.*;
 
 import java.util.Optional;
 
+import com.momentum.releaser.redis.refreshtoken.RefreshTokenRedisRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
@@ -47,17 +48,22 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
-    private final PasswordEncoder passwordEncoder;
-    private final UserRepository userRepository;
-    private final AuthPasswordRepository authPasswordRepository;
-    private final RefreshTokenRepository refreshTokenRepository;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final JwtTokenProvider jwtTokenProvider;
     private final ModelMapper modelMapper;
 
+    // Domain
+    private final PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final AuthPasswordRepository authPasswordRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
+
+    // Redis
     private final RedisUtil redisUtil;
     private final PasswordRedisRepository passwordRedisRepository;
+    private final RefreshTokenRedisRepository refreshTokenRedisRepository;
 
+    // RabbitMQ
     private final AmqpAdmin rabbitAdmin;
     private final DirectExchange userDirectExchange;
     private final ConnectionFactory connectionFactory;
@@ -96,7 +102,8 @@ public class AuthServiceImpl implements AuthService {
         // Token 생성
         TokenDto tokenDto = jwtTokenProvider.generateToken(authentication);
         // Refresh Token 관리
-        manageRefreshToken(userLoginReq.getEmail(), tokenDto.getRefreshToken());
+//        manageRefreshToken(userLoginReq.getEmail(), tokenDto.getRefreshToken());
+        manageRefreshTokenInRedis(userLoginReq.getEmail(), tokenDto.getRefreshToken());
         return tokenDto;
     }
 
@@ -114,7 +121,9 @@ public class AuthServiceImpl implements AuthService {
     @Transactional
     public TokenDto saveRefreshUser(String accessToken, String refreshToken) {
         // Refresh Token 검증 및 사용자 이메일 가져오기
-        String email = validateAndGetEmailFromRefreshToken(refreshToken);
+//        String email = validateAndGetEmailFromRefreshToken(refreshToken);
+        String email = validateAndGetEmailFromRefreshTokenInRedis(refreshToken);
+
         // Access Token에서 유저 정보 가져오기
         Authentication authentication = validateAndGetAuthenticationFromAccessToken(accessToken);
         // 새로운 Access Token 생성
@@ -293,6 +302,34 @@ public class AuthServiceImpl implements AuthService {
     }
 
     /**
+     * 새로 발급받은 Refresh Token을 Redis에 업데이트한다.
+     *
+     * @param email        사용자 이메일
+     * @param refreshToken 새로 발급받은 Refresh Token
+     * @author seonwoo
+     * @date 2023-08-15 (화)
+     */
+    private void manageRefreshTokenInRedis(String email, String refreshToken) {
+        // 해당 사용자의 Refresh Token 찾기
+        Optional<com.momentum.releaser.redis.refreshtoken.RefreshToken> optionalRefreshToken =
+                refreshTokenRedisRepository.findByUserEmail(email);
+
+        // 이미 해당 사용자의 Refresh Token이 존재하면 업데이트한다.
+        if (optionalRefreshToken.isPresent()) {
+            com.momentum.releaser.redis.refreshtoken.RefreshToken existingRefreshToken = optionalRefreshToken.get();
+            existingRefreshToken.updateRefreshToken(refreshToken);
+            refreshTokenRedisRepository.save(existingRefreshToken);
+        }
+
+        // 존재하지 않는다면 새로운 토큰을 생성하여 저장한다.
+        if (optionalRefreshToken.isEmpty()) {
+            com.momentum.releaser.redis.refreshtoken.RefreshToken newRefreshToken
+                    = new com.momentum.releaser.redis.refreshtoken.RefreshToken(refreshToken, email, 604800);
+            refreshTokenRedisRepository.save(newRefreshToken);
+        }
+    }
+
+    /**
      * 주어진 Refresh Token으로 사용자 이메일 확인하고 반환
      * 만약 Refresh Token이 유효하지 않거나 해당 사용자의 Refresh Token이 존재하지 않을 경우 예외를 발생시킵니다.
      *
@@ -312,6 +349,32 @@ public class AuthServiceImpl implements AuthService {
         // Refresh Token이 유효하지 않거나
         // 해당 사용자의 Refresh Token이 존재하지 않으면 예외 발생
         if (existRefreshToken.isEmpty() || !jwtTokenProvider.validateToken(refreshToken)) {
+            throw new CustomException(INVALID_REFRESH_TOKEN);
+        }
+
+        return email;
+    }
+
+    /**
+     * 주어진 Refresh Token으로 사용자 이메일을 확인하고 반환한다.
+     * 만약 Refresh Token이 유효하지 않거나 해당 사용자의 Refresh Token이 존재하지 않을 경우 예외를 발생시킨다.
+     *
+     * @param refreshToken 확인할 Refresh Token 값
+     * @return 해당 사용자의 이메일
+     * @throws CustomException Refresh Token이 유효하지 않거나 해당 사용자의 Refresh Token이 존재하지 않을 경우 발생하는 예외
+     * @author seonwoo
+     * @date 2023-08-15 (화)
+     */
+    private String validateAndGetEmailFromRefreshTokenInRedis(String refreshToken) {
+        // Refresh Token에서 사용자 이메일 추출
+        String email = jwtTokenProvider.getEmailFromToken(refreshToken);
+
+        // 해당 사용자의 Refresh Token 찾기
+        Optional<com.momentum.releaser.redis.refreshtoken.RefreshToken> existingRefreshToken
+                = refreshTokenRedisRepository.findByUserEmail(email);
+
+        // Refresh Token이 유효하지 않거나 해당 사용자의 Refresh Token이 존재하지 않으면 예외 발생
+        if (existingRefreshToken.isEmpty() || !jwtTokenProvider.validateToken(refreshToken)) {
             throw new CustomException(INVALID_REFRESH_TOKEN);
         }
 
