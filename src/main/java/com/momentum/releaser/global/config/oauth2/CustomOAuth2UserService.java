@@ -43,11 +43,11 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     }
 
     private OAuth2User processOAuth2User(OAuth2UserRequest oAuth2UserRequest, OAuth2User oAuth2User) {
-        OAuth2UserInfo oAuth2UserInfo = OAuth2UserInfoFactory.getOAuth2UserInfo(
-                oAuth2UserRequest.getClientRegistration().getRegistrationId(),
-                oAuth2User.getAttributes()
-        );
-        if(!StringUtils.hasText(oAuth2UserInfo.getEmail())) {
+        final String registrationId = oAuth2UserRequest.getClientRegistration().getRegistrationId();
+
+        OAuth2UserInfo oAuth2UserInfo = OAuth2UserInfoFactory.getOAuth2UserInfo(registrationId, oAuth2User.getAttributes());
+
+        if(StringUtils.isEmpty(oAuth2UserInfo.getEmail())) {
             throw new OAuth2AuthenticationProcessingException("OAuth2 provider에 이메일이 없습니다.");
         }
 
@@ -57,6 +57,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         if(userOptional.isPresent()) {
             user = userOptional.get();
             authSocial = userOptional.get().getAuthSocial();
+
+            // 가져온 유저의 Provider와 넘어온 Provider가 다른 경우
             if(!authSocial.getProvider().equals(AuthProvider.valueOf(oAuth2UserRequest.getClientRegistration().getRegistrationId()))) {
                 throw new OAuth2AuthenticationProcessingException("이미 등록된 멤버입니다.");
             }

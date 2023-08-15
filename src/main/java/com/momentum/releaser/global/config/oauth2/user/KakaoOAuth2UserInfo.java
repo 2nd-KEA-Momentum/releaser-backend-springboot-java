@@ -33,22 +33,4 @@ public class KakaoOAuth2UserInfo  extends OAuth2UserInfo {
         return (String) attributes.get("picture");
     }
 
-    @Override
-    public Gender getGender() {
-        Map kakaoAccount = (Map) attributes.get("kakao_account");
-        String gender = (String) kakaoAccount.get("gender");
-        return Gender.valueOf(gender.toUpperCase(Locale.ROOT));
-    }
-
-    @Override
-    public Integer getAge() {
-        Map kakaoAccount = (Map) attributes.get("kakao_account");
-        String ageRange= (String) kakaoAccount.get("age_range");
-        return Integer.parseInt(ageRange.substring(0,2));
-    }
-
-    @Override
-    public LocalDate getBirth() {
-        return null;
-    }
 }

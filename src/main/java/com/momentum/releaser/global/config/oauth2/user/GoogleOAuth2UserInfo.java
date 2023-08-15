@@ -1,11 +1,6 @@
 package com.momentum.releaser.global.config.oauth2.user;
 
-
-import java.time.LocalDate;
 import java.util.Map;
-
-import static com.momentum.releaser.global.config.oauth2.user.Gender.UNKNOWN;
-
 
 public class GoogleOAuth2UserInfo extends OAuth2UserInfo {
 
@@ -33,18 +28,4 @@ public class GoogleOAuth2UserInfo extends OAuth2UserInfo {
         return (String) attributes.get("picture");
     }
 
-    @Override
-    public Gender getGender() {
-        return UNKNOWN;
-    }
-
-    @Override
-    public Integer getAge() {
-        return 0;
-    }
-
-    @Override
-    public LocalDate getBirth() {
-        return null;
-    }
 }

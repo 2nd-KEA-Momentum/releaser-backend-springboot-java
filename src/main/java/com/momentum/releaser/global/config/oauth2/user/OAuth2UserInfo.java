@@ -23,9 +23,4 @@ public abstract class OAuth2UserInfo {
 
     public abstract String getImageUrl();
 
-    public abstract Gender getGender();
-
-    public abstract Integer getAge();
-
-    public abstract LocalDate getBirth();
 }
