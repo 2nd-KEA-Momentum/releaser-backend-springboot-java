@@ -1,5 +1,7 @@
 package com.momentum.releaser.global.config.oauth2.social;
 
+import com.momentum.releaser.global.config.oauth2.OAuth2UserInfo;
+
 import java.util.Map;
 
 public class GoogleOAuth2User extends OAuth2UserInfo {

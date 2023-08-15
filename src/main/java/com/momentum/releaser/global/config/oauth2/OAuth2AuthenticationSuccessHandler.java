@@ -1,5 +1,6 @@
 package com.momentum.releaser.global.config.oauth2;
 
+import com.momentum.releaser.domain.user.dto.TokenDto;
 import com.momentum.releaser.global.jwt.JwtTokenProvider;
 import com.momentum.releaser.global.util.CookieUtils;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Optional;
+
+import static com.momentum.releaser.global.config.oauth2.CookieAuthorizationRequestRepository.REDIRECT_URI_PARAM_COOKIE_NAME;
 
 @Slf4j
 @Component
@@ -50,10 +53,12 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         String targetUrl = redirectUri.orElse(getDefaultTargetUrl());
 
         //JWT 생성
-        UserResponseDto.TokenInfo tokenInfo = jwtTokenProvider.generateToken(authentication);
+        TokenDto token = jwtTokenProvider.generateToken(authentication);
 
-        return UriComponentsBuilder.fromUriString(targetUrl)
-                .queryParam("token", tokenInfo.getAccessToken())
+        return UriComponentsBuilder
+                .fromUriString(targetUrl)
+                .queryParam("accessToken", token.getAccessToken())
+                .queryParam("refreshToken", token.getRefreshToken())
                 .build().toUriString();
     }
 
