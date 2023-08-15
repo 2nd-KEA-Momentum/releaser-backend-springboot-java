@@ -130,10 +130,10 @@ public class SecurityConfig {
 
         http
                 .cors()
-                .and()
-                .authorizeRequests()
-                .antMatchers("/oauth2/**").permitAll()
-                .anyRequest().authenticated()
+//                .and()
+//                .authorizeRequests()
+//                .antMatchers("/oauth2/**").permitAll()
+//                .anyRequest().authenticated()
                 .and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
