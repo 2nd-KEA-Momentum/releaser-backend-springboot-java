@@ -1,6 +1,7 @@
 package com.momentum.releaser.global.config.oauth2;
 
 import com.momentum.releaser.domain.user.dto.TokenDto;
+import com.momentum.releaser.global.config.AppProperties;
 import com.momentum.releaser.global.exception.UnAuthorizedRedirectUrlException;
 import com.momentum.releaser.global.jwt.JwtTokenProvider;
 import com.momentum.releaser.global.util.CookieUtils;
@@ -27,6 +28,7 @@ import static com.momentum.releaser.global.config.oauth2.HttpCookieOAuth2Authori
 public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private final JwtTokenProvider jwtTokenProvider;
+    private final AppProperties appProperties;
     private final HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
 
     @Override
@@ -71,22 +73,18 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     }
 
     private boolean isAuthorizedRedirectUri(String uri) {
-        // TODO: OAuth2 클라이언트가 허용하는 유효한 리다이렉트 URI 목록을 가져와야 합니다.
-        List<String> authorizedRedirectUris = Arrays.asList(
-                "http://localhost:8080/oauth2/callback/google",
-                "https://www.releaser.shop/oauth2/callback/google",
-                "http://localhost:3000/oauth2/callback/google"
-        );
-
         URI clientRedirectUri = URI.create(uri);
 
-        return authorizedRedirectUris
+        return appProperties.getOauth2().getAuthorizedRedirectUris()
                 .stream()
-                .anyMatch(authorizedUri -> {
-                    // 리다이렉트 URI가 OAuth2 클라이언트가 허용하는 URI 목록 중 하나와 일치하는지 확인합니다.
-                    URI authorizedURI = URI.create(authorizedUri);
-                    return authorizedURI.getHost().equalsIgnoreCase(clientRedirectUri.getHost())
-                            && authorizedURI.getPort() == clientRedirectUri.getPort();
+                .anyMatch(authorizedRedirectUri -> {
+                    // Only validate host and port. Let the clients use different paths if they want to
+                    URI authorizedURI = URI.create(authorizedRedirectUri);
+                    if(authorizedURI.getHost().equalsIgnoreCase(clientRedirectUri.getHost())
+                            && authorizedURI.getPort() == clientRedirectUri.getPort()) {
+                        return true;
+                    }
+                    return false;
                 });
     }
 }

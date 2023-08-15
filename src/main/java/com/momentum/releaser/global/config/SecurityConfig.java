@@ -61,6 +61,7 @@ public class SecurityConfig {
     private final AuthSocialRepository authSocialRepository;
     private final CustomUserDetailsService customUserDetailsService;
     private final CustomLogoutSuccessHandler customLogoutSuccessHandler;
+    private final AppProperties appProperties;
 
     /**
      * 정적 리소스(/resources)가 Spring Security 필터에 걸리지 않도록 설정한다.
@@ -73,7 +74,7 @@ public class SecurityConfig {
 
     @Bean
     OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler() {
-        return new OAuth2AuthenticationSuccessHandler(jwtTokenProvider, httpCookieOAuth2AuthorizationRequestRepository());
+        return new OAuth2AuthenticationSuccessHandler(jwtTokenProvider, appProperties, httpCookieOAuth2AuthorizationRequestRepository());
     }
 
 //    @Bean
