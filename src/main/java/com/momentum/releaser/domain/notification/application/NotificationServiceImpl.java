@@ -100,6 +100,26 @@ public class NotificationServiceImpl implements NotificationService {
         return "릴리즈 노트 배포 동의 여부 알림이 전송되었습니다.";
     }
 
+    /**
+     * 11.3 알림 읽음 확인
+     *
+     * @param userEmail      사용자 이메일
+     * @param notificationId 알림 식별 문자
+     * @return 알림 읽음 업데이트 성공 메시지
+     * @author seonwoo
+     * @date 2023-08-15 (화)
+     */
+    @Override
+    public String modifyNotificationIsRead(String userEmail, String notificationId) {
+        // Redis에서 해당 알림 정보를 가져온다.
+        Notification notification = findNotificationById(notificationId);
+
+        // 알림 읽음 정보를 업데이트한다.
+        updateIsReadByUserEmail(userEmail, notification);
+
+        return "알림 읽음 여부 업데이트에 성공하였습니다.";
+    }
+
     // =================================================================================================================
 
     /**
@@ -251,5 +271,34 @@ public class NotificationServiceImpl implements NotificationService {
         return projectMemberRepository.findByProject(project).stream()
                 .map(m -> m.getUser().getEmail())
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * 알림 식별 문자를 이용하여 알림 데이터를 가져온다.
+     *
+     * @param notificationId 알림 식별 문자
+     * @return Notification
+     * @author seonwoo
+     * @date 2023-08-15 (화)
+     */
+    private Notification findNotificationById(String notificationId) {
+        return notificationRedisRepository.findById(notificationId)
+                .orElseThrow(() -> new CustomException(NOT_EXISTS_NOTIFICATION));
+    }
+
+    /**
+     * 해당 사용자의 알림 읽음 여부 데이터를 업데이트한다.
+     *
+     * @param email        사용자 이메일
+     * @param notification 알림 정보
+     * @author seonwoo
+     * @date 2023-08-15 (화)
+     */
+    private void updateIsReadByUserEmail(String email, Notification notification) {
+        // markByUsers에서 key 값이 현재 email 값에 해당하는 읽음 여부 값을 업데이트한다. (1: 읽음, 0: 안 읽음)
+        notification.updateMarkByUsers(email, 1);
+
+        // 업데이트된 값을 저장한다.
+        notificationRedisRepository.save(notification);
     }
 }
