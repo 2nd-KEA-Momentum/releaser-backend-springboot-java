@@ -1,6 +1,7 @@
 package com.momentum.releaser.domain.notification.api;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -60,5 +61,22 @@ public class NotificationController {
             @RequestBody @Valid NotificationApprovalRequestDto notificationApprovalRequestDto) {
 
         return new BaseResponse<>(notificationService.sendApprovalNotification(userPrincipal.getEmail(), notificationApprovalRequestDto));
+    }
+
+    /**
+     * 11.3 알림 읽음 확인
+     *
+     * @param userPrincipal  JWT, 사용자 이메일
+     * @param notificationId 알림 식별 문자
+     * @return 알림 읽음 업데이트 성공 메시지
+     * @author seonwoo
+     * @date 2023-08-15 (화)
+     */
+    @PostMapping("/{notificationId}")
+    public BaseResponse<String> notificationIsReadModify(
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
+            @PathVariable @NotBlank(message = "알림 식별 문자를 입력해 주세요.") String notificationId) {
+
+        return new BaseResponse<>(notificationService.modifyNotificationIsRead(userPrincipal.getEmail(), notificationId));
     }
 }
