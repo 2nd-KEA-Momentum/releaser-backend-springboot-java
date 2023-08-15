@@ -28,6 +28,7 @@ spring:
 logging:
   slack:
     webhook-url-prod-error: ${SLACK_WEBHOOK_URL_PROD_ERROR}
+  config: classpath:logback-spring.xml
 
 ---
 # dev
@@ -50,6 +51,7 @@ logging:
   slack:
     webhook-url-dev-warn: ${SLACK_WEBHOOK_URL_DEV_WARN}
     webhook-url-dev-error: ${SLACK_WEBHOOK_URL_DEV_ERROR}
+  config: classpath:logback-spring.xml
 
 ---
 # local
