@@ -29,4 +29,15 @@ public interface NotificationService {
      * @date 2023-08-14 (월)
      */
     String sendApprovalNotification(String userEmail, NotificationApprovalRequestDto notificationApprovalRequestDto);
+
+    /**
+     * 11.3 알림 읽음 확인
+     *
+     * @param userEmail      사용자 이메일
+     * @param notificationId 알림 식별 문자
+     * @return 알림 읽음 업데이트 성공 메시지
+     * @author seonwoo
+     * @date 2023-08-15 (화)
+     */
+    String modifyNotificationIsRead(String userEmail, String notificationId);
 }

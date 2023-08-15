@@ -46,4 +46,16 @@ public class Notification {
         this.markByUsers = markByUsers;
         this.expiredTime = expiredTime;
     }
+
+    /**
+     * 사용자 읽음 여부 데이터를 업데이트한다.
+     *
+     * @author seonwoo
+     * @date 2023-08-15 (화)
+     * @param key 사용자 이메일
+     * @param value 읽음 여부 데이터
+     */
+    public void updateMarkByUsers(String key, int value) {
+        this.markByUsers.put(key, value);
+    }
 }

@@ -80,12 +80,12 @@ public class RabbitMQConfig {
         return new Jackson2JsonMessageConverter();
     }
 
-    @Bean
-    public Jackson2ObjectMapperBuilder jackson2ObjectMapperBuilder() {
-        Jackson2ObjectMapperBuilder builder = new Jackson2ObjectMapperBuilder();
-        builder.modules(new JavaTimeModule()); // Java 8 날짜/시간 모듈 추가
-        return builder;
-    }
+//    @Bean
+//    public Jackson2ObjectMapperBuilder jackson2ObjectMapperBuilder() {
+//        Jackson2ObjectMapperBuilder builder = new Jackson2ObjectMapperBuilder();
+//        builder.modules(new JavaTimeModule()); // Java 8 날짜/시간 모듈 추가
+//        return builder;
+//    }
 
     /**
      * 동적으로 큐를 생성한다.
@@ -119,8 +119,8 @@ public class RabbitMQConfig {
      * @author seonwoo
      * @date 2023-08-08 (화)
      */
-    @Bean
-    public Module dateTimeModule() {
-        return new JavaTimeModule();
-    }
+//    @Bean
+//    public Module dateTimeModule() {
+//        return new JavaTimeModule();
+//    }
 }
