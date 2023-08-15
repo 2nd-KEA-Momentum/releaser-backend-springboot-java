@@ -92,7 +92,6 @@ dependencies {
     implementation 'ch.qos.logback.contrib:logback-json-classic:0.1.5'
     implementation 'net.logstash.logback:logstash-logback-encoder:6.1'
     implementation 'com.github.maricn:logback-slack-appender:1.4.0'
-    implementation("net.gpedro.integrations.slack:slack-webhook:1.4.0")
 
     // RabbitMQ
     implementation 'org.springframework.boot:spring-boot-starter-amqp'
@@ -101,6 +100,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-reactor-netty' // 외부 브로커 사용 위해
     implementation 'io.netty:netty-resolver-dns-native-macos:4.1.68.Final:osx-aarch_64' // macOS용
     implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.12.4' // LocalDateTime
+    implementation 'io.netty:netty-buffer:4.1.92.Final'
 
     // WebSocket
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
