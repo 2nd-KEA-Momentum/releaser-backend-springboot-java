@@ -8,8 +8,8 @@
               value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %clr(%5level) %cyan(%logger) - %msg%n"/>
     <property name="FILE_LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %5level %logger - %msg%n"/>
     <property name="SLACK_LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %5level %logger %n %n %msg %n"/>
-    <springProperty name="SLACK_WEBHOOK_URL_DEV_WARN" source="${logging.slack.webhook-url-dev-warn"/>
-    <springProperty name="SLACK_WEBHOOK_URL_DEV_ERROR" source="${logging.slack.webhook-url-dev-error"/>
+    <springProperty name="SLACK_WEBHOOK_URL_DEV_WARN" source="${logging.slack.webhook-url-dev-warn}"/>
+    <springProperty name="SLACK_WEBHOOK_URL_DEV_ERROR" source="${logging.slack.webhook-url-dev-error}"/>
     <springProperty name="SLACK_WEBHOOK_URL_PROD_ERROR" source="${logging.slack.webhook-url-prod-error}"/>
 
     <!-- Console 출력 -->
@@ -46,7 +46,8 @@
         </encoder>
 
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <fileNamePattern>./logs/info-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+<!--            <fileNamePattern>./logs/info-%d{yyyy-MM-dd}.%i.log</fileNamePattern>-->
+            <fileNamePattern>/home/ubuntu/releaser-app/logs/info-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
             <maxFileSize>100MB</maxFileSize>
             <maxHistory>30</maxHistory>
         </rollingPolicy>
@@ -67,7 +68,8 @@
                     <pattern>
                         {
                         "timestamp": "%date{yyyyMMdd HHmmss.SSSSSS}",
-                        "message": "%yellow(%message)"
+                        "message": "%yellow(%message)",
+                        "stacktrace": "%rEx"
                         }
                     </pattern>
                 </pattern>
@@ -79,7 +81,8 @@
         </encoder>
 
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <fileNamePattern>./logs/warn-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+<!--            <fileNamePattern>./logs/warn-%d{yyyy-MM-dd}.%i.log</fileNamePattern>-->
+            <fileNamePattern>/home/ubuntu/releaser-app/logs/warn-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
             <maxFileSize>100MB</maxFileSize>
             <maxHistory>30</maxHistory>
         </rollingPolicy>
@@ -113,7 +116,8 @@
         </encoder>
 
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <fileNamePattern>./logs/error-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+<!--            <fileNamePattern>./logs/error-%d{yyyy-MM-dd}.%i.log</fileNamePattern>-->
+            <fileNamePattern>/home/ubuntu/releaser-app/logs/error-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
             <maxFileSize>100MB</maxFileSize>
             <maxHistory>30</maxHistory>
         </rollingPolicy>
@@ -129,10 +133,14 @@
         <iconEmoji>:eyes:</iconEmoji>
         <colorCoding>true</colorCoding>
     </appender>
+
     <appender name="ASYNC_SLACK_DEV_WARN" class="ch.qos.logback.classic.AsyncAppender">
         <appender-ref ref="SLACK_DEV_WARN"/>
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <!-- WARN 레벨만 전달되도록 한다. -->
             <level>WARN</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
         </filter>
     </appender>
 
@@ -145,6 +153,7 @@
         <iconEmoji>:rotating_light:</iconEmoji>
         <colorCoding>true</colorCoding>
     </appender>
+
     <appender name="ASYNC_SLACK_DEV_ERROR" class="ch.qos.logback.classic.AsyncAppender">
         <appender-ref ref="SLACK_DEV_ERROR"/>
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
@@ -161,6 +170,7 @@
         <iconEmoji>:rotating_light:</iconEmoji>
         <colorCoding>true</colorCoding>
     </appender>
+
     <appender name="ASYNC_SLACK_PROD_ERROR" class="ch.qos.logback.classic.AsyncAppender">
         <appender-ref ref="SLACK_PROD_ERROR"/>
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
@@ -183,6 +193,7 @@
             <appender-ref ref="WARN"/>
             <appender-ref ref="ERROR"/>
             <appender-ref ref="ASYNC_SLACK_DEV_WARN"/>
+            <appender-ref ref="ASYNC_SLACK_DEV_ERROR"/>
         </root>
     </springProfile>
 
@@ -192,6 +203,7 @@
             <appender-ref ref="INFO"/>
             <appender-ref ref="WARN"/>
             <appender-ref ref="ERROR"/>
+            <appender-ref ref="ASYNC_SLACK_PROD_ERROR"/>
         </root>
     </springProfile>
 
