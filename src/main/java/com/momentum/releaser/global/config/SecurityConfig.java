@@ -61,6 +61,9 @@ public class SecurityConfig {
     private final AuthSocialRepository authSocialRepository;
     private final CustomUserDetailsService customUserDetailsService;
     private final CustomLogoutSuccessHandler customLogoutSuccessHandler;
+    private final CookieAuthorizationRequestRepository cookieAuthorizationRequestRepository;
+    private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
+    private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
 
     /**
      * 정적 리소스(/resources)가 Spring Security 필터에 걸리지 않도록 설정한다.
@@ -71,10 +74,10 @@ public class SecurityConfig {
         return (web) -> web.ignoring().antMatchers("/images/**");
     }
 
-    @Bean
-    OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler() {
-        return new OAuth2AuthenticationSuccessHandler(jwtTokenProvider, httpCookieOAuth2AuthorizationRequestRepository());
-    }
+//    @Bean
+//    OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler() {
+//        return new OAuth2AuthenticationSuccessHandler(jwtTokenProvider, httpCookieOAuth2AuthorizationRequestRepository());
+//    }
 
 //    @Bean
 //    CustomUserDetailsService customUserDetailsService(){
@@ -86,15 +89,15 @@ public class SecurityConfig {
         return new CustomOAuth2UserService(userRepository, authSocialRepository, authPasswordRepository);
     }
 
-    @Bean
-    OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler() {
-        return new OAuth2AuthenticationFailureHandler(httpCookieOAuth2AuthorizationRequestRepository());
-    }
+//    @Bean
+//    OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler() {
+//        return new OAuth2AuthenticationFailureHandler(httpCookieOAuth2AuthorizationRequestRepository());
+//    }
 
-    @Bean
-    HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository() {
-        return new HttpCookieOAuth2AuthorizationRequestRepository();
-    }
+//    @Bean
+//    HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository() {
+//        return new HttpCookieOAuth2AuthorizationRequestRepository();
+//    }
 
     @Bean
     AuthenticationManager authenticationManager() {
@@ -159,23 +162,15 @@ public class SecurityConfig {
                 .and()
                 .oauth2Login()
                 .authorizationEndpoint().baseUri("/oauth2/authorize")  // 소셜 로그인 url
-                .authorizationRequestRepository(cookieAuthorizationRequestRepository())  // 인증 요청을 cookie 에 저장
+                .authorizationRequestRepository(cookieAuthorizationRequestRepository)  // 인증 요청을 cookie 에 저장
                 .and()
                 .redirectionEndpoint().baseUri("/oauth2/callback/*")  // 소셜 인증 후 redirect url
                 .and()
                 //userService()는 OAuth2 인증 과정에서 Authentication 생성에 필요한 OAuth2User 를 반환하는 클래스를 지정한다.
                 .userInfoEndpoint().userService(customOAuth2UserService())  // 회원 정보 처리
                 .and()
-                .successHandler(oAuth2AuthenticationSuccessHandler())
-                .failureHandler(oAuth2AuthenticationFailureHandler());
-//                .authorizationEndpoint()
-//                .authorizationRequestRepository(httpCookieOAuth2AuthorizationRequestRepository())
-//                .and()
-//                .userInfoEndpoint()
-//                .userService(customOAuth2UserService())
-//                .and()
-//                .successHandler(oAuth2AuthenticationSuccessHandler())
-//                .failureHandler(oAuth2AuthenticationFailureHandler());
+                .successHandler(oAuth2AuthenticationSuccessHandler)
+                .failureHandler(oAuth2AuthenticationFailureHandler);
 
         http
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);

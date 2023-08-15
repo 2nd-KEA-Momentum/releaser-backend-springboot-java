@@ -14,4 +14,6 @@ public interface AuthSocialRepository extends JpaRepository<AuthSocial, Long> {
 
     // Optional<User>를 인자로 받아 해당하는 AuthSocial 찾기
     Optional<AuthSocial> findByUser(Optional<User> userOptional);
+    AuthSocial findByUser(User user);
 }
+

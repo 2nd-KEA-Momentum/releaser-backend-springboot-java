@@ -13,6 +13,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
+import static com.momentum.releaser.global.config.oauth2.CookieAuthorizationRequestRepository.REDIRECT_URI_PARAM_COOKIE_NAME;
+
 @Component
 @RequiredArgsConstructor
 public class OAuth2AuthenticationFailureHandler extends SimpleUrlAuthenticationFailureHandler {

@@ -25,7 +25,7 @@ import static com.momentum.releaser.global.config.oauth2.CookieAuthorizationRequ
 @RequiredArgsConstructor
 public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
-    @Value("${oauth.authorizedRedirectUri}")
+    @Value("${spring.security.oauth2.redirect_uri}")
     private String redirectUri;
     private final JwtTokenProvider jwtTokenProvider;
     private final CookieAuthorizationRequestRepository cookieAuthorizationRequestRepository;

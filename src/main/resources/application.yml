@@ -118,7 +118,7 @@ spring:
             client-id: ${SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_ID}
             client-secret: ${SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET}
             scope: email,profile
-            redirect_uri: https://releaser.shop/oauth2/callback/google
+            redirect_uri: https://releaser.shop/login/oauth2/code/google
 
   mail:
     host: smtp.gmail.com

@@ -1,6 +1,9 @@
 package com.momentum.releaser.global.jwt;
+
+import com.momentum.releaser.domain.user.domain.Role;
 import com.momentum.releaser.domain.user.domain.AuthPassword;
 import com.momentum.releaser.domain.user.domain.User;
+import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -11,11 +14,15 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+//import static com.amazonaws.services.ec2.model.PrincipalType.Role;
+
 public class UserPrincipal implements OAuth2User, UserDetails {
     private Long id;
     private String email;
     private String password;
     private Collection<? extends GrantedAuthority> authorities;
+
+    @Setter
     private Map<String, Object> attributes;
 
     public UserPrincipal(Long id, String email, String password, Collection<? extends GrantedAuthority> authorities) {
@@ -25,9 +32,18 @@ public class UserPrincipal implements OAuth2User, UserDetails {
         this.authorities = authorities;
     }
 
+    public static UserPrincipal create(User user, AuthPassword authPassword, Map<String, Object> attributes) {
+        List<GrantedAuthority> authorities = Collections.singletonList(
+                new SimpleGrantedAuthority(Role.ROLE_USER.name())
+        );
+        UserPrincipal userPrincipal = new UserPrincipal(user.getUserId(), user.getEmail(), authPassword.getPassword(), authorities);
+        userPrincipal.setAttributes(attributes);
+        return userPrincipal;
+    }
+
     public static UserPrincipal create(User user, AuthPassword authPassword) {
         List<GrantedAuthority> authorities = Collections.
-                singletonList(new SimpleGrantedAuthority("ROLE_USER"));
+                singletonList(new SimpleGrantedAuthority(Role.ROLE_USER.name()));
 
         return new UserPrincipal(
                 user.getUserId(),
@@ -35,12 +51,6 @@ public class UserPrincipal implements OAuth2User, UserDetails {
                 authPassword.getPassword(),
                 authorities
         );
-    }
-
-    public static UserPrincipal create(User user, AuthPassword authPassword, Map<String, Object> attributes) {
-        UserPrincipal userPrincipal = UserPrincipal.create(user, authPassword);
-        userPrincipal.setAttributes(attributes);
-        return userPrincipal;
     }
 
     public Long getId() {

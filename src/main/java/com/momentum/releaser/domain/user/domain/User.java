@@ -6,6 +6,7 @@ import java.util.List;
 import javax.persistence.*;
 
 import com.momentum.releaser.domain.issue.domain.IssueOpinion;
+import com.momentum.releaser.global.config.oauth2.OAuth2UserInfo;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
@@ -98,20 +99,16 @@ public class User extends BaseTime {
         this.img = img;
     }
 
+    public void updateInfo(OAuth2UserInfo oAuth2UserInfo) {
+        this.name = oAuth2UserInfo.getName();
+        this.email = oAuth2UserInfo.getEmail();
+    }
+
     public void updateAuthPassword(AuthPassword authPassword) {
         this.authPassword = authPassword;
     }
-    public void updateAuth(AuthSocial authSocial, AuthPassword authPassword) {
+    public void updateAuthSocial(AuthSocial authSocial) {
         this.authSocial = authSocial;
-        this.authPassword = authPassword;
-    }
-
-    public void updateRole(Role role) {
-        this.role = role;
-    }
-
-    public String getRoleKey() {
-        return this.role.getKey();
     }
 
 }
