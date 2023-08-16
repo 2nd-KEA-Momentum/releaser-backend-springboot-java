@@ -140,7 +140,7 @@ public class SecurityConfig {
                 .authenticationEntryPoint(new RestAuthenticationEntryPoint())
                 .and()
                 .authorizeRequests()
-                .antMatchers("/api/auth/**").permitAll()
+                .antMatchers("/api/auth/**", "/oauth2/**").permitAll()
                 .antMatchers("/notification/**").permitAll()
                 .anyRequest().authenticated()
 
