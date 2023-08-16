@@ -67,13 +67,13 @@ public class SecurityConfig {
 
     /**
      * 정적 리소스(/resources)가 Spring Security 필터에 걸리지 않도록 설정한다.
+     *
      * @return WebSecurityCustomizer
      */
 //    @Bean
 //    public WebSecurityCustomizer configure() {
 //        return (web) -> web.ignoring().antMatchers("/images/**");
 //    }
-
     @Bean
     OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler() {
         return new OAuth2AuthenticationSuccessHandler(jwtTokenProvider, appProperties, httpCookieOAuth2AuthorizationRequestRepository());
@@ -122,10 +122,6 @@ public class SecurityConfig {
 
         http
                 .cors()
-//                .and()
-//                .authorizeRequests()
-//                .antMatchers("/oauth2/**").permitAll()
-//                .anyRequest().authenticated()
                 .and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
