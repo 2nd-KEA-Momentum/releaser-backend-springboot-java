@@ -1,10 +1,17 @@
+/src/main/generated/
+
+#application-aws.yml
+#application-credentials.yml
+#application-dev.yml
+
 HELP.md
 .gradle
 build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
-application.yml
+**/*.log
+/logs
 
 ### STS ###
 .apt_generated

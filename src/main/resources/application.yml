@@ -1,0 +1,176 @@
+spring:
+  profiles:
+    group:
+      prod: prod, common
+      dev: dev, common
+      local: local, common
+
+    # 활성 프로필 설정
+    active: dev
+
+---
+# prod
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+  rabbitmq:
+    host: ${RABBITMQ_HOST}
+    port: ${RABBITMQ_PORT}
+    username: ${RABBITMQ_USERNAME}
+    password: ${RABBITMQ_PASSWORD}
+
+  redis:
+    host: ${REDIS_PROD_HOST}
+    port: ${REDIS_PROD_PORT}
+
+logging:
+  slack:
+    webhook-url-prod-error: ${SLACK_WEBHOOK_URL_PROD_ERROR}
+  config: classpath:logback-spring.xml
+
+---
+# dev
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+  rabbitmq:
+    host: ${RABBITMQ_HOST}
+    port: ${RABBITMQ_PORT}
+    username: ${RABBITMQ_USERNAME}
+    password: ${RABBITMQ_PASSWORD}
+
+  redis:
+    host: ${REDIS_LOCAL_HOST}
+    port: ${REDIS_LOCAL_PORT}
+
+logging:
+  slack:
+    webhook-url-dev-warn: ${SLACK_WEBHOOK_URL_DEV_WARN}
+    webhook-url-dev-error: ${SLACK_WEBHOOK_URL_DEV_ERROR}
+  config: classpath:logback-spring.xml
+
+---
+# local
+spring:
+  config:
+    activate:
+      on-profile: local
+
+  rabbitmq:
+    host: ${RABBITMQ_HOST}
+    port: ${RABBITMQ_PORT}
+    username: ${RABBITMQ_USERNAME}
+    password: ${RABBITMQ_PASSWORD}
+
+  redis:
+    host: ${REDIS_LOCAL_HOST}
+    port: ${REDIS_LOCAL_PORT}
+
+rabbitmq:
+  user:
+    queue.name: ${RABBITMQ_USER_QUEUE}
+    exchange.name: ${RABBITMQ_USER_EXCHANGE}
+    routing.key: ${RABBITMQ_USER_ROUTINGKEY}
+
+---
+# common
+server:
+  port: 8080
+
+spring:
+  config:
+    activate:
+      on-profile: common
+
+  thymeleaf:
+    prefix: classpath:templates/
+    check-template-location: true
+    suffix: .html
+    mode: HTML5
+    cache: false
+
+  datasource:
+    url: ${DEV_DB_URL}
+    username: ${DEV_DB_USERNAME}
+    password: ${DEV_DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+        highlight_sql: true
+        use_sql_comments: true
+        dialect: com.momentum.releaser.global.config.MySQL8DialectCustom
+
+  main:
+    allow-bean-definition-overriding: true
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_ID}
+            client-secret: ${SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET}
+            scope: email,profile
+            redirectUri: "{baseUrl}/oauth2/callback/{registrationId}"
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+
+logging.level:
+  org.hibernate.SQL: debug
+
+jwt:
+  secret:
+    key: ${JWT_SECRET_KEY}
+
+cloud:
+  aws:
+    s3:
+      bucket: ${AWS_BUCKET_NAME}
+    credentials:
+      access-key: ${AWS_ACCESS_KEY}
+      secret-key: ${AWS_SECRET_KEY}
+    region:
+      static: ap-northeast-2
+      auto: false
+    stack:
+      auto: false
+
+url:
+  image:
+    banner-project: ${URL_BANNER_PROJECT}
+    logo-team: ${URL_LOGO_TEAM}
+
+stomp:
+  relay.port: ${STOMP_RELAY_PORT}
+
+app:
+  oauth2:
+    # OAuth2 공급자로 성공적으로 인증 한 후 사용자에 대한 인증 토큰을 생성하고 토큰을
+    # 프론트 엔드 클라이언트가 /oauth2/authorize 요청에서 지정한 redirectUri 입니다.
+    # 쿠키는 모바일 클라이언트에서 잘 작동하지 않기 때문에 사용하지 않습니다
+    authorizedRedirectUris:
+      - http://localhost:3000/oauth2/redirect
+      - https://www.releaser.shop/oauth2/redirect

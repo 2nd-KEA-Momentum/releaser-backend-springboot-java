@@ -4,9 +4,14 @@ package com.momentum.releaser.global.config;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
+//@EnableWebSecurity
 public class SpringConfig {
+
 
     /**
      * - 반복되는 객체 간 변환을 간단하게 줄이는 데 사용하는 ModelMapper

@@ -26,11 +26,15 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-rest'
     implementation 'org.springframework.boot:spring-boot-starter-hateoas'
     implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'io.jsonwebtoken:jjwt:0.9.1'
-    compileOnly 'org.projectlombok:lombok'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+
+    //jwt
+    compileOnly group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.2'
+    runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.2'
+    runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.2'
+
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     runtimeOnly 'com.mysql:mysql-connector-j'
-    annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
     // queryDSL 설정
@@ -50,16 +54,64 @@ dependencies {
     // MapStruct
     implementation 'org.mapstruct:mapstruct:1.4.2.Final'
     implementation 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.4.2.Final'
     annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
 
     // Validation
     implementation 'org.springframework.boot:spring-boot-starter-validation'
 
+    // Gson
+    implementation 'com.google.code.gson:gson:2.9.0'
+
+    // redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation 'org.springframework.session:spring-session-data-redis'
+    implementation 'io.lettuce:lettuce-core:6.2.1.RELEASE'
+
+    // S3
+    implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+
     // Spring Security
     implementation "org.springframework.boot:spring-boot-starter-security"
     implementation "org.springframework.security:spring-security-test"
+
+    //oauth2
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+
+    // 사용자 이메일 인증
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+
+    // Properties에서 오토컴플릿을 지원하도록 하기 위한 의존성 추가
+    compileOnly 'org.springframework.boot:spring-boot-configuration-processor'
+    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
+
+    // Logging
+    implementation 'ch.qos.logback.contrib:logback-jackson:0.1.5'
+    implementation 'ch.qos.logback.contrib:logback-json-classic:0.1.5'
+    implementation 'net.logstash.logback:logstash-logback-encoder:6.1'
+    implementation 'com.github.maricn:logback-slack-appender:1.4.0'
+    implementation("net.gpedro.integrations.slack:slack-webhook:1.4.0")
+
+    // RabbitMQ
+    implementation 'org.springframework.boot:spring-boot-starter-amqp'
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
+
+    implementation 'org.springframework.boot:spring-boot-starter-reactor-netty' // 외부 브로커 사용 위해
+    implementation 'io.netty:netty-resolver-dns-native-macos:4.1.68.Final:osx-aarch_64' // macOS용
+    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.12.4' // LocalDateTime
+
+    // WebSocket
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+    implementation group: 'org.webjars', name: 'sockjs-client', version: '1.1.2'
+    implementation group: 'org.webjars', name: 'stomp-websocket', version: '2.3.3'
+    implementation group: 'org.webjars', name: 'webjars-locator-core', version: '0.47'
 }
+
+//tasks.named('compileJava') {
+//    inputs.file(tasks.named('processResources'))
+//}
 
 tasks.named('test') {
     useJUnitPlatform()
@@ -82,4 +134,6 @@ sourceSets {
 clean {
     delete file(generated)
 }
-//querydsl 추가 끝
+jar{
+    enabled = false
+}
