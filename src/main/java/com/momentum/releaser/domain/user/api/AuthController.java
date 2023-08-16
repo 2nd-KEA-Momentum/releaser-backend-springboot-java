@@ -7,6 +7,7 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+import com.nimbusds.oauth2.sdk.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -167,5 +168,14 @@ public class AuthController {
             @Valid @RequestBody SavePasswordRequestDTO savePasswordRequestDTO) {
 
         return new BaseResponse<>(authService.savePassword(email, savePasswordRequestDTO));
+    }
+
+    @GetMapping(value = "token")
+    public String token(@RequestParam(name = "accessToken") String token, @RequestParam(required = false) String error) {
+        if (StringUtils.isNotBlank(error)) {
+            return error;
+        } else {
+            return token;
+        }
     }
 }
