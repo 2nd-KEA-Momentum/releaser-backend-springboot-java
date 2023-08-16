@@ -73,7 +73,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 oAuth2UserInfo.getName(),
                 oAuth2UserInfo.getEmail(),
                 oAuth2UserInfo.getImageUrl(),
-                'Y');
+                'Y'
+        );
         AuthSocial authSocial = new AuthSocial(
                 user,
                 AuthProvider.valueOf(oAuth2UserRequest.getClientRegistration().getRegistrationId()),

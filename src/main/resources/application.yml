@@ -28,6 +28,7 @@ spring:
 logging:
   slack:
     webhook-url-prod-error: ${SLACK_WEBHOOK_URL_PROD_ERROR}
+  config: classpath:logback-spring.xml
 
 ---
 # dev
@@ -118,6 +119,7 @@ spring:
             client-id: ${SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_ID}
             client-secret: ${SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET}
             scope: email,profile
+            redirectUri: "https://www.releaser.shop/oauth2/callback/{registrationId}"
 
   mail:
     host: smtp.gmail.com
@@ -170,4 +172,5 @@ app:
     # 쿠키는 모바일 클라이언트에서 잘 작동하지 않기 때문에 사용하지 않습니다
     authorizedRedirectUris:
       - http://localhost:3000/oauth2/redirect
+      - http://localhost:8080/oauth2/redirect
       - https://www.releaser.shop/oauth2/redirect
