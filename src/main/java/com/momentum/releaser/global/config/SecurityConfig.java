@@ -130,10 +130,6 @@ public class SecurityConfig {
 
         http
                 .cors()
-//                .and()
-//                .authorizeRequests()
-//                .antMatchers("/oauth2/**").permitAll()
-//                .anyRequest().authenticated()
                 .and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -148,9 +144,9 @@ public class SecurityConfig {
                 .authenticationEntryPoint(new RestAuthenticationEntryPoint())
                 .and()
                 .authorizeRequests()
-                .antMatchers("/api/auth/**").permitAll()
-                .antMatchers("/notification/**").permitAll()
-                .anyRequest().authenticated()
+                .antMatchers("/oauth2/**", "/login/**", "/api/auth/**", "/notification/**").permitAll()
+                .anyRequest()
+                .authenticated()
 
                 .and()
                 .logout()
@@ -163,9 +159,6 @@ public class SecurityConfig {
 
                 .and()
                 .oauth2Login()
-                .authorizationEndpoint()
-                .authorizationRequestRepository(httpCookieOAuth2AuthorizationRequestRepository())
-                .and()
                 .userInfoEndpoint()
                 .userService(customOAuth2UserService())
                 .and()

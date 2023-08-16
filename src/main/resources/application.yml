@@ -123,13 +123,14 @@ spring:
           kakao:
             client-id: ${OAUTH2_KAKAO_CLIENT_ID}
             client-secret: ${OAUTH2_KAKAO_CLIENT_SECRET}
-            redirect-uri: ${OAUTH2_KAKAO_REDIRECT_URI}
-            client-authentication-method: POST
+            redirect-uri: ${OAUTH_KAKAO_REDIRECT_URI}
             authorization-grant-type: authorization_code
+            client-authentication-method: POST
+            client-name: Kakao
             scope:
               - profile_nickname
+              - profile_image
               - account_email
-            client-name: Kakao
         provider:
           kakao:
             authorization-uri: ${OAUTH2_KAKAO_AUTHORIZATION_URI}

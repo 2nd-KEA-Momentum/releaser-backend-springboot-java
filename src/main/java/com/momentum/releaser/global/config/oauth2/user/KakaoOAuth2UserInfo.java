@@ -1,36 +1,35 @@
 package com.momentum.releaser.global.config.oauth2.user;
 
-
-import java.time.LocalDate;
-import java.util.Locale;
 import java.util.Map;
 
 public class KakaoOAuth2UserInfo  extends OAuth2UserInfo {
 
+    private final Map<String, Object> kakaoAccountAttributes;
+    private final Map<String, Object> profileAttributes;
+
     public KakaoOAuth2UserInfo(Map<String, Object> attributes) {
         super(attributes);
+        this.kakaoAccountAttributes = (Map<String, Object>) attributes.get("kakao_account");
+        this.profileAttributes = (Map<String, Object>) attributes.get("profile");
     }
 
     @Override
     public String getId() {
-        return (String) attributes.get("sub");
+        return attributes.get("sub").toString();
     }
 
     @Override
     public String getName() {
-        Map properties = (Map) attributes.get("properties");
-        return (String) properties.get("nickname");
+        return profileAttributes.get("nickname").toString();
     }
 
     @Override
     public String getEmail() {
-        Map kakaoAccount = (Map) attributes.get("kakao_account");
-        return (String) kakaoAccount.get("email");
+        return kakaoAccountAttributes.get("email").toString();
     }
 
     @Override
     public String getImageUrl() {
-        return (String) attributes.get("picture");
+        return profileAttributes.get("image").toString();
     }
-
 }
