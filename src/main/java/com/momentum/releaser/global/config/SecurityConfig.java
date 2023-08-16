@@ -61,23 +61,23 @@ public class SecurityConfig {
     private final AuthSocialRepository authSocialRepository;
     private final CustomUserDetailsService customUserDetailsService;
     private final CustomLogoutSuccessHandler customLogoutSuccessHandler;
+    private final AppProperties appProperties;
     private final CookieAuthorizationRequestRepository cookieAuthorizationRequestRepository;
-    private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
-    private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
+
 
     /**
      * 정적 리소스(/resources)가 Spring Security 필터에 걸리지 않도록 설정한다.
+     *
      * @return WebSecurityCustomizer
      */
-    @Bean
-    public WebSecurityCustomizer configure() {
-        return (web) -> web.ignoring().antMatchers("/images/**");
-    }
-
 //    @Bean
-//    OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler() {
-//        return new OAuth2AuthenticationSuccessHandler(jwtTokenProvider, httpCookieOAuth2AuthorizationRequestRepository());
+//    public WebSecurityCustomizer configure() {
+//        return (web) -> web.ignoring().antMatchers("/images/**");
 //    }
+    @Bean
+    OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler() {
+        return new OAuth2AuthenticationSuccessHandler(jwtTokenProvider, appProperties, httpCookieOAuth2AuthorizationRequestRepository());
+    }
 
 //    @Bean
 //    CustomUserDetailsService customUserDetailsService(){
@@ -89,15 +89,15 @@ public class SecurityConfig {
         return new CustomOAuth2UserService(userRepository, authSocialRepository, authPasswordRepository);
     }
 
-//    @Bean
-//    OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler() {
-//        return new OAuth2AuthenticationFailureHandler(httpCookieOAuth2AuthorizationRequestRepository());
-//    }
+    @Bean
+    OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler() {
+        return new OAuth2AuthenticationFailureHandler(httpCookieOAuth2AuthorizationRequestRepository());
+    }
 
-//    @Bean
-//    HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository() {
-//        return new HttpCookieOAuth2AuthorizationRequestRepository();
-//    }
+    @Bean
+    HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository() {
+        return new HttpCookieOAuth2AuthorizationRequestRepository();
+    }
 
     @Bean
     AuthenticationManager authenticationManager() {
@@ -117,60 +117,52 @@ public class SecurityConfig {
         return new JwtAuthenticationFilter(jwtTokenProvider);
     }
 
-    /**
-     * httpBasic().disable().csrf().disable(): rest api이므로 basic auth 및 csrf 보안을 사용하지 않는다는 설정
-     * sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS): JWT를 사용하기 때문에 세션을 사용하지 않는다는 설정
-     * antMatchers().permitAll(): 해당 API에 대해서는 모든 요청을 허가한다는 설정
-     * antMatchers().hasRole("USER"): USER 권한이 있어야 요청할 수 있다는 설정
-     * anyRequest().authenticated(): 이 밖에 모든 요청에 대해서 인증을 필요로 한다는 설정
-     * addFilterBefore(new JwtAUthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class): JWT 인증을 위하여 직접 구현한 필터를 UsernamePasswordAuthenticationFilter 전에 실행하겠다는 설정
-     * passwordEncoder: JWT를 사용하기 위해서는 기본적으로 password encoder가 필요한데, 여기서는 Bycrypt encoder를 사용
-     */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-
         http
                 .cors()
-                .and()
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                .csrf()
-                .disable()
-                .formLogin()
-                .disable()
-                .httpBasic()
-                .disable()
-                .exceptionHandling()
-                .authenticationEntryPoint(new RestAuthenticationEntryPoint())
-                .and()
-                .authorizeRequests()
+                .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+
+                .and().csrf().disable().formLogin().disable().httpBasic().disable().exceptionHandling().authenticationEntryPoint(new RestAuthenticationEntryPoint())
+                .and().authorizeRequests()
                 .antMatchers("/api/auth/**").permitAll()
                 .antMatchers("/notification/**").permitAll()
-                .anyRequest().authenticated()
+                .antMatchers("/oauth2/**").permitAll()
+                .anyRequest().authenticated();
 
-                .and()
+        http
                 .logout()
                 .logoutUrl("/api/auth/logout") // 로그아웃 URL을 지정합니다.
                 .logoutSuccessHandler(customLogoutSuccessHandler) // 로그아웃 성공 후의 처리를 위해 CustomLogoutSuccessHandler를 등록합니다.
                 .deleteCookies("JSESSIONID") // 로그아웃 시 삭제할 쿠키를 지정합니다.
                 .clearAuthentication(true) // 인증 정보를 삭제합니다.
                 .invalidateHttpSession(true) // 세션을 무효화합니다.
-                .permitAll() // 로그아웃은 모두에게 허용합니다.
+                .permitAll(); // 로그아웃은 모두에게 허용합니다.
 
-                .and()
+        http
                 .oauth2Login()
-                .authorizationEndpoint().baseUri("/oauth2/authorize")  // 소셜 로그인 url
-                .authorizationRequestRepository(cookieAuthorizationRequestRepository)  // 인증 요청을 cookie 에 저장
+                .userInfoEndpoint()
+                .userService(customOAuth2UserService())
                 .and()
-                .redirectionEndpoint().baseUri("/oauth2/callback/*")  // 소셜 인증 후 redirect url
-                .and()
-                //userService()는 OAuth2 인증 과정에서 Authentication 생성에 필요한 OAuth2User 를 반환하는 클래스를 지정한다.
-                .userInfoEndpoint().userService(customOAuth2UserService())  // 회원 정보 처리
-                .and()
-                .successHandler(oAuth2AuthenticationSuccessHandler)
-                .failureHandler(oAuth2AuthenticationFailureHandler);
+                .successHandler(oAuth2AuthenticationSuccessHandler())
+                .failureHandler(oAuth2AuthenticationFailureHandler());
+
+//        http
+//                .oauth2Login()
+//                .authorizationEndpoint()
+//                .baseUri("/oauth2/authorize")
+//                .authorizationRequestRepository(cookieAuthorizationRequestRepository)
+//                .and()
+//                .redirectionEndpoint()
+//                .baseUri("/oauth2/callback/*")
+//
+//                .and()
+//                .userInfoEndpoint()
+//                .userService(customOAuth2UserService())
+//                .and()
+//                .successHandler(oAuth2AuthenticationSuccessHandler())
+//                .failureHandler(oAuth2AuthenticationFailureHandler());
 
         http
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);

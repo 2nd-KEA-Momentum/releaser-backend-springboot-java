@@ -6,6 +6,7 @@ import static org.mockito.Mockito.*;
 
 import java.util.Optional;
 
+import com.momentum.releaser.redis.refreshtoken.RefreshTokenRedisRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,18 +30,18 @@ import com.momentum.releaser.redis.RedisUtil;
 import com.momentum.releaser.redis.password.PasswordRedisRepository;
 
 class AuthServiceImplTest {
-    
+
     private AuthServiceImpl authService;
     private PasswordEncoder passwordEncoder;
     private UserRepository userRepository;
     private AuthPasswordRepository authPasswordRepository;
     private RefreshTokenRepository refreshTokenRepository;
-    private AuthenticationManager authenticationManager;
     private AuthenticationManagerBuilder authenticationManagerBuilder;
     private JwtTokenProvider jwtTokenProvider;
     private ModelMapper modelMapper;
     private RedisUtil redisUtil;
     private PasswordRedisRepository passwordRedisRepository;
+    private RefreshTokenRedisRepository refreshTokenRedisRepository;
     private AmqpAdmin rabbitAdmin;
     private DirectExchange userDirectExchange;
     private ConnectionFactory connectionFactory;
@@ -48,22 +49,37 @@ class AuthServiceImplTest {
 
     @BeforeEach
     void setUp() {
+        authenticationManagerBuilder = mock(AuthenticationManagerBuilder.class);
+        jwtTokenProvider = mock(JwtTokenProvider.class);
+        modelMapper = mock(ModelMapper.class);
+
         passwordEncoder = mock(PasswordEncoder.class);
         userRepository = mock(UserRepository.class);
         authPasswordRepository = mock(AuthPasswordRepository.class);
         refreshTokenRepository = mock(RefreshTokenRepository.class);
-        authenticationManager = mock(AuthenticationManager.class);
-        authenticationManagerBuilder = mock(AuthenticationManagerBuilder.class);
-        jwtTokenProvider = mock(JwtTokenProvider.class);
-        modelMapper = mock(ModelMapper.class);
+
         redisUtil = mock(RedisUtil.class);
         passwordRedisRepository = mock(PasswordRedisRepository.class);
+        refreshTokenRedisRepository = mock(RefreshTokenRedisRepository.class);
+
         rabbitAdmin = mock(AmqpAdmin.class);
         userDirectExchange = mock(DirectExchange.class);
         connectionFactory = mock(ConnectionFactory.class);
-        authService = new AuthServiceImpl(passwordEncoder, userRepository, authPasswordRepository, refreshTokenRepository,
-                authenticationManagerBuilder, jwtTokenProvider, modelMapper, redisUtil, passwordRedisRepository,
-                rabbitAdmin, userDirectExchange, connectionFactory);
+
+        authService = new AuthServiceImpl(
+                authenticationManagerBuilder,
+                jwtTokenProvider,
+                modelMapper,
+                passwordEncoder,
+                userRepository,
+                authPasswordRepository,
+                refreshTokenRepository,
+                redisUtil,
+                passwordRedisRepository,
+                refreshTokenRedisRepository,
+                rabbitAdmin,
+                userDirectExchange,
+                connectionFactory);
     }
 
     @Test

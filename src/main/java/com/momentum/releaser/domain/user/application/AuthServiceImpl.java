@@ -506,7 +506,7 @@ public class AuthServiceImpl implements AuthService {
 
         createUserQueue(queueName);
         bindUserQueue(queueName, routingKey);
-        registerListener(queueName);
+//        registerListener(queueName);
     }
 
     /**
@@ -541,11 +541,11 @@ public class AuthServiceImpl implements AuthService {
      * @author seonwoo
      * @date 2023-08-07 (월)
      */
-    private void registerListener(String queueName) {
-        SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
-        container.setConnectionFactory(connectionFactory);
-        container.setQueueNames(queueName);
-        container.setMessageListener(new MessageListenerAdapter(this, "receiveMessagePerUser"));
-        container.start();
-    }
+//    private void registerListener(String queueName) {
+//        SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
+//        container.setConnectionFactory(connectionFactory);
+//        container.setQueueNames(queueName);
+//        container.setMessageListener(new MessageListenerAdapter(this, "receiveMessagePerUser"));
+//        container.start();
+//    }
 }

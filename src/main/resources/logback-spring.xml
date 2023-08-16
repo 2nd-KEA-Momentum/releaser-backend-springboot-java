@@ -8,9 +8,9 @@
               value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %clr(%5level) %cyan(%logger) - %msg%n"/>
     <property name="FILE_LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %5level %logger - %msg%n"/>
     <property name="SLACK_LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %5level %logger %n %n %msg %n"/>
-    <springProperty name="SLACK_WEBHOOK_URL_DEV_WARN" source="${logging.slack.webhook-url-dev-warn}"/>
-    <springProperty name="SLACK_WEBHOOK_URL_DEV_ERROR" source="${logging.slack.webhook-url-dev-error}"/>
-    <springProperty name="SLACK_WEBHOOK_URL_PROD_ERROR" source="${logging.slack.webhook-url-prod-error}"/>
+    <springProperty name="SLACK_WEBHOOK_URL_DEV_WARN" source="logging.slack.webhook-url-dev-warn"/>
+    <springProperty name="SLACK_WEBHOOK_URL_DEV_ERROR" source="logging.slack.webhook-url-dev-error"/>
+    <springProperty name="SLACK_WEBHOOK_URL_PROD_ERROR" source="logging.slack.webhook-url-prod-error"/>
 
     <!-- Console 출력 -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
@@ -46,8 +46,7 @@
         </encoder>
 
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-<!--            <fileNamePattern>./logs/info-%d{yyyy-MM-dd}.%i.log</fileNamePattern>-->
-            <fileNamePattern>/home/ubuntu/releaser-app/logs/info-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <fileNamePattern>./logs/info-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
             <maxFileSize>100MB</maxFileSize>
             <maxHistory>30</maxHistory>
         </rollingPolicy>
@@ -81,8 +80,7 @@
         </encoder>
 
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-<!--            <fileNamePattern>./logs/warn-%d{yyyy-MM-dd}.%i.log</fileNamePattern>-->
-            <fileNamePattern>/home/ubuntu/releaser-app/logs/warn-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <fileNamePattern>./logs/warn-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
             <maxFileSize>100MB</maxFileSize>
             <maxHistory>30</maxHistory>
         </rollingPolicy>
@@ -116,8 +114,7 @@
         </encoder>
 
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-<!--            <fileNamePattern>./logs/error-%d{yyyy-MM-dd}.%i.log</fileNamePattern>-->
-            <fileNamePattern>/home/ubuntu/releaser-app/logs/error-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <fileNamePattern>./logs/error-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
             <maxFileSize>100MB</maxFileSize>
             <maxHistory>30</maxHistory>
         </rollingPolicy>
