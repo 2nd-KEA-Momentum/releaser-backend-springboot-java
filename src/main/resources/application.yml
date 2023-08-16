@@ -119,8 +119,9 @@ spring:
           google:
             client-id: ${SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_ID}
             client-secret: ${SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET}
-            scope: email,profile
-            redirect-uri: "https://www.releaser.com/oauth2/callback/google"
+            scope: email, profile
+            redirect-uri: "http://localhost:8080/oauth2/callback/google"
+#            redirect-uri: "https://www.releaser.com/oauth2/callback/google"
           kakao:
             client-id: ${OAUTH2_KAKAO_CLIENT_ID}
             client-secret: ${OAUTH2_KAKAO_CLIENT_SECRET}

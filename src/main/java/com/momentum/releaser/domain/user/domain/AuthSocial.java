@@ -35,21 +35,15 @@ public class AuthSocial extends BaseTime {
     private AuthProvider provider;
 
     @NotNull
-    @Column(name = "token")
-    private String token;
-
-    @NotNull
     @Column(name = "status")
     private char status;
 
 
 
     @Builder
-    public AuthSocial(Long authId, User user, AuthProvider provider, String token, char status) {
-        this.authId = authId;
+    public AuthSocial(User user, AuthProvider provider, char status) {
         this.user = user;
         this.provider = provider;
-        this.token = token;
         this.status = status;
     }
 
@@ -61,9 +55,12 @@ public class AuthSocial extends BaseTime {
         this.status = (this.status == '\0') ? 'Y' : this.status;
     }
 
-    public AuthSocial(User user, AuthProvider authProvider, Object token, char y) {
-        super();
-    }
+//    public AuthSocial(User user, AuthProvider authProvider, Object token, char y) {
+//        super();
+//    }
+//    public AuthSocial(User user, AuthProvider authProvider, char y) {
+//        super();
+//    }
 
     /**
      * 삭제를 위한 status ='N' 변경
