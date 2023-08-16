@@ -76,7 +76,7 @@ public class SecurityConfig {
 //    }
     @Bean
     OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler() {
-        return new OAuth2AuthenticationSuccessHandler(jwtTokenProvider, appProperties, httpCookieOAuth2AuthorizationRequestRepository());
+        return new OAuth2AuthenticationSuccessHandler(jwtTokenProvider, appProperties, cookieAuthorizationRequestRepository());
     }
 
 //    @Bean
@@ -91,12 +91,12 @@ public class SecurityConfig {
 
     @Bean
     OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler() {
-        return new OAuth2AuthenticationFailureHandler(httpCookieOAuth2AuthorizationRequestRepository());
+        return new OAuth2AuthenticationFailureHandler(cookieAuthorizationRequestRepository());
     }
 
     @Bean
-    HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository() {
-        return new HttpCookieOAuth2AuthorizationRequestRepository();
+    CookieAuthorizationRequestRepository cookieAuthorizationRequestRepository() {
+        return new CookieAuthorizationRequestRepository();
     }
 
     @Bean
