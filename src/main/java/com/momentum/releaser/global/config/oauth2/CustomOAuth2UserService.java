@@ -74,23 +74,21 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 oAuth2UserInfo.getEmail(),
                 oAuth2UserInfo.getImageUrl(),
                 'Y');
+        User saveUser = userRepository.save(user);
         AuthSocial authSocial = new AuthSocial(
-                user,
+                saveUser,
                 AuthProvider.valueOf(oAuth2UserRequest.getClientRegistration().getRegistrationId()),
-                null,
                 'Y'
         );
         AuthPassword authPassword = new AuthPassword(
-                user,
+                saveUser,
                 "Momentum2023!",
                 'Y'
-
         );
-        user.updateAuth(authSocial, authPassword);
-        User saveUser = userRepository.save(user);
+        saveUser.updateAuth(authSocial, authPassword);
         authSocialRepository.save(authSocial);
         authPasswordRepository.save(authPassword);
-
+        userRepository.save(saveUser);
         return saveUser;
     }
 }

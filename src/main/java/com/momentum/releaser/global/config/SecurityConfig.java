@@ -123,13 +123,11 @@ public class SecurityConfig {
         http
                 .cors()
                 .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-
                 .and().csrf().disable().formLogin().disable().httpBasic().disable().exceptionHandling().authenticationEntryPoint(new RestAuthenticationEntryPoint())
                 .and().authorizeRequests()
-                .antMatchers("/api/auth/**").permitAll()
-                .antMatchers("/notification/**").permitAll()
-                .antMatchers("/oauth2/**").permitAll()
-                .anyRequest().authenticated();
+                .antMatchers("/oauth2/**", "/login/**", "/api/auth/**", "/notification/**").permitAll()
+                .anyRequest()
+                .authenticated();
 
         http
                 .logout()
@@ -142,6 +140,13 @@ public class SecurityConfig {
 
         http
                 .oauth2Login()
+                .authorizationEndpoint()
+                .baseUri("/oauth2/authorize")
+                .authorizationRequestRepository(httpCookieOAuth2AuthorizationRequestRepository())
+                .and()
+                .redirectionEndpoint()
+                .baseUri("/oauth2/callback/*")
+                .and()
                 .userInfoEndpoint()
                 .userService(customOAuth2UserService())
                 .and()

@@ -119,8 +119,26 @@ spring:
           google:
             client-id: ${SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_ID}
             client-secret: ${SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET}
-            scope: email,profile
-            redirectUri: "{baseUrl}/oauth2/callback/{registrationId}"
+            scope: email, profile
+#            redirect-uri: "http://localhost:8080/oauth2/callback/google"
+            redirect-uri: "https://www.releaser.com/oauth2/callback/google"
+          kakao:
+            client-id: ${OAUTH2_KAKAO_CLIENT_ID}
+            client-secret: ${OAUTH2_KAKAO_CLIENT_SECRET}
+            redirect-uri: "{baseUrl}/oauth2/callback/{registrationId}"
+            authorization-grant-type: authorization_code
+            client-authentication-method: POST
+            client-name: Kakao
+            scope:
+              - profile_nickname
+              - profile_image
+              - account_email
+        provider:
+          kakao:
+            authorization-uri: ${OAUTH2_KAKAO_AUTHORIZATION_URI}
+            token-uri: ${OAUTH2_KAKAO_TOKEN_URI}
+            user-info-uri: ${OAUTH2_KAKAO_USER_INFO_URI}
+            user-name-attribute: id
 
   mail:
     host: smtp.gmail.com
@@ -172,5 +190,6 @@ app:
     # 프론트 엔드 클라이언트가 /oauth2/authorize 요청에서 지정한 redirectUri 입니다.
     # 쿠키는 모바일 클라이언트에서 잘 작동하지 않기 때문에 사용하지 않습니다
     authorizedRedirectUris:
-      - http://localhost:3000/oauth2/redirect
-      - https://www.releaser.shop/oauth2/redirect
+      - http://localhost:3000/api/auth/token
+      - http://localhost:8080/api/auth/token
+      - https://www.releaser.shop/api/auth/token
