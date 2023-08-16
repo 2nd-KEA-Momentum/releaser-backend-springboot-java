@@ -81,8 +81,14 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 null,
                 'Y'
         );
-        user.updateAuth(authSocial);
+        AuthPassword authPassword = new AuthPassword(
+                saveUser,
+                "Momentum2023!",
+                'Y'
+        );
+        user.updateAuth(authSocial, authPassword);
         authSocialRepository.save(authSocial);
+        authPasswordRepository.save(authPassword);
         return saveUser;
     }
 }
