@@ -681,7 +681,7 @@ public class IssueServiceImpl implements IssueService {
 
     private void notifyIssueAll(Project project, Issue issue) {
 
-        if (issue == null || issue.getEndDate() == null) {
+        if (issue == null || issue.getCreatedDate() == null) {
             throw new CustomException(INVALID_ISSUE);
         }
 
