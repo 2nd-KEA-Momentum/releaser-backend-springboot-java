@@ -80,15 +80,15 @@ public class ReleaseDataDto {
     public static class ReleaseApprovalsDataDTO {
         private Long memberId;
         private String memberName;
-        private String memberProfileImg;
+        private String memberImg;
         private char position;
         private char approval;
 
         @Builder
-        public ReleaseApprovalsDataDTO(Long memberId, String memberName, String memberProfileImg, char position, char approval) {
+        public ReleaseApprovalsDataDTO(Long memberId, String memberName, String memberImg, char position, char approval) {
             this.memberId = memberId;
             this.memberName = memberName;
-            this.memberProfileImg = memberProfileImg;
+            this.memberImg = memberImg;
             this.position = position;
             this.approval = approval;
         }
