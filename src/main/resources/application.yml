@@ -6,7 +6,7 @@ spring:
       local: local, common
 
     # 활성 프로필 설정
-    active: dev
+    active: local
 
 ---
 # prod
@@ -120,6 +120,22 @@ spring:
             client-id: ${SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_ID}
             client-secret: ${SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET}
             scope: email,profile
+          kakao:
+            client-id: ${OAUTH2_KAKAO_CLIENT_ID}
+            client-secret: ${OAUTH2_KAKAO_CLIENT_SECRET}
+            redirect-uri: ${OAUTH2_KAKAO_REDIRECT_URI}
+            client-authentication-method: POST
+            authorization-grant-type: authorization_code
+            scope:
+              - profile_nickname
+              - account_email
+            client-name: Kakao
+        provider:
+          kakao:
+            authorization-uri: ${OAUTH2_KAKAO_AUTHORIZATION_URI}
+            token-uri: ${OAUTH2_KAKAO_TOKEN_URI}
+            user-info-uri: ${OAUTH2_KAKAO_USER_INFO_URI}
+            user-name-attribute: id
 
   mail:
     host: smtp.gmail.com
