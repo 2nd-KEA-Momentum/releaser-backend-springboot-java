@@ -171,7 +171,7 @@ public class AuthController {
     }
 
     @GetMapping(value = "token")
-    public String token(@RequestParam(name = "accessToken") String token, @RequestParam(required = false) String error) {
+    public String token(@RequestParam(name = "accessToken") String token, @RequestParam(required = false, name = "authError") String error) {
         if (StringUtils.isNotBlank(error)) {
             return error;
         } else {

@@ -62,7 +62,6 @@ public class SecurityConfig {
     private final CustomUserDetailsService customUserDetailsService;
     private final CustomLogoutSuccessHandler customLogoutSuccessHandler;
     private final AppProperties appProperties;
-    private final CookieAuthorizationRequestRepository cookieAuthorizationRequestRepository;
 
 
     /**
