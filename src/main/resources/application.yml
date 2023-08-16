@@ -122,7 +122,6 @@ spring:
             scope: email, profile
 #            redirect-uri: "http://localhost:8080/login/oauth2/code/google"
             redirect-uri: "https://www.releaser.com/login/oauth2/code/google"
-#            redirect-uri: "https://www.releaser.com/oauth2/callback/google"
           kakao:
             client-id: ${OAUTH2_KAKAO_CLIENT_ID}
             client-secret: ${OAUTH2_KAKAO_CLIENT_SECRET}
