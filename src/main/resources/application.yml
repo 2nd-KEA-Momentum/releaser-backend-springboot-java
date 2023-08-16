@@ -6,7 +6,7 @@ spring:
       local: local, common
 
     # 활성 프로필 설정
-    active: dev
+    active: local
 
 ---
 # prod
@@ -120,7 +120,7 @@ spring:
             client-id: ${SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_ID}
             client-secret: ${SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET}
             scope: email,profile
-            redirectUri: "{baseUrl}/oauth2/callback/{registrationId}"
+            redirectUri: "https://www.releaser.shop/oauth2/callback/{registrationId}"
 
   mail:
     host: smtp.gmail.com
@@ -171,7 +171,7 @@ app:
     # OAuth2 공급자로 성공적으로 인증 한 후 사용자에 대한 인증 토큰을 생성하고 토큰을
     # 프론트 엔드 클라이언트가 /oauth2/authorize 요청에서 지정한 redirectUri 입니다.
     # 쿠키는 모바일 클라이언트에서 잘 작동하지 않기 때문에 사용하지 않습니다
-    authorized-redirect-uris:
+    authorizedRedirectUris:
       - http://localhost:3000/oauth2/redirect
       - http://localhost:8080/oauth2/redirect
       - https://www.releaser.shop/oauth2/redirect
