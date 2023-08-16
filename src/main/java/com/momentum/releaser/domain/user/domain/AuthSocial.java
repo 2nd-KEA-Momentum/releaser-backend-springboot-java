@@ -42,8 +42,6 @@ public class AuthSocial extends BaseTime {
     @Column(name = "status")
     private char status;
 
-
-
     @Builder
     public AuthSocial(Long authId, User user, AuthProvider provider, String token, char status) {
         this.authId = authId;
