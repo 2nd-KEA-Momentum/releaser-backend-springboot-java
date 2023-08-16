@@ -28,7 +28,6 @@ spring:
 logging:
   slack:
     webhook-url-prod-error: ${SLACK_WEBHOOK_URL_PROD_ERROR}
-  config: classpath:logback-spring.xml
 
 ---
 # dev
@@ -51,7 +50,6 @@ logging:
   slack:
     webhook-url-dev-warn: ${SLACK_WEBHOOK_URL_DEV_WARN}
     webhook-url-dev-error: ${SLACK_WEBHOOK_URL_DEV_ERROR}
-  config: classpath:logback-spring.xml
 
 ---
 # local
@@ -120,7 +118,6 @@ spring:
             client-id: ${SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_ID}
             client-secret: ${SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET}
             scope: email,profile
-            redirectUri: "{baseUrl}/oauth2/callback/{registrationId}"
 
   mail:
     host: smtp.gmail.com

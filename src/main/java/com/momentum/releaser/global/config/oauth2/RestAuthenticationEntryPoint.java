@@ -1,6 +1,5 @@
 package com.momentum.releaser.global.config.oauth2;
 
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
