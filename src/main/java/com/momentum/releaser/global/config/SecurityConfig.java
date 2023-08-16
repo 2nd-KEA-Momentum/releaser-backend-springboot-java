@@ -144,7 +144,7 @@ public class SecurityConfig {
                 .authorizationRequestRepository(httpCookieOAuth2AuthorizationRequestRepository())
                 .and()
                 .redirectionEndpoint()
-                .baseUri("/*/login/oauth2/code/*")
+                .baseUri("/login/oauth2/code/*")
                 .and()
                 .userInfoEndpoint()
                 .userService(customOAuth2UserService())
