@@ -62,6 +62,7 @@ public class SecurityConfig {
     private final CustomUserDetailsService customUserDetailsService;
     private final CustomLogoutSuccessHandler customLogoutSuccessHandler;
     private final AppProperties appProperties;
+    private final HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
 
     /**
      * 정적 리소스(/resources)가 Spring Security 필터에 걸리지 않도록 설정한다.
@@ -159,6 +160,13 @@ public class SecurityConfig {
 
                 .and()
                 .oauth2Login()
+                .authorizationEndpoint()
+                .baseUri("/oauth2/authorization")
+                .authorizationRequestRepository(httpCookieOAuth2AuthorizationRequestRepository())
+                .and()
+                .redirectionEndpoint()
+                .baseUri("/oauth2/callback/*")
+                .and()
                 .userInfoEndpoint()
                 .userService(customOAuth2UserService())
                 .and()
