@@ -121,8 +121,8 @@ spring:
             client-secret: ${SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET}
             scope: email, profile
 #            redirect-uri: "http://localhost:8080/login/oauth2/code/google"
-            redirect-uri: "http://www.releaser.com:8080/login/oauth2/code/google"
-#            redirect-uri: "https://www.releaser.com/login/oauth2/code/google"
+#            redirect-uri: "http://www.releaser.com:8080/login/oauth2/code/google"
+            redirect-uri: "https://www.releaser.com/login/oauth2/code/google"
           kakao:
             client-id: ${OAUTH2_KAKAO_CLIENT_ID}
             client-secret: ${OAUTH2_KAKAO_CLIENT_SECRET}
