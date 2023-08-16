@@ -159,6 +159,13 @@ public class SecurityConfig {
 
                 .and()
                 .oauth2Login()
+                .authorizationEndpoint()
+                .baseUri("/oauth2/authorize")
+                .authorizationRequestRepository(httpCookieOAuth2AuthorizationRequestRepository())
+                .and()
+                .redirectionEndpoint()
+                .baseUri("/oauth2/callback/*")
+                .and()
                 .userInfoEndpoint()
                 .userService(customOAuth2UserService())
                 .and()
