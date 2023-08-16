@@ -120,11 +120,11 @@ spring:
             client-id: ${SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_ID}
             client-secret: ${SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET}
             scope: email,profile
-            redirect-uri: "https://www.releaser.shop/oauth2/callback/google"
+            redirect-uri: "http://localhost:8080/oauth2/callback/google"
           kakao:
             client-id: ${OAUTH2_KAKAO_CLIENT_ID}
             client-secret: ${OAUTH2_KAKAO_CLIENT_SECRET}
-            redirect-uri: ${OAUTH_KAKAO_REDIRECT_URI}
+            redirect-uri: "{baseUrl}/oauth2/callback/{registrationId}"
             authorization-grant-type: authorization_code
             client-authentication-method: POST
             client-name: Kakao
@@ -138,6 +138,7 @@ spring:
             token-uri: ${OAUTH2_KAKAO_TOKEN_URI}
             user-info-uri: ${OAUTH2_KAKAO_USER_INFO_URI}
             user-name-attribute: id
+
 
   mail:
     host: smtp.gmail.com
