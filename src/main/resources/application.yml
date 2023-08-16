@@ -140,7 +140,6 @@ spring:
             user-info-uri: ${OAUTH2_KAKAO_USER_INFO_URI}
             user-name-attribute: id
 
-
   mail:
     host: smtp.gmail.com
     port: 587
