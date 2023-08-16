@@ -122,48 +122,47 @@ public class SecurityConfig {
 
         http
                 .cors()
-                .and()
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                .csrf()
-                .disable()
-                .formLogin()
-                .disable()
-                .httpBasic()
-                .disable()
-                .exceptionHandling()
-                .authenticationEntryPoint(new RestAuthenticationEntryPoint())
-                .and()
-                .authorizeRequests()
+                .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+
+                .and().csrf().disable().formLogin().disable().httpBasic().disable().exceptionHandling().authenticationEntryPoint(new RestAuthenticationEntryPoint())
+                .and().authorizeRequests()
                 .antMatchers("/api/auth/**").permitAll()
                 .antMatchers("/notification/**").permitAll()
                 .antMatchers("/oauth2/**").permitAll()
-                .anyRequest().authenticated()
+                .anyRequest().authenticated();
 
-                .and()
+        http
                 .logout()
                 .logoutUrl("/api/auth/logout") // 로그아웃 URL을 지정합니다.
                 .logoutSuccessHandler(customLogoutSuccessHandler) // 로그아웃 성공 후의 처리를 위해 CustomLogoutSuccessHandler를 등록합니다.
                 .deleteCookies("JSESSIONID") // 로그아웃 시 삭제할 쿠키를 지정합니다.
                 .clearAuthentication(true) // 인증 정보를 삭제합니다.
                 .invalidateHttpSession(true) // 세션을 무효화합니다.
-                .permitAll() // 로그아웃은 모두에게 허용합니다.
+                .permitAll(); // 로그아웃은 모두에게 허용합니다.
 
-                .and()
+        http
                 .oauth2Login()
-                .authorizationEndpoint()
-                .baseUri("/oauth2/authorize")
-                .authorizationRequestRepository(cookieAuthorizationRequestRepository)
-                .and()
-                .redirectionEndpoint()
-                .baseUri("/oauth2/callback/*")
-                .and()
                 .userInfoEndpoint()
                 .userService(customOAuth2UserService())
                 .and()
                 .successHandler(oAuth2AuthenticationSuccessHandler())
                 .failureHandler(oAuth2AuthenticationFailureHandler());
+
+//        http
+//                .oauth2Login()
+//                .authorizationEndpoint()
+//                .baseUri("/oauth2/authorize")
+//                .authorizationRequestRepository(cookieAuthorizationRequestRepository)
+//                .and()
+//                .redirectionEndpoint()
+//                .baseUri("/oauth2/callback/*")
+//
+//                .and()
+//                .userInfoEndpoint()
+//                .userService(customOAuth2UserService())
+//                .and()
+//                .successHandler(oAuth2AuthenticationSuccessHandler())
+//                .failureHandler(oAuth2AuthenticationFailureHandler());
 
         http
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
