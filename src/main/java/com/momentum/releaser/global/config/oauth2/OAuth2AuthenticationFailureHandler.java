@@ -31,6 +31,7 @@ public class OAuth2AuthenticationFailureHandler extends SimpleUrlAuthenticationF
                 .orElse(("/"));
 
         targetUrl = UriComponentsBuilder.fromUriString(targetUrl)
+                .queryParam("token", "")
                 .queryParam("error", exception.getLocalizedMessage())
                 .build().toUriString();
 
