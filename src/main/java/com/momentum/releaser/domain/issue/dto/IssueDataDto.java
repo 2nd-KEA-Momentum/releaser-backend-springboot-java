@@ -25,10 +25,10 @@ public class IssueDataDto {
         private Date endDate;
         private Long memberId;
         private String memberName;
-        private String memberProfileImg;
+        private String memberImg;
 
         @Builder
-        public ConnectedIssuesDataDTO(Long issueId, Long issueNum, String title, String lifeCycle, String tag, Date endDate, char edit, Long memberId, String memberName, String memberProfileImg) {
+        public ConnectedIssuesDataDTO(Long issueId, Long issueNum, String title, String lifeCycle, String tag, Date endDate, char edit, Long memberId, String memberName, String memberImg) {
             this.issueId = issueId;
             this.issueNum = issueNum;
             this.title = title;
@@ -38,7 +38,7 @@ public class IssueDataDto {
             this.endDate = endDate;
             this.memberId = memberId;
             this.memberName = memberName;
-            this.memberProfileImg = memberProfileImg;
+            this.memberImg = memberImg;
         }
     }
 
