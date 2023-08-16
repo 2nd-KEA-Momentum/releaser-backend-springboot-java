@@ -67,13 +67,13 @@ public class SecurityConfig {
 
     /**
      * 정적 리소스(/resources)가 Spring Security 필터에 걸리지 않도록 설정한다.
+     *
      * @return WebSecurityCustomizer
      */
 //    @Bean
 //    public WebSecurityCustomizer configure() {
 //        return (web) -> web.ignoring().antMatchers("/images/**");
 //    }
-
     @Bean
     OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler() {
         return new OAuth2AuthenticationSuccessHandler(jwtTokenProvider, appProperties, httpCookieOAuth2AuthorizationRequestRepository());
@@ -122,41 +122,28 @@ public class SecurityConfig {
 
         http
                 .cors()
-//                .and()
-//                .authorizeRequests()
-//                .antMatchers("/oauth2/**").permitAll()
-//                .anyRequest().authenticated()
-                .and()
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                .csrf()
-                .disable()
-                .formLogin()
-                .disable()
-                .httpBasic()
-                .disable()
-                .exceptionHandling()
-                .authenticationEntryPoint(new RestAuthenticationEntryPoint())
-                .and()
-                .authorizeRequests()
-                .antMatchers("/api/auth/**", "/oauth2/**").permitAll()
-                .antMatchers("/notification/**").permitAll()
-                .anyRequest().authenticated()
+                .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 
-                .and()
+                .and().csrf().disable().formLogin().disable().httpBasic().disable().exceptionHandling().authenticationEntryPoint(new RestAuthenticationEntryPoint())
+                .and().authorizeRequests()
+                .antMatchers("/api/auth/**").permitAll()
+                .antMatchers("/notification/**").permitAll()
+                .antMatchers("/oauth2/**").permitAll()
+                .anyRequest().authenticated();
+
+        http
                 .logout()
                 .logoutUrl("/api/auth/logout") // 로그아웃 URL을 지정합니다.
                 .logoutSuccessHandler(customLogoutSuccessHandler) // 로그아웃 성공 후의 처리를 위해 CustomLogoutSuccessHandler를 등록합니다.
                 .deleteCookies("JSESSIONID") // 로그아웃 시 삭제할 쿠키를 지정합니다.
                 .clearAuthentication(true) // 인증 정보를 삭제합니다.
                 .invalidateHttpSession(true) // 세션을 무효화합니다.
-                .permitAll() // 로그아웃은 모두에게 허용합니다.
+                .permitAll(); // 로그아웃은 모두에게 허용합니다.
 
-                .and()
+        http
                 .oauth2Login()
                 .authorizationEndpoint()
-                .baseUri("/oauth2/authorize")
+                .baseUri("/oauth2/authorization/*")
                 .authorizationRequestRepository(cookieAuthorizationRequestRepository)
                 .and()
                 .redirectionEndpoint()
@@ -167,6 +154,22 @@ public class SecurityConfig {
                 .and()
                 .successHandler(oAuth2AuthenticationSuccessHandler())
                 .failureHandler(oAuth2AuthenticationFailureHandler());
+
+//        http
+//                .oauth2Login()
+//                .authorizationEndpoint()
+//                .baseUri("/oauth2/authorize")
+//                .authorizationRequestRepository(cookieAuthorizationRequestRepository)
+//                .and()
+//                .redirectionEndpoint()
+//                .baseUri("/oauth2/callback/*")
+//
+//                .and()
+//                .userInfoEndpoint()
+//                .userService(customOAuth2UserService())
+//                .and()
+//                .successHandler(oAuth2AuthenticationSuccessHandler())
+//                .failureHandler(oAuth2AuthenticationFailureHandler());
 
         http
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
