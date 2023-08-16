@@ -97,8 +97,7 @@ public class User extends BaseTime {
     public void updateAuthPassword(AuthPassword authPassword) {
         this.authPassword = authPassword;
     }
-    public void updateAuth(AuthSocial authSocial, AuthPassword authPassword) {
+    public void updateAuth(AuthSocial authSocial) {
         this.authSocial = authSocial;
-        this.authPassword = authPassword;
     }
 }
