@@ -12,6 +12,9 @@ import com.momentum.releaser.domain.issue.dto.IssueDataDto.IssueDetailsDataDTO;
 import com.momentum.releaser.domain.notification.event.IssueMessageEvent;
 import com.momentum.releaser.domain.notification.event.NotificationEventPublisher;
 import com.momentum.releaser.rabbitmq.MessageDto.IssueMessageDto;
+import com.momentum.releaser.redis.issue.IssueStatus;
+import com.momentum.releaser.redis.issue.OrderIssue;
+import com.momentum.releaser.redis.issue.OrderIssueRedisRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,6 +40,8 @@ import com.momentum.releaser.domain.user.domain.User;
 import com.momentum.releaser.global.config.BaseResponseStatus;
 import com.momentum.releaser.global.exception.CustomException;
 
+import javax.swing.text.html.Option;
+
 /**
  * 이슈 관련된 기능을 제공하는 서비스 구현 클래스입니다.
  */
@@ -52,6 +57,8 @@ public class IssueServiceImpl implements IssueService {
     private final ProjectMemberRepository projectMemberRepository;
     private final UserRepository userRepository;
     private final ReleaseRepository releaseRepository;
+
+    private final OrderIssueRedisRepository orderIssueRedisRepository;
 
     private final NotificationEventPublisher notificationEventPublisher;
 
@@ -162,13 +169,14 @@ public class IssueServiceImpl implements IssueService {
         // 프로젝트 정보 조회
         Project findProject = getProjectById(projectId);
 
+
         // 해당 프로젝트에 속하는 모든 이슈 정보
         List<IssueInfoResponseDTO> getAllIssue = issueRepository.getIssues(findProject);
 
         // 각 상태별로 이슈를 분류
-        List<IssueInfoResponseDTO> notStartedList = filterAndSetDeployStatus(getAllIssue, "NOT_STARTED");
-        List<IssueInfoResponseDTO> inProgressList = filterAndSetDeployStatus(getAllIssue, "IN_PROGRESS");
-        List<IssueInfoResponseDTO> doneList = filterAndSetDeployStatus(getAllIssue, "DONE");
+        List<IssueInfoResponseDTO> notStartedList = filterAndSetDeployStatus(projectId, getAllIssue, "NOT_STARTED");
+        List<IssueInfoResponseDTO> inProgressList = filterAndSetDeployStatus(projectId, getAllIssue, "IN_PROGRESS");
+        List<IssueInfoResponseDTO> doneList = filterAndSetDeployStatus(projectId, getAllIssue, "DONE");
 
         // 분류된 리스트들을 담아 반환
         return AllIssueListResponseDTO.builder()
@@ -264,23 +272,25 @@ public class IssueServiceImpl implements IssueService {
     /**
      * 7.8 이슈 상태 변경
      *
+     * @param issueId   상태 변경할 이슈 식별 번호
+     * @param index     순서
      * @param lifeCycle 변경할 이슈의 상태 ("NOT_STARTED", "IN_PROGRESS", "DONE" 중 하나로 대소문자 구분 없이 입력)
      * @author chaeanna
      * @date 2023-07-08
      */
     @Override
     @Transactional
-    public String modifyIssueLifeCycle(Long issueId, String lifeCycle) {
+    public String modifyIssueLifeCycle(Long issueId, Integer index, String lifeCycle) {
         // 이슈 정보 조회
         Issue issue = getIssueById(issueId);
 
-        // 연결된 이슈가 있을 경우 상태 변경이 불가능, 예외 발생
-        if (issue.getRelease() != null) {
+        // 연결된 이슈가 있고 상태의 src != dest일 경우 상태 변경이 불가능, 예외 발생
+        if (issue.getRelease() != null && !Objects.equals(issue.getLifeCycle().toString(), lifeCycle.toUpperCase())) {
             throw new CustomException(CONNECTED_ISSUE_EXISTS);
         }
 
         // 이슈의 상태 변경
-        String result = changeLifeCycle(issue, lifeCycle.toUpperCase());
+        String result = changeLifeCycle(issue, index, lifeCycle.toUpperCase());
 
         return result;
     }
@@ -416,6 +426,37 @@ public class IssueServiceImpl implements IssueService {
         // 이슈 업데이트
         issue.updateIssueNum(issueNum);
 
+        // 기존에 저장된 이슈 순서
+        Optional<OrderIssue> optionalOrderIssue = orderIssueRedisRepository.findByProjectId(issue.getProject().getProjectId());
+
+        // 새로 생성하려는 이슈 인덱스
+        IssueStatus issueStatus = IssueStatus.builder()
+                .issueId(issue.getIssueId())
+                .lifeCycle(issue.getLifeCycle().toString())
+                .index(0)
+                .build();
+
+        // 기존에 있는 이슈 인덱스들의 값 업데이트
+        optionalOrderIssue.ifPresent(orderIssue -> {
+            orderIssue.getIssueStatusList().forEach(issueStatusItem -> {
+                if (issueStatusItem.getLifeCycle().equals(issue.getLifeCycle().toString())) {
+                    issueStatusItem.updateIndex(issueStatusItem.getIndex() + 1);
+                }
+            });
+            orderIssue.updateOrderIndex(issueStatus);
+            orderIssueRedisRepository.save(orderIssue);
+        });
+
+        if (optionalOrderIssue.isEmpty()) {
+            OrderIssue orderIssueResult = OrderIssue.builder()
+                    .id(UUID.randomUUID().toString())
+                    .projectId(project.getProjectId())
+                    .issueStatusList(Collections.singletonList(issueStatus))
+                    .build();
+
+            orderIssueRedisRepository.save(orderIssueResult);
+        }
+
         return issue;
     }
 
@@ -489,7 +530,18 @@ public class IssueServiceImpl implements IssueService {
      * @author chaeanna
      * @date 2023-07-08
      */
-    private List<IssueInfoResponseDTO> filterAndSetDeployStatus(List<IssueInfoResponseDTO> issues, String lifeCycle) {
+    private List<IssueInfoResponseDTO> filterAndSetDeployStatus(Long projectId, List<IssueInfoResponseDTO> issues, String lifeCycle) {
+        Optional<OrderIssue> optionalOrderIssue = orderIssueRedisRepository.findByProjectId(projectId);
+
+        if (optionalOrderIssue.isEmpty()) {
+            // 만약 optionalOrderIssue가 비어있다면 정렬을 무시하고 입력 리스트를 그대로 반환
+            return issues;
+        }
+
+        // issue 순서
+        OrderIssue orderIssue = optionalOrderIssue.get();
+        List<IssueStatus> issueStatusList = orderIssue.getIssueStatusList();
+
         return issues.stream()
                 .filter(issue -> lifeCycle.equalsIgnoreCase(issue.getLifeCycle()))
                 .peek(issueInfoRes -> {
@@ -510,6 +562,14 @@ public class IssueServiceImpl implements IssueService {
                         issueInfoRes.setDeployYN('N');
                     }
                 })
+                .sorted(Comparator.comparingInt(issueInfoRes -> {
+                    // 이슈 상태 리스트에서 해당 이슈의 index를 찾아서 반환
+                    IssueStatus status = issueStatusList.stream()
+                            .filter(result -> result.getIssueId().equals(issueInfoRes.getIssueId()))
+                            .findFirst()
+                            .orElse(null);
+                    return status != null ? status.getIndex() : Integer.MAX_VALUE;
+                }))
                 .collect(Collectors.toList());
     }
 
@@ -616,19 +676,104 @@ public class IssueServiceImpl implements IssueService {
     /**
      * 이슈 상태 변경
      *
-     * @param issue     이슈 정보
-     * @param lifeCycle 변경할 상태 ("NOT_STARTED", "IN_PROGRESS", "DONE" 중 하나로 대소문자 구분 없이 입력)
+     * @param issue 이슈 정보
+     * @param destLifeCycle 변경할 상태 ("NOT_STARTED", "IN_PROGRESS", "DONE" 중 하나로 대소문자 구분 없이 입력)
      * @return String "이슈 상태 변경이 완료되었습니다."
      * @author chaeanna
      * @date 2023-07-08
      */
-    private String changeLifeCycle(Issue issue, String lifeCycle) {
+    private String changeLifeCycle(Issue issue, Integer index, String destLifeCycle) {
+        // 기존 lifeCycle
+        String srcLifeCycle = String.valueOf(issue.getLifeCycle());
+
+        // 이슈 순서 업데이트
+        Optional<OrderIssue> optionalOrderIssue = orderIssueRedisRepository.findByProjectId(issue.getProject().getProjectId());
+
+        if (optionalOrderIssue.isPresent()) {
+            OrderIssue orderIssue = optionalOrderIssue.get();
+            Long updateIssueId = issue.getIssueId();
+            // updateIssueId가 issueStatusList에 있는지 확인하는 코드
+            IssueStatus issueStatusResult = orderIssue.getIssueStatusList().stream().filter(issueStatus -> issueStatus.getIssueId().equals(updateIssueId)).findFirst().get();
+
+            if (issueStatusResult != null && srcLifeCycle.equals(destLifeCycle)) {
+                List<IssueStatus> issueList = orderIssue.getIssueStatusList().stream()
+                        .filter(issueStatus -> issueStatus.getLifeCycle().equals(destLifeCycle))
+                        .sorted(Comparator.comparingInt(IssueStatus::getIndex))
+                        .collect(Collectors.toList());
+
+                if (index >= 0 && index < issueList.size()) {
+                    IssueStatus targetIssue = issueList.get(index);
+                    int newIndex = issueList.indexOf(targetIssue);
+
+                    // 두 이슈의 위치를 서로 바꿉니다
+                    IssueStatus originalIssue = issueList.get(newIndex);
+                    issueList.set(newIndex, targetIssue);
+                    issueList.set(index, originalIssue);
+
+                    // 인덱스를 업데이트합니다
+                    for (int i = 0; i < issueList.size(); i++) {
+                        issueList.get(i).updateIndex(i);
+                    }
+                }
+
+                List<IssueStatus> issueStatusList = orderIssue.getIssueStatusList().stream()
+                        .filter(issueStatus -> !(issueStatus.getLifeCycle().equals(destLifeCycle)))
+                                .collect(Collectors.toList());
+
+                List<IssueStatus> updatedIssueStatusList = new ArrayList<>(issueList);
+                updatedIssueStatusList.addAll(issueStatusList);
+                orderIssue.updateIssueStatusList(updatedIssueStatusList);
+
+                orderIssueRedisRepository.save(orderIssue);
+            } else {
+
+                boolean exists = orderIssue.getIssueStatusList().stream()
+                        .anyMatch(status -> status.getIssueId().equals(updateIssueId));
+                // 해당 이슈가 존재하면 업데이트
+                if (exists) {
+
+                    // index가 0이면
+                    if (index == 0) {
+                        // destLifeCycle과 같은 lifeCycle이며 모든 인덱스 +1
+                        orderIssue.getIssueStatusList().forEach(issueStatusItem -> {
+                            if (issueStatusItem.getLifeCycle().equals(destLifeCycle)) {
+                                issueStatusItem.updateIndex(issueStatusItem.getIndex() + 1);
+                            }
+                        });
+                    } else {
+                        // destLifeCycle과 같은 lifeCycle이며 index 이상 +1
+                        orderIssue.getIssueStatusList().forEach(issueStatusItem -> {
+                            if (issueStatusItem.getLifeCycle().equals(destLifeCycle) && issueStatusItem.getIndex() >= index) {
+                                issueStatusItem.updateIndex(issueStatusItem.getIndex() + 1);
+                            }
+                        });
+                    }
+
+                    // srcLifeCycle과 같은 lifeCycle이며 기존 인덱스보다 큰 인덱스 -1
+                    orderIssue.getIssueStatusList().replaceAll(issueStatus -> {
+                        if (issueStatus.getLifeCycle().equals(srcLifeCycle) && issueStatus.getIndex() > index) {
+                            // 기존 인덱스보다 크면 -1 처리
+                            issueStatus.updateIndex(issueStatus.getIndex() - 1);
+                        }
+                        return issueStatus;
+                    });
+
+                    // 순서 변경 저장
+                    IssueStatus issueStatus = new IssueStatus(updateIssueId, destLifeCycle, index);
+                    orderIssue.updateIssueStatus(issueStatusResult, issueStatus);
+
+                    orderIssueRedisRepository.save(orderIssue);
+                }
+            }
+        }
+
         // 이슈의 상태를 주어진 상태로 변경
-        issue.updateLifeCycle(lifeCycle);
+        issue.updateLifeCycle(destLifeCycle);
         issueRepository.save(issue);
 
         return "이슈 상태 변경이 완료되었습니다.";
     }
+
 
     /**
      * 특정 이슈에 대한 의견을 저장하는 메서드입니다.

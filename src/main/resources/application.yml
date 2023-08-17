@@ -6,7 +6,7 @@ spring:
       local: local, common
 
     # 활성 프로필 설정
-    active: dev
+    active: local
 
 ---
 # prod
@@ -125,7 +125,6 @@ spring:
             client-id: ${OAUTH2_KAKAO_CLIENT_ID}
             client-secret: ${OAUTH2_KAKAO_CLIENT_SECRET}
             redirect-uri: "https://releaser.com/login/oauth2/code/kakao"
-#            redirect-uri: "http://localhost:8080/login/oauth2/code/kakao"
             authorization-grant-type: authorization_code
             client-authentication-method: POST
             client-name: kakao

@@ -49,7 +49,7 @@ public interface IssueService {
     /**
      * 7.8 이슈 상태 변경
      */
-    String modifyIssueLifeCycle(Long issueId, String lifeCycle);
+    String modifyIssueLifeCycle(Long issueId, Integer index, String lifeCycle);
 
     /**
      * 8.1 이슈 의견 추가
