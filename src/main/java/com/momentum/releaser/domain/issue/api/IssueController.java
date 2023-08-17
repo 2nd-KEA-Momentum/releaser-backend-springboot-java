@@ -147,10 +147,11 @@ public class IssueController {
      */
     @PatchMapping("/{issueId}")
     public BaseResponse<String> issueLifeCycleModify(@PathVariable @Min(value = 1, message = "이슈 식별 번호는 1 이상의 숫자여야 합니다.") Long issueId,
+                                                     @RequestParam(name = "index") Integer index,
                                                      @RequestParam(name = "status")
                                                      @Pattern(regexp = "(?i)^(NOT_STARTED|IN_PROGRESS|DONE)$", message = "상태는 NOT_STARTED, IN_PROGRESS, DONE 중 하나여야 합니다.")
                                                      String lifeCycle) {
-        return new BaseResponse<>(issueService.modifyIssueLifeCycle(issueId, lifeCycle));
+        return new BaseResponse<>(issueService.modifyIssueLifeCycle(issueId, index, lifeCycle));
     }
 
     /**

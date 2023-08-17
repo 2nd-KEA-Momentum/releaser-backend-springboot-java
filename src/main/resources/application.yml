@@ -6,7 +6,7 @@ spring:
       local: local, common
 
     # 활성 프로필 설정
-    active: prod
+    active: dev
 
 ---
 # prod
