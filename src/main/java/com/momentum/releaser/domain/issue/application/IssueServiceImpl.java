@@ -535,7 +535,27 @@ public class IssueServiceImpl implements IssueService {
 
         if (optionalOrderIssue.isEmpty()) {
             // 만약 optionalOrderIssue가 비어있다면 정렬을 무시하고 입력 리스트를 그대로 반환
-            return issues;
+            return issues.stream()
+                    .filter(issue -> lifeCycle.equalsIgnoreCase(issue.getLifeCycle()))
+                    .peek(issueInfoRes -> {
+                        // 이슈 정보 조회
+                        Issue issue = getIssueById(issueInfoRes.getIssueId());
+
+                        // 이슈에 연결된 멤버의 식별 번호 조회
+                        Long memberId = issueInfoRes.getMemberId();
+
+                        // 멤버 식별 번호가 null이 아니면서 프로젝트 멤버가 존재하지 않을 경우, 멤버 식별 번호를 0으로 설정
+                        if (memberId != null && projectMemberRepository.findById(memberId).isEmpty()) {
+                            issueInfoRes.setMemberId(0L);
+                        }
+                        // 연결된 릴리즈 존재, 릴리즈의 배포 상태가 "DEPLOYED"인 경우, deployYN 'Y' 설정, 그렇지 않은 경우 'N' 설정
+                        if (issue.getRelease() != null && "DEPLOYED".equalsIgnoreCase(String.valueOf(issue.getRelease().getDeployStatus()))) {
+                            issueInfoRes.setDeployYN('Y');
+                        } else {
+                            issueInfoRes.setDeployYN('N');
+                        }
+                    })
+                    .collect(Collectors.toList());
         }
 
         // issue 순서
