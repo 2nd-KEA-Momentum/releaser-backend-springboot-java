@@ -21,6 +21,7 @@ public class Notification {
     private String notificationId;
 
     private String type;
+    private Long projectId;
 
     private String projectTitle;
 
@@ -36,9 +37,10 @@ public class Notification {
     private long expiredTime;
 
     @Builder
-    public Notification(String notificationId, String type, String projectTitle, String projectImg, String message, String date, HashMap<String, Integer> markByUsers, long expiredTime) {
+    public Notification(String notificationId, String type, Long projectId, String projectTitle, String projectImg, String message, String date, HashMap<String, Integer> markByUsers, long expiredTime) {
         this.notificationId = notificationId;
         this.type = type;
+        this.projectId = projectId;
         this.projectTitle = projectTitle;
         this.projectImg = projectImg;
         this.message = message;

@@ -18,6 +18,7 @@ public class NotificationResponseDto {
     public static class NotificationListResponseDto {
         private String notificationId;
         private String type;
+        private Long projectId;
         private String projectTitle;
         private String projectImg;
         private String message;
@@ -25,9 +26,10 @@ public class NotificationResponseDto {
         private int isRead;
 
         @Builder
-        public NotificationListResponseDto(String notificationId, String type, String projectTitle, String projectImg, String message, String date, int isRead) {
+        public NotificationListResponseDto(String notificationId, String type, Long projectId, String projectTitle, String projectImg, String message, String date, int isRead) {
             this.notificationId = notificationId;
             this.type = type;
+            this.projectId = projectId;
             this.projectTitle = projectTitle;
             this.projectImg = projectImg;
             this.message = message;
