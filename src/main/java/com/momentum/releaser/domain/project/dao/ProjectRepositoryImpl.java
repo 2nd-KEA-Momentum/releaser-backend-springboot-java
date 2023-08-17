@@ -36,7 +36,7 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom {
         QProjectMember member = QProjectMember.projectMember;
         QUser user = QUser.user;
 
-        List<GetMembersDataDTO> getMembersRes = queryFactory
+        return queryFactory
                 .select(new QProjectDataDto_GetMembersDataDTO(
                         member.memberId,
                         user.userId,
@@ -48,7 +48,6 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom {
                 .leftJoin(member.user, user)
                 .where(member.project.eq(project))
                 .fetch();
-        return getMembersRes;
     }
 
     @Override

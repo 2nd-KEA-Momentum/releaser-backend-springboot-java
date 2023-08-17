@@ -71,7 +71,8 @@ jobs:
           sed -i 's|\${REDIS_PROD_HOST}|${{secrets.REDIS_PROD_HOST}}|g' ./src/main/resources/application.yml
           sed -i 's|\${REDIS_PROD_PORT}|${{secrets.REDIS_PROD_PORT}}|g' ./src/main/resources/application.yml
           sed -i 's|\${STOMP_RELAY_PORT}|${{secrets.STOMP_RELAY_PORT}}|g' ./src/main/resources/application.yml
-          
+          sed -i 's|\${OAUTH2_KAKAO_CLIENT_ID}|${{secrets.OAUTH2_KAKAO_CLIENT_ID}}|g' ./src/main/resources/application.yml
+          sed -i 's|\${OAUTH2_KAKAO_CLIENT_SECRET}|${{secrets.OAUTH2_KAKAO_CLIENT_SECRET}}|g' ./src/main/resources/application.yml
           
           
 
